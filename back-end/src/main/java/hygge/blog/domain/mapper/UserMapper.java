@@ -22,6 +22,7 @@ public interface UserMapper {
     User userDTOToUser(UserDTO userDTO);
 
     @Mappings(value = {
+            @Mapping(source = "userName", target = "userName", ignore = true),
             @Mapping(source = "password", target = "password", ignore = true),
             @Mapping(expression = "java(ObjectMappingUtils.timestampToLong(user.getBirthday()))", target = "birthday"),
             @Mapping(source = "phone", target = "phone", ignore = true),
