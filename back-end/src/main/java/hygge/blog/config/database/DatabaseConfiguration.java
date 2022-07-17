@@ -1,4 +1,4 @@
-package hygge.blog.config;
+package hygge.blog.config.database;
 
 import hygge.commons.spring.config.configuration.HyggeSpringProperties;
 import lombok.Generated;

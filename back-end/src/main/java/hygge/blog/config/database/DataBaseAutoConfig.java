@@ -1,4 +1,4 @@
-package hygge.blog.config;
+package hygge.blog.config.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import hygge.commons.spring.config.HyggeAutoConfiguration;
