@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * 入口程序
  *
+ *  "http://localhost:8080/swagger-ui/index.html"
  * @author Xavier
  * @date 2022/7/17
  */

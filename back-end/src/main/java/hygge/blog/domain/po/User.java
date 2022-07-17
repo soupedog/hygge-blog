@@ -44,39 +44,39 @@ public class User extends BasePO {
     /**
      * [PO_PK_ALIAS]用户展示用唯一标识
      */
-    @Column(nullable = false, length = 64)
+    @Column(length = 64)
     private String uid;
     /**
      * 用户身份
      */
-    @Column(nullable = false, columnDefinition = "varchar(50) default 'NORMAL'")
+    @Column(columnDefinition = "varchar(50) default 'NORMAL'")
     @Enumerated(EnumType.STRING)
     private UserTypeEnum userType;
     /**
      * 登录密码
      */
-    @Column
+    @Column(nullable = false)
     private String password;
     /**
      * 用户名
      */
-    @Column
+    @Column(nullable = false)
     private String userName;
     /**
      * 用户头像链接
      */
-    @Column
+    @Column(nullable = false)
     private String userAvatar;
     /**
      * 用户性别:保密,男,女
      */
-    @Column(nullable = false, columnDefinition = "varchar(50) default 'SECRET'")
+    @Column(columnDefinition = "varchar(50) default 'SECRET'")
     @Enumerated(EnumType.STRING)
     private UserSexEnum userSex;
     /**
      * 个人简介
      */
-    @Column(nullable = false, columnDefinition = "varchar(500) default '系统免费赠送给每一份小可爱的简介'")
+    @Column(columnDefinition = "varchar(500) default '系统免费赠送给每一份小可爱的简介'")
     private String biography;
     /**
      * 生日 UTC 毫秒级 Long 时间戳
@@ -96,7 +96,7 @@ public class User extends BasePO {
     /**
      * [PO_STATUS]用户状态:禁用,启用
      */
-    @Column(nullable = false, columnDefinition = "varchar(50) default 'ACTIVE'")
+    @Column(columnDefinition = "varchar(50) default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
     private UserStateEnum userState;
 }
