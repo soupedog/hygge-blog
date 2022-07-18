@@ -1,4 +1,4 @@
-package hygge.blog.domain.mapper;
+package hygge.blog.domain.mapper.convert;
 
 import hygge.web.template.HyggeWebUtilContainer;
 
@@ -8,7 +8,7 @@ import java.sql.Timestamp;
  * @author Xavier
  * @date 2022/7/17
  */
-public class ObjectMappingUtils extends HyggeWebUtilContainer {
+public class ObjectMappingConvert extends HyggeWebUtilContainer {
 
     public static Timestamp longToTimestamp(Long target) {
         if (target == null) {

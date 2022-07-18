@@ -26,7 +26,7 @@ public abstract class BasePO {
     }
 
     @CreatedDate
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Timestamp createTs;
     @LastModifiedDate
     @Column(nullable = false)

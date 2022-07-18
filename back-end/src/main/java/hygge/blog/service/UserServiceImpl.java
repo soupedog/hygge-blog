@@ -5,15 +5,24 @@ import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
+import hygge.blog.domain.mapper.MapToAnyMapper;
+import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.po.User;
+import hygge.commons.enums.ColumnTypeEnum;
 import hygge.commons.enums.StringFormatModeEnum;
 import hygge.commons.exceptions.LightRuntimeException;
-import hygge.commons.exceptions.ParameterRuntimeException;
+import hygge.utils.UtilsCreator;
+import hygge.utils.bo.ColumnInfo;
+import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -21,9 +30,23 @@ import java.util.Optional;
  * @date 2022/7/17
  */
 @Service
+@SuppressWarnings("java:S1192")
 public class UserServiceImpl extends HyggeWebUtilContainer {
+    private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private UserDao userDao;
+    private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
+
+    static {
+        forUpdate.add(new ColumnInfo("biography", null, ColumnTypeEnum.STRING, true, false, 1, 500));
+        forUpdate.add(new ColumnInfo("birthday", null, ColumnTypeEnum.LONG, true, false, 0, Long.MAX_VALUE));
+        forUpdate.add(new ColumnInfo("email", null, ColumnTypeEnum.STRING, true, false, 1, 500));
+        forUpdate.add(new ColumnInfo("password", null, ColumnTypeEnum.STRING, true, false, 6, 50));
+        forUpdate.add(new ColumnInfo("phone", null, ColumnTypeEnum.STRING, true, false, 11, 20));
+        forUpdate.add(new ColumnInfo("userAvatar", null, ColumnTypeEnum.STRING, true, false, 0, 500));
+        forUpdate.add(new ColumnInfo("userName", null, ColumnTypeEnum.STRING, true, false, 1, 100));
+        forUpdate.add(new ColumnInfo("userSex", null, ColumnTypeEnum.STRING, true, false, 1, 100));
+    }
 
     public User findUserByUserId(Integer userId, boolean nullable) {
         User example = User.builder()
@@ -50,9 +73,10 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
         if (parameterHelper.isNotEmpty(userDao.findUserByUserName(user.getUserName()))) {
             throw new LightRuntimeException(String.format("User(%s) create conflict.", user.getUserName()), BlogSystemCode.USER_ALREADY_EXISTS);
         }
-        user.setUserType(UserTypeEnum.NORMAL);
         user.setUserSex(parameterHelper.parseObjectOfNullable("userSex", user.getUserSex(), UserSexEnum.SECRET));
+        user.setUserType(UserTypeEnum.NORMAL);
         user.setUserState(UserStateEnum.ACTIVE);
+
         // 取到 id
         User resultTemp = userDao.save(user);
         // 初始化 uid
@@ -60,36 +84,14 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
         return userDao.save(resultTemp);
     }
 
-    public User updateUser(String uid, User user) {
+    public User updateUser(String uid, Map<String, Object> data) {
         parameterHelper.stringNotEmpty("uid", (Object) uid);
-        updateValidate(user);
+        HashMap<String, Object> finalData = daoHelper.filterOutTheFinalColumns(data, forUpdate);
 
         User old = findUserByUid(uid, false);
 
-        if (parameterHelper.isNotEmpty(user.getPassword())) {
-            old.setPassword(user.getPassword());
-        }
-        if (parameterHelper.isNotEmpty(user.getUserName())) {
-            old.setUserName(user.getUserName());
-        }
-        if (parameterHelper.isNotEmpty(user.getUserAvatar())) {
-            old.setUserAvatar(user.getUserAvatar());
-        }
-        if (parameterHelper.isNotEmpty(user.getUserSex())) {
-            old.setUserSex(user.getUserSex());
-        }
-        if (parameterHelper.isNotEmpty(user.getBiography())) {
-            old.setBiography(user.getBiography());
-        }
-        if (parameterHelper.isNotEmpty(user.getBirthday())) {
-            old.setBirthday(user.getBirthday());
-        }
-        if (parameterHelper.isNotEmpty(user.getEmail())) {
-            old.setEmail(user.getEmail());
-        }
-        if (parameterHelper.isNotEmpty(user.getPhone())) {
-            old.setPhone(user.getPhone());
-        }
+        User newOne = MapToAnyMapper.INSTANCE.mapToUser(finalData);
+        OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
 
         return userDao.save(old);
     }
@@ -115,21 +117,5 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
         parameterHelper.stringNotEmpty("password", (Object) user.getPassword());
         parameterHelper.stringNotEmpty("userName", (Object) user.getUserName());
         parameterHelper.stringNotEmpty("userAvatar", (Object) user.getUserAvatar());
-    }
-
-    private void updateValidate(User user) {
-        parameterHelper.notEmpty("user", user);
-
-        if (parameterHelper.isAllEmpty(
-                user.getPassword(),
-                user.getUserName(),
-                user.getUserAvatar(),
-                user.getUserSex(),
-                user.getBiography(),
-                user.getBirthday(),
-                user.getEmail(),
-                user.getPhone())) {
-            throw new ParameterRuntimeException("Valid modification information must not be empty.");
-        }
     }
 }

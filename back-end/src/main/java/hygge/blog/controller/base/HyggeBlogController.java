@@ -1,4 +1,4 @@
-package hygge.blog.controller;
+package hygge.blog.controller.base;
 
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
 import hygge.commons.exceptions.code.GlobalHyggeCode;

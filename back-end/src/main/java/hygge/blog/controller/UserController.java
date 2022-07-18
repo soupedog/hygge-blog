@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * @author Xavier
  * @date 2022/7/17
@@ -43,9 +45,8 @@ public class UserController implements UserControllerDoc {
 
     @Override
     @PutMapping("/user/{uid}")
-    public ResponseEntity<HyggeBlogControllerResponse<UserDTO>> updateUser(@PathVariable("uid") String uid, @RequestBody UserDTO userDTO) {
-        User user = UserMapper.INSTANCE.userDTOToUser(userDTO);
-        user = userService.updateUser(uid, user);
+    public ResponseEntity<HyggeBlogControllerResponse<UserDTO>> updateUser(@PathVariable("uid") String uid, @RequestBody Map<String, Object> data) {
+        User user = userService.updateUser(uid, data);
         UserDTO result = UserMapper.INSTANCE.userToUserDTO(user);
         return (ResponseEntity<HyggeBlogControllerResponse<UserDTO>>) success(result);
     }

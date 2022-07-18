@@ -29,12 +29,12 @@ public class UserDTO {
     /**
      * 登录密码
      */
-    @Schema(title = "密码", description = "用户密码", example = "xxxxx")
+    @Schema(title = "密码", description = "用户密码", example = "xxxxxx")
     private String password;
     /**
      * 用户名
      */
-    @Schema(title = "账号", description = "登录用的账号", example = "xxxxx")
+    @Schema(title = "账号", description = "登录用的账号", example = "xxxxxx")
     private String userName;
     /**
      * 用户头像链接

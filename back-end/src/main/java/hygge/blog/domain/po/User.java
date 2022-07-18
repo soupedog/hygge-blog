@@ -9,6 +9,8 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,14 +27,17 @@ import java.sql.Timestamp;
  * @author Xavier
  * @date 2022/7/17
  */
-@Entity
-@Table(name = "user", indexes = {@Index(name = "index_uid", columnList = "uid", unique = true)})
+
 @Getter
 @Setter
 @Builder
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
+@Entity
+@Table(name = "user", indexes = {@Index(name = "index_uid", columnList = "uid", unique = true)})
 public class User extends BasePO {
     /**
      * 唯一标识
@@ -49,7 +54,7 @@ public class User extends BasePO {
     /**
      * 用户身份
      */
-    @Column(columnDefinition = "varchar(50) default 'NORMAL'")
+    @Column(columnDefinition = "varchar(50) default 'NORMAL'", insertable = false)
     @Enumerated(EnumType.STRING)
     private UserTypeEnum userType;
     /**
@@ -96,7 +101,7 @@ public class User extends BasePO {
     /**
      * [PO_STATUS]用户状态:禁用,启用
      */
-    @Column(columnDefinition = "varchar(50) default 'ACTIVE'")
+    @Column(columnDefinition = "varchar(50) default 'ACTIVE'", insertable = false)
     @Enumerated(EnumType.STRING)
     private UserStateEnum userState;
 }
