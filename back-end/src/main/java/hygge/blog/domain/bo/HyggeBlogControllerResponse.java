@@ -28,7 +28,7 @@ public class HyggeBlogControllerResponse<T> {
     /**
      * 提示信息
      */
-    @Schema(title = "提示信息，通常在请求异常是才存在")
+    @Schema(title = "提示信息，通常在请求发生异常时才存在")
     protected String msg;
     /**
      * 返回核心内容

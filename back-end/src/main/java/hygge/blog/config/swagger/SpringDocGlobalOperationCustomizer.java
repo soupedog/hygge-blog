@@ -35,7 +35,6 @@ public class SpringDocGlobalOperationCustomizer implements GlobalOperationCustom
                 .name("scope")
                 .description("当前登录用户的登录渠道").schema(new StringSchema()).required(false);
         operation.addParametersItem(scope);
-
         return operation;
     }
 }

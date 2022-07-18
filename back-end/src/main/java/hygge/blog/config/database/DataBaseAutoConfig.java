@@ -44,9 +44,11 @@ public class DataBaseAutoConfig implements HyggeAutoConfiguration {
         hikariDataSource.setPassword(databaseConfiguration.getPassword());
         hikariDataSource.setJdbcUrl(databaseConfiguration.getUrl());
         hikariDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+
+        hikariDataSource.setMaximumPoolSize(20);
         hikariDataSource.setMinimumIdle(1);
-        hikariDataSource.setMaximumPoolSize(10);
-        hikariDataSource.setIdleTimeout(600000);
+        hikariDataSource.setMaxLifetime(30000);
+        hikariDataSource.setIdleTimeout(60000);
         return hikariDataSource;
     }
 
