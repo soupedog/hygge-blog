@@ -1,0 +1,92 @@
+package hygge.blog.service;
+
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.RequestProcessTrace;
+import hygge.blog.dao.UserTokenDao;
+import hygge.blog.domain.bo.BlogSystemCode;
+import hygge.blog.domain.po.User;
+import hygge.blog.domain.po.UserToken;
+import hygge.commons.exceptions.LightRuntimeException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author Xavier
+ * @date 2022/7/20
+ */
+@Service
+public class UserTokenServiceImpl {
+    @Autowired
+    private UserTokenDao userTokenDao;
+    @Autowired
+    private UserServiceImpl userService;
+
+    public UserToken signIn(String userName, String password) {
+        User user = userService.findUserByUserName(userName);
+        if (user == null) {
+            throw new LightRuntimeException(String.format("User(%s) was not found.", userName), BlogSystemCode.USER_NOT_FOUND);
+        }
+
+        if (!user.getPassword().equals(password)) {
+            throw new LightRuntimeException(BlogSystemCode.LOGIN_FAIL.getPublicMessage(), BlogSystemCode.LOGIN_FAIL);
+        }
+
+        HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+
+        UserToken userToken = userTokenDao.findUserTokenByUserIdAndAndScope(user.getUserId(), hyggeRequestContext.getTokenScope());
+
+        if (userToken == null) {
+            userToken = UserToken.builder()
+                    .userId(user.getUserId())
+                    .scope(hyggeRequestContext.getTokenScope())
+                    .build();
+            userToken.refresh(hyggeRequestContext.getServiceStartTs());
+
+            userToken = userTokenDao.save(userToken);
+        }
+
+        return userToken;
+    }
+
+    public void validateUserToken(String token, User targetLoginUser, String targetUid) {
+        HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+
+        UserToken userToken = getUserToken(targetLoginUser, targetUid, hyggeRequestContext);
+
+        if (userToken.getDeadline().getTime() < System.currentTimeMillis()) {
+            throw new LightRuntimeException("User token has expired.", BlogSystemCode.LOGIN_ILLEGAL);
+        }
+
+        if (!userToken.getToken().equals(token)) {
+            throw new LightRuntimeException("Unexpected userToken.", BlogSystemCode.LOGIN_ILLEGAL);
+        }
+    }
+
+    public UserToken refreshToken(User targetLoginUser, String targetUid, String refreshKey) {
+        HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+
+        UserToken userToken = getUserToken(targetLoginUser, targetUid, hyggeRequestContext);
+
+        if (!userToken.getRefreshKey().equals(refreshKey)) {
+            throw new LightRuntimeException("Unexpected refreshKey.", BlogSystemCode.LOGIN_ILLEGAL);
+        }
+
+        userToken.refresh(hyggeRequestContext.getServiceStartTs());
+        return userTokenDao.save(userToken);
+    }
+
+    private UserToken getUserToken(User targetLoginUser, String targetUid, HyggeRequestContext hyggeRequestContext) {
+        if (targetLoginUser == null) {
+            targetLoginUser = userService.findUserByUid(targetUid, true);
+            if (targetLoginUser == null) {
+                throw new LightRuntimeException(BlogSystemCode.LOGIN_ILLEGAL.getPublicMessage(), BlogSystemCode.LOGIN_ILLEGAL);
+            }
+        }
+
+        UserToken userToken = userTokenDao.findUserTokenByUserIdAndAndScope(targetLoginUser.getUserId(), hyggeRequestContext.getTokenScope());
+        if (userToken == null) {
+            throw new LightRuntimeException(BlogSystemCode.LOGIN_ILLEGAL.getPublicMessage(), BlogSystemCode.LOGIN_ILLEGAL);
+        }
+        return userToken;
+    }
+}

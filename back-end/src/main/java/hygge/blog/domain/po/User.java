@@ -39,9 +39,6 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "user", indexes = {@Index(name = "index_uid", columnList = "uid", unique = true)})
 public class User extends BasePO {
-    /**
-     * 唯一标识
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

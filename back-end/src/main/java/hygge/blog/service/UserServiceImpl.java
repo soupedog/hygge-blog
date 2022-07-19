@@ -58,6 +58,18 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
         return checkUserResult(userTemp, userId, nullable);
     }
 
+    public User findUserByUserName(String userName) {
+        parameterHelper.stringNotEmpty("userName", (Object) userName);
+
+        User example = User.builder()
+                .userName(userName)
+                .build();
+
+        Optional<User> userTemp = userDao.findOne(Example.of(example));
+
+        return userTemp.orElse(null);
+    }
+
     public User findUserByUid(String uid, boolean nullable) {
         User example = User.builder()
                 .uid(uid)
