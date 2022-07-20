@@ -1,7 +1,7 @@
 package hygge.blog.service;
 
 import hygge.blog.common.HyggeRequestContext;
-import hygge.blog.common.RequestProcessTrace;
+import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.dao.UserTokenDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.po.User;
@@ -31,27 +31,27 @@ public class UserTokenServiceImpl {
             throw new LightRuntimeException(BlogSystemCode.LOGIN_FAIL.getPublicMessage(), BlogSystemCode.LOGIN_FAIL);
         }
 
-        HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
 
-        UserToken userToken = userTokenDao.findUserTokenByUserIdAndAndScope(user.getUserId(), hyggeRequestContext.getTokenScope());
+        UserToken userToken = userTokenDao.findUserTokenByUserIdAndAndScope(user.getUserId(), context.getTokenScope());
 
         if (userToken == null) {
             userToken = UserToken.builder()
                     .userId(user.getUserId())
-                    .scope(hyggeRequestContext.getTokenScope())
+                    .scope(context.getTokenScope())
                     .build();
-            userToken.refresh(hyggeRequestContext.getServiceStartTs());
-
-            userToken = userTokenDao.save(userToken);
         }
+
+        userToken.refresh(context.getServiceStartTs());
+        userToken = userTokenDao.save(userToken);
 
         return userToken;
     }
 
     public void validateUserToken(String token, User targetLoginUser, String targetUid) {
-        HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
 
-        UserToken userToken = getUserToken(targetLoginUser, targetUid, hyggeRequestContext);
+        UserToken userToken = getUserToken(targetLoginUser, targetUid, context);
 
         if (userToken.getDeadline().getTime() < System.currentTimeMillis()) {
             throw new LightRuntimeException("User token has expired.", BlogSystemCode.LOGIN_ILLEGAL);
@@ -63,15 +63,15 @@ public class UserTokenServiceImpl {
     }
 
     public UserToken refreshToken(User targetLoginUser, String targetUid, String refreshKey) {
-        HyggeRequestContext hyggeRequestContext = RequestProcessTrace.getContext();
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
 
-        UserToken userToken = getUserToken(targetLoginUser, targetUid, hyggeRequestContext);
+        UserToken userToken = getUserToken(targetLoginUser, targetUid, context);
 
         if (!userToken.getRefreshKey().equals(refreshKey)) {
             throw new LightRuntimeException("Unexpected refreshKey.", BlogSystemCode.LOGIN_ILLEGAL);
         }
 
-        userToken.refresh(hyggeRequestContext.getServiceStartTs());
+        userToken.refresh(context.getServiceStartTs());
         return userTokenDao.save(userToken);
     }
 

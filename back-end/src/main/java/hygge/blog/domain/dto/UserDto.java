@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "用户信息")
-public class UserDTO {
+public class UserDto {
     /**
      * [PO_PK_ALIAS]用户展示用唯一标识
      */

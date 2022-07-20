@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.EnumMap;
+
 /**
  * 请求上下文
  *
@@ -24,6 +26,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HyggeRequestContext extends AbstractHyggeContext<HyggeRequestContext.Key> {
+    @Override
+    protected void initContainer(int initialCapacity, float loadFactor) {
+        this.container = new EnumMap<>(HyggeRequestContext.Key.class);
+    }
+
     /**
      * 服务端首次开始处理请求 UTC 毫秒级 Long 时间戳
      */
@@ -37,7 +44,9 @@ public class HyggeRequestContext extends AbstractHyggeContext<HyggeRequestContex
      */
     private User currentLoginUser;
 
-    enum Key {
-        TOKEN, SECRET_KEY, IP_ADDRESS
+    private boolean guest = false;
+
+    public enum Key {
+        UID, TOKEN, REFRESH_KEY, SECRET_KEY, IP_ADDRESS
     }
 }

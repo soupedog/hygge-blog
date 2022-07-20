@@ -5,6 +5,7 @@ import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,7 @@ import java.sql.Timestamp;
  * @date 2022/7/17
  */
 
-@Getter
-@Setter
+@Data
 @Builder
 @Generated
 @NoArgsConstructor
@@ -83,7 +83,7 @@ public class User extends BasePO {
     /**
      * 生日 UTC 毫秒级 Long 时间戳
      */
-    @Column
+    @Column(columnDefinition = "datetime(3)")
     private Timestamp birthday;
     /**
      * 用户手机号

@@ -6,7 +6,7 @@ package hygge.blog.common;
  * @author Xavier
  * @date 2022/7/20
  */
-public class RequestProcessTrace {
+public class HyggeRequestTracker {
     private static final InheritableThreadLocal<HyggeRequestContext> HYGGE_REQUEST_CONTEXT_THREAD_LOCAL = new InheritableThreadLocal<>();
 
     public static HyggeRequestContext getContext() {

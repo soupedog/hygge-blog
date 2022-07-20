@@ -19,6 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.Map;
 
 /**
  * @author Xavier
@@ -70,7 +71,10 @@ public class DataBaseAutoConfig implements HyggeAutoConfiguration {
         entityManagerFactoryBean.setJpaVendorAdapter(hibernateJpaVendorAdapter);
         entityManagerFactoryBean.setPackagesToScan("hygge.blog.domain.po");
         // 当前线程不存在事务、事务已关闭时，也允许懒加载查询(异步线程时通常用得上)
-        entityManagerFactoryBean.getJpaPropertyMap().put(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");
+        Map<String, Object> jpaPropertyMap = entityManagerFactoryBean.getJpaPropertyMap();
+        jpaPropertyMap.put(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");
+        jpaPropertyMap.put(AvailableSettings.FORMAT_SQL, "true");
+        jpaPropertyMap.put(AvailableSettings.HIGHLIGHT_SQL, "true");
         return entityManagerFactoryBean;
     }
 

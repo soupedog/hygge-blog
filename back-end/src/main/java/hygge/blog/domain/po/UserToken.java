@@ -19,8 +19,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import java.sql.Timestamp;
 
 /**
@@ -36,7 +36,9 @@ import java.sql.Timestamp;
 @DynamicInsert
 @DynamicUpdate
 @Entity
-@Table(name = "user_token", uniqueConstraints = {@UniqueConstraint(columnNames = {"userId", "scope"})})
+@Table(name = "user_token",
+        indexes = {@Index(name = "index_userId_scope", columnList = "userId,scope", unique = true)}
+)
 public class UserToken {
     private static final RandomHelper randomHelper = UtilsCreator.INSTANCE.getDefaultInstance(RandomHelper.class);
 
@@ -53,7 +55,7 @@ public class UserToken {
     private String token;
     @Column(nullable = false)
     private String refreshKey;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "datetime(3)")
     private Timestamp deadline;
 
     public void refresh(long currentTimeStamp) {
