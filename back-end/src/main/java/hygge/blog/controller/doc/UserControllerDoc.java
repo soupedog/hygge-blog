@@ -25,7 +25,7 @@ public interface UserControllerDoc extends HyggeBlogController<ResponseEntity<?>
     @Operation(summary = "修改用户", description = "修改当前用户信息")
     @RequestBody(
             content = {@Content(schema =
-            @Schema(ref = "#/components/schemas/UserDTO")
+            @Schema(ref = "#/components/schemas/UserDto")
             )}
     )
     ResponseEntity<HyggeBlogControllerResponse<UserDto>> updateUser(String uid, Map<String, Object> data);

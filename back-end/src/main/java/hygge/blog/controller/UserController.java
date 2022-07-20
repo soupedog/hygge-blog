@@ -38,6 +38,8 @@ public class UserController implements UserControllerDoc {
     @Override
     @PutMapping("/user/{uid}")
     public ResponseEntity<HyggeBlogControllerResponse<UserDto>> updateUser(@PathVariable("uid") String uid, @RequestBody Map<String, Object> data) {
+        userService.notGuest();
+
         User user = userService.updateUser(uid, data);
         UserDto result = PoToDtoMapper.INSTANCE.poToDto(user);
         return (ResponseEntity<HyggeBlogControllerResponse<UserDto>>) success(result);

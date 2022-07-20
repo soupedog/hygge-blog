@@ -1,5 +1,7 @@
 package hygge.blog.service;
 
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.dao.UserDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.enums.UserSexEnum;
@@ -102,10 +104,55 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
 
         User old = findUserByUid(uid, false);
 
+        checkUserRightOrHimself(old, UserTypeEnum.ROOT);
+
         User newOne = MapToAnyMapper.INSTANCE.mapToUser(finalData);
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
 
         return userDao.save(old);
+    }
+
+    public void notGuest() {
+        if (HyggeRequestTracker.getContext().isGuest()) {
+            throw new LightRuntimeException(BlogSystemCode.INSUFFICIENT_PERMISSIONS.getPublicMessage(), BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+        }
+    }
+
+    public void checkUserRight(User targetUser, UserTypeEnum... expectedUserType) {
+        if (targetUser == null) {
+            for (UserTypeEnum item : expectedUserType) {
+                if (UserTypeEnum.NORMAL.equals(item)) {
+                    return;
+                }
+            }
+        } else {
+            for (UserTypeEnum item : expectedUserType) {
+                if (targetUser.getUserType().equals(item)) {
+                    return;
+                }
+            }
+        }
+        throw new LightRuntimeException(BlogSystemCode.INSUFFICIENT_PERMISSIONS.getPublicMessage(), BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+    }
+
+    public void checkUserRightOrHimself(User targetUser, UserTypeEnum... expectedUserType) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User loginUser = context.getCurrentLoginUser();
+
+        // 验证是否是本人
+        if (loginUser != null) {
+            // 非访客
+            if (loginUser.getUserId().equals(targetUser.getUserId())) {
+                return;
+            }
+        } else {
+            // 访客
+            if (targetUser == null) {
+                return;
+            }
+        }
+
+        checkUserRight(targetUser, expectedUserType);
     }
 
     private User checkUserResult(Optional<User> userTemp, Integer info, boolean nullable) {

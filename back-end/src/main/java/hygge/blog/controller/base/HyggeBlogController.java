@@ -75,6 +75,14 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
     }
 
     /**
+     * 取消非严重异常的日志打印
+     */
+    @Override
+    default boolean muteLessSeriousException() {
+        return true;
+    }
+
+    /**
      * 只要服务端进行了响应 HttpStatus 固定为 200
      *
      * @param httpStatus 预期状态码
