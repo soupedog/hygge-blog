@@ -16,5 +16,6 @@ import java.util.Map;
 public interface MapToAnyMapper {
     MapToAnyMapper INSTANCE = Mappers.getMapper(MapToAnyMapper.class);
 
+    @Mapping(source = "blogGroupList", target = "blogGroupList", ignore = true)
     User mapToUser(Map<String, ?> map);
 }

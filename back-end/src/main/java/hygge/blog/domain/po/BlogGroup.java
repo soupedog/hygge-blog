@@ -1,6 +1,6 @@
 package hygge.blog.domain.po;
 
-import hygge.blog.domain.po.base.BasePO;
+import hygge.blog.domain.po.base.BasePo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -35,7 +35,7 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "blog_group")
-public class BlogGroup extends BasePO {
+public class BlogGroup extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

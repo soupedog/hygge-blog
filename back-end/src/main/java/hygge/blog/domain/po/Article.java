@@ -1,7 +1,7 @@
 package hygge.blog.domain.po;
 
 import hygge.blog.domain.enums.ArticleStateEnum;
-import hygge.blog.domain.po.base.BasePO;
+import hygge.blog.domain.po.base.BasePo;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +41,7 @@ import javax.persistence.Table;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "article", indexes = {@Index(name = "index_aid", columnList = "aid", unique = true)})
-public class Article extends BasePO {
+public class Article extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

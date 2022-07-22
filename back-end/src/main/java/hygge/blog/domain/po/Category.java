@@ -2,7 +2,7 @@ package hygge.blog.domain.po;
 
 import hygge.blog.domain.enums.CategoryStateEnum;
 import hygge.blog.domain.enums.CategoryTypeEnum;
-import hygge.blog.domain.po.base.BasePO;
+import hygge.blog.domain.po.base.BasePo;
 import hygge.blog.domain.po.inner.CategoryAccessRule;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,7 +42,7 @@ import javax.persistence.Table;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "category", indexes = {@Index(name = "index_cid", columnList = "cid", unique = true)})
-public class Category extends BasePO {
+public class Category extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

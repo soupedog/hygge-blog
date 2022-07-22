@@ -21,7 +21,6 @@ import java.util.EnumMap;
  */
 @Getter
 @Setter
-@Builder
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor

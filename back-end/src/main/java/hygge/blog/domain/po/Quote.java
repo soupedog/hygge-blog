@@ -1,7 +1,7 @@
 package hygge.blog.domain.po;
 
 import hygge.blog.domain.enums.QuoteStateEnum;
-import hygge.blog.domain.po.base.BasePO;
+import hygge.blog.domain.po.base.BasePo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -38,7 +38,7 @@ import javax.persistence.Table;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "quote")
-public class Quote extends BasePO {
+public class Quote extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

@@ -21,8 +21,8 @@ import java.sql.Timestamp;
 @Setter
 @Generated
 @MappedSuperclass
-public abstract class BasePO {
-    protected BasePO() {
+public abstract class BasePo {
+    protected BasePo() {
     }
 
     @CreationTimestamp

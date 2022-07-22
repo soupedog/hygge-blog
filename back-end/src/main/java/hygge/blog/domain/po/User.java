@@ -3,7 +3,7 @@ package hygge.blog.domain.po;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
-import hygge.blog.domain.po.base.BasePO;
+import hygge.blog.domain.po.base.BasePo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -43,7 +43,7 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "user", indexes = {@Index(name = "index_uid", columnList = "uid", unique = true)})
-public class User extends BasePO {
+public class User extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
