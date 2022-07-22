@@ -6,7 +6,7 @@ package hygge.blog.domain.enums;
  * @author Xavier
  * @date 2022/7/17
  */
-public enum ArticleCategoryTreeTypeEnum {
+public enum CategoryTypeEnum {
     /**
      * 默认
      */
@@ -16,34 +16,34 @@ public enum ArticleCategoryTreeTypeEnum {
      */
     PATH(1, "PATH");
 
-    ArticleCategoryTreeTypeEnum(Integer index, String value) {
+    CategoryTypeEnum(Integer index, String value) {
         this.index = index;
         this.value = value;
     }
 
-    public static ArticleCategoryTreeTypeEnum parse(Integer index) {
+    public static CategoryTypeEnum parse(Integer index) {
         if (index == null) {
             throw new IllegalArgumentException("Unexpected index of ArticleCategoryTreeTypeEnum,it can't be null.");
         }
         switch (index) {
             case 0:
-                return ArticleCategoryTreeTypeEnum.DEFAULT;
+                return CategoryTypeEnum.DEFAULT;
             case 1:
-                return ArticleCategoryTreeTypeEnum.PATH;
+                return CategoryTypeEnum.PATH;
             default:
                 throw new IllegalArgumentException("Unexpected index of ArticleCategoryTreeTypeEnum,it can't be " + index + ".");
         }
     }
 
-    public static ArticleCategoryTreeTypeEnum parse(String value) {
+    public static CategoryTypeEnum parse(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Unexpected value of ArticleCategoryTreeTypeEnum,it can't be null.");
         }
         switch (value) {
             case "DEFAULT":
-                return ArticleCategoryTreeTypeEnum.DEFAULT;
+                return CategoryTypeEnum.DEFAULT;
             case "PATH":
-                return ArticleCategoryTreeTypeEnum.PATH;
+                return CategoryTypeEnum.PATH;
             default:
                 throw new IllegalArgumentException("Unexpected value of ArticleCategoryTreeTypeEnum,it can't be " + value + ".");
         }

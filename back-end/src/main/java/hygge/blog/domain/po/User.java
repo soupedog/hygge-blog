@@ -3,9 +3,9 @@ package hygge.blog.domain.po;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
+import hygge.blog.domain.po.base.BasePO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,22 +21,27 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * @author Xavier
  * @date 2022/7/17
  */
 
-@Data
+@Getter
+@Setter
 @Builder
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @DynamicInsert
 @DynamicUpdate
-@Entity
 @Table(name = "user", indexes = {@Index(name = "index_uid", columnList = "uid", unique = true)})
 public class User extends BasePO {
     @Id
@@ -46,12 +51,12 @@ public class User extends BasePO {
     /**
      * [PO_PK_ALIAS]用户展示用唯一标识
      */
-    @Column(length = 64)
+    @Column(length = 15)
     private String uid;
     /**
      * 用户身份
      */
-    @Column(columnDefinition = "varchar(50) default 'NORMAL'", insertable = false)
+    @Column(insertable = false, columnDefinition = "enum ('ROOT', 'NORMAL') default 'NORMAL'")
     @Enumerated(EnumType.STRING)
     private UserTypeEnum userType;
     /**
@@ -62,7 +67,7 @@ public class User extends BasePO {
     /**
      * 用户名
      */
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String userName;
     /**
      * 用户头像链接
@@ -72,7 +77,7 @@ public class User extends BasePO {
     /**
      * 用户性别:保密,男,女
      */
-    @Column(columnDefinition = "varchar(50) default 'SECRET'")
+    @Column(columnDefinition = "enum ('SECRET', 'MAN', 'WOMAN') default 'SECRET'")
     @Enumerated(EnumType.STRING)
     private UserSexEnum userSex;
     /**
@@ -98,7 +103,16 @@ public class User extends BasePO {
     /**
      * [PO_STATUS]用户状态:禁用,启用
      */
-    @Column(columnDefinition = "varchar(50) default 'ACTIVE'", insertable = false)
+    @Column(columnDefinition = "enum ('INACTIVE', 'ACTIVE') default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
     private UserStateEnum userState;
+
+    @ManyToMany
+    @JoinTable(name = "join_user_blog_group",
+            // name:referencedColumnName 在中间表的别名  referencedColumnName:当前表关联字段名称
+            joinColumns = {@JoinColumn(name = "userId", referencedColumnName = "userId")},
+            // 关联关系另一方，其他属性同 joinColumns
+            inverseJoinColumns = {@JoinColumn(name = "groupId", referencedColumnName = "groupId")}
+    )
+    private List<BlogGroup> blogGroupList;
 }

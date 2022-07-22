@@ -33,9 +33,9 @@ import java.sql.Timestamp;
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @DynamicInsert
 @DynamicUpdate
-@Entity
 @Table(name = "user_token",
         indexes = {@Index(name = "index_userId_scope", columnList = "userId,scope", unique = true)}
 )
@@ -48,7 +48,7 @@ public class UserToken {
     private Integer tokenId;
     @Column(nullable = false)
     private Integer userId;
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "enum ('WEB', 'PHONE') default 'WEB'")
     @Enumerated(EnumType.STRING)
     private TokenScopeEnum scope;
     @Column(nullable = false)

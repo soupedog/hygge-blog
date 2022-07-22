@@ -1,12 +1,12 @@
 package hygge.blog.domain.enums;
 
 /**
- * [PO_STATUS]句子收藏状态
+ * [PO_STATUS]文章类别状态
  *
  * @author Xavier
  * @date 2022/7/17
  */
-public enum SentenceStateEnum {
+public enum CategoryStateEnum {
     /**
      * 禁用
      */
@@ -16,36 +16,36 @@ public enum SentenceStateEnum {
      */
     ACTIVE(1, "ACTIVE");
 
-    SentenceStateEnum(Integer index, String value) {
+    CategoryStateEnum(Integer index, String value) {
         this.index = index;
         this.value = value;
     }
 
-    public static SentenceStateEnum parse(Integer index) {
+    public static CategoryStateEnum parse(Integer index) {
         if (index == null) {
-            throw new IllegalArgumentException("Unexpected index of SentenceStateEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected index of ArticleCategoryStateEnum,it can't be null.");
         }
         switch (index) {
             case 0:
-                return SentenceStateEnum.INACTIVE;
+                return CategoryStateEnum.INACTIVE;
             case 1:
-                return SentenceStateEnum.ACTIVE;
+                return CategoryStateEnum.ACTIVE;
             default:
-                throw new IllegalArgumentException("Unexpected index of SentenceStateEnum,it can't be " + index + ".");
+                throw new IllegalArgumentException("Unexpected index of ArticleCategoryStateEnum,it can't be " + index + ".");
         }
     }
 
-    public static SentenceStateEnum parse(String value) {
+    public static CategoryStateEnum parse(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Unexpected value of SentenceStateEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected value of ArticleCategoryStateEnum,it can't be null.");
         }
         switch (value) {
             case "INACTIVE":
-                return SentenceStateEnum.INACTIVE;
+                return CategoryStateEnum.INACTIVE;
             case "ACTIVE":
-                return SentenceStateEnum.ACTIVE;
+                return CategoryStateEnum.ACTIVE;
             default:
-                throw new IllegalArgumentException("Unexpected value of SentenceStateEnum,it can't be " + value + ".");
+                throw new IllegalArgumentException("Unexpected value of ArticleCategoryStateEnum,it can't be " + value + ".");
         }
     }
 

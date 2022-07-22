@@ -3,6 +3,7 @@ package hygge.blog.domain.mapper;
 import hygge.blog.domain.mapper.convert.MapObjectConvert;
 import hygge.blog.domain.po.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.Map;

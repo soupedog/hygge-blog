@@ -1,12 +1,12 @@
 package hygge.blog.domain.enums;
 
 /**
- * [PO_STATUS]板块状态
+ * [PO_STATUS]句子收藏状态
  *
  * @author Xavier
  * @date 2022/7/17
  */
-public enum BoardStateEnum {
+public enum QuoteStateEnum {
     /**
      * 禁用
      */
@@ -16,36 +16,36 @@ public enum BoardStateEnum {
      */
     ACTIVE(1, "ACTIVE");
 
-    BoardStateEnum(Integer index, String value) {
+    QuoteStateEnum(Integer index, String value) {
         this.index = index;
         this.value = value;
     }
 
-    public static BoardStateEnum parse(Integer index) {
+    public static QuoteStateEnum parse(Integer index) {
         if (index == null) {
-            throw new IllegalArgumentException("Unexpected index of BoardStateEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected index of SentenceStateEnum,it can't be null.");
         }
         switch (index) {
             case 0:
-                return BoardStateEnum.INACTIVE;
+                return QuoteStateEnum.INACTIVE;
             case 1:
-                return BoardStateEnum.ACTIVE;
+                return QuoteStateEnum.ACTIVE;
             default:
-                throw new IllegalArgumentException("Unexpected index of BoardStateEnum,it can't be " + index + ".");
+                throw new IllegalArgumentException("Unexpected index of SentenceStateEnum,it can't be " + index + ".");
         }
     }
 
-    public static BoardStateEnum parse(String value) {
+    public static QuoteStateEnum parse(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Unexpected value of BoardStateEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected value of SentenceStateEnum,it can't be null.");
         }
         switch (value) {
             case "INACTIVE":
-                return BoardStateEnum.INACTIVE;
+                return QuoteStateEnum.INACTIVE;
             case "ACTIVE":
-                return BoardStateEnum.ACTIVE;
+                return QuoteStateEnum.ACTIVE;
             default:
-                throw new IllegalArgumentException("Unexpected value of BoardStateEnum,it can't be " + value + ".");
+                throw new IllegalArgumentException("Unexpected value of SentenceStateEnum,it can't be " + value + ".");
         }
     }
 

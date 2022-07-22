@@ -1,12 +1,12 @@
 package hygge.blog.domain.enums;
 
 /**
- * [PO_STATUS]文章类别状态
+ * [PO_STATUS]板块状态
  *
  * @author Xavier
  * @date 2022/7/17
  */
-public enum ArticleCategoryStateEnum {
+public enum TopicStateEnum {
     /**
      * 禁用
      */
@@ -16,36 +16,36 @@ public enum ArticleCategoryStateEnum {
      */
     ACTIVE(1, "ACTIVE");
 
-    ArticleCategoryStateEnum(Integer index, String value) {
+    TopicStateEnum(Integer index, String value) {
         this.index = index;
         this.value = value;
     }
 
-    public static ArticleCategoryStateEnum parse(Integer index) {
+    public static TopicStateEnum parse(Integer index) {
         if (index == null) {
-            throw new IllegalArgumentException("Unexpected index of ArticleCategoryStateEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected index of TopicStateEnum,it can't be null.");
         }
         switch (index) {
             case 0:
-                return ArticleCategoryStateEnum.INACTIVE;
+                return TopicStateEnum.INACTIVE;
             case 1:
-                return ArticleCategoryStateEnum.ACTIVE;
+                return TopicStateEnum.ACTIVE;
             default:
-                throw new IllegalArgumentException("Unexpected index of ArticleCategoryStateEnum,it can't be " + index + ".");
+                throw new IllegalArgumentException("Unexpected index of TopicStateEnum,it can't be " + index + ".");
         }
     }
 
-    public static ArticleCategoryStateEnum parse(String value) {
+    public static TopicStateEnum parse(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Unexpected value of ArticleCategoryStateEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected value of TopicStateEnum,it can't be null.");
         }
         switch (value) {
             case "INACTIVE":
-                return ArticleCategoryStateEnum.INACTIVE;
+                return TopicStateEnum.INACTIVE;
             case "ACTIVE":
-                return ArticleCategoryStateEnum.ACTIVE;
+                return TopicStateEnum.ACTIVE;
             default:
-                throw new IllegalArgumentException("Unexpected value of ArticleCategoryStateEnum,it can't be " + value + ".");
+                throw new IllegalArgumentException("Unexpected value of TopicStateEnum,it can't be " + value + ".");
         }
     }
 
