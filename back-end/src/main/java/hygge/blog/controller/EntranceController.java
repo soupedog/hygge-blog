@@ -6,7 +6,7 @@ import hygge.blog.controller.doc.EntranceControllerDoc;
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.dto.UserDto;
 import hygge.blog.domain.dto.UserTokenDto;
-import hygge.blog.domain.mapper.PoToDtoMapper;
+import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;
 import hygge.blog.service.UserServiceImpl;
@@ -34,9 +34,9 @@ public class EntranceController extends HyggeWebUtilContainer implements Entranc
     @Override
     @PostMapping("/sign/up")
     public ResponseEntity<HyggeBlogControllerResponse<UserDto>> signUp(@RequestBody UserDto userDTO) {
-        User user = PoToDtoMapper.INSTANCE.dtoToPo(userDTO);
+        User user = PoDtoMapper.INSTANCE.dtoToPo(userDTO);
         user = userService.saveUser(user);
-        UserDto result = PoToDtoMapper.INSTANCE.poToDto(user);
+        UserDto result = PoDtoMapper.INSTANCE.poToDto(user);
         return (ResponseEntity<HyggeBlogControllerResponse<UserDto>>) success(result);
     }
 
@@ -60,7 +60,7 @@ public class EntranceController extends HyggeWebUtilContainer implements Entranc
             userToken = userTokenService.signIn(userDTO.getUserName(), userDTO.getPassword());
         }
 
-        UserTokenDto result = PoToDtoMapper.INSTANCE.poToDto(userToken);
+        UserTokenDto result = PoDtoMapper.INSTANCE.poToDto(userToken);
         return (ResponseEntity<HyggeBlogControllerResponse<UserTokenDto>>) success(result);
     }
 }

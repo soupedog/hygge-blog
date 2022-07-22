@@ -16,8 +16,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -53,12 +53,17 @@ public class BlogGroup extends BasePo {
     /**
      * 群组拥有者唯一标识
      */
-    @JoinColumn(nullable = false, name = "userId")
-    @ManyToOne(targetEntity = User.class)
+    @Column(nullable = false)
     private Integer userId;
     /**
      * 组内成员
      */
-    @ManyToMany(mappedBy = "blogGroupList")
+    @ManyToMany
+    @JoinTable(name = "join_user_blog_group",
+            // name:referencedColumnName 在中间表的别名  referencedColumnName:当前表关联字段名称
+            joinColumns = {@JoinColumn(name = "groupId", referencedColumnName = "groupId")},
+            // 关联关系另一方，其他属性同 joinColumns
+            inverseJoinColumns = {@JoinColumn(name = "userId", referencedColumnName = "userId")}
+    )
     private List<User> members;
 }

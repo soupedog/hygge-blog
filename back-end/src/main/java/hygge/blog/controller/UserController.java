@@ -3,7 +3,7 @@ package hygge.blog.controller;
 import hygge.blog.controller.doc.UserControllerDoc;
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.dto.UserDto;
-import hygge.blog.domain.mapper.PoToDtoMapper;
+import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.User;
 import hygge.blog.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class UserController implements UserControllerDoc {
     @GetMapping("/user/{uid}")
     public ResponseEntity<HyggeBlogControllerResponse<UserDto>> findUser(@PathVariable("uid") String uid) {
         User user = userService.findUserByUid(uid, true);
-        UserDto result = PoToDtoMapper.INSTANCE.poToDto(user);
+        UserDto result = PoDtoMapper.INSTANCE.poToDto(user);
         return (ResponseEntity<HyggeBlogControllerResponse<UserDto>>) success(result);
     }
 
@@ -41,7 +41,7 @@ public class UserController implements UserControllerDoc {
         userService.notGuest();
 
         User user = userService.updateUser(uid, data);
-        UserDto result = PoToDtoMapper.INSTANCE.poToDto(user);
+        UserDto result = PoDtoMapper.INSTANCE.poToDto(user);
         return (ResponseEntity<HyggeBlogControllerResponse<UserDto>>) success(result);
     }
 }

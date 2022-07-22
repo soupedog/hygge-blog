@@ -107,12 +107,6 @@ public class User extends BasePo {
     @Enumerated(EnumType.STRING)
     private UserStateEnum userState;
 
-    @ManyToMany
-    @JoinTable(name = "join_user_blog_group",
-            // name:referencedColumnName 在中间表的别名  referencedColumnName:当前表关联字段名称
-            joinColumns = {@JoinColumn(name = "userId", referencedColumnName = "userId")},
-            // 关联关系另一方，其他属性同 joinColumns
-            inverseJoinColumns = {@JoinColumn(name = "groupId", referencedColumnName = "groupId")}
-    )
+    @ManyToMany(mappedBy = "members")
     private List<BlogGroup> blogGroupList;
 }

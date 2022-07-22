@@ -152,7 +152,7 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
             }
         }
 
-        checkUserRight(targetUser, expectedUserType);
+        checkUserRight(loginUser, expectedUserType);
     }
 
     private User checkUserResult(Optional<User> userTemp, Integer info, boolean nullable) {

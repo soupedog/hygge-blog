@@ -29,6 +29,10 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
      */
     LOGIN_CREATE_CONFLICT(true, "Login conflict.", 409000, null),
     /**
+     * 用户名称已存在
+     */
+    USER_ALREADY_EXISTS(false, null, 403201, null),
+    /**
      * 用户对象未找到
      */
     USER_NOT_FOUND(false, null, 404201, null),
@@ -36,6 +40,14 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
      * 板块未找到
      */
     BOARD_NOT_FOUND(false, null, 404301, null),
+    /**
+     * 群组名称已存在
+     */
+    BLOG_GROUP_ALREADY_EXISTS(false, null, 403701, null),
+    /**
+     * 群组绑定变更失败
+     */
+    BLOG_GROUP_BIND_CHANGE_EXCEPTION(false, "群组绑定变更失败", 403701, null),
     /**
      * 文章类别下挂载文章不为空
      */
@@ -80,10 +92,6 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
      * 文章类别访问规则插入落库失败
      */
     ARTICLE_CATEGORY_ACCESS_RULE_SAVE_CONFLICT(false, null, 409404, null),
-    /**
-     * 用户名称已存在
-     */
-    USER_ALREADY_EXISTS(false, null, 403201, null),
     /**
      * 文章名称已存在
      */

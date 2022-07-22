@@ -1,8 +1,10 @@
 package hygge.blog.domain.mapper;
 
+import hygge.blog.domain.dto.BlogGroupDto;
 import hygge.blog.domain.dto.UserDto;
 import hygge.blog.domain.dto.UserTokenDto;
 import hygge.blog.domain.mapper.convert.ObjectMappingConvert;
+import hygge.blog.domain.po.BlogGroup;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;
 import org.mapstruct.Mapper;
@@ -15,8 +17,8 @@ import org.mapstruct.factory.Mappers;
  * @date 2022/7/17
  */
 @Mapper(imports = ObjectMappingConvert.class)
-public interface PoToDtoMapper {
-    PoToDtoMapper INSTANCE = Mappers.getMapper(PoToDtoMapper.class);
+public interface PoDtoMapper {
+    PoDtoMapper INSTANCE = Mappers.getMapper(PoDtoMapper.class);
 
     @Mappings(value = {
             @Mapping(source = "uid", target = "uid", ignore = true),
@@ -37,4 +39,8 @@ public interface PoToDtoMapper {
             @Mapping(expression = "java(ObjectMappingConvert.timestampToLong(po.getDeadline()))", target = "deadline")
     })
     UserTokenDto poToDto(UserToken po);
+
+    BlogGroupDto poToDto(BlogGroup po);
+
+    BlogGroup dtoToPo(BlogGroupDto dto);
 }

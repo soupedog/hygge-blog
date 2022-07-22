@@ -7,6 +7,7 @@ import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;
 import hygge.commons.exceptions.LightRuntimeException;
+import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,16 @@ import org.springframework.stereotype.Service;
  * @date 2022/7/20
  */
 @Service
-public class UserTokenServiceImpl {
+public class UserTokenServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private UserTokenDao userTokenDao;
     @Autowired
     private UserServiceImpl userService;
 
     public UserToken signIn(String userName, String password) {
+        parameterHelper.stringNotEmpty("userName", (Object) userName);
+        parameterHelper.stringNotEmpty("password", (Object) password);
+
         User user = userService.findUserByUserName(userName);
         if (user == null) {
             throw new LightRuntimeException(String.format("User(%s) was not found.", userName), BlogSystemCode.USER_NOT_FOUND);
