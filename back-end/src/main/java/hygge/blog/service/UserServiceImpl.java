@@ -85,7 +85,7 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
     public User saveUser(User user) {
         createValidate(user);
         if (parameterHelper.isNotEmpty(userDao.findUserByUserName(user.getUserName()))) {
-            throw new LightRuntimeException(String.format("User(%s) create conflict.", user.getUserName()), BlogSystemCode.USER_ALREADY_EXISTS);
+            throw new LightRuntimeException(String.format("User(%s) already exists.", user.getUserName()), BlogSystemCode.USER_ALREADY_EXISTS);
         }
         user.setUserSex(parameterHelper.parseObjectOfNullable("userSex", user.getUserSex(), UserSexEnum.SECRET));
         user.setUserType(UserTypeEnum.NORMAL);

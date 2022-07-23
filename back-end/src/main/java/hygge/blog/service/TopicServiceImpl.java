@@ -96,4 +96,16 @@ public class TopicServiceImpl extends HyggeWebUtilContainer {
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
         return topicDao.save(old);
     }
+
+    public Topic findTopicByTid(String tid, boolean nullable) {
+        Topic result = topicDao.findTopicByTid(tid);
+        return checkTopicResult(result, tid, nullable);
+    }
+
+    private Topic checkTopicResult(Topic topicTemp, String info, boolean nullable) {
+        if (!nullable && topicTemp == null) {
+            throw new LightRuntimeException(String.format("Topic(%s) was not found.", info), BlogSystemCode.TOPIC_NOT_FOUND);
+        }
+        return topicTemp;
+    }
 }

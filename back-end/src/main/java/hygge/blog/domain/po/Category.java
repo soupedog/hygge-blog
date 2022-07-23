@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -22,9 +22,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.List;
 
 /**
  * 文章类别
@@ -52,13 +51,15 @@ public class Category extends BasePo {
      */
     @Column(nullable = false)
     private String cid;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "enum ('DEFAULT', 'PATH') default 'DEFAULT'")
     private CategoryTypeEnum categoryType;
     /**
      * 文章类别访问规则
      */
-    @Embedded
-    private CategoryAccessRule categoryAccessRule;
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private List<CategoryAccessRule> accessRuleList;
     /**
      * 文章类别名称
      */
@@ -67,30 +68,26 @@ public class Category extends BasePo {
     /**
      * 所属板块唯一标识
      */
-    @ManyToOne(targetEntity = Topic.class)
-    @JoinColumn(name = "topicId")
+    @Column(nullable = false)
     private Integer topicId;
     /**
      * 文章类别拥有者唯一标识
      */
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(nullable = false, name = "userId")
+    @Column(nullable = false)
     private Integer userId;
 
-    @ManyToOne(targetEntity = Category.class)
-    @JoinColumn(nullable = false, name = "rootId")
+    @Column
     private Integer rootId;
 
-    @ManyToOne(targetEntity = Category.class)
-    @JoinColumn(nullable = false, name = "parentId")
+    @Column
     private Integer parentId;
 
-    @Column
+    @Column(nullable = false)
     private Integer depth;
     /**
      * 排序优先级(越大越靠前)
      */
-    @Column
+    @Column(nullable = false)
     private Integer orderVal;
     /**
      * [PO_STATUS]文章类别状态:禁用,启用

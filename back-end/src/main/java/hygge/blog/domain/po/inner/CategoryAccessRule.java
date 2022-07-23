@@ -1,6 +1,7 @@
 package hygge.blog.domain.po.inner;
 
 import hygge.blog.domain.enums.AccessRuleTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -24,21 +25,16 @@ import javax.persistence.Enumerated;
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
+@Schema(title = "文章类别访问规则")
 public class CategoryAccessRule {
-    /**
-     * [PO_STATUS]访问规则类型:仅自己可见,秘钥访问,群组,男性可见,女性可见,周期开放,公开可见
-     */
     @Column(columnDefinition = "enum ('PERSONAL', 'SECRET_KEY', 'GROUP', 'MALE', 'FEMALE', 'CRON', 'PUBLIC') default 'PERSONAL'")
     @Enumerated(EnumType.STRING)
+    @Schema(title = "文章类别访问类型")
     private AccessRuleTypeEnum accessRuleType;
-    /**
-     * 是否为必要条件
-     */
     @Column
+    @Schema(title = "是否为必要条件")
     private boolean requirement;
-    /**
-     * 功能拓展字段，根据规则类型可能为：无意义、秘钥、组标识、时间表达式……
-     */
     @Column
+    @Schema(title = "扩展字段", description = "功能拓展字段，根据规则类型可能为：无意义、秘钥、组标识、时间表达式……")
     private String extendString;
 }

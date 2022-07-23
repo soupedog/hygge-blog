@@ -18,8 +18,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -46,8 +44,7 @@ public class Quote extends BasePo {
     /**
      * 创建者唯一标识
      */
-    @ManyToOne(targetEntity = User.class)
-    @JoinColumn(nullable = false, name = "userId")
+    @Column(nullable = false)
     private Integer userId;
     /**
      * 主图绝对路径

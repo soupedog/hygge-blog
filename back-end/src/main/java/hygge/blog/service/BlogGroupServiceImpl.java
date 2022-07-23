@@ -38,7 +38,7 @@ public class BlogGroupServiceImpl extends HyggeWebUtilContainer {
 
         BlogGroup old = blogGroupDao.findBlogGroupByGroupName(blogGroup.getGroupName());
         if (old != null) {
-            throw new LightRuntimeException(String.format("BlogGroup(%s) create conflict.", blogGroup.getGroupName()), BlogSystemCode.BLOG_GROUP_ALREADY_EXISTS);
+            throw new LightRuntimeException(String.format("BlogGroup(%s) already exists.", blogGroup.getGroupName()), BlogSystemCode.BLOG_GROUP_ALREADY_EXISTS);
         }
 
         blogGroup.setGid(randomHelper.getUniversallyUniqueIdentifier(true));

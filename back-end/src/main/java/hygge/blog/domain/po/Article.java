@@ -21,8 +21,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -60,14 +58,12 @@ public class Article extends BasePo {
     /**
      * 文章类别唯一标识
      */
-    @JoinColumn(nullable = false, name = "categoryId")
-    @ManyToOne(targetEntity = Category.class)
+    @Column(nullable = false)
     private Integer categoryId;
     /**
      * 作者唯一标识
      */
-    @JoinColumn(nullable = false, name = "userId")
-    @ManyToOne(targetEntity = User.class)
+    @Column(nullable = false)
     private Integer userId;
     /**
      * 文章标题
