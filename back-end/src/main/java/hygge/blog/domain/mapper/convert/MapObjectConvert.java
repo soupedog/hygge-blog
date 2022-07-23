@@ -1,5 +1,6 @@
 package hygge.blog.domain.mapper.convert;
 
+import hygge.blog.domain.enums.TopicStateEnum;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
@@ -42,5 +43,9 @@ public class MapObjectConvert {
 
     public UserStateEnum asUserStateEnum(Object target) {
         return UserStateEnum.parse(parameterHelper.string(target));
+    }
+
+    public TopicStateEnum asTopicStateEnum(Object target) {
+        return TopicStateEnum.parse(parameterHelper.string(target));
     }
 }

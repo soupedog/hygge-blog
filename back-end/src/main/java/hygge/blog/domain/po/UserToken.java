@@ -59,8 +59,8 @@ public class UserToken {
     private Timestamp deadline;
 
     public void refresh(long currentTimeStamp) {
-        this.token = randomHelper.getUniversallyUniqueIdentifier(false);
-        this.refreshKey = randomHelper.getUniversallyUniqueIdentifier(false);
+        this.token = randomHelper.getUniversallyUniqueIdentifier(true);
+        this.refreshKey = randomHelper.getUniversallyUniqueIdentifier(true);
         // 往后有效 3 小时
         this.deadline = new Timestamp(currentTimeStamp + 10800000L);
     }

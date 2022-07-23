@@ -39,7 +39,11 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
     /**
      * 板块未找到
      */
-    BOARD_NOT_FOUND(false, null, 404301, null),
+    TOPIC_NOT_FOUND(false, null, 404301, null),
+    /**
+     * 板块已存在
+     */
+    TOPIC_ALREADY_EXISTS(false, null, 404301, null),
     /**
      * 群组名称已存在
      */

@@ -20,8 +20,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -58,8 +56,7 @@ public class Topic extends BasePo {
     /**
      * 板块拥有者唯一标识
      */
-    @JoinColumn(nullable = false, name = "userId")
-    @ManyToOne(targetEntity = User.class)
+    @Column(nullable = false)
     private Integer userId;
     /**
      * 排序优先级(越大越靠前)

@@ -1,10 +1,12 @@
 package hygge.blog.domain.mapper;
 
 import hygge.blog.domain.dto.BlogGroupDto;
+import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.UserDto;
 import hygge.blog.domain.dto.UserTokenDto;
 import hygge.blog.domain.mapper.convert.ObjectMappingConvert;
 import hygge.blog.domain.po.BlogGroup;
+import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;
 import org.mapstruct.Mapper;
@@ -43,4 +45,8 @@ public interface PoDtoMapper {
     BlogGroupDto poToDto(BlogGroup po);
 
     BlogGroup dtoToPo(BlogGroupDto dto);
+
+    TopicDto poToDto(Topic po);
+
+    Topic dtoToPo(TopicDto dto);
 }

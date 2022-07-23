@@ -18,6 +18,7 @@ import lombok.Setter;
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(title = "博客群组绑定信息")
 public class GroupBindInfo {
     @Schema(title = "群组编号", description = "系统自动生成群组编号")
     private String gid;
