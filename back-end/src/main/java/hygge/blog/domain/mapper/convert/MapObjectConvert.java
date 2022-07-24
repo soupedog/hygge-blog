@@ -1,5 +1,7 @@
 package hygge.blog.domain.mapper.convert;
 
+import hygge.blog.domain.enums.CategoryStateEnum;
+import hygge.blog.domain.enums.CategoryTypeEnum;
 import hygge.blog.domain.enums.TopicStateEnum;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
@@ -47,5 +49,13 @@ public class MapObjectConvert {
 
     public TopicStateEnum asTopicStateEnum(Object target) {
         return TopicStateEnum.parse(parameterHelper.string(target));
+    }
+
+    public CategoryTypeEnum asCategoryTypeEnum(Object target) {
+        return CategoryTypeEnum.parse(parameterHelper.string(target));
+    }
+
+    public CategoryStateEnum asCategoryStateEnum(Object target) {
+        return CategoryStateEnum.parse(parameterHelper.string(target));
     }
 }

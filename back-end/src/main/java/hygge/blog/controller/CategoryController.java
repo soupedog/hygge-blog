@@ -38,6 +38,8 @@ public class CategoryController implements CategoryControllerDoc {
     @Override
     @PutMapping("/category/{cid}")
     public ResponseEntity<HyggeBlogControllerResponse<CategoryDto>> updateCategory(@PathVariable("cid") String cid, @RequestBody Map<String, Object> data) {
-        return null;
+        Category resultTemp = categoryService.updateCategory(cid, data);
+        CategoryDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
+        return (ResponseEntity<HyggeBlogControllerResponse<CategoryDto>>) success(result);
     }
 }

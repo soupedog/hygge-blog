@@ -70,20 +70,13 @@ public class TopicServiceImpl extends HyggeWebUtilContainer {
         User currentUser = context.getCurrentLoginUser();
         userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
 
-        Topic old = topicDao.findTopicByTid(tid);
-
-        if (old == null) {
-            throw new LightRuntimeException(String.format("Topic(%s) was not found.", tid), BlogSystemCode.TOPIC_NOT_FOUND);
-        }
+        Topic old = findTopicByTid(tid, false);
 
         HashMap<String, Object> finalData = daoHelper.filterOutTheFinalColumns(data, forUpdate);
 
         String topicName = (String) finalData.get("topicName");
         if (topicName != null) {
-            Topic existOne = topicDao.findTopicByTopicName(topicName);
-            if (existOne != null) {
-                throw new LightRuntimeException(String.format("Topic(%s) already exists.", existOne.getTopicName()), BlogSystemCode.TOPIC_ALREADY_EXISTS);
-            }
+            nameConflictCheck(topicName);
         }
 
         String uid = (String) finalData.get("uid");
@@ -95,6 +88,13 @@ public class TopicServiceImpl extends HyggeWebUtilContainer {
         Topic newOne = MapToAnyMapper.INSTANCE.mapToTopic(finalData);
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
         return topicDao.save(old);
+    }
+
+    public void nameConflictCheck(String topicName) {
+        Topic old = topicDao.findTopicByTopicName(topicName);
+        if (old != null) {
+            throw new LightRuntimeException(String.format("Topic(%s) already exists.", topicName), BlogSystemCode.ARTICLE_CATEGORY_ALREADY_EXISTS);
+        }
     }
 
     public Topic findTopicByTid(String tid, boolean nullable) {
