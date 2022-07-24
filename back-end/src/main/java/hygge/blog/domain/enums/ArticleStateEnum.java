@@ -8,13 +8,18 @@ package hygge.blog.domain.enums;
  */
 public enum ArticleStateEnum {
     /**
-     * 禁用
+     * 草稿
      */
-    INACTIVE(0, "INACTIVE"),
+    DRAFT(0, "DRAFT"),
     /**
-     * 启用
+     * 正常启用启用
      */
-    ACTIVE(1, "ACTIVE");
+    ACTIVE(1, "ACTIVE"),
+    /**
+     * 私人的，仅自身可见
+     */
+    PRIVATE(2, "PRIVATE"),
+    ;
 
     ArticleStateEnum(Integer index, String value) {
         this.index = index;
@@ -27,9 +32,11 @@ public enum ArticleStateEnum {
         }
         switch (index) {
             case 0:
-                return ArticleStateEnum.INACTIVE;
+                return ArticleStateEnum.DRAFT;
             case 1:
                 return ArticleStateEnum.ACTIVE;
+            case 2:
+                return ArticleStateEnum.PRIVATE;
             default:
                 throw new IllegalArgumentException("Unexpected index of ArticleStateEnum,it can't be " + index + ".");
         }
@@ -41,9 +48,11 @@ public enum ArticleStateEnum {
         }
         switch (value) {
             case "INACTIVE":
-                return ArticleStateEnum.INACTIVE;
+                return ArticleStateEnum.DRAFT;
             case "ACTIVE":
                 return ArticleStateEnum.ACTIVE;
+            case "PRIVATE":
+                return ArticleStateEnum.PRIVATE;
             default:
                 throw new IllegalArgumentException("Unexpected value of ArticleStateEnum,it can't be " + value + ".");
         }

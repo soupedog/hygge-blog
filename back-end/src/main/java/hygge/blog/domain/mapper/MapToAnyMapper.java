@@ -1,6 +1,7 @@
 package hygge.blog.domain.mapper;
 
 import hygge.blog.domain.mapper.convert.MapObjectConvert;
+import hygge.blog.domain.po.Article;
 import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
@@ -20,10 +21,12 @@ public interface MapToAnyMapper {
 
     @Mapping(source = "blogGroupList", target = "blogGroupList", ignore = true)
     User mapToUser(Map<String, ?> map);
+
     @Mapping(source = "topicId", target = "topicId", ignore = true)
     @Mapping(source = "tid", target = "tid", ignore = true)
     Topic mapToTopic(Map<String, ?> map);
 
-    @Mapping(source = "accessRuleList", target = "accessRuleList", ignore = true)
     Category mapToCategory(Map<String, ?> map);
+
+    Article mapToArticle(Map<String, ?> map);
 }

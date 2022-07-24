@@ -52,6 +52,7 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
+        forUpdate.add(new ColumnInfo("accessRuleList", null, ColumnTypeEnum.OTHER_OBJECT, true, false, 0, 0));
         forUpdate.add(new ColumnInfo("categoryName", null, ColumnTypeEnum.STRING, true, false, 1, 500));
         forUpdate.add(new ColumnInfo("tid", null, ColumnTypeEnum.STRING, true, false, 0, 500));
         forUpdate.add(new ColumnInfo("uid", null, ColumnTypeEnum.STRING, true, false, 0, 500));
@@ -141,11 +142,9 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
             // TODO 更新 parent Type
         }
 
-        Object accessRuleListTemp = data.get("accessRuleList");
-        if (accessRuleListTemp != null) {
-            ArrayList<CategoryAccessRule> accessRuleList = (ArrayList<CategoryAccessRule>) jsonHelper.readAsObjectWithClassInfo(jsonHelper.formatAsString(accessRuleListTemp), TYPE_INFO_ACCESS_RULE_LIST);
-            accessRuleListValidate(accessRuleList);
-            newOne.setAccessRuleList(accessRuleList);
+        if (newOne.getAccessRuleList() != null) {
+            collectionHelper.collectionNotEmpty("accessRuleList", newOne.getAccessRuleList());
+            accessRuleListValidate(newOne.getAccessRuleList());
         }
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);

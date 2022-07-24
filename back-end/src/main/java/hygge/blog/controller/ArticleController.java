@@ -1,0 +1,44 @@
+package hygge.blog.controller;
+
+import hygge.blog.controller.doc.ArticleControllerDoc;
+import hygge.blog.domain.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.dto.ArticleDto;
+import hygge.blog.domain.mapper.PoDtoMapper;
+import hygge.blog.domain.po.Article;
+import hygge.blog.service.ArticleServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+/**
+ * @author Xavier
+ * @date 2022/7/24
+ */
+@RestController
+@RequestMapping(value = "/blog-service/api/main")
+public class ArticleController implements ArticleControllerDoc {
+    @Autowired
+    private ArticleServiceImpl articleService;
+
+    @Override
+    @PostMapping("/article")
+    public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> createArticle(@RequestBody ArticleDto articleDto) {
+        Article resultTemp = articleService.createArticle(articleDto);
+        ArticleDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(result);
+    }
+
+    @Override
+    @PostMapping("/article/{aid}")
+    public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> updateArticle(@PathVariable("aid") String aid, @RequestBody Map<String, Object> data) {
+        Article resultTemp = articleService.updateArticle(aid, data);
+        ArticleDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(result);
+    }
+}

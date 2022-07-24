@@ -1,15 +1,22 @@
 package hygge.blog.domain.mapper.convert;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.CategoryStateEnum;
 import hygge.blog.domain.enums.CategoryTypeEnum;
 import hygge.blog.domain.enums.TopicStateEnum;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
+import hygge.blog.domain.po.inner.ArticleConfiguration;
+import hygge.blog.domain.po.inner.CategoryAccessRule;
 import hygge.utils.UtilsCreator;
+import hygge.utils.definitions.JsonHelper;
 import hygge.utils.definitions.ParameterHelper;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Xavier
@@ -17,6 +24,10 @@ import java.sql.Timestamp;
  */
 public class MapObjectConvert {
     private static final ParameterHelper parameterHelper = UtilsCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
+    private static final JsonHelper<?> jsonHelper = UtilsCreator.INSTANCE.getDefaultJsonHelperInstance(false);
+
+    private static TypeReference<ArrayList<CategoryAccessRule>> TYPE_INFO_ACCESS_RULE_LIST = new TypeReference<>() {
+    };
 
     public String asString(Object target) {
         return parameterHelper.string(target);
@@ -51,11 +62,30 @@ public class MapObjectConvert {
         return TopicStateEnum.parse(parameterHelper.string(target));
     }
 
+    public List<CategoryAccessRule> asAccessRuleList(Object target) {
+        if (target == null) {
+            return null;
+        }
+        return (List<CategoryAccessRule>) jsonHelper.readAsObjectWithClassInfo(jsonHelper.formatAsString(target), TYPE_INFO_ACCESS_RULE_LIST);
+    }
+
     public CategoryTypeEnum asCategoryTypeEnum(Object target) {
         return CategoryTypeEnum.parse(parameterHelper.string(target));
     }
 
     public CategoryStateEnum asCategoryStateEnum(Object target) {
         return CategoryStateEnum.parse(parameterHelper.string(target));
+    }
+
+
+    public ArticleConfiguration asArticleConfiguration(Object target) {
+        if (target == null) {
+            return null;
+        }
+        return jsonHelper.readAsObject(jsonHelper.formatAsString(target), ArticleConfiguration.class);
+    }
+
+    public ArticleStateEnum asArticleStateEnum(Object target) {
+        return ArticleStateEnum.parse(parameterHelper.string(target));
     }
 }

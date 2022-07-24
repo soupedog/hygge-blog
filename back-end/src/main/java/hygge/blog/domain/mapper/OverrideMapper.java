@@ -1,5 +1,6 @@
 package hygge.blog.domain.mapper;
 
+import hygge.blog.domain.po.Article;
 import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
@@ -21,4 +22,5 @@ public interface OverrideMapper {
     void overrideToAnother(Topic one, @MappingTarget Topic another);
 
     void overrideToAnother(Category one, @MappingTarget Category another);
+    void overrideToAnother(Article one, @MappingTarget Article another);
 }
