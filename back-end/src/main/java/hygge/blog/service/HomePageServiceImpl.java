@@ -57,8 +57,10 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
 
                 Optional<ArticleCountInfo> articleCountInfoTemp = articleCountInfoList.stream().filter(articleCountInfo -> articleCountInfo.getCategoryId().equals(category.getCategoryId())).findFirst();
                 Integer count = articleCountInfoTemp.map(articleCountInfo -> articleCountInfo.getCount().intValue()).orElse(0);
-                categoryDto.setArticleCount(count);
-                topicOverviewInfo.getCategoryListInfo().add(categoryDto);
+                if (count > 0) {
+                    categoryDto.setArticleCount(count);
+                    topicOverviewInfo.getCategoryListInfo().add(categoryDto);
+                }
             }
             if (!topicOverviewInfo.getCategoryListInfo().isEmpty()) {
                 result.getTopicOverviewInfoList().add(topicOverviewInfo);

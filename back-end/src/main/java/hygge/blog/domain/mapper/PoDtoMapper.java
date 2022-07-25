@@ -50,10 +50,14 @@ public interface PoDtoMapper {
 
     BlogGroup dtoToPo(BlogGroupDto dto);
 
+    @Mapping(source = "topicState", target = "topicState", ignore = true)
     TopicDto poToDto(Topic po);
 
     Topic dtoToPo(TopicDto dto);
 
+    @Mapping(source = "accessRuleList", target = "accessRuleList", ignore = true)
+    @Mapping(source = "categoryState", target = "categoryState", ignore = true)
+    @Mapping(source = "categoryType", target = "categoryType", ignore = true)
     CategoryDto poToDto(Category po);
 
     Category dtoToPo(CategoryDto dto);
