@@ -12,6 +12,7 @@ import hygge.blog.domain.mapper.MapToAnyMapper;
 import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Article;
+import hygge.blog.domain.po.ArticleCountInfo;
 import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -118,6 +120,11 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
 
         return articleDao.save(old);
+    }
+
+    public List<ArticleCountInfo> findArticleCountInfo(List<Integer> accessibleCategoryIdList, Integer userId) {
+        return userId == null ? articleDao.findArticleCountsOfCategory(accessibleCategoryIdList)
+                : articleDao.findArticleCountsOfCategory(accessibleCategoryIdList, userId);
     }
 
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {

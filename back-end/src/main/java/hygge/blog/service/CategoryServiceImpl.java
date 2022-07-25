@@ -7,6 +7,7 @@ import hygge.blog.dao.CategoryDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.CategoryDto;
 import hygge.blog.domain.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.enums.CategoryStateEnum;
 import hygge.blog.domain.enums.CategoryTypeEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.MapToAnyMapper;
@@ -23,6 +24,7 @@ import hygge.utils.bo.ColumnInfo;
 import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,6 +152,12 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
 
         return categoryDao.save(old);
+    }
+
+    public List<Category> getAccessibleCategoryList(User currentUser) {
+        Example<Category> example = Example.of(Category.builder().categoryState(CategoryStateEnum.ACTIVE).build());
+        List<Category> categoryList = categoryDao.findAll(example);
+        return categoryList.stream().filter(category -> category.accessibleForUser(currentUser)).toList();
     }
 
     private void nameConflictCheck(String categoryName) {

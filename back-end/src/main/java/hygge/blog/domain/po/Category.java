@@ -1,7 +1,11 @@
 package hygge.blog.domain.po;
 
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.domain.enums.AccessRuleTypeEnum;
 import hygge.blog.domain.enums.CategoryStateEnum;
 import hygge.blog.domain.enums.CategoryTypeEnum;
+import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.po.base.BasePo;
 import hygge.blog.domain.po.inner.CategoryAccessRule;
 import lombok.AllArgsConstructor;
@@ -95,4 +99,62 @@ public class Category extends BasePo {
     @Column(nullable = false, columnDefinition = "enum ('INACTIVE', 'ACTIVE') default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
     private CategoryStateEnum categoryState;
+
+    public boolean accessibleForUser(User targetUser) {
+        if (parameterHelper.isEmpty(accessRuleList)) {
+            return false;
+        }
+
+        if (targetUser == null) {
+            // 访客
+            return accessRuleList.stream().anyMatch(categoryAccessRule -> AccessRuleTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
+        }
+
+        boolean result = false;
+
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        for (CategoryAccessRule categoryAccessRule : accessRuleList) {
+            boolean itemResult = false;
+            switch (categoryAccessRule.getAccessRuleType()) {
+                case SECRET_KEY:
+                    if (categoryAccessRule.getExtendString().equals(context.getObject(HyggeRequestContext.Key.SECRET_KEY))) {
+                        itemResult = true;
+                    }
+                    break;
+                case PERSONAL:
+                    if (context.getCurrentLoginUser().getUserId().equals(targetUser.getUserId())) {
+                        itemResult = true;
+                    }
+                    break;
+                case GROUP:
+                    List<BlogGroup> groupList = targetUser.getBlogGroupList();
+                    if (groupList.stream().anyMatch(group -> group.getGid().equals(categoryAccessRule.getExtendString()))) {
+                        itemResult = true;
+                    }
+                    break;
+                case MALE:
+                    if (targetUser.getUserSex().equals(UserSexEnum.MAN)) {
+                        itemResult = true;
+                    }
+                    break;
+                case FEMALE:
+                    if (targetUser.getUserSex().equals(UserSexEnum.WOMAN)) {
+                        itemResult = true;
+                    }
+                    break;
+                case CRON:
+                    // 暂时不会出现，先偷个懒
+                    break;
+                default:
+                    itemResult = true;
+            }
+
+            if (categoryAccessRule.isRequirement()) {
+                result = result && itemResult;
+            } else {
+                result = result || itemResult;
+            }
+        }
+        return result;
+    }
 }

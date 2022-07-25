@@ -28,7 +28,7 @@ public class FilterConfig {
     public FilterRegistrationBean<LoginFilter> loginFilterRegistration(LoginFilter loginFilter) {
         FilterRegistrationBean<LoginFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(loginFilter);
-        filterRegistrationBean.addUrlPatterns("/blog-service/api/main/*");
+        filterRegistrationBean.addUrlPatterns("/blog-service/api/*");
         filterRegistrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
         return filterRegistrationBean;
     }

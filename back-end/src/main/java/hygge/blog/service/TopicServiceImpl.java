@@ -17,11 +17,14 @@ import hygge.utils.bo.ColumnInfo;
 import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,6 +91,10 @@ public class TopicServiceImpl extends HyggeWebUtilContainer {
         Topic newOne = MapToAnyMapper.INSTANCE.mapToTopic(finalData);
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
         return topicDao.save(old);
+    }
+
+    public List<Topic> findAllTopic() {
+        return topicDao.findAll(Example.of(Topic.builder().topicState(TopicStateEnum.ACTIVE).build()), Sort.by(Sort.Order.desc("orderVal")));
     }
 
     public void nameConflictCheck(String topicName) {
