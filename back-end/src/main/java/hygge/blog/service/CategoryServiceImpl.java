@@ -13,6 +13,7 @@ import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.MapToAnyMapper;
 import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.mapper.PoDtoMapper;
+import hygge.blog.domain.po.ArticleCountInfo;
 import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
@@ -25,6 +26,7 @@ import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +49,8 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
     };
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private ArticleServiceImpl articleService;
     @Autowired
     private TopicServiceImpl topicService;
     @Autowired
@@ -90,10 +94,19 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
 
         if (parameterHelper.isNotEmpty(categoryDto.getParentCid())) {
             Category parentCategory = findCategoryByCid(categoryDto.getParentCid(), false);
+            ArticleCountInfo parentCategoryCountInfo = articleService.findArticleCountInfo(parentCategory.getCategoryId(), currentUser.getUserId());
+            if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT) && parentCategoryCountInfo.getCount() > 0) {
+                throw new LightRuntimeException(String.format("Category(%s) can't contain article, but contains %d.", parentCategory.getCategoryName(), parentCategoryCountInfo.getCount()), BlogSystemCode.ARTICLE_CATEGORY_SUB_ARTICLE_NOT_EMPTY);
+            }
+            // 更新 parent Type
+            if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT)) {
+                parentCategory.setCategoryType(CategoryTypeEnum.PATH);
+                categoryDao.save(parentCategory);
+            }
+
             category.setRootId(parentCategory.getRootId());
             category.setParentId(parentCategory.getCategoryId());
             category.setDepth(parentCategory.getDepth() + 1);
-            // TODO 更新 parent Type
         } else {
             category.setDepth(0);
         }
@@ -138,10 +151,19 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
         String parentCid = (String) finalData.get("parentCid");
         if (parentCid != null) {
             Category parentCategory = findCategoryByCid(parentCid, false);
+            ArticleCountInfo parentCategoryCountInfo = articleService.findArticleCountInfo(parentCategory.getCategoryId(), currentUser.getUserId());
+            if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT) && parentCategoryCountInfo.getCount() > 0) {
+                throw new LightRuntimeException(String.format("Category(%s) can't contain article, but contains %d.", parentCategory.getCategoryName(), parentCategoryCountInfo.getCount()), BlogSystemCode.ARTICLE_CATEGORY_SUB_ARTICLE_NOT_EMPTY);
+            }
+            // 更新 parent Type
+            if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT)) {
+                parentCategory.setCategoryType(CategoryTypeEnum.PATH);
+                categoryDao.save(parentCategory);
+            }
+
             newOne.setParentId(parentCategory.getCategoryId());
             newOne.setRootId(parentCategory.getRootId());
             newOne.setDepth(parentCategory.getDepth() + 1);
-            // TODO 更新 parent Type
         }
 
         if (newOne.getAccessRuleList() != null) {
@@ -156,7 +178,7 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
 
     public List<Category> getAccessibleCategoryList(User currentUser) {
         Example<Category> example = Example.of(Category.builder().categoryState(CategoryStateEnum.ACTIVE).build());
-        List<Category> categoryList = categoryDao.findAll(example);
+        List<Category> categoryList = categoryDao.findAll(example, Sort.by(Sort.Order.desc("orderVal")));
         return categoryList.stream().filter(category -> category.accessibleForUser(currentUser)).toList();
     }
 

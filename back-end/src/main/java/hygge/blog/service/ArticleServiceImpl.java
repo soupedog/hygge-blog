@@ -127,6 +127,17 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
                 : articleDao.findArticleCountsOfCategory(accessibleCategoryIdList, userId);
     }
 
+    public ArticleCountInfo findArticleCountInfo(Integer categoryId, Integer userId) {
+        parameterHelper.integerFormatNotEmpty("categoryId", categoryId);
+        List<Integer> accessibleCategoryIdList = collectionHelper.createCollection(categoryId);
+
+        List<ArticleCountInfo> articleCountInfoList = findArticleCountInfo(accessibleCategoryIdList, userId);
+        if (parameterHelper.isEmpty(articleCountInfoList)) {
+            return null;
+        }
+        return articleCountInfoList.get(0);
+    }
+
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {
         if (articleConfiguration != null) {
             articleConfiguration.setBackgroundMusicType(parameterHelper.parseObjectOfNullable("backgroundMusicType", articleConfiguration.getBackgroundMusicType(), BackgroundMusicTypeEnum.NONE));
