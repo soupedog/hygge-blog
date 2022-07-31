@@ -1,5 +1,6 @@
 package hygge.blog.domain.dto.inner;
 
+import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.CategoryDto;
 import hygge.blog.domain.dto.TopicDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,6 +27,10 @@ import java.util.List;
 public class TopicOverviewInfo {
     @Schema(title = "板块信息")
     private TopicDto topicInfo;
-    @Schema(title = "所有文章类别容器")
+    @Schema(title = "板块下所有文章类别容器")
     private List<CategoryDto> categoryListInfo;
+    @Schema(title = "板块下文章摘要信息")
+    private List<ArticleDto> articleSummaryList;
+    @Schema(title = "板块下文章总数")
+    private int totalCount;
 }

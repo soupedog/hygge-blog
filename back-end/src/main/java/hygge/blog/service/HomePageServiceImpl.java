@@ -5,6 +5,7 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.dto.CategoryDto;
 import hygge.blog.domain.dto.HomepageFetchResult;
 import hygge.blog.domain.dto.TopicDto;
+import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.ArticleCountInfo;
@@ -26,6 +27,8 @@ import java.util.Optional;
 @Service
 public class HomePageServiceImpl extends HyggeWebUtilContainer {
     @Autowired
+    private UserServiceImpl userService;
+    @Autowired
     private TopicServiceImpl topicService;
     @Autowired
     private CategoryServiceImpl categoryService;
@@ -38,7 +41,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
 
         List<Topic> topicList = topicService.findAllTopic();
 
-        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser);
+        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
 
@@ -72,4 +75,16 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         }
         return result;
     }
+
+    public ArticleSummaryInfo findArticleSummaryOfTopic(String tid, int currentPage, int pageSize) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
+        Topic topic = topicService.findTopicByTid(tid, false);
+        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, collectionHelper.createCollection(topic.getTopicId()));
+
+        List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
+        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+    }
+
 }

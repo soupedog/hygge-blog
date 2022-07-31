@@ -176,10 +176,15 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
         return categoryDao.save(old);
     }
 
-    public List<Category> getAccessibleCategoryList(User currentUser) {
+    public List<Category> getAccessibleCategoryList(User currentUser, Collection<Integer> topicIdRequirement) {
         Example<Category> example = Example.of(Category.builder().categoryState(CategoryStateEnum.ACTIVE).build());
         List<Category> categoryList = categoryDao.findAll(example, Sort.by(Sort.Order.desc("orderVal")));
-        return categoryList.stream().filter(category -> category.accessibleForUser(currentUser)).toList();
+
+        List<Category> result = categoryList.stream().filter(category -> category.accessibleForUser(currentUser)).toList();
+        if (parameterHelper.isNotEmpty(topicIdRequirement)) {
+            result = result.stream().filter(category -> topicIdRequirement.contains(category.getTopicId())).toList();
+        }
+        return result;
     }
 
     private void nameConflictCheck(String categoryName) {

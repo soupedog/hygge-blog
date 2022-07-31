@@ -5,6 +5,7 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.dao.ArticleDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.ArticleDto;
+import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.enums.BackgroundMusicTypeEnum;
 import hygge.blog.domain.enums.MediaPlayTypeEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
@@ -122,21 +123,45 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         return articleDao.save(old);
     }
 
-    public List<ArticleCountInfo> findArticleCountInfo(List<Integer> accessibleCategoryIdList, Integer userId) {
-        return userId == null ? articleDao.findArticleCountsOfCategory(accessibleCategoryIdList)
-                : articleDao.findArticleCountsOfCategory(accessibleCategoryIdList, userId);
+    public List<ArticleCountInfo> findArticleCountInfo(List<Integer> accessibleCategoryIdList, Integer currentUserId) {
+        return currentUserId == null ? articleDao.findArticleCountsOfCategory(accessibleCategoryIdList)
+                : articleDao.findArticleCountsOfCategory(accessibleCategoryIdList, currentUserId);
     }
 
-    public ArticleCountInfo findArticleCountInfo(Integer categoryId, Integer userId) {
+    public ArticleCountInfo findArticleCountInfo(Integer categoryId, Integer currentUserId) {
         parameterHelper.integerFormatNotEmpty("categoryId", categoryId);
         List<Integer> accessibleCategoryIdList = collectionHelper.createCollection(categoryId);
 
-        List<ArticleCountInfo> articleCountInfoList = findArticleCountInfo(accessibleCategoryIdList, userId);
+        List<ArticleCountInfo> articleCountInfoList = findArticleCountInfo(accessibleCategoryIdList, currentUserId);
         if (parameterHelper.isEmpty(articleCountInfoList)) {
             return null;
         }
         return articleCountInfoList.get(0);
     }
+
+    public ArticleSummaryInfo findArticleSummaryInfoByCategoryId(List<Integer> accessibleCategoryIdList, Integer currentUserId, int currentPage, int pageSize) {
+        ArticleSummaryInfo result = new ArticleSummaryInfo();
+        if (accessibleCategoryIdList.isEmpty()) {
+            result.setArticleSummaryList(new ArrayList<>(0));
+            return result;
+        }
+
+        List<Article> articleList;
+        int totalCount;
+        if (currentUserId != null) {
+            articleList = articleDao.findArticleSummary(accessibleCategoryIdList, currentUserId, "orderGlobal desc,createTs desc", (currentPage - 1) * pageSize, pageSize);
+            totalCount = articleDao.findArticleSummaryTotalCount(accessibleCategoryIdList, currentUserId);
+        } else {
+            articleList = articleDao.findArticleSummary(accessibleCategoryIdList, "orderGlobal desc,createTs desc", (currentPage - 1) * pageSize, pageSize);
+            totalCount = articleDao.findArticleSummaryTotalCount(accessibleCategoryIdList);
+        }
+
+        List<ArticleDto> articleSummaryList = collectionHelper.filterNonemptyItemAsArrayList(false, articleList, (PoDtoMapper.INSTANCE::poToDto));
+        result.setArticleSummaryList(articleSummaryList);
+        result.setTotalCount(totalCount);
+        return result;
+    }
+
 
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {
         if (articleConfiguration != null) {

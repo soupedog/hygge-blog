@@ -26,12 +26,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {
+    @Schema(title = "板块编号", description = "系统自动生成板块编号")
+    private String tid;
     @Schema(title = "文章类别编号", description = "系统自动生成文章类别编号")
     private String cid;
     @Schema(title = "文章类别类型", description = "PATH 类型下不允许挂载文章")
     private CategoryTypeEnum categoryType;
-    @Schema(title = "板块编号", description = "系统自动生成板块编号")
-    private String tid;
     @Schema(title = "文章类别名称", description = "创建者自定义的文章类别名称")
     private String categoryName;
     @Schema(title = "文章类别访问规则", description = "限制文章类别可见性")

@@ -22,6 +22,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 
 /**
  * 文章
@@ -116,4 +117,21 @@ public class Article extends BasePo {
     @Column(nullable = false, columnDefinition = "enum ('DRAFT', 'INACTIVE', 'ACTIVE') default 'DRAFT'")
     @Enumerated(EnumType.STRING)
     private ArticleStateEnum articleState;
+
+    public Article(Timestamp createTs, Timestamp lastUpdateTs, Integer articleId, String aid, Integer categoryId, Integer userId, String title, String imageSrc, String summary, Integer wordCount, Integer pageViews, Integer selfPageViews, Integer orderGlobal, Integer orderCategory) {
+        this.createTs = createTs;
+        this.lastUpdateTs = lastUpdateTs;
+        this.articleId = articleId;
+        this.aid = aid;
+        this.categoryId = categoryId;
+        this.userId = userId;
+        this.title = title;
+        this.imageSrc = imageSrc;
+        this.summary = summary;
+        this.wordCount = wordCount;
+        this.pageViews = pageViews;
+        this.selfPageViews = selfPageViews;
+        this.orderGlobal = orderGlobal;
+        this.orderCategory = orderCategory;
+    }
 }

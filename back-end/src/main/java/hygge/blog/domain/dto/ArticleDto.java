@@ -11,19 +11,6 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
 
 /**
  * 文章
@@ -61,10 +48,10 @@ public class ArticleDto extends BasePo {
     private Integer pageViews;
     @Schema(title = "作者自身贡献的浏览量")
     private Integer selfPageViews;
-    @Schema(title = "全局排序优先级",description = "越大越靠前")
+    @Schema(title = "全局排序优先级", description = "越大越靠前")
     private Integer orderGlobal;
-    @Schema(title = "类别内排序优先级",description = "越大越靠前")
+    @Schema(title = "类别内排序优先级", description = "越大越靠前")
     private Integer orderCategory;
-    @Schema(title = "文章状态",description = "草稿,启用,私人的")
+    @Schema(title = "文章状态", description = "草稿,启用,私人的")
     private ArticleStateEnum articleState;
 }
