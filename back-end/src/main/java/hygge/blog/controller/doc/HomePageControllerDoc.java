@@ -19,4 +19,7 @@ public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntit
 
     @Operation(summary = "查询特定主题下的文章", description = "在主题加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> topicInfoFetch(String tid, int currentPage, int pageSize);
+
+    @Operation(summary = "查询特定文章类别下的文章", description = "在文章类别加载时需要拉取的数据")
+    ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> categoryInfoFetch(String cid, int currentPage, int pageSize);
 }

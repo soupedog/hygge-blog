@@ -27,8 +27,6 @@ import java.util.Optional;
 @Service
 public class HomePageServiceImpl extends HyggeWebUtilContainer {
     @Autowired
-    private UserServiceImpl userService;
-    @Autowired
     private TopicServiceImpl topicService;
     @Autowired
     private CategoryServiceImpl categoryService;
@@ -70,9 +68,6 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
             }
         }
 
-        if (result.getTopicOverviewInfoList().isEmpty()) {
-            return null;
-        }
         return result;
     }
 
@@ -82,6 +77,23 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
 
         Topic topic = topicService.findTopicByTid(tid, false);
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, collectionHelper.createCollection(topic.getTopicId()));
+
+        List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
+        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+    }
+
+    public ArticleSummaryInfo findArticleSummaryOfCategory(String cid, int currentPage, int pageSize) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
+        Category category = categoryService.findCategoryByCid(cid, true);
+        List<Category> categoryList;
+        if (category != null) {
+            categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+            categoryList = categoryList.stream().filter(item -> item.getCategoryId().equals(category.getCategoryId())).toList();
+        } else {
+            categoryList = new ArrayList<>(0);
+        }
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
         return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);

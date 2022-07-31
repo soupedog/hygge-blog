@@ -24,7 +24,7 @@ public class HomePageController implements HomePageControllerDoc {
     private HomePageServiceImpl homePageService;
 
     @Override
-    @GetMapping("/fetch/home")
+    @GetMapping("/fetch")
     public ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>> homepageFetch() {
         return (ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>>) success(homePageService.fetch());
     }
@@ -37,4 +37,11 @@ public class HomePageController implements HomePageControllerDoc {
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>>) success(homePageService.findArticleSummaryOfTopic(tid, currentPage, pageSize));
     }
 
+    @Override
+    @GetMapping("/fetch/category/{cid}")
+    public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> categoryInfoFetch(@PathVariable("cid") String cid,
+                                                                                             @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                             @RequestParam(required = false, defaultValue = "5") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>>) success(homePageService.findArticleSummaryOfCategory(cid, currentPage, pageSize));
+    }
 }
