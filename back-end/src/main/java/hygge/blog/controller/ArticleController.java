@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,7 @@ public class ArticleController implements ArticleControllerDoc {
     }
 
     @Override
-    @PostMapping("/article/{aid}")
+    @PutMapping("/article/{aid}")
     public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> updateArticle(@PathVariable("aid") String aid, @RequestBody Map<String, Object> data) {
         Article resultTemp = articleService.updateArticle(aid, data);
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
