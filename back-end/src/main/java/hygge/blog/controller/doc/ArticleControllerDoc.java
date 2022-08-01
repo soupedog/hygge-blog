@@ -28,4 +28,7 @@ public interface ArticleControllerDoc extends HyggeBlogController<ResponseEntity
             )}
     )
     ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> updateArticle(String aid, Map<String, Object> data);
+
+    @Operation(summary = "查询文章", description = "查询文章详情")
+    ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(String aid);
 }

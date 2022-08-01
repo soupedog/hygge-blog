@@ -79,7 +79,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, collectionHelper.createCollection(topic.getTopicId()));
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
-        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, categoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
     }
 
     public ArticleSummaryInfo findArticleSummaryOfCategory(String cid, int currentPage, int pageSize) {
@@ -96,7 +96,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         }
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
-        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, categoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
     }
 
 }

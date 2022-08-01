@@ -109,9 +109,21 @@ public class TopicServiceImpl extends HyggeWebUtilContainer {
         return checkTopicResult(result, tid, nullable);
     }
 
+    public Topic findTopicByTopicId(Integer topicId, boolean nullable) {
+        Topic result = topicDao.findById(topicId).orElse(null);
+        return checkTopicResult(result, topicId, nullable);
+    }
+
     private Topic checkTopicResult(Topic topicTemp, String info, boolean nullable) {
         if (!nullable && topicTemp == null) {
             throw new LightRuntimeException(String.format("Topic(%s) was not found.", info), BlogSystemCode.TOPIC_NOT_FOUND);
+        }
+        return topicTemp;
+    }
+
+    private Topic checkTopicResult(Topic topicTemp, Integer info, boolean nullable) {
+        if (!nullable && topicTemp == null) {
+            throw new LightRuntimeException(String.format("Topic(%d) was not found.", info), BlogSystemCode.TOPIC_NOT_FOUND);
         }
         return topicTemp;
     }

@@ -8,6 +8,7 @@ import hygge.blog.domain.po.Article;
 import hygge.blog.service.ArticleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,5 +42,11 @@ public class ArticleController implements ArticleControllerDoc {
         Article resultTemp = articleService.updateArticle(aid, data);
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(result);
+    }
+
+    @Override
+    @GetMapping("/article/{aid}")
+    public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(@PathVariable("aid") String aid) {
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(articleService.findArticleDetailByAid(aid));
     }
 }
