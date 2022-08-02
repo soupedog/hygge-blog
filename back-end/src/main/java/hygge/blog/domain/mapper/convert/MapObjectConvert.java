@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.CategoryStateEnum;
 import hygge.blog.domain.enums.CategoryTypeEnum;
+import hygge.blog.domain.enums.QuoteStateEnum;
 import hygge.blog.domain.enums.TopicStateEnum;
 import hygge.blog.domain.enums.UserSexEnum;
 import hygge.blog.domain.enums.UserStateEnum;
@@ -87,5 +88,8 @@ public class MapObjectConvert {
 
     public ArticleStateEnum asArticleStateEnum(Object target) {
         return ArticleStateEnum.parse(parameterHelper.string(target));
+    }
+    public QuoteStateEnum asQuoteStateEnum(Object target) {
+        return QuoteStateEnum.parse(parameterHelper.string(target));
     }
 }

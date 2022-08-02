@@ -4,6 +4,7 @@ import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.dto.CategoryDto;
 import hygge.blog.domain.dto.HomepageFetchResult;
+import hygge.blog.domain.dto.QuoteInfo;
 import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
@@ -32,6 +33,8 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
     private CategoryServiceImpl categoryService;
     @Autowired
     private ArticleServiceImpl articleService;
+    @Autowired
+    private QuoteServiceImpl quoteService;
 
     public HomepageFetchResult fetch() {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
@@ -97,6 +100,10 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
         return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, categoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+    }
+
+    public QuoteInfo findQuoteInfo(int currentPage, int pageSize) {
+        return quoteService.findQuoteInfo(currentPage, pageSize);
     }
 
 }

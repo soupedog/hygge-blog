@@ -2,6 +2,7 @@ package hygge.blog.controller;
 
 import hygge.blog.controller.doc.HomePageControllerDoc;
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.dto.QuoteInfo;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
 import hygge.blog.service.HomePageServiceImpl;
@@ -44,4 +45,13 @@ public class HomePageController implements HomePageControllerDoc {
                                                                                              @RequestParam(required = false, defaultValue = "5") int pageSize) {
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>>) success(homePageService.findArticleSummaryOfCategory(cid, currentPage, pageSize));
     }
+
+    @Override
+    @GetMapping("/fetch/quote")
+    public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                 @RequestParam(required = false, defaultValue = "5") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(homePageService.findQuoteInfo(currentPage, pageSize));
+    }
+
+
 }

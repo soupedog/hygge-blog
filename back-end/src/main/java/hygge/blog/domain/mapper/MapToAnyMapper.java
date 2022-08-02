@@ -3,6 +3,7 @@ package hygge.blog.domain.mapper;
 import hygge.blog.domain.mapper.convert.MapObjectConvert;
 import hygge.blog.domain.po.Article;
 import hygge.blog.domain.po.Category;
+import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import org.mapstruct.Mapper;
@@ -29,4 +30,6 @@ public interface MapToAnyMapper {
     Category mapToCategory(Map<String, ?> map);
 
     Article mapToArticle(Map<String, ?> map);
+
+    Quote mapToQuote(Map<String, ?> map);
 }

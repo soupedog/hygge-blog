@@ -109,6 +109,10 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
      */
     ARTICLE_CONFIGURATION_NOT_FOUND(false, null, 404502, null),
     /**
+     * 句子收藏不存在
+     */
+    QUOTE_NOT_FOUND(false, null, 404601, null),
+    /**
      * 文章插入落库失败
      */
     ARTICLE_SAVE_CONFLICT(false, null, 409501, null),
@@ -119,11 +123,11 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
     /**
      * 句子收藏落库失败
      */
-    SENTENCE_COLLECTION_SAVE_CONFLICT(false, null, 409601, null),
+    QUOTE_SAVE_CONFLICT(false, null, 409601, null),
     /**
      * 句子收藏更新落库失败
      */
-    SENTENCE_COLLECTION_UPDATE_CONFLICT(false, null, 409602, null),
+    QUOTE_UPDATE_CONFLICT(false, null, 409602, null),
     /**
      * 构造文章类型树形结构失败
      */

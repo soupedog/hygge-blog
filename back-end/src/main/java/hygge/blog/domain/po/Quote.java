@@ -49,12 +49,12 @@ public class Quote extends BasePo {
     /**
      * 主图绝对路径
      */
-    @Column
+    @Column(length = 1000)
     private String imageSrc;
     /**
      * 内容
      */
-    @Column(length = 5000)
+    @Column(length = 5000, unique = true)
     private String content;
     /**
      * 可能的出处
@@ -81,5 +81,5 @@ public class Quote extends BasePo {
      */
     @Column(columnDefinition = "enum ('INACTIVE', 'ACTIVE') default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
-    private QuoteStateEnum sentenceState;
+    private QuoteStateEnum quoteState;
 }

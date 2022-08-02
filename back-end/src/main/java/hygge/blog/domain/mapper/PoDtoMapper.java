@@ -3,6 +3,7 @@ package hygge.blog.domain.mapper;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.BlogGroupDto;
 import hygge.blog.domain.dto.CategoryDto;
+import hygge.blog.domain.dto.QuoteDto;
 import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.UserDto;
 import hygge.blog.domain.dto.UserTokenDto;
@@ -10,6 +11,7 @@ import hygge.blog.domain.mapper.convert.ObjectMappingConvert;
 import hygge.blog.domain.po.Article;
 import hygge.blog.domain.po.BlogGroup;
 import hygge.blog.domain.po.Category;
+import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;
@@ -65,4 +67,8 @@ public interface PoDtoMapper {
     ArticleDto poToDto(Article po);
 
     Article dtoToPo(ArticleDto dto);
+
+    QuoteDto poToDto(Quote po);
+
+    Quote dtoToPo(QuoteDto dto);
 }

@@ -2,6 +2,7 @@ package hygge.blog.controller.doc;
 
 import hygge.blog.controller.base.HyggeBlogController;
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.dto.QuoteInfo;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,4 +23,7 @@ public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntit
 
     @Operation(summary = "查询特定文章类别下的文章", description = "在文章类别加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> categoryInfoFetch(String cid, int currentPage, int pageSize);
+
+    @Operation(summary = "查询句子收藏", description = "在句子收藏加载时需要拉取的数据")
+    ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(int currentPage, int pageSize);
 }
