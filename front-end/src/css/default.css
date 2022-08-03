@@ -1,15 +1,6 @@
 @charset "utf-8";
-a, body, div, dl, dt, h1, h2, h3, h4, h5, h6, input, li, ol, p, span, textarea {
-    margin: 0;
-    padding: 0
-}
-
 a, em {
     text-decoration: none
-}
-
-* {
-    outline: 0;
 }
 
 a img {
@@ -71,9 +62,4 @@ address, caption, cite, code, dfn, p, em, i, th, var {
 
 .textCenter {
     text-align: center;
-}
-
-.testStyle1{
-    background-color: #333333;
-    color: #CC6633;
 }
