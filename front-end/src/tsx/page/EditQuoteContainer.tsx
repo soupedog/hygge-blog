@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../utils/LogHelper';
+import {LogHelper} from '../utils/UtilContainer';
 
 // 描述该组件 props 数据类型
 export interface EditQuoteContainerProps {
@@ -13,7 +13,7 @@ export class EditQuoteContainer extends React.Component<EditQuoteContainerProps,
     constructor(props: EditQuoteContainerProps) {
         super(props);
         this.state = {};
-        LogHelper.info("EditQuoteContainer", "constructor", "----------", false);
+        LogHelper.info({className: "EditQuoteContainer", msg: "初始化成功"});
     }
 
     render() {

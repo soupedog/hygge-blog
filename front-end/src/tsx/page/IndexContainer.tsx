@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../utils/LogHelper';
+import {LogHelper} from '../utils/UtilContainer';
 
 // 描述该组件 props 数据类型
 export interface IndexContainerProps {
@@ -13,7 +13,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
     constructor(props: IndexContainerProps) {
         super(props);
         this.state = {};
-        LogHelper.info("IndexContainer", "constructor", "----------", false);
+        LogHelper.info({className: "IndexContainer", msg: "初始化成功"});
     }
 
     render() {

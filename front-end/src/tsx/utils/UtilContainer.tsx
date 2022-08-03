@@ -23,7 +23,7 @@ export interface LogParam2 {
 }
 
 export class LogHelper {
-    static actualLogLevel: LogLevel = LogLevel.WARN;
+    static actualLogLevel: LogLevel = LogLevel.INFO;
 
     static log(inputParam: LogParam): void {
         if (LogHelper.actualLogLevel > inputParam.level) {
@@ -110,7 +110,7 @@ export class LogHelper {
     }
 }
 
-console.log("[LogHelper] " + "constructor---------- CurrentLogLevel:" + LogLevel[LogHelper.actualLogLevel]);
+console.log("MUST [LogHelper] " + "初始化成功 CurrentLogLevel:" + LogLevel[LogHelper.actualLogLevel]);
 
 export interface OfNullableStringInputParam {
     target?: any;
@@ -445,7 +445,7 @@ const Scroll_FunctionMap = new Map<string, any>();
 const Resize_FunctionMap = new Map<string, any>();
 const FunctionLimiter_Map = new Map<string, boolean>();
 const FunctionLimiter_Time = new Map<string, number>();
-LogHelper.info({className: "WindowsEventHelper", msg: "constructor----------"});
+LogHelper.info({className: "WindowsEventHelper", msg: "初始化成功"});
 
 export class WindowsEventHelper {
 

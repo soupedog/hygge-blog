@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../utils/LogHelper';
+import {LogHelper} from '../utils/UtilContainer';
 
 // 描述该组件 props 数据类型
 export interface SignInContainerProps {
@@ -13,7 +13,7 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
     constructor(props: SignInContainerProps) {
         super(props);
         this.state = {};
-        LogHelper.info("SignInContainer", "constructor", "----------", false);
+        LogHelper.info({className: "SignInContainer", msg: "初始化成功"});
     }
 
     render() {

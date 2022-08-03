@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../utils/LogHelper';
+import {LogHelper} from '../utils/UtilContainer';
 
 // 描述该组件 props 数据类型
 export interface ArticleBrowserContainerProps {
@@ -13,7 +13,7 @@ export class ArticleBrowserContainer extends React.Component<ArticleBrowserConta
     constructor(props: ArticleBrowserContainerProps) {
         super(props);
         this.state = {};
-        LogHelper.info("ArticleBrowserContainer", "constructor", "----------", false);
+        LogHelper.info({className: "ArticleBrowserContainer", msg: "初始化成功"});
     }
 
     render() {
