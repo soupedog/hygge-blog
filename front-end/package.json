@@ -1,8 +1,8 @@
 {
-  "name": "react-ts-antd-demo",
+  "name": "hygge-blog-front-end",
   "version": "1.0.0",
-  "description": "demo",
-  "main": "index.tsx",
+  "description": "Hygge 博客程序前端应用",
+  "main": "root.tsx",
   "scripts": {
     "build": "webpack --progress --mode production",
     "start:dev": "webpack serve --config webpack.config.js --progress --mode development --open"
