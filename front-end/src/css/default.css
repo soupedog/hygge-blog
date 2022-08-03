@@ -16,12 +16,12 @@ address, caption, cite, code, dfn, p, em, i, th, var {
     cursor: pointer;
 }
 
-.floatLeft {
+.floatToLeft {
     display: inline-block;
     float: left;
 }
 
-.floatRight {
+.floatToRight {
     display: inline-block;
     float: right;
 }

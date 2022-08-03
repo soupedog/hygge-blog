@@ -1,8 +1,6 @@
 import * as React from "react"
 import {LogHelper} from '../utils/LogHelper';
 
-import '../../css/default.css';
-
 // 描述该组件 props 数据类型
 export interface IndexContainerProps {
 }
@@ -21,7 +19,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
     render() {
         return (
             <>
-                <h1>你好！世界！</h1>
+                <h1>首页</h1>
             </>
         );
     }

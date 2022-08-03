@@ -16,7 +16,7 @@ tsc --init
 npm i webpack webpack-cli webpack-dev-server --save-dev
 
 // 安装 react
-npm i react @types/react react-dom @types/react-dom --save-dev
+npm i react @types/react react-dom @types/react-dom react-router-dom --save-dev
 
 // 安装 babel
 npm i babel-loader @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript --save-dev

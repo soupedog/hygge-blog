@@ -17,9 +17,10 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js', '.json']
     },
     mode: 'development',
+    devtool: 'eval-source-map',
     //入口文件的路径(可配多个，此处只配置了 "index" 实体)
     entry: {
-        index: "./src/tsx/index.tsx"
+        index: "./src/tsx/root.tsx"
     },
     output: {
         publicPath: "",
