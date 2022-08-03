@@ -2,14 +2,14 @@
   "name": "hygge-blog-front-end",
   "version": "1.0.0",
   "description": "Hygge 博客程序前端应用",
-  "main": "root.tsx",
+  "main": "app.tsx",
   "scripts": {
     "build": "webpack --progress --mode production",
     "start:dev": "webpack serve --config webpack.config.js --progress --mode development --open"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Xavier",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
