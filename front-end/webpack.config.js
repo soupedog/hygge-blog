@@ -4,6 +4,7 @@ const path = require("path");
 // 外部插件
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
@@ -90,7 +91,7 @@ module.exports = {
         ),
         new HtmlWebpackPlugin({
             filename: "index.html",
-            title: "骨架模板页",
+            title: "我的小宅子",
             favicon: "./src/img/favicon.ico",
             template: "./src/html/defaultTemplate.html",
             chunks: ["index", "commons"],
@@ -99,6 +100,12 @@ module.exports = {
                 removeComments: true,
                 collapseWhitespace: true
             }
+        }),
+        new CompressionPlugin({
+            algorithm: 'gzip', // 类型
+            test: /\.(js|css)$/, // 匹配规则
+            threshold: 10240, // 字节数 只处理比这个大的资源
+            minRatio: 0.8 // 压缩率 只有比这个小的才会处理
         }),
         new BundleAnalyzerPlugin()
     ],

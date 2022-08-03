@@ -7,40 +7,43 @@
 npm init
 
 // 安装 typescript
-npm i typescript --save-dev
+npm install typescript --save-dev
 
 // 创建 typescript 配置文件
 tsc --init
 
 // 安装 webpack
-npm i webpack webpack-cli webpack-dev-server --save-dev
+npm install webpack webpack-cli webpack-dev-server --save-dev
 
 // 安装 react
-npm i react @types/react react-dom @types/react-dom react-router-dom --save-dev
+npm install react @types/react react-dom @types/react-dom react-router-dom --save-dev
 
 // 安装 babel
-npm i babel-loader @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript --save-dev
+npm install babel-loader @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript --save-dev
 
 // 安装各种 css loader
-npm i css-loader style-loader sass sass-loader less less-loader --save-dev
+npm install css-loader style-loader sass sass-loader less less-loader --save-dev
 
 // 安装实用插件
-npm i webpack-bundle-analyzer html-webpack-plugin clean-webpack-plugin --save-dev
+npm install webpack-bundle-analyzer html-webpack-plugin clean-webpack-plugin --save-dev
+
+// 压缩插件
+npm install compression-webpack-plugin --save-dev
 
 // 好用的 js 音乐播放器
-npm i aplayer
+npm install aplayer
 
 // 多条件合并返回 true false 工具
-npm i clsx
+npm install clsx
 
 // antd
-npm i antd
+npm install antd
 
 // md 编辑工具
-npm i vditor
+npm install vditor
 
 // http 请求工具
-npm i axios
+npm install axios
 
 ```
 
