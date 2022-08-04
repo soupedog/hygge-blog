@@ -56,12 +56,6 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
 
     menuOnClick: MenuProps['onClick'] = e => {
         switch (e.key) {
-            case "GitHub":
-                UrlHelper.openNewPage({
-                    finalUrl: "https://github.com/SoupeDog",
-                    inNewTab: true
-                });
-                break;
             case "友链":
                 message.warn('暂时还没有，有人在期待着一场 PY 交易嘛~', 2);
                 break;
