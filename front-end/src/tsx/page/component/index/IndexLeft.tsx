@@ -1,7 +1,7 @@
 import * as React from "react"
 import {LogHelper, UrlHelper} from '../../../utils/UtilContainer';
 import {Layout, Menu, MenuProps, message, notification} from 'antd';
-import {GithubOutlined, LinkOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {LinkOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexContainerStatus} from "../../IndexContainer";
 
@@ -80,7 +80,6 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
-    IndexLeft.getMenuItem('GitHub', 'GitHub', <GithubOutlined/>),
     IndexLeft.getMenuItem('友链', '友链', <LinkOutlined/>),
     IndexLeft.getMenuItem('关于', '关于', <QuestionCircleOutlined/>),
 ];
