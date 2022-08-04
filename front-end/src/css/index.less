@@ -1,0 +1,121 @@
+.left_box {
+  position: fixed;
+  z-index: 100;
+
+  .page-title {
+    height: 32px;
+    margin: 16px;
+    background: rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+    line-height: 32px;
+    color: white;
+  }
+}
+
+.right_box {
+
+  .header_menu {
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    padding: 0;
+    color: #fff;
+  }
+
+  .indexMenuSwitch {
+    padding: 0 24px;
+    font-size: 26px;
+    line-height: 64px;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .indexMenuSwitch:hover {
+    color: #1890ff;
+  }
+
+  @headMenuBasePaddingRight: 20px;
+
+  .headMenuSmallMode {
+    padding-right: 200px+@headMenuBasePaddingRight;
+    animation: toSmallMode 0.2s 1;
+  }
+
+  .headMenuBigMode {
+    padding-right: 80px+@headMenuBasePaddingRight;
+    animation: toBigMode 0.2s 1;
+  }
+
+  @keyframes toBigMode {
+    from {
+      padding-right: 200px+@headMenuBasePaddingRight;
+    }
+    to {
+      padding-right: 80px+@headMenuBasePaddingRight;
+    }
+  }
+
+  @keyframes toSmallMode {
+    from {
+      padding-right: 80px+@headMenuBasePaddingRight;
+    }
+    to {
+      padding-right: 200px+@headMenuBasePaddingRight;
+    }
+  }
+}
+
+
+.ant-list-item-main {
+  .summaryTitle {
+    font-size: 36px;
+    line-height: 50px;
+    font-weight: 600;
+  }
+
+  .ant-breadcrumb {
+    //color: #a6bbd0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .summaryContent {
+    font-size: 14px;
+    line-height: 16px;
+    //color: #5f5f5f;
+  }
+}
+
+
+.myContent {
+  margin: 84px 16px 24px 216px;
+  padding: 24px;
+  background: #FFF;
+  min-height: 600px;
+  transition: 0.2s;
+  border-radius: 10px;
+}
+
+.sentenceContent {
+  padding: 10px;
+  color: #8d1010;
+}
+
+.sentenceExtra {
+  line-height: 32px;
+}
+
+.tips {
+  font-weight: bold;
+}
+
+.tipsContent {
+  padding-left: 10px;
+}
+
+//给草稿高亮
+.ant-list-item-meta-content > .ant-list-item-meta-title > .draftHighlight {
+  color: #a32001;
+}

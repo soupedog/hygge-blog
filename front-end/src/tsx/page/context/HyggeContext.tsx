@@ -1,9 +1,7 @@
 import * as React from "react"
+import {IndexContainerStatus} from "../IndexContainer";
 
-// 描述该组件 props 数据类型
-export interface IndexContextValue {
-}
 
-export const IndexContext = React.createContext<IndexContextValue>(
+export const IndexContainerContext = React.createContext<IndexContainerStatus>(
     {}
 );
