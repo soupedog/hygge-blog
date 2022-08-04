@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper, UrlHelper} from '../../../utils/UtilContainer';
+import {LogHelper} from '../../../utils/UtilContainer';
 import {Layout, Menu, MenuProps, message, notification} from 'antd';
 import {LinkOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {IndexContainerContext} from "../../context/HyggeContext";
@@ -40,20 +40,6 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
         );
     }
 
-    static getMenuItem(label: React.ReactNode,
-                       key?: React.Key | null,
-                       icon?: React.ReactNode,
-                       children?: MenuItem[],
-                       theme?: 'light' | 'dark'): MenuItem {
-        return {
-            key,
-            icon,
-            children,
-            label,
-            theme,
-        } as MenuItem;
-    }
-
     menuOnClick: MenuProps['onClick'] = e => {
         switch (e.key) {
             case "友链":
@@ -67,13 +53,26 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
                 });
                 break;
         }
-
     };
 }
 
 type MenuItem = Required<MenuProps>['items'][number];
 
+function getMenuItem(label: React.ReactNode,
+                     key?: React.Key | null,
+                     icon?: React.ReactNode,
+                     children?: MenuItem[],
+                     theme?: 'light' | 'dark'): MenuItem {
+    return {
+        key,
+        icon,
+        children,
+        label,
+        theme,
+    } as MenuItem;
+}
+
 const items: MenuItem[] = [
-    IndexLeft.getMenuItem('友链', '友链', <LinkOutlined/>),
-    IndexLeft.getMenuItem('关于', '关于', <QuestionCircleOutlined/>),
+    getMenuItem('友链', '友链', <LinkOutlined/>),
+    getMenuItem('关于', '关于', <QuestionCircleOutlined/>),
 ];
