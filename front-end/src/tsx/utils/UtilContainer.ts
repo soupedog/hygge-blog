@@ -131,11 +131,11 @@ export interface ArrayFormatInputParam {
 }
 
 export class CoreHelper {
-    static sleep(ms: number) {
+    static sleep(ms: number): Promise<any> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    static async scrollTop(top: number, ms: number) {
+    static async scrollTop(top: number, ms: number): Promise<void> {
         let currentScrollY = window.scrollY;
 
         let value = 0;
@@ -151,7 +151,7 @@ export class CoreHelper {
 }
 
 export class PropertiesHelper {
-    static stringOfNullable(inputParam: OfNullableStringInputParam) {
+    static stringOfNullable(inputParam: OfNullableStringInputParam): string {
         let resultTemp = inputParam.target;
         if (PropertiesHelper.isStringNotNull(resultTemp)) {
             return resultTemp.trim() == "" ? inputParam.defaultValue : resultTemp;
@@ -190,7 +190,7 @@ export class PropertiesHelper {
         return result;
     }
 
-    static booleanOfNullable(inputParam: OfNullableBooleanInputParam) {
+    static booleanOfNullable(inputParam: OfNullableBooleanInputParam): boolean {
         if (PropertiesHelper.isBooleanNotNull(inputParam.target)) {
             return inputParam.target;
         } else {
@@ -267,32 +267,34 @@ export interface OpenNewPageConfig {
 
 export class UrlHelper {
 
-    static getBaseUrl() {
+    static getBaseUrl(): string {
         return baseUrl;
     }
 
-    static getBaseStaticSourceUrl() {
+    static getBaseStaticSourceUrl(): string {
         return baseStaticSourceUrl;
     }
 
-    static removeBaseStaticSourceUrl(target: string) {
+    static removeBaseStaticSourceUrl(target: string): string {
         return target.replace(baseStaticSourceUrl, "");
     }
 
-    static getUrl(path?: string) {
+    static getUrl(path?: string): string {
         return path == null ? this.getBaseUrl() : this.getBaseUrl() + path;
     }
 
-    static getQueryString(key: string) {
+    static getQueryString(key: string): string | null {
         let fullURL = window.location.href;
-        let start = fullURL.indexOf('?');
-        let search = fullURL.substring(start + 1);
-        let searchArr = search.split('&');
+        let startPoint = fullURL.indexOf('?') + 1;
+        let queryStringTarget = fullURL.substring(startPoint);
+        let queryStringArray = queryStringTarget.split('&');
         let searchObj: any = {};
-        for (let element of searchArr) {
-            let arr: string[] = element.split('=');
+
+        queryStringArray.forEach((item => {
+            let arr: string[] = item.split('=');
             searchObj[arr[0]] = arr[1];
-        }
+        }))
+
         if (searchObj[key]) {
             return decodeURI(searchObj[key]);
         } else {
@@ -300,7 +302,7 @@ export class UrlHelper {
         }
     }
 
-    static openNewPage(config: OpenNewPageConfig) {
+    static openNewPage(config: OpenNewPageConfig): void {
         if (config.path == null && config.finalUrl == null) {
             throw new Error("path、finalUrl 不可同时为空")
         }
@@ -352,12 +354,12 @@ export enum TimeType {
 
 export class TimeHelper {
     // 一天的毫秒数
-    static getDayMsec() {
+    static getDayMsec(): number {
         return 86400000;
     }
 
     // 填充 timeStamp 为 outPutSize 位数
-    static formatNumber(timeStamp: number, outPutSize?: number) {
+    static formatNumber(timeStamp: number, outPutSize?: number): string {
         if (outPutSize == null) {
             outPutSize = 2;
         }
@@ -385,7 +387,7 @@ export class TimeHelper {
     }
 
     // 获取当前时间 ± x 天的毫秒级时间戳
-    static getTimeStamp(x: number) {
+    static getTimeStamp(x: number): number {
         let currentTs = new Date().getTime();
         if (x == null) {
             return currentTs;
@@ -395,7 +397,7 @@ export class TimeHelper {
     }
 
     // 目标毫秒级时间戳格式化成字符串,默认格式为 yyyy-mm-dd hh:mm:ss
-    static formatTimeStampToString(timeStamp: number, type?: TimeType) {
+    static formatTimeStampToString(timeStamp: number, type?: TimeType): string {
         let currentDate = new Date(timeStamp);
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth() + 1;
@@ -414,7 +416,7 @@ export class TimeHelper {
     }
 
     // 获取目标时间戳 ± x 个自然天的 00:00:00 时刻时间戳
-    static getNaturalDayTimeStamp(timeStamp: number, deltaDay?: number) {
+    static getNaturalDayTimeStamp(timeStamp: number, deltaDay?: number): number {
         let currentDate = new Date(timeStamp);
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth();
@@ -447,7 +449,7 @@ LogHelper.info({className: "WindowsEventHelper", msg: "初始化成功"});
 
 export class WindowsEventHelper {
 
-    static addCallback_Scroll(eventCallbackItem: EventCallbackItem) {
+    static addCallback_Scroll(eventCallbackItem: EventCallbackItem): void {
         if (Scroll_FunctionMap.has(eventCallbackItem.name) || FunctionLimiter_Time.has(eventCallbackItem.name)) {
             LogHelper.warn({
                 className: "WindowsEventHelper",
@@ -465,7 +467,7 @@ export class WindowsEventHelper {
         return Scroll_FunctionMap;
     }
 
-    static addCallback_Resize(eventCallbackItem: EventCallbackItem) {
+    static addCallback_Resize(eventCallbackItem: EventCallbackItem): void {
         if (Scroll_FunctionMap.has(eventCallbackItem.name) || FunctionLimiter_Time.has(eventCallbackItem.name)) {
             LogHelper.warn({
                 className: "WindowsEventHelper",
@@ -483,7 +485,7 @@ export class WindowsEventHelper {
         return Resize_FunctionMap;
     }
 
-    static start_OnScroll() {
+    static start_OnScroll(): void {
         window.onscroll = () => {
             LogHelper.info({className: "WindowsEventHelper", msg: "OnScroll----------" + Scroll_FunctionMap.size});
             let currentScrollY = window.scrollY;
@@ -501,7 +503,7 @@ export class WindowsEventHelper {
         }
     }
 
-    static start_OnResize() {
+    static start_OnResize(): void {
         window.onresize = () => {
             LogHelper.info({className: "WindowsEventHelper", msg: "OnResize----------" + Resize_FunctionMap.size});
             let currentHeight = window.innerHeight;
