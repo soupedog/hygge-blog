@@ -3,7 +3,7 @@ import * as React from "react"
 import {Collapse, Input, Layout, Space, Spin, Switch, Tabs} from 'antd';
 import {MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import {IndexContainerContext} from "../../context/HyggeContext";
-import {IndexContainerStatus} from "../../IndexContainer";
+import {IndexContainerStatus, SearchType} from "../../IndexContainer";
 import {HyggeFooter} from "../HyggeFooter";
 import clsx from "clsx";
 import {LogHelper} from '../../../utils/UtilContainer';
@@ -62,6 +62,13 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
                                                     enterButton
                                                     size="middle"
                                                     onSearch={(value) => {
+                                                        let searchType: SearchType;
+                                                        if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
+                                                            searchType = SearchType.ARTICLE;
+                                                        } else {
+                                                            searchType = SearchType.QUOTE;
+                                                        }
+                                                        console.log(searchType)
                                                     }}
                                             />
                                         </div>
@@ -73,7 +80,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
                                     <div className="clearfix"></div>
                                 </Header>
                                 <Content
-                                    className={"site-layout-background myContent"}
+                                    className={"site-layout-background index_content"}
                                     style={{
                                         margin: '88px 16px',
                                         padding: 24,

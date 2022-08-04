@@ -1,10 +1,7 @@
 import * as React from "react"
 import {LogHelper} from '../../../utils/UtilContainer';
-
-import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexLeft} from "./IndexLeft";
 import {IndexRight} from "./IndexRight";
-import {IndexContainerStatus} from "../../IndexContainer";
 
 // 描述该组件 props 数据类型
 export interface IndexCoreProps {
@@ -22,16 +19,11 @@ export class IndexCore extends React.Component<IndexCoreProps, IndexCoreStatus> 
     }
 
     render() {
-        let _react = this;
         return (
-            <IndexContainerContext.Consumer>
-                {(status: IndexContainerStatus) => (
-                    <>
-                        <IndexLeft/>
-                        <IndexRight/>
-                    </>
-                )}
-            </IndexContainerContext.Consumer>
+            <>
+                <IndexLeft/>
+                <IndexRight/>
+            </>
         );
     }
 }

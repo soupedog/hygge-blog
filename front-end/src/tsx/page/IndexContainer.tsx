@@ -20,7 +20,13 @@ export interface IndexContainerStatus {
     netWorkArrayCounter?: boolean[]
     // 是否折叠收起
     folded?: boolean;
+    searchType?: SearchType;
     updateRootStatus?: Function;
+}
+
+export enum SearchType {
+    ARTICLE,
+    QUOTE
 }
 
 export class IndexContainer extends React.Component<IndexContainerProps, IndexContainerStatus> {
@@ -29,6 +35,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
         this.state = {
             netWorkArrayCounter: [],
             folded: true,
+            searchType: SearchType.ARTICLE,
             updateRootStatus: this.updateRootStatus.bind(this)
         };
         LogHelper.info({className: "IndexContainer", msg: "初始化成功"});
