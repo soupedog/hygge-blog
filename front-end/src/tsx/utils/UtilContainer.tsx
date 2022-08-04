@@ -259,8 +259,9 @@ const baseUrl = "https://www.xavierwang.cn/";
 const baseStaticSourceUrl = "https://www.xavierwang.cn/static/";
 
 export interface OpenNewPageConfig {
-    finalUrl: string;
     inNewTab: boolean;
+    path?: string;
+    finalUrl?: string;
     delayTime?: number;
 }
 
@@ -300,7 +301,17 @@ export class UrlHelper {
     }
 
     static openNewPage(config: OpenNewPageConfig) {
-        let actualUrl = config.finalUrl;
+        if (config.path == null && config.finalUrl == null) {
+            throw new Error("path、finalUrl 不可同时为空")
+        }
+
+        let actualUrl: string;
+        if (config.finalUrl == null) {
+            actualUrl = this.getBaseUrl() + config.path;
+        } else {
+            actualUrl = config.finalUrl;
+        }
+
         let secretKey = this.getQueryString("secretKey");
         if (PropertiesHelper.isStringNotNull(secretKey)) {
             if (actualUrl.indexOf("?") > 0) {
@@ -330,11 +341,13 @@ export class UrlHelper {
     }
 }
 
-interface TimeInfo {
-    timeStamp?: number;
-    outPutType?: string;
-    outPutSize?: number;
-    deltaDay?: number;
+export enum TimeType {
+    // 2022-8-4
+    yyyy_mm_dd = 0,
+    // 21:39:44
+    hh_mm_ss = 1,
+    // 2022-8-4 21:39:44
+    yyyy_mm_dd_hh_mm_ss = 2,
 }
 
 export class TimeHelper {
@@ -343,27 +356,31 @@ export class TimeHelper {
         return 86400000;
     }
 
-    // 填充 inputParam.timeStamp 为 inputParam.outPutSize 位数
-    static formatNumber(inputParam: TimeInfo) {
-        let compareNumber = Math.pow(10, inputParam.outPutSize!);
+    // 填充 timeStamp 为 outPutSize 位数
+    static formatNumber(timeStamp: number, outPutSize?: number) {
+        if (outPutSize == null) {
+            outPutSize = 2;
+        }
+
+        let compareNumber = Math.pow(10, outPutSize);
         let needAddCount = 0;
         let result = "";
         let prefix = "";
-        if (inputParam.timeStamp! < 0) {
+        if (timeStamp < 0) {
             prefix = "-";
         }
-        inputParam.timeStamp = Math.abs(inputParam.timeStamp!);
-        if (inputParam.timeStamp < 2) {
-            needAddCount = inputParam.outPutSize! - 1;
+        timeStamp = Math.abs(timeStamp);
+        if (timeStamp < 2) {
+            needAddCount = outPutSize - 1;
         } else {
-            while (Math.pow(10, needAddCount + 1) * inputParam.timeStamp < compareNumber) {
+            while (Math.pow(10, needAddCount + 1) * timeStamp < compareNumber) {
                 needAddCount += 1;
             }
         }
         for (let i = 0; i < needAddCount; i++) {
             result += "0";
         }
-        result += inputParam.timeStamp;
+        result += timeStamp;
         return prefix + result;
     }
 
@@ -378,56 +395,37 @@ export class TimeHelper {
     }
 
     // 目标毫秒级时间戳格式化成字符串,默认格式为 yyyy-mm-dd hh:mm:ss
-    static formatTimeStampToString(inputParam: TimeInfo) {
-        if (typeof inputParam.timeStamp != "number") {
-            throw new Error("TimeHelper:[inputParam.timeStamp] of formatTimeStampToString(inputParam.timeStamp, type) should be number.");
-        }
-        let currentDate = new Date(inputParam.timeStamp);
+    static formatTimeStampToString(timeStamp: number, type?: TimeType) {
+        let currentDate = new Date(timeStamp);
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth() + 1;
         let day = currentDate.getDate();
         let hour = currentDate.getHours();
         let minute = currentDate.getMinutes();
         let second = currentDate.getSeconds();
-        switch (inputParam.outPutType) {
-            case "yyyy-mm-dd":
-                return year + "-" + this.formatNumber({timeStamp: month, outPutSize: 2}) + "-" + this.formatNumber({
-                    timeStamp: day,
-                    outPutSize: 2
-                });
-            case "hh:mm:ss":
-                return this.formatNumber({timeStamp: hour, outPutSize: 2}) + ":" +
-                    this.formatNumber({
-                        timeStamp: minute,
-                        outPutSize: 2
-                    }) + ":" +
-                    this.formatNumber({timeStamp: second, outPutSize: 2});
+        switch (type) {
+            case TimeType.yyyy_mm_dd:
+                return year + "-" + this.formatNumber(month) + "-" + this.formatNumber(day);
+            case TimeType.hh_mm_ss:
+                return this.formatNumber(hour) + ":" + this.formatNumber(minute) + ":" + this.formatNumber(second);
             default:
-                return year + "-" + this.formatNumber({timeStamp: month, outPutSize: 2}) + "-" + this.formatNumber({
-                        timeStamp: day,
-                        outPutSize: 2
-                    }) + " " +
-                    this.formatNumber({timeStamp: hour, outPutSize: 2}) + ":" + this.formatNumber({
-                        timeStamp: minute,
-                        outPutSize: 2
-                    }) + ":" + this.formatNumber({timeStamp: second, outPutSize: 2});
+                return year + "-" + this.formatNumber(month) + "-" + this.formatNumber(day) + " " + this.formatNumber(hour) + ":" + this.formatNumber(minute) + ":" + this.formatNumber(second);
         }
     }
 
     // 获取目标时间戳 ± x 个自然天的 00:00:00 时刻时间戳
-    static getNaturalDayTimeStamp(inputParam: TimeInfo) {
-        let currentDate = new Date(inputParam.timeStamp!);
+    static getNaturalDayTimeStamp(timeStamp: number, deltaDay?: number) {
+        let currentDate = new Date(timeStamp);
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth();
         let day = currentDate.getDate();
-        if (typeof inputParam.timeStamp != "number") {
-            throw new Error("TimeHelper:[inputParam.timeStamp] of getNaturalDayTimeStamp(inputParam.timeStamp, inputParam.deltaDay) should be number.");
-        }
+
         let resultDate = new Date(year, month, day, 0, 0, 0, 0);
-        if (inputParam.deltaDay == null) {
-            inputParam.deltaDay = 0;
+
+        if (deltaDay == null) {
+            deltaDay = 0;
         }
-        return resultDate.getTime() + inputParam.deltaDay * this.getDayMsec();
+        return resultDate.getTime() + deltaDay * this.getDayMsec();
     }
 }
 
