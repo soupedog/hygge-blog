@@ -15,30 +15,6 @@ export interface IndexLeftProps {
 export interface IndexLeftStatus {
 }
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-    label: React.ReactNode,
-    key?: React.Key | null,
-    icon?: React.ReactNode,
-    children?: MenuItem[],
-    theme?: 'light' | 'dark',
-): MenuItem {
-    return {
-        key,
-        icon,
-        children,
-        label,
-        theme,
-    } as MenuItem;
-}
-
-const items: MenuItem[] = [
-    getItem('GitHub', 'GitHub', <GithubOutlined/>),
-    getItem('友链', '友链', <LinkOutlined/>),
-    getItem('关于', '关于', <QuestionCircleOutlined/>),
-];
-
 export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> {
     constructor(props: IndexLeftProps) {
         super(props);
@@ -64,6 +40,20 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
         );
     }
 
+    static getMenuItem(label: React.ReactNode,
+                       key?: React.Key | null,
+                       icon?: React.ReactNode,
+                       children?: MenuItem[],
+                       theme?: 'light' | 'dark'): MenuItem {
+        return {
+            key,
+            icon,
+            children,
+            label,
+            theme,
+        } as MenuItem;
+    }
+
     menuOnClick: MenuProps['onClick'] = e => {
         switch (e.key) {
             case "GitHub":
@@ -86,3 +76,11 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
 
     };
 }
+
+type MenuItem = Required<MenuProps>['items'][number];
+
+const items: MenuItem[] = [
+    IndexLeft.getMenuItem('GitHub', 'GitHub', <GithubOutlined/>),
+    IndexLeft.getMenuItem('友链', '友链', <LinkOutlined/>),
+    IndexLeft.getMenuItem('关于', '关于', <QuestionCircleOutlined/>),
+];
