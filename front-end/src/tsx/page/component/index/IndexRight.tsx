@@ -1,12 +1,12 @@
 import * as React from "react"
 
-import {Collapse, Input, Layout, Space, Spin, Switch, Tabs} from 'antd';
+import {Badge, Button, Col, Collapse, Input, Layout, Row, Spin, Switch, Tabs, Timeline, Tooltip} from 'antd';
 import {MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexContainerStatus, SearchType} from "../../IndexContainer";
-import {HyggeFooter} from "../HyggeFooter";
 import clsx from "clsx";
 import {LogHelper} from '../../../utils/UtilContainer';
+import {HyggeFooter} from "../HyggeFooter";
 
 const {Header, Sider, Content} = Layout;
 const {Panel} = Collapse;
@@ -32,32 +32,38 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
         return (
             <IndexContainerContext.Consumer>
                 {(status: IndexContainerStatus) => (
-                    <>
-                        <Layout className={"right_box"}>
-                            <Sider collapsed={status.folded} key={"placeholder"}>{/*IndexLeft 的占位区块*/}</Sider>
-                            <Layout>
-                                <Header className={"header_menu floatToToLeft"}>
-                                    {React.createElement(status.folded ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                                        className: 'indexMenuSwitch',
-                                        onClick: () => {
-                                            status.updateRootStatus!({folded: !status.folded});
-                                        },
-                                    })}
-                                    <div className={clsx({
-                                        "floatToRight": true,
-                                        "headMenuSmallMode": !status.folded,
-                                        "headMenuBigMode": status.folded
-                                    })}>
-                                        <div className={"floatToRight"} style={{marginLeft: "40px"}}>
-                                            <Space size="middle">
-                                                <Spin spinning={status.netWorkArrayCounter!.length > 0} size="large"/>
-                                            </Space>
-                                        </div>
-                                        <div className={"floatToRight"}>
-                                            {/*<HeaderUserInfoBox userInfo={currentUser} key={"HeaderUserInfoBox"}/>*/}
-                                        </div>
-                                        <div className={"floatToRight"} style={{padding: "18px"}}>
-                                            <Search placeholder="搜索关键字"
+                    <Layout className="right_box site-layout">
+                        <Header className="site-layout-background"
+                                style={{
+                                    padding: 0,
+                                    position: 'fixed',
+                                    zIndex: 1,
+                                    width: '100%',
+                                    background: "#001529",
+                                    color: "#fff"
+                                }}>
+                            <Row gutter={[0, 0]} justify="start" className={clsx({
+                                "headMenuSmallMode": !status.folded,
+                                "headMenuBigMode": status.folded
+                            })}>
+                                <Col md={2} xl={12}>
+                                    <Tooltip placement="bottom" title={status.folded ? "展开" : "收起"}>
+                                        {React.createElement(status.folded ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                                            className: 'trigger',
+                                            onClick: () => status.updateRootStatus!({folded: !status.folded}),
+                                        })}
+                                    </Tooltip>
+                                </Col>
+                                <Col md={22} xl={12}>
+                                    <Row gutter={[0, 0]} justify="end">
+                                        <Col md={1}  xl={4}>{/*占位符*/}</Col>
+                                        <Col md={3} xl={3}>
+                                            <Tooltip placement="bottom" title={"搜索类型"}>
+                                                <Switch checkedChildren="文章" unCheckedChildren="句子" defaultChecked/>
+                                            </Tooltip>
+                                        </Col>
+                                        <Col md={8} xl={11}>
+                                            <Search style={{marginTop: 16}} placeholder="搜索关键字"
                                                     allowClear
                                                     enterButton
                                                     size="middle"
@@ -71,30 +77,110 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
                                                         console.log(searchType)
                                                     }}
                                             />
-                                        </div>
-                                        <div id={"searchModeSwitch"} className={"floatToRight"}>
-                                            <Switch checkedChildren="搜索模式：文章" unCheckedChildren="搜索模式：收藏"
-                                                    defaultChecked/>
-                                        </div>
-                                    </div>
-                                    <div className="clearfix"></div>
-                                </Header>
-                                <Content
-                                    className={"site-layout-background index_content"}
-                                    style={{
-                                        margin: '88px 16px',
-                                        padding: 24,
-                                        minHeight: 800,
-                                    }}
-                                ></Content>
-                                <HyggeFooter/>
-                            </Layout>
-                        </Layout>
-                    </>
+                                        </Col>
+                                        <Col md={1} xl={1}>{/*占位符*/}</Col>
+                                        <Col md={3} xl={3}>
+                                            <Button type="primary">登录</Button>
+                                        </Col>
+                                        <Col md={2} xl={2} className={"textCenter"}>
+                                            <Spin spinning/>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Header>
+                        <Content
+                            id={"myContent"}
+                            className="site-layout-background"
+                            style={{
+                                borderRadius:15,
+                                background:"#fff",
+                                margin: '24px 16px',
+                                marginTop: 100,
+                                padding: 24,
+                                minHeight: window.innerHeight,
+                            }}
+                        >
+                            <Tabs defaultActiveKey="编程" type="card" size={"large"}>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>编程</span>
+                                            <Badge count={66} overflowCount={9999} offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="编程"
+                                >
+                                    Tab 1
+                                </TabPane>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>杂项</span>
+                                            <Badge count={5} overflowCount={9999} offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="杂项"
+                                >
+                                    杂项
+                                </TabPane>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>树洞</span>
+                                            <Badge count={5} overflowCount={9999} offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="树洞"
+                                >
+                                    树洞
+                                </TabPane>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>句子收藏</span>
+                                            <Badge count={111} overflowCount={9999} offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="句子收藏"
+                                >
+                                    句子收藏
+                                </TabPane>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>公告</span>
+                                            <Badge count={"?"} overflowCount={9999} offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="公告"
+                                >
+                                    <Timeline mode={"left"} reverse={true} pending="To be continued...">
+                                        <Timeline.Item label="2015-09-01">Create a services</Timeline.Item>
+                                        <Timeline.Item label="2015-09-01 09:12:11">
+                                            <p>Solve initial network problems</p>
+                                            <p>Solve initial network problems</p>
+                                        </Timeline.Item>
+                                        <Timeline.Item label="2015-09-01 09:12:13">Technical testing</Timeline.Item>
+                                    </Timeline>
+                                </TabPane>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>搜索结果</span>
+                                            <Badge count={null} overflowCount={9999} offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="搜索结果"
+                                >
+                                    搜索结果
+                                </TabPane>
+                            </Tabs>
+                        </Content>
+                        <HyggeFooter/>
+                    </Layout>
                 )}
             </IndexContainerContext.Consumer>
         );
     }
-
-
 }

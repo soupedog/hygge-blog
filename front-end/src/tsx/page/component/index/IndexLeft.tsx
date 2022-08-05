@@ -26,15 +26,13 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
         return (
             <IndexContainerContext.Consumer>
                 {(status: IndexContainerStatus) => (
-                    <>
-                        <Sider className={"left_box"} collapsible collapsed={status.folded}>
-                            <div className={"page-title autoWrap autoOmit"}>{status.folded ? "宅" : "我的小宅子"}</div>
-                            <Menu theme={"dark"} mode={"inline"} selectable={false}
-                                  items={items}
-                                  onClick={this.menuOnClick}>
-                            </Menu>
-                        </Sider>
-                    </>
+                    <Sider trigger={null} className={"left_box"} collapsible collapsed={status.folded}>
+                        <div className={"page-title autoWrap autoOmit"}>{status.folded ? "宅" : "我的小宅子"}</div>
+                        <Menu theme={"dark"} mode={"inline"} selectable={false}
+                              items={items}
+                              onClick={this.menuOnClick}>
+                        </Menu>
+                    </Sider>
                 )}
             </IndexContainerContext.Consumer>
         );
