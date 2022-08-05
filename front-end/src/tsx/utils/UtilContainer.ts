@@ -303,15 +303,14 @@ export class UrlHelper {
     }
 
     static openNewPage(config: OpenNewPageConfig): void {
-        if (config.path == null && config.finalUrl == null) {
-            throw new Error("path、finalUrl 不可同时为空")
-        }
-
         let actualUrl: string;
-        if (config.finalUrl == null) {
+
+        if (config.path != null) {
             actualUrl = this.getBaseUrl() + config.path;
-        } else {
+        } else if (config.finalUrl != null) {
             actualUrl = config.finalUrl;
+        } else {
+            actualUrl = this.getBaseUrl();
         }
 
         let secretKey = this.getQueryString("secretKey");

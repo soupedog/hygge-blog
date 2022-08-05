@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../utils/UtilContainer';
+import {LogHelper, UrlHelper} from '../utils/UtilContainer';
 
 import zhCN from "antd/lib/locale/zh_CN";
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
@@ -7,8 +7,9 @@ import {Button, ConfigProvider, Form, Input, Layout} from "antd";
 import {HyggeFooter} from "./component/HyggeFooter";
 
 import "./../../css/signin.less"
+import {UserService} from "../rest/ApiClient";
 
-const {Header, Sider, Content} = Layout;
+const {Header, Content} = Layout;
 
 // 描述该组件 props 数据类型
 export interface SignInContainerProps {
@@ -37,6 +38,11 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
                             name="hygge_login"
                             className="login-form"
                             onFinish={(val) => {
+                                UserService.signIn(val.uid, val.password, (data) => {
+                                    console.log(data);
+
+                                    UrlHelper.openNewPage({inNewTab: false});
+                                });
                                 // LoginService.login({uid: val.uid, password: val.password})
                             }}
                         >
