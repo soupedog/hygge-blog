@@ -5,7 +5,7 @@ import {MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexContainerStatus, SearchType} from "../../IndexContainer";
 import clsx from "clsx";
-import {LogHelper} from '../../../utils/UtilContainer';
+import {LogHelper, UrlHelper} from '../../../utils/UtilContainer';
 import {HyggeFooter} from "../HyggeFooter";
 
 const {Header, Sider, Content} = Layout;
@@ -56,7 +56,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
                                 </Col>
                                 <Col md={22} xl={12}>
                                     <Row gutter={[0, 0]} justify="end">
-                                        <Col md={1}  xl={4}>{/*占位符*/}</Col>
+                                        <Col md={1} xl={4}>{/*占位符*/}</Col>
                                         <Col md={3} xl={3}>
                                             <Tooltip placement="bottom" title={"搜索类型"}>
                                                 <Switch checkedChildren="文章" unCheckedChildren="句子" defaultChecked/>
@@ -80,7 +80,11 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
                                         </Col>
                                         <Col md={1} xl={1}>{/*占位符*/}</Col>
                                         <Col md={3} xl={3}>
-                                            <Button type="primary">登录</Button>
+                                            <Button type="primary"
+                                                    onClick={() => UrlHelper.openNewPage({
+                                                        path: "#/signin",
+                                                        inNewTab: false
+                                                    })}>登录</Button>
                                         </Col>
                                         <Col md={2} xl={2} className={"textCenter"}>
                                             <Spin spinning/>
@@ -93,12 +97,12 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
                             id={"myContent"}
                             className="site-layout-background"
                             style={{
-                                borderRadius:15,
-                                background:"#fff",
+                                borderRadius: 15,
+                                background: "#fff",
                                 margin: '24px 16px',
                                 marginTop: 100,
                                 padding: 24,
-                                minHeight: window.innerHeight,
+                                minHeight: window.innerHeight - 282,
                             }}
                         >
                             <Tabs defaultActiveKey="编程" type="card" size={"large"}>

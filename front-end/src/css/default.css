@@ -63,3 +63,14 @@ address, caption, cite, code, dfn, p, em, i, th, var {
 .textCenter {
     text-align: center;
 }
+
+.page-title {
+    height: 32px;
+    margin: 16px;
+    background: rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+    line-height: 32px;
+    color: white;
+}
