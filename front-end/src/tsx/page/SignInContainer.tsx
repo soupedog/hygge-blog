@@ -3,7 +3,7 @@ import {LogHelper, UrlHelper} from '../utils/UtilContainer';
 
 import zhCN from "antd/lib/locale/zh_CN";
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
-import {Button, ConfigProvider, Form, Input, Layout} from "antd";
+import {Button, ConfigProvider, Form, Input, Layout, message} from "antd";
 import {HyggeFooter} from "./component/HyggeFooter";
 
 import "./../../css/signin.less"
@@ -23,6 +23,7 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
     constructor(props: SignInContainerProps) {
         super(props);
         this.state = {};
+        UserService.removeCurrentUser()
         LogHelper.info({className: "SignInContainer", msg: "初始化成功"});
     }
 
@@ -38,19 +39,18 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
                             name="hygge_login"
                             className="login-form"
                             onFinish={(val) => {
-                                UserService.signIn(val.uid, val.password, (data) => {
+                                UserService.signIn(val.account, val.password, (data) => {
                                     console.log(data);
-
-                                    UrlHelper.openNewPage({inNewTab: false});
+                                    message.success("登录成功，3 秒内自动跳转回主页，请稍后", 3000);
+                                    UrlHelper.openNewPage({inNewTab: false, delayTime: 3000});
                                 });
-                                // LoginService.login({uid: val.uid, password: val.password})
                             }}
                         >
                             <Form.Item
-                                name="uid"
-                                rules={[{required: true, message: '请输入 UID!'}]}
+                                name="account"
+                                rules={[{required: true, message: '请输账号!'}]}
                             >
-                                <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="UID"/>
+                                <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="账号"/>
                             </Form.Item>
                             <Form.Item
                                 name="password"

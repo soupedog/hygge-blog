@@ -34,9 +34,7 @@ public class UserTokenServiceImpl extends HyggeWebUtilContainer {
         if (!user.getPassword().equals(password)) {
             throw new LightRuntimeException(BlogSystemCode.LOGIN_FAIL.getPublicMessage(), BlogSystemCode.LOGIN_FAIL);
         }
-
         HyggeRequestContext context = HyggeRequestTracker.getContext();
-
         UserToken userToken = userTokenDao.findUserTokenByUserIdAndAndScope(user.getUserId(), context.getTokenScope());
 
         if (userToken == null) {
@@ -49,6 +47,7 @@ public class UserTokenServiceImpl extends HyggeWebUtilContainer {
         userToken.refresh(context.getServiceStartTs());
         userToken = userTokenDao.save(userToken);
 
+        context.setCurrentLoginUser(user);
         return userToken;
     }
 

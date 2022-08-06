@@ -3,7 +3,7 @@ import {LogHelper} from '../../../utils/UtilContainer';
 import {Layout, Menu, MenuProps, message, notification} from 'antd';
 import {LinkOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 import {IndexContainerContext} from "../../context/HyggeContext";
-import {IndexContainerStatus} from "../../IndexContainer";
+import {IndexContainerState} from "../../IndexContainer";
 
 const {Sider} = Layout;
 
@@ -25,9 +25,9 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftStatus> 
     render() {
         return (
             <IndexContainerContext.Consumer>
-                {(status: IndexContainerStatus) => (
-                    <Sider trigger={null} className={"left_box"} collapsible collapsed={status.folded}>
-                        <div className={"page-title autoWrap autoOmit"}>{status.folded ? "宅" : "我的小宅子"}</div>
+                {(state: IndexContainerState) => (
+                    <Sider trigger={null} className={"left_box"} collapsible collapsed={state.folded}>
+                        <div className={"page-title autoWrap autoOmit"}>{state.folded ? "宅" : "我的小宅子"}</div>
                         <Menu theme={"dark"} mode={"inline"} selectable={false}
                               items={items}
                               onClick={this.menuOnClick}>

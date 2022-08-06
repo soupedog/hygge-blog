@@ -1,17 +1,14 @@
 import * as React from "react"
 
-import {Badge, Button, Col, Collapse, Input, Layout, Row, Spin, Switch, Tabs, Timeline, Tooltip} from 'antd';
-import {MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
+import {Badge, Layout, Tabs, Timeline} from 'antd';
 import {IndexContainerContext} from "../../context/HyggeContext";
-import {IndexContainerStatus, SearchType} from "../../IndexContainer";
-import clsx from "clsx";
-import {LogHelper, UrlHelper} from '../../../utils/UtilContainer';
+import {IndexContainerState} from "../../IndexContainer";
+import {LogHelper} from '../../../utils/UtilContainer';
 import {HyggeFooter} from "../HyggeFooter";
+import {HyggeIndexHeader} from "../HyggeIndexHeader";
 
-const {Header, Sider, Content} = Layout;
-const {Panel} = Collapse;
+const {Content} = Layout;
 const {TabPane} = Tabs;
-const {Search} = Input;
 
 // 描述该组件 props 数据类型
 export interface IndexRightProps {
@@ -31,68 +28,9 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightStatu
     render() {
         return (
             <IndexContainerContext.Consumer>
-                {(status: IndexContainerStatus) => (
+                {(state: IndexContainerState) => (
                     <Layout className="right_box site-layout">
-                        <Header className="site-layout-background"
-                                style={{
-                                    padding: 0,
-                                    position: 'fixed',
-                                    zIndex: 1,
-                                    width: '100%',
-                                    background: "#001529",
-                                    color: "#fff"
-                                }}>
-                            <Row gutter={[0, 0]} justify="start" className={clsx({
-                                "headMenuSmallMode": !status.folded,
-                                "headMenuBigMode": status.folded
-                            })}>
-                                <Col md={2} xl={12}>
-                                    <Tooltip placement="bottom" title={status.folded ? "展开" : "收起"}>
-                                        {React.createElement(status.folded ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                                            className: 'trigger',
-                                            onClick: () => status.updateRootStatus!({folded: !status.folded}),
-                                        })}
-                                    </Tooltip>
-                                </Col>
-                                <Col md={22} xl={12}>
-                                    <Row gutter={[0, 0]} justify="end">
-                                        <Col md={1} xl={4}>{/*占位符*/}</Col>
-                                        <Col md={3} xl={3}>
-                                            <Tooltip placement="bottom" title={"搜索类型"}>
-                                                <Switch checkedChildren="文章" unCheckedChildren="句子" defaultChecked/>
-                                            </Tooltip>
-                                        </Col>
-                                        <Col md={8} xl={11}>
-                                            <Search style={{marginTop: 16}} placeholder="搜索关键字"
-                                                    allowClear
-                                                    enterButton
-                                                    size="middle"
-                                                    onSearch={(value) => {
-                                                        let searchType: SearchType;
-                                                        if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
-                                                            searchType = SearchType.ARTICLE;
-                                                        } else {
-                                                            searchType = SearchType.QUOTE;
-                                                        }
-                                                        console.log(searchType)
-                                                    }}
-                                            />
-                                        </Col>
-                                        <Col md={1} xl={1}>{/*占位符*/}</Col>
-                                        <Col md={3} xl={3}>
-                                            <Button type="primary"
-                                                    onClick={() => UrlHelper.openNewPage({
-                                                        path: "#/signin",
-                                                        inNewTab: false
-                                                    })}>登录</Button>
-                                        </Col>
-                                        <Col md={2} xl={2} className={"textCenter"}>
-                                            <Spin spinning/>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            </Row>
-                        </Header>
+                        <HyggeIndexHeader/>
                         <Content
                             id={"myContent"}
                             className="site-layout-background"

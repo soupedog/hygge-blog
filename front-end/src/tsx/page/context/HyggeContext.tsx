@@ -1,7 +1,7 @@
 import * as React from "react"
-import {IndexContainerStatus} from "../IndexContainer";
+import {IndexContainerState} from "../IndexContainer";
 
 
-export const IndexContainerContext = React.createContext<IndexContainerStatus>(
+export const IndexContainerContext = React.createContext<IndexContainerState>(
     {}
 );

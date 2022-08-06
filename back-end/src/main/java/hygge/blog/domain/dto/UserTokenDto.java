@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserTokenDto {
+    private UserDto user;
     private TokenScopeEnum scope;
     private String token;
     private String refreshKey;

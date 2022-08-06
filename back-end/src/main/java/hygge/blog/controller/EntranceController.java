@@ -61,6 +61,10 @@ public class EntranceController extends HyggeWebUtilContainer implements Entranc
         }
 
         UserTokenDto result = PoDtoMapper.INSTANCE.poToDto(userToken);
+
+        if (context.getCurrentLoginUser() != null) {
+            result.setUser(PoDtoMapper.INSTANCE.poToDto(context.getCurrentLoginUser()));
+        }
         return (ResponseEntity<HyggeBlogControllerResponse<UserTokenDto>>) success(result);
     }
 }
