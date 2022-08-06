@@ -22,6 +22,7 @@ axios.interceptors.response.use(function (response) {
     }
 }, function (error) {
     // 对响应错误做点什么
+    message.error(error.message, 5);
     return Promise.reject(error);
 });
 

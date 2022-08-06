@@ -15,10 +15,10 @@ export interface IndexRightProps {
 }
 
 // 描述该组件 states 数据类型
-export interface IndexRightStatus {
+export interface IndexRightState {
 }
 
-export class IndexRight extends React.Component<IndexRightProps, IndexRightStatus> {
+export class IndexRight extends React.Component<IndexRightProps, IndexRightState> {
     constructor(props: IndexRightProps) {
         super(props);
         this.state = {};

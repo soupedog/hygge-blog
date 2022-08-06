@@ -10,10 +10,10 @@ export interface HyggeFooterProps {
 }
 
 // 描述该组件 states 数据类型
-export interface HyggeFooterStatus {
+export interface HyggeFooterState {
 }
 
-export class HyggeFooter extends React.Component<HyggeFooterProps, HyggeFooterStatus> {
+export class HyggeFooter extends React.Component<HyggeFooterProps, HyggeFooterState> {
     constructor(props: HyggeFooterProps) {
         super(props);
         this.state = {};

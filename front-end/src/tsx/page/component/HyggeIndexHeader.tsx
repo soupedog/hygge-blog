@@ -5,21 +5,22 @@ import {IndexContainerContext} from "../context/HyggeContext";
 import {Button, Col, Input, Layout, Row, Spin, Switch, Tooltip} from "antd";
 import clsx from "clsx";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
+import { HyggeUserMenu } from "./HyggeUserMenu";
 
 const {Search} = Input;
 const {Header} = Layout;
 
 // 描述该组件 props 数据类型
-export interface SignInCoreProps {
+export interface HyggeIndexHeaderProps {
 }
 
 // 描述该组件 states 数据类型
-export interface SignInCoreStatus {
+export interface HyggeIndexHeaderState {
 
 }
 
-export class HyggeIndexHeader extends React.Component<SignInCoreProps, SignInCoreStatus> {
-    constructor(props: SignInCoreProps) {
+export class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndexHeaderState> {
+    constructor(props: HyggeIndexHeaderProps) {
         super(props);
         this.state = {};
         LogHelper.info({className: "HyggeIndexHeader", msg: "初始化成功"});
@@ -76,7 +77,7 @@ export class HyggeIndexHeader extends React.Component<SignInCoreProps, SignInCor
                                     </Col>
                                     <Col md={1} xl={1}>{/*占位符*/}</Col>
                                     <Col md={3} xl={3}>
-                                        {state.currentUser != null ? <div>"已登录"</div> :
+                                        {state.currentUser != null ? <HyggeUserMenu /> :
                                             <Button type="primary"
                                                     onClick={() => UrlHelper.openNewPage({
                                                         path: "#/signin",
