@@ -32,7 +32,9 @@ export interface HyggeResponse<T> {
     main?: T;
 }
 
-export interface UserResponse {
+const emptyResponse = {} as HyggeResponse<any>;
+
+export interface UserDto {
     uid: string;
     userAvatar: string;
     userSex: string;
@@ -43,19 +45,19 @@ export interface UserResponse {
 }
 
 export interface SignInResponse {
-    user?: UserResponse;
+    user?: UserDto;
     token: string;
     refreshKey: string;
     deadline: number;
 }
 
 export class UserService {
-    static getCurrentUser(): UserResponse | null | undefined {
+    static getCurrentUser(): UserDto | null | undefined {
         let currentUserStringValue = localStorage.getItem('currentUser');
         if (PropertiesHelper.isStringNotNull()) {
             return null;
         }
-        return JSON.parse(currentUserStringValue!) as UserResponse;
+        return JSON.parse(currentUserStringValue!) as UserDto;
     }
 
     static removeCurrentUser() {
@@ -94,7 +96,7 @@ export class UserService {
     }
 
     static signIn(ac: string, pw: string,
-                  successHook?: (i: HyggeResponse<SignInResponse>) => void,
+                  successHook?: (input?: HyggeResponse<SignInResponse>) => void,
                   beforeHook?: () => void,
                   finallyHook?: () => void): void {
         if (beforeHook != null) {
@@ -127,6 +129,84 @@ export class UserService {
             if (finallyHook != null) {
                 finallyHook();
             }
-        })
+        });
+    }
+}
+
+
+export interface ArticleConfiguration {
+    backgroundMusicType: string,
+    mediaPlayType: string,
+    src: string,
+    coverSrc?: string,
+    name?: string,
+    artist?: string,
+    lrc?: string
+}
+
+export interface TopicDto {
+    tid: string,
+    topicName: string,
+    orderVal: number
+}
+
+export interface CategoryDto {
+    cid: string,
+    categoryName: string,
+    orderVal: number
+}
+
+export interface CategoryTreeInfo {
+    topicInfo: TopicDto,
+    categoryList: CategoryDto[]
+}
+
+export interface ArticleDto {
+    aid: string,
+    configuration: ArticleConfiguration,
+    categoryTreeInfo: CategoryTreeInfo,
+    cid: string,
+    title: string,
+    imageSrc: string,
+    summary: string,
+    content: string,
+    wordCount: number,
+    pageViews: number,
+    selfPageViews: number,
+    orderGlobal: number,
+    orderCategory: number,
+    articleState: string
+}
+
+export class ArticleService {
+
+    static findArticleByAid(aid: string | null,
+                            successHook?: (input?: HyggeResponse<ArticleDto>) => void,
+                            beforeHook?: () => void,
+                            finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        if (aid == null) {
+            if (successHook != null) {
+                successHook();
+            }
+            return;
+        }
+
+        axios.get("/main/article/" + aid, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<ArticleDto> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
     }
 }

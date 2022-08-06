@@ -26,5 +26,5 @@ import java.util.List;
 public class CategoryTreeInfo {
     private TopicDto topicInfo;
     @Schema(title = "类别层级信息", description = "从父节点排列到当前类别节点")
-    private List<CategoryDto> categoryTreeInfo;
+    private List<CategoryDto> categoryList;
 }

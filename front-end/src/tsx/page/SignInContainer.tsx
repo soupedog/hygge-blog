@@ -39,7 +39,7 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
                             name="hygge_login"
                             className="login-form"
                             onFinish={(val) => {
-                                UserService.signIn(val.account, val.password, (data) => {
+                                UserService.signIn(val.account, val.password, () => {
                                     message.success("登录成功，1 秒内自动跳转回主页，请稍后", 1000);
                                     UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
                                 });

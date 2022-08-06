@@ -8,7 +8,7 @@ import '../../css/icon.css';
 import 'antd/dist/antd.min.css';
 import '../../css/default.css';
 import '../../css/index.less';
-import {UserResponse, UserService} from "../rest/ApiClient";
+import {UserDto, UserService} from "../rest/ApiClient";
 import {IndexLeft} from "./component/index/IndexLeft";
 import {IndexRight} from "./component/index/IndexRight";
 
@@ -18,7 +18,7 @@ export interface IndexContainerProps {
 
 // 描述该组件 states 数据类型
 export interface IndexContainerState {
-    currentUser?: UserResponse | null;
+    currentUser?: UserDto | null;
     // 标记当前有多少网络请求
     netWorkArrayCounter?: boolean[]
     // 是否折叠收起

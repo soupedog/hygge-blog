@@ -28,7 +28,7 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
                 {(state: IndexContainerState) => (
                     <Dropdown overlay={
                         <Menu items={items} onClick={(event) => {
-                            let articleNo = UrlHelper.getQueryString("articleNo");
+                            let aid = UrlHelper.getQueryString("aid");
                             let finalUrl = UrlHelper.getBaseUrl();
                             switch (event.key) {
                                 case "signOut":
@@ -41,8 +41,8 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
                                     UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false, delayTime: 1000})
                                     break;
                                 case "editArticle":
-                                    if (articleNo != null) {
-                                        finalUrl = finalUrl + "#/editor/article?articleNo=" + articleNo;
+                                    if (aid != null) {
+                                        finalUrl = finalUrl + "#/editor/article?aid=" + aid;
                                     } else {
                                         finalUrl = finalUrl + "#/editor/article";
                                     }

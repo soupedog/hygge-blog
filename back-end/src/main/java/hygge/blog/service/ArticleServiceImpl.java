@@ -231,18 +231,18 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
     private void initCategoryTreeInfo(TopicDto currentTopicDto, Category currentCategory, List<Category> categoryList, ArticleDto result) {
         CategoryTreeInfo categoryTreeInfo = new CategoryTreeInfo();
         categoryTreeInfo.setTopicInfo(currentTopicDto);
-        categoryTreeInfo.setCategoryTreeInfo(new ArrayList<>(0));
+        categoryTreeInfo.setCategoryList(new ArrayList<>(0));
 
         // 确保当前节点一定被添加
-        while (categoryTreeInfo.getCategoryTreeInfo().isEmpty() || (currentCategory != null && currentCategory.getParentId() != null)) {
-            categoryTreeInfo.getCategoryTreeInfo().add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
+        while (categoryTreeInfo.getCategoryList().isEmpty() || (currentCategory != null && currentCategory.getParentId() != null)) {
+            categoryTreeInfo.getCategoryList().add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
             // 确认不会空指针
             Integer parentId = currentCategory.getParentId();
             currentCategory = categoryList.stream().filter(item -> item.getCategoryId().equals(parentId)).findFirst().orElse(null);
         }
 
         // 上面是从当前找到根节点，所以需要反转数组才是从根到当前节点
-        Collections.reverse(categoryTreeInfo.getCategoryTreeInfo());
+        Collections.reverse(categoryTreeInfo.getCategoryList());
         result.setCategoryTreeInfo(categoryTreeInfo);
     }
 
