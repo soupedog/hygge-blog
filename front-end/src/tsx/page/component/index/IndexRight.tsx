@@ -30,7 +30,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
             <IndexContainerContext.Consumer>
                 {(state: IndexContainerState) => (
                     <Layout className="right_box site-layout">
-                        <HyggeIndexHeader/>
+                        <HyggeIndexHeader key={"he"}/>
                         <Content
                             id={"myContent"}
                             className="site-layout-background"

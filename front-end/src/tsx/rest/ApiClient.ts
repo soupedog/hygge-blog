@@ -180,7 +180,7 @@ export interface ArticleDto {
 
 export class ArticleService {
 
-    static findArticleByAid(aid: string | null,
+    static findArticleByAid(aid?: string | null,
                             successHook?: (input?: HyggeResponse<ArticleDto>) => void,
                             beforeHook?: () => void,
                             finallyHook?: () => void): void {
@@ -188,7 +188,7 @@ export class ArticleService {
             beforeHook();
         }
 
-        if (aid == null) {
+        if (!PropertiesHelper.isStringNotNull(aid)) {
             if (successHook != null) {
                 successHook();
             }

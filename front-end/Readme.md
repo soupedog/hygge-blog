@@ -36,6 +36,9 @@ npm install aplayer
 // 多条件合并返回 true false 工具
 npm install clsx
 
+// querystring 工具
+npm install qs --save-dev
+
 // antd
 npm install antd
 

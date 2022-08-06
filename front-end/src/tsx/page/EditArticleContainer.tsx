@@ -3,17 +3,20 @@ import {LogHelper, UrlHelper} from '../utils/UtilContainer';
 import {ArticleDto, ArticleService, UserService} from "../rest/ApiClient";
 import {EditArticleContainerContext} from "./context/HyggeContext";
 import {message} from "antd";
+import {ReactRouter, withRouter} from "../utils/ReactRouterHelper";
 
 // 描述该组件 props 数据类型
 export interface EditArticleContainerProps {
+    router: ReactRouter;
 }
 
 // 描述该组件 states 数据类型
 export interface EditArticleContainerState {
+    aid?: string;
     currentArticle?: ArticleDto
 }
 
-export class EditArticleContainer extends React.Component<EditArticleContainerProps, EditArticleContainerState> {
+class EditArticleContainer extends React.Component<EditArticleContainerProps, EditArticleContainerState> {
     constructor(props: EditArticleContainerProps) {
         super(props);
         this.state = {
@@ -38,9 +41,7 @@ export class EditArticleContainer extends React.Component<EditArticleContainerPr
     }
 
     componentDidMount() {
-        let aid: string | null = UrlHelper.getQueryString("aid");
-
-        ArticleService.findArticleByAid(aid, (data) => {
+        ArticleService.findArticleByAid(this.props.router.params.aid, (data) => {
             if (data != null) {
                 this.updateRootStatus({
                     currentArticle: data.main
@@ -53,3 +54,5 @@ export class EditArticleContainer extends React.Component<EditArticleContainerPr
         this.setState(deltaInfo);
     }
 }
+
+export default withRouter(EditArticleContainer)

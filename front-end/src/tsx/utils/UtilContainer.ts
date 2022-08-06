@@ -287,6 +287,13 @@ export class UrlHelper {
         let fullURL = window.location.href;
         let startPoint = fullURL.indexOf('?') + 1;
         let queryStringTarget = fullURL.substring(startPoint);
+
+        let endPoint = queryStringTarget.indexOf("#");
+
+        if (endPoint > 0) {
+            queryStringTarget = queryStringTarget.substring(0, endPoint);
+        }
+
         let queryStringArray = queryStringTarget.split('&');
         let searchObj: any = {};
 

@@ -5,9 +5,11 @@ import {IndexContainerContext} from "../context/HyggeContext";
 import {Avatar, Dropdown, Menu, MenuProps, message} from "antd";
 import {CloseCircleOutlined, EditOutlined} from '@ant-design/icons';
 import {UserService} from "../../rest/ApiClient";
+import {ReactRouter, withRouter} from "../../utils/ReactRouterHelper";
 
 // 描述该组件 props 数据类型
 export interface HyggeUserMenuProps {
+    router: ReactRouter;
 }
 
 // 描述该组件 states 数据类型
@@ -37,20 +39,20 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
                                     let currentSecretKey = UrlHelper.getQueryString("secretKey");
                                     if (currentSecretKey != null) {
                                         finalUrl = finalUrl + "?secretKey=" + currentSecretKey;
+                                        UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
+                                    } else {
+                                        this.props.router.navigate("")
                                     }
-                                    UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false, delayTime: 1000})
                                     break;
                                 case "editArticle":
                                     if (aid != null) {
-                                        finalUrl = finalUrl + "#/editor/article?aid=" + aid;
+                                        this.props.router.navigate("editor/article/" + aid, {replace: false})
                                     } else {
-                                        finalUrl = finalUrl + "#/editor/article";
+                                        this.props.router.navigate("editor/article/")
                                     }
-                                    UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
                                     break;
                                 case "editQuote":
-                                    finalUrl = finalUrl + "#/editor/quote";
-                                    UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
+                                    this.props.router.navigate("editor/quote")
                                     break;
                             }
                         }}/>
@@ -62,6 +64,8 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
         );
     }
 }
+
+export default withRouter(HyggeUserMenu)
 
 
 type MenuItem = Required<MenuProps>['items'][number];

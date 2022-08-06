@@ -5,7 +5,7 @@ import {IndexContainerContext} from "../context/HyggeContext";
 import {Button, Col, Input, Layout, Row, Spin, Switch, Tooltip} from "antd";
 import clsx from "clsx";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
-import {HyggeUserMenu} from "./HyggeUserMenu";
+import HyggeUserMenu from "./HyggeUserMenu";
 import {ReactRouter, withRouter} from "../../utils/ReactRouterHelper";
 
 const {Search} = Input;
@@ -97,4 +97,6 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
             </IndexContainerContext.Consumer>
         );
     }
-}export default withRouter(HyggeIndexHeader)
+}
+
+export default withRouter(HyggeIndexHeader)
