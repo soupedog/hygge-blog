@@ -46,6 +46,11 @@ module.exports = {
                         '@babel/preset-env',
                         '@babel/preset-react',
                         '@babel/preset-typescript'
+                    ],
+                    plugins: [
+                        // 支持装饰器(类似 java 的注解)
+                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
                     ]
                 }
             },

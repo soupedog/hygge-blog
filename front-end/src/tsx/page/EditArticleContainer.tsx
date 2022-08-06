@@ -1,7 +1,8 @@
 import * as React from "react"
 import {LogHelper, UrlHelper} from '../utils/UtilContainer';
-import {ArticleDto, ArticleService} from "../rest/ApiClient";
+import {ArticleDto, ArticleService, UserService} from "../rest/ApiClient";
 import {EditArticleContainerContext} from "./context/HyggeContext";
+import {message} from "antd";
 
 // 描述该组件 props 数据类型
 export interface EditArticleContainerProps {
@@ -18,6 +19,13 @@ export class EditArticleContainer extends React.Component<EditArticleContainerPr
         this.state = {
             currentArticle: undefined
         };
+
+        let currentUser = UserService.getCurrentUser();
+        if (currentUser == null) {
+            message.warn("未登录用户无权访问，2 秒内自动为您跳转至主页")
+            UrlHelper.openNewPage({inNewTab: false, delayTime: 2000})
+        }
+
         LogHelper.info({className: "EditArticleContainer", msg: "初始化成功"});
     }
 

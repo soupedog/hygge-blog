@@ -5,7 +5,7 @@ import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexContainerState} from "../../IndexContainer";
 import {LogHelper} from '../../../utils/UtilContainer';
 import {HyggeFooter} from "../HyggeFooter";
-import {HyggeIndexHeader} from "../HyggeIndexHeader";
+import HyggeIndexHeader from "../HyggeIndexHeader";
 
 const {Content} = Layout;
 const {TabPane} = Tabs;

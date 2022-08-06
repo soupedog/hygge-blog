@@ -1,25 +1,26 @@
 import * as React from "react"
-import {LogHelper, UrlHelper} from '../../utils/UtilContainer';
+import {LogHelper} from '../../utils/UtilContainer';
 import {IndexContainerState, SearchType} from "../IndexContainer";
 import {IndexContainerContext} from "../context/HyggeContext";
 import {Button, Col, Input, Layout, Row, Spin, Switch, Tooltip} from "antd";
 import clsx from "clsx";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
-import { HyggeUserMenu } from "./HyggeUserMenu";
+import {HyggeUserMenu} from "./HyggeUserMenu";
+import {ReactRouter, withRouter} from "../../utils/ReactRouterHelper";
 
 const {Search} = Input;
 const {Header} = Layout;
 
 // 描述该组件 props 数据类型
 export interface HyggeIndexHeaderProps {
+    router: ReactRouter;
 }
 
 // 描述该组件 states 数据类型
 export interface HyggeIndexHeaderState {
-
 }
 
-export class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndexHeaderState> {
+class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndexHeaderState> {
     constructor(props: HyggeIndexHeaderProps) {
         super(props);
         this.state = {};
@@ -77,12 +78,12 @@ export class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, Hyg
                                     </Col>
                                     <Col md={1} xl={1}>{/*占位符*/}</Col>
                                     <Col md={3} xl={3}>
-                                        {state.currentUser != null ? <HyggeUserMenu /> :
+                                        {state.currentUser != null ? <HyggeUserMenu/> :
                                             <Button type="primary"
-                                                    onClick={() => UrlHelper.openNewPage({
-                                                        path: "#/signin",
-                                                        inNewTab: false
-                                                    })}>登录</Button>}
+                                                    onClick={() => {
+                                                        this.props.router.navigate("/signin");
+                                                    }}
+                                            >登录</Button>}
 
                                     </Col>
                                     <Col md={2} xl={2} className={"textCenter"}>
@@ -96,4 +97,4 @@ export class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, Hyg
             </IndexContainerContext.Consumer>
         );
     }
-}
+}export default withRouter(HyggeIndexHeader)
