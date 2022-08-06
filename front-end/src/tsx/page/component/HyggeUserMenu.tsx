@@ -39,10 +39,10 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
                                     let currentSecretKey = UrlHelper.getQueryString("secretKey");
                                     if (currentSecretKey != null) {
                                         finalUrl = finalUrl + "?secretKey=" + currentSecretKey;
-                                        UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
                                     } else {
                                         this.props.router.navigate("")
                                     }
+                                    UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
                                     break;
                                 case "editArticle":
                                     if (aid != null) {

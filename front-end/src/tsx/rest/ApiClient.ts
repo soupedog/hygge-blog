@@ -153,12 +153,13 @@ export interface TopicDto {
 export interface CategoryDto {
     cid: string,
     categoryName: string,
-    orderVal: number
+    orderVal: number,
+    articleCount?: number
 }
 
 export interface CategoryTreeInfo {
     topicInfo: TopicDto,
-    categoryList: CategoryDto[]
+    categoryList: CategoryDto[],
 }
 
 export interface ArticleDto {
@@ -179,7 +180,6 @@ export interface ArticleDto {
 }
 
 export class ArticleService {
-
     static findArticleByAid(aid?: string | null,
                             successHook?: (input?: HyggeResponse<ArticleDto>) => void,
                             beforeHook?: () => void,
@@ -200,6 +200,96 @@ export class ArticleService {
         }).then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<ArticleDto> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static createArticle(aid: string,
+                         article: ArticleDto,
+                         successHook?: (input?: HyggeResponse<ArticleDto>) => void,
+                         beforeHook?: () => void,
+                         finallyHook?: () => void): void {
+        axios.post("/main/article", article, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<ArticleDto> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+}
+
+export interface TopicOverviewInfo {
+    topicInfo: TopicDto,
+    categoryListInfo: CategoryDto[],
+    totalCount?: number
+}
+
+export interface AllOverviewInfo {
+    "topicOverviewInfoList": TopicOverviewInfo[];
+}
+
+export class HomePageService {
+    static fetch(successHook?: (input?: HyggeResponse<AllOverviewInfo>) => void,
+                 beforeHook?: () => void,
+                 finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("/home/fetch", {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<AllOverviewInfo> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+}
+
+export interface FileInfo {
+    "src": string,
+    "name": string,
+    "fileSize": number
+}
+
+export class FileService {
+    static findFileInfo(type: string[],
+                        successHook?: (input?: HyggeResponse<FileInfo[]>) => void,
+                        beforeHook?: () => void,
+                        finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        let typeInfo: string = "";
+        type.forEach((item) => {
+            typeInfo = typeInfo + item;
+        });
+
+        axios.get("/main/file?type=" + typeInfo, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<FileInfo[]> = response.data;
                     successHook(data);
                 }
             }

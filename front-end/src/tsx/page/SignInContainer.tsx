@@ -32,7 +32,7 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
             <ConfigProvider locale={zhCN}>
                 <Layout className="layout">
                     <Header>
-                        <div className="page-title floatToLeft" style={{width: 200}}>我的小宅子---登录页面</div>
+                        <div className="page-title floatToLeft" style={{width: 200}}>我的小宅子---登录</div>
                     </Header>
                     <Content className="mainContent" style={{padding: '0 50px', minHeight: window.innerHeight - 182}}>
                         <Form

@@ -250,8 +250,10 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         if (articleConfiguration != null) {
             articleConfiguration.setBackgroundMusicType(parameterHelper.parseObjectOfNullable("backgroundMusicType", articleConfiguration.getBackgroundMusicType(), BackgroundMusicTypeEnum.NONE));
             articleConfiguration.setMediaPlayType(parameterHelper.parseObjectOfNullable("mediaPlayType", articleConfiguration.getMediaPlayType(), MediaPlayTypeEnum.SUGGEST_AUTO_PLAY));
-            parameterHelper.stringNotEmpty("src", (Object) articleConfiguration.getSrc());
-            if (BackgroundMusicTypeEnum.DEFAULT.equals(articleConfiguration.getBackgroundMusicType())) {
+
+            if (!articleConfiguration.getBackgroundMusicType().equals(BackgroundMusicTypeEnum.NONE)) {
+                parameterHelper.stringNotEmpty("src", (Object) articleConfiguration.getSrc());
+            } else if (BackgroundMusicTypeEnum.DEFAULT.equals(articleConfiguration.getBackgroundMusicType())) {
                 parameterHelper.stringNotEmpty("name", (Object) articleConfiguration.getName());
                 parameterHelper.stringNotEmpty("artist", (Object) articleConfiguration.getArtist());
             }

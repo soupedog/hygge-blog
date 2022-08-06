@@ -64,6 +64,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
                 if (count > 0) {
                     categoryDto.setArticleCount(count);
                     topicOverviewInfo.getCategoryListInfo().add(categoryDto);
+                    topicOverviewInfo.setTotalCount(topicOverviewInfo.getTotalCount() + count);
                 }
             }
             if (!topicOverviewInfo.getCategoryListInfo().isEmpty()) {
