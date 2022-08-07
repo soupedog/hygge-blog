@@ -27,6 +27,10 @@ import hygge.utils.bo.ColumnInfo;
 import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -152,17 +156,19 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
             return result;
         }
 
-        List<Article> articleList;
-        int totalCount;
+        Page<Article> articleListTemp;
+        Sort sort = Sort.by(Sort.Order.desc("orderGlobal"), Sort.Order.desc("createTs"));
+        Pageable pageable = PageRequest.of((currentPage - 1) * pageSize, pageSize, sort);
+
         if (currentUserId != null) {
-            articleList = articleDao.findArticleSummary(accessibleCategoryIdList, currentUserId, "orderGlobal desc,createTs desc", (currentPage - 1) * pageSize, pageSize);
-            totalCount = articleDao.findArticleSummaryTotalCount(accessibleCategoryIdList, currentUserId);
+            articleListTemp = articleDao.findArticleSummary(accessibleCategoryIdList, currentUserId, pageable);
         } else {
-            articleList = articleDao.findArticleSummary(accessibleCategoryIdList, "orderGlobal desc,createTs desc", (currentPage - 1) * pageSize, pageSize);
-            totalCount = articleDao.findArticleSummaryTotalCount(accessibleCategoryIdList);
+            articleListTemp = articleDao.findArticleSummary(accessibleCategoryIdList, pageable);
         }
 
-        List<ArticleDto> articleSummaryList = collectionHelper.filterNonemptyItemAsArrayList(false, articleList, (item -> {
+        long totalCount = articleListTemp.getTotalElements();
+
+        List<ArticleDto> articleSummaryList = collectionHelper.filterNonemptyItemAsArrayList(false, articleListTemp.getContent(), (item -> {
             ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(item);
             if (categoryList != null) {
                 categoryList.stream()

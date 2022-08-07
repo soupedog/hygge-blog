@@ -56,7 +56,7 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                                     <IconText icon={EditTwoTone} text={"字数 " + item.wordCount}
                                               key={"word_count_" + item.aid}/>,
                                     <IconText icon={DashboardTwoTone}
-                                              text={"创建时间 " + TimeHelper.formatTimeStampToString(item.createTs)}
+                                              text={TimeHelper.formatTimeStampToString(item.createTs)}
                                               key={"create_ts_" + item.aid}/>,
                                     <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews}
                                               key={"page_view_" + item.aid}/>,
@@ -89,7 +89,7 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                                 <IconText icon={EditTwoTone} text={"字数 " + item.wordCount}
                                           key={"word_count_" + item.aid}/>,
                                 <IconText icon={DashboardTwoTone}
-                                          text={"创建时间 " + TimeHelper.formatTimeStampToString(item.createTs)}
+                                          text={TimeHelper.formatTimeStampToString(item.createTs)}
                                           key={"create_ts_" + item.aid}/>,
                                 <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews}
                                           key={"page_view_" + item.aid}/>,

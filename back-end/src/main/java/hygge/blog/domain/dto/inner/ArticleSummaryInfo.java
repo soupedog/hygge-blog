@@ -26,5 +26,5 @@ public class ArticleSummaryInfo {
     @Schema(title = "文章摘要信息数组")
     private List<ArticleDto> articleSummaryList;
     @Schema(title = "文章总数")
-    private int totalCount;
+    private long totalCount;
 }
