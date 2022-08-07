@@ -163,7 +163,7 @@ export class UserService {
                         localStorage.setItem('token', data.main.token);
                         localStorage.setItem('refreshKey', data.main.refreshKey);
                         localStorage.setItem('currentUser', JSON.stringify(user));
-                        message.info("用户信息更新")
+                        message.info("用户信息已更新")
                     }
 
                     successHook(data);
@@ -254,12 +254,39 @@ export class ArticleService {
         });
     }
 
-    static createArticle(aid: string,
+    static createArticle(article: ArticleDto,
+                         successHook?: (input?: HyggeResponse<ArticleDto>) => void,
+                         beforeHook?: () => void,
+                         finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.post("/main/article", article, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<ArticleDto> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static updateArticle(aid: string,
                          article: ArticleDto,
                          successHook?: (input?: HyggeResponse<ArticleDto>) => void,
                          beforeHook?: () => void,
                          finallyHook?: () => void): void {
-        axios.post("/main/article", article, {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.put("/main/article/" + aid, article, {
             headers: UserService.getHeader()
         }).then((response) => {
                 if (successHook != null && response != null) {

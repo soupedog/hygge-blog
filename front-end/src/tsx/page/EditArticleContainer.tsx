@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper, UrlHelper} from '../utils/UtilContainer';
+import {LogHelper, PropertiesHelper, UrlHelper} from '../utils/UtilContainer';
 import {
     AllOverviewInfo,
     ArticleDto,
@@ -89,26 +89,19 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                                     margin: "40px auto 0 auto"
                                 }}
                                 onFinish={(value) => {
-                                    let actualData;
+                                    value.content = _react.state.mdController?.getValue();
                                     if (value.action == "update") {
-                                        actualData = {
-                                            articleCategoryNo: value.articleCategoryNo,
-                                            title: value.title,
-                                            articleState: value.articleState,
-                                            summary: value.summary,
-                                            content: _react.state.mdController?.getValue(),
-                                            articleConfiguration: value.articleConfiguration
-                                        };
+                                        if (PropertiesHelper.isStringNotNull(value.aid)) {
+                                            ArticleService.updateArticle(value.aid,value, () => {
+                                                    message.success("修改文章成功");
+                                                }
+                                            );
+                                        } else {
+                                            message.warn("修改文章时 aid 不可为空");
+                                        }
 
-                                        // AdminService.updateArticle(value.articleNo, {
-                                        //     data: JSON.stringify(actualData),
-                                        //     successHook: (response) => {
-                                        //         message.success("修改文章成功");
-                                        //     }
-                                        // });
                                     } else if (value.action == "add") {
-                                        value.content = _react.state.mdController?.getValue();
-                                        ArticleService.createArticle(_react.props.router.params.aid!, value, (data) => {
+                                        ArticleService.createArticle(value, (data) => {
                                                 _react.updateForm(data!, _react);
                                                 message.success("添加文章成功");
                                             }

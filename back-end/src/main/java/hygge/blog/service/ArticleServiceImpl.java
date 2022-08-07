@@ -109,7 +109,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         Article newOne = MapToAnyMapper.INSTANCE.mapToArticle(finalData);
 
         String title = (String) finalData.get("title");
-        if (title != null) {
+        if (title != null && !old.getTitle().equals(newOne.getTitle())) {
             nameConflictCheck(title);
         }
         String cid = (String) finalData.get("cid");
