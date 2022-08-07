@@ -343,6 +343,18 @@ export interface ArticleSummaryResponse {
     totalCount: number
 }
 
+export interface QuoteDto {
+    "quoteId": number,
+    "content": string,
+    "source": string,
+    "portal": string
+}
+
+export interface QuoteResponse {
+    "quoteList": QuoteDto[],
+    "totalCount": number
+}
+
 export class HomePageService {
     static fetch(successHook?: (input?: HyggeResponse<AllOverviewInfo>) => void,
                  beforeHook?: () => void,
@@ -378,6 +390,30 @@ export class HomePageService {
         }).then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<AnnouncementDto[]> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static fetchQuote(currentPage: number,
+                      pageSize: number,
+                      successHook?: (input?: HyggeResponse<QuoteResponse>) => void,
+                      beforeHook?: () => void,
+                      finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/fetch/quote" + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<QuoteResponse> = response.data;
                     successHook(data);
                 }
             }

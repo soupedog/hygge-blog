@@ -4,7 +4,7 @@ import {HashRouter, Route, Routes} from "react-router-dom";
 import {IndexContainer} from "./page/IndexContainer";
 import {ArticleBrowserContainer} from "./page/ArticleBrowserContainer";
 import {SignInContainer} from "./page/SignInContainer";
-import {EditQuoteContainer} from "./page/EditQuoteContainer";
+import EditQuoteContainer from "./page/EditQuoteContainer";
 import EditArticleContainer from "./page/EditArticleContainer";
 import {SignInAutoContainer} from "./page/SignInAutoContainer";
 

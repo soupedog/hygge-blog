@@ -38,7 +38,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                             style={{
                                 borderRadius: 15,
                                 background: "#fff",
-                                margin: '24px 16px',
+                                margin: '24px 60px',
                                 marginTop: 100,
                                 padding: 24,
                                 minHeight: window.innerHeight - 282,

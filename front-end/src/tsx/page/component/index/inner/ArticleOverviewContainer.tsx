@@ -64,10 +64,14 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                                 src={item.imageSrc}
                             />
                         }
+                        style={{
+                            // backgroundColor: "red"
+                        }}
                     >
                         <List.Item.Meta
                             title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                                      href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid} target="_blank">{item.title}</a>}
+                                      href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}
+                                      target="_blank">{item.title}</a>}
                             description={_react.getCategoryInfo(item)}
                         />
                         <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
