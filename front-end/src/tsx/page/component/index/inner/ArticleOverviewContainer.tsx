@@ -66,10 +66,13 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                         }
                     >
                         <List.Item.Meta
-                            title={<a href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}>{item.title}</a>}
+                            title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
+                                      href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid} target="_blank">{item.title}</a>}
                             description={_react.getCategoryInfo(item)}
                         />
-                        {item.summary}
+                        <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
+                            {item.summary}
+                        </div>
                     </List.Item>
                 )}
             />

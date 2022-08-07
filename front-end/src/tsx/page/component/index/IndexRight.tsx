@@ -48,7 +48,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                 {
                                     state.topicOverviewInfoList?.map((item) => {
                                         return (
-                                            <TabPane key={"tab_pane"+item.topicInfo.topicName}
+                                            <TabPane key={"tab_pane"+item.topicInfo.tid}
                                                      tab={
                                                 <>
                                                     <span>{item.topicInfo.topicName}</span>
