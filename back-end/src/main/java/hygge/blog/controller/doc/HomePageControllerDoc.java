@@ -2,12 +2,15 @@ package hygge.blog.controller.doc;
 
 import hygge.blog.controller.base.HyggeBlogController;
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.dto.AnnouncementDto;
 import hygge.blog.domain.dto.QuoteInfo;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 /**
  * @author Xavier
@@ -26,4 +29,7 @@ public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntit
 
     @Operation(summary = "查询句子收藏", description = "在句子收藏加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(int currentPage, int pageSize);
+
+    @Operation(summary = "公告查询", description = "在公告加载时需要拉取的数据")
+    ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>> announcementFetch(int currentPage, int pageSize);
 }

@@ -1,5 +1,6 @@
 package hygge.blog.domain.mapper;
 
+import hygge.blog.domain.dto.AnnouncementDto;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.BlogGroupDto;
 import hygge.blog.domain.dto.CategoryDto;
@@ -8,6 +9,7 @@ import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.UserDto;
 import hygge.blog.domain.dto.UserTokenDto;
 import hygge.blog.domain.mapper.convert.ObjectMappingConvert;
+import hygge.blog.domain.po.Announcement;
 import hygge.blog.domain.po.Article;
 import hygge.blog.domain.po.BlogGroup;
 import hygge.blog.domain.po.Category;
@@ -73,4 +75,9 @@ public interface PoDtoMapper {
     QuoteDto poToDto(Quote po);
 
     Quote dtoToPo(QuoteDto dto);
+
+    @Mapping(expression = "java(ObjectMappingConvert.timestampToLong(po.getCreateTs()))", target = "createTs")
+    AnnouncementDto poToDto(Announcement po);
+
+    Announcement dtoToPo(AnnouncementDto dto);
 }

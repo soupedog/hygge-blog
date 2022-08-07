@@ -312,7 +312,11 @@ export interface AllOverviewInfo {
     "topicOverviewInfoList": TopicOverviewInfo[];
 }
 
-export interface CategoryInfo {
+export interface AnnouncementDto {
+    "announcementId": number,
+    "paragraphList": string[],
+    "color": string,
+    "createTs": number
 }
 
 export interface ArticleSummaryInfo {
@@ -352,6 +356,28 @@ export class HomePageService {
         }).then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<AllOverviewInfo> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static fetchAnnouncement(successHook?: (input?: HyggeResponse<AnnouncementDto[]>) => void,
+                             beforeHook?: () => void,
+                             finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/fetch/announcement", {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<AnnouncementDto[]> = response.data;
                     successHook(data);
                 }
             }

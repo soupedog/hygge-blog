@@ -8,7 +8,7 @@ import '../../css/icon.css';
 import 'antd/dist/antd.min.css';
 import '../../css/default.css';
 import '../../css/index.less';
-import {HomePageService, TopicOverviewInfo, UserDto, UserService} from "../rest/ApiClient";
+import {AnnouncementDto, HomePageService, TopicOverviewInfo, UserDto, UserService} from "../rest/ApiClient";
 import {IndexLeft} from "./component/index/IndexLeft";
 import {IndexRight} from "./component/index/IndexRight";
 
@@ -18,19 +18,20 @@ export interface IndexContainerProps {
 
 // 描述该组件 states 数据类型
 export interface IndexContainerState {
-    currentUser?: UserDto | null;
+    currentUser?: UserDto | null,
     // 标记当前有多少网络请求
-    netWorkArrayCounter?: boolean[];
-    "topicOverviewInfoList"?: TopicOverviewInfo[];
+    netWorkArrayCounter?: boolean[],
+    topicOverviewInfoList?: TopicOverviewInfo[],
+    announcementDtoList?: AnnouncementDto[],
     // 是否折叠收起
-    folded?: boolean;
-    searchType?: SearchType;
-    updateRootStatus?: Function;
+    folded?: boolean,
+    searchType?: SearchType,
+    updateRootStatus?: Function,
 }
 
 export enum SearchType {
-    ARTICLE,
-    QUOTE
+    ARTICLE = "ARTICLE",
+    QUOTE = "QUOTE"
 }
 
 export class IndexContainer extends React.Component<IndexContainerProps, IndexContainerState> {
@@ -48,6 +49,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 categoryListInfo: [],
                 totalCount: 0
             }],
+            announcementDtoList: [],
             folded: true,
             searchType: SearchType.ARTICLE,
             updateRootStatus: this.updateRootStatus.bind(this)
@@ -76,6 +78,12 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                     topicOverviewInfoList: data?.main?.topicOverviewInfoList
                 });
             }
+
+            HomePageService.fetchAnnouncement((data) => {
+                _raact.updateRootStatus({
+                    announcementDtoList: data?.main
+                });
+            });
         });
     }
 

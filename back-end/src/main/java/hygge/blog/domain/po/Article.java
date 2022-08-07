@@ -94,12 +94,12 @@ public class Article extends BasePo {
     /**
      * 总浏览量
      */
-    @Column
+    @Column(columnDefinition = "int(11) default 0")
     private Integer pageViews;
     /**
      * 作者自身贡献的浏览量
      */
-    @Column
+    @Column(columnDefinition = "int(11) default 0")
     private Integer selfPageViews;
     /**
      * 全局排序优先级(越大越靠前)

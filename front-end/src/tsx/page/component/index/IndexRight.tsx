@@ -3,7 +3,7 @@ import * as React from "react"
 import {Badge, Layout, Tabs, Timeline} from 'antd';
 import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexContainerState} from "../../IndexContainer";
-import {LogHelper} from '../../../utils/UtilContainer';
+import {LogHelper, TimeHelper} from '../../../utils/UtilContainer';
 import {HyggeFooter} from "../HyggeFooter";
 import HyggeIndexHeader from "../HyggeIndexHeader";
 import {ArticleOverviewContainer} from "./inner/ArticleOverviewContainer";
@@ -48,15 +48,15 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                 {
                                     state.topicOverviewInfoList?.map((item) => {
                                         return (
-                                            <TabPane key={"tab_pane"+item.topicInfo.tid}
+                                            <TabPane key={"tab_pane" + item.topicInfo.tid}
                                                      tab={
-                                                <>
-                                                    <span>{item.topicInfo.topicName}</span>
-                                                    <Badge count={item.totalCount} overflowCount={9999}
-                                                           offset={[10, -10]}></Badge>
-                                                </>
-                                            }>
-                                                <ArticleOverviewContainer tid={item.topicInfo.tid} />
+                                                         <>
+                                                             <span>{item.topicInfo.topicName}</span>
+                                                             <Badge count={item.totalCount} overflowCount={9999}
+                                                                    offset={[10, -10]}></Badge>
+                                                         </>
+                                                     }>
+                                                <ArticleOverviewContainer tid={item.topicInfo.tid}/>
                                             </TabPane>
                                         )
                                     })
@@ -75,24 +75,6 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                 <TabPane
                                     tab={
                                         <>
-                                            <span>公告</span>
-                                            <Badge count={"?"} overflowCount={9999} offset={[10, -10]}></Badge>
-                                        </>
-                                    }
-                                    key="公告"
-                                >
-                                    <Timeline mode={"left"} reverse={true} pending="To be continued...">
-                                        <Timeline.Item label="2015-09-01">Create a services</Timeline.Item>
-                                        <Timeline.Item label="2015-09-01 09:12:11">
-                                            <p>Solve initial network problems</p>
-                                            <p>Solve initial network problems</p>
-                                        </Timeline.Item>
-                                        <Timeline.Item label="2015-09-01 09:12:13">Technical testing</Timeline.Item>
-                                    </Timeline>
-                                </TabPane>
-                                <TabPane
-                                    tab={
-                                        <>
                                             <span>搜索结果</span>
                                             <Badge count={null} overflowCount={9999} offset={[10, -10]}></Badge>
                                         </>
@@ -100,6 +82,37 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                     key="搜索结果"
                                 >
                                     搜索结果
+                                </TabPane>
+                                <TabPane
+                                    tab={
+                                        <>
+                                            <span>公告</span>
+                                            <Badge count={state.announcementDtoList!.length} overflowCount={9999}
+                                                   offset={[10, -10]}></Badge>
+                                        </>
+                                    }
+                                    key="公告"
+                                >
+                                    <Timeline mode={"left"} reverse={true} pending="To be continued...">
+                                        {
+                                            state.announcementDtoList!.map(((item, index) => {
+                                                return (
+                                                    <Timeline.Item
+                                                        key={"announcement_" + item.announcementId + "_" + index}
+                                                        color={item.color}
+                                                        label={TimeHelper.formatTimeStampToString(item.createTs)}>
+                                                        {
+                                                            item.paragraphList.map((p, index) => {
+                                                                return (
+                                                                    <p key={"p_" + item.announcementId + "_" + index}>{p}</p>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Timeline.Item>
+                                                )
+                                            }))
+                                        }
+                                    </Timeline>
                                 </TabPane>
                             </Tabs>
                         </Content>
