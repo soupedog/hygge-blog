@@ -8,6 +8,7 @@ import hygge.blog.domain.dto.QuoteInfo;
 import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
+import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.ArticleCountInfo;
 import hygge.blog.domain.po.Category;
@@ -40,13 +41,15 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
+        boolean isMaintainer = !context.isGuest() && UserTypeEnum.ROOT.equals(currentUser.getUserType());
+
         List<Topic> topicList = topicService.findAllTopic();
 
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
 
-        List<ArticleCountInfo> articleCountInfoList = articleService.findArticleCountInfo(accessibleCategoryIdList, context.isGuest() ? null :  currentUser.getUserId());
+        List<ArticleCountInfo> articleCountInfoList = articleService.findArticleCountInfo(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
 
         HomepageFetchResult result = HomepageFetchResult.builder().topicOverviewInfoList(new ArrayList<>()).build();
         for (Topic topic : topicList) {
@@ -61,15 +64,20 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
 
                 Optional<ArticleCountInfo> articleCountInfoTemp = articleCountInfoList.stream().filter(articleCountInfo -> articleCountInfo.getCategoryId().equals(category.getCategoryId())).findFirst();
                 Integer count = articleCountInfoTemp.map(articleCountInfo -> articleCountInfo.getCount().intValue()).orElse(0);
-                if (count > 0) {
-                    categoryDto.setArticleCount(count);
-                    topicOverviewInfo.getCategoryListInfo().add(categoryDto);
-                    topicOverviewInfo.setTotalCount(topicOverviewInfo.getTotalCount() + count);
+
+                if (!isMaintainer && count < 1) {
+                    continue;
                 }
+
+                categoryDto.setArticleCount(count);
+                topicOverviewInfo.getCategoryListInfo().add(categoryDto);
+                topicOverviewInfo.setTotalCount(topicOverviewInfo.getTotalCount() + count);
             }
-            if (!topicOverviewInfo.getCategoryListInfo().isEmpty()) {
-                result.getTopicOverviewInfoList().add(topicOverviewInfo);
+
+            if (!isMaintainer && topicOverviewInfo.getCategoryListInfo().isEmpty()) {
+                continue;
             }
+            result.getTopicOverviewInfoList().add(topicOverviewInfo);
         }
 
         return result;
