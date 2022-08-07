@@ -89,7 +89,7 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                             onFinish={(value) => {
                                 value.content = _react.state.mdController?.getValue();
                                 if (value.action == "update") {
-                                    if (PropertiesHelper.isStringNotNull(value.aid)) {
+                                    if (PropertiesHelper.isStringNotEmpty(value.aid)) {
                                         ArticleService.updateArticle(value.aid, value, () => {
                                                 message.success("修改文章成功");
                                             }
@@ -97,7 +97,6 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                                     } else {
                                         message.warn("修改文章时 aid 不可为空");
                                     }
-
                                 } else if (value.action == "add") {
                                     ArticleService.createArticle(value, (data) => {
                                             _react.updateForm(data!, _react);

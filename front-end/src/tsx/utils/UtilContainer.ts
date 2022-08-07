@@ -34,7 +34,7 @@ export class LogHelper {
         let finalTag: string = PropertiesHelper.stringOfNullable({target: inputParam.tag, defaultValue: ""});
 
         if (inputParam.msg !== undefined) {
-            if (inputParam.isJson === false || PropertiesHelper.isStringNotNull(inputParam.msg)) {
+            if (inputParam.isJson === false || PropertiesHelper.isStringNotEmpty(inputParam.msg)) {
                 finalMsg = inputParam.msg;
             } else {
                 try {
@@ -153,18 +153,18 @@ export class CoreHelper {
 export class PropertiesHelper {
     static stringOfNullable(inputParam: OfNullableStringInputParam): string {
         let resultTemp = inputParam.target;
-        if (PropertiesHelper.isStringNotNull(resultTemp)) {
-            return resultTemp.trim() == "" ? inputParam.defaultValue : resultTemp;
+        if (PropertiesHelper.isStringNotEmpty(resultTemp)) {
+            return resultTemp;
         } else {
             return inputParam.defaultValue;
         }
     }
 
-    static isStringNotNull(target?: any): boolean {
+    static isStringNotEmpty(target?: any): boolean {
         let result = false;
         if (target != null) {
             if (typeof target == "string") {
-                result = true;
+                result = target.length > 0;
             }
         }
         return result;
@@ -321,7 +321,7 @@ export class UrlHelper {
         }
 
         let secretKey = this.getQueryString("secretKey");
-        if (PropertiesHelper.isStringNotNull(secretKey)) {
+        if (PropertiesHelper.isStringNotEmpty(secretKey)) {
             if (actualUrl.indexOf("?") > 0) {
                 actualUrl = actualUrl + "&secretKey=" + secretKey;
             } else {

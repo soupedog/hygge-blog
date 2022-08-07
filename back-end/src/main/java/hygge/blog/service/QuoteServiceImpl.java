@@ -66,6 +66,7 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
         userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
 
         quote.setQuoteState(parameterHelper.parseObjectOfNullable("quoteState", quote.getQuoteState(), QuoteStateEnum.ACTIVE));
+        quote.setUserId(currentUser.getUserId());
 
         return quoteDao.save(quote);
     }

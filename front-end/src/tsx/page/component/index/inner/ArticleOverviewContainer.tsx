@@ -91,7 +91,7 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
         let _react = this;
 
         let currentTid = _react.props.tid;
-        if (PropertiesHelper.isStringNotNull(currentTid) && currentTid.length > 0) {
+        if (PropertiesHelper.isStringNotEmpty(currentTid) && currentTid.length > 0) {
             HomePageService.fetchArticleSummaryByTid(_react.props.tid, currentPage, pageSize, (data) => {
                 _react.setState({
                     articleSummaryList: data?.main!.articleSummaryList!,

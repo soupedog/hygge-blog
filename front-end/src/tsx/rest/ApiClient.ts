@@ -71,7 +71,7 @@ export enum ClientScope {
 export class UserService {
     static getCurrentUser(): UserDto | null | undefined {
         let currentUserStringValue = localStorage.getItem('currentUser');
-        if (PropertiesHelper.isStringNotNull()) {
+        if (PropertiesHelper.isStringNotEmpty()) {
             return null;
         }
         return JSON.parse(currentUserStringValue!) as UserDto;
@@ -131,14 +131,14 @@ export class UserService {
 
         let requestHeader = null;
         let requestData = null;
-        if (PropertiesHelper.isStringNotNull(ac) && PropertiesHelper.isStringNotNull(pw)) {
+        if (PropertiesHelper.isStringNotEmpty(ac) && PropertiesHelper.isStringNotEmpty(pw)) {
             requestData = {
                 "password": pw,
                 "userName": ac
             };
         } else {
             requestHeader = UserService.getHeader();
-            if (PropertiesHelper.isStringNotNull(requestHeader.uid)) {
+            if (PropertiesHelper.isStringNotEmpty(requestHeader.uid)) {
                 requestHeader.refreshKey = localStorage.getItem("refreshKey");
             } else {
                 requestHeader = null;
@@ -232,7 +232,7 @@ export class ArticleService {
             beforeHook();
         }
 
-        if (!PropertiesHelper.isStringNotNull(aid)) {
+        if (!PropertiesHelper.isStringNotEmpty(aid)) {
             if (successHook != null) {
                 successHook();
             }
@@ -345,9 +345,13 @@ export interface ArticleSummaryResponse {
 
 export interface QuoteDto {
     "quoteId": number,
+    "imageSrc"?: string,
     "content": string,
-    "source": string,
-    "portal": string
+    "source"?: string,
+    "portal"?: string,
+    "remarks"?: string,
+    "orderVal"?: number,
+    "quoteState"?: string,
 }
 
 export interface QuoteResponse {
@@ -440,6 +444,85 @@ export class HomePageService {
         }).then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<ArticleSummaryResponse> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+}
+
+export class QuoteService {
+    static findQuoteByQuoteId(quoteId?: string | null,
+                              successHook?: (input?: HyggeResponse<QuoteDto>) => void,
+                              beforeHook?: () => void,
+                              finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        if (!PropertiesHelper.isStringNotEmpty(quoteId)) {
+            if (successHook != null) {
+                successHook();
+            }
+            return;
+        }
+
+        axios.get("/main/quote/" + quoteId, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<QuoteDto> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static createQuote(quote: QuoteDto,
+                       successHook?: (input?: HyggeResponse<QuoteDto>) => void,
+                       beforeHook?: () => void,
+                       finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.post("/main/quote", quote, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<QuoteDto> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static updateQuote(quoteId: string,
+                       quote: QuoteDto,
+                       successHook?: (input?: HyggeResponse<QuoteDto>) => void,
+                       beforeHook?: () => void,
+                       finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.put("/main/quote/" + quoteId, quote, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<QuoteDto> = response.data;
                     successHook(data);
                 }
             }

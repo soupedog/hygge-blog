@@ -137,7 +137,7 @@ export class MdHelper {
 
     static defaultCallErrorCallback(errorCallback: ErrorCallbackFunction | null, msg: string | null) {
         if (errorCallback != null) {
-            if (PropertiesHelper.isStringNotNull(msg)) {
+            if (PropertiesHelper.isStringNotEmpty(msg)) {
                 errorCallback(msg);
             } else {
                 errorCallback(null);

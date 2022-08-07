@@ -24,7 +24,7 @@ if (container != null) {
                     <Route path={"/editor/article"} element={<EditArticleContainer key={"editor-article"}/>}/>
                     <Route path={"/editor/article/:aid"} element={<EditArticleContainer key={"editor-article"}/>}/>
                     <Route path={"/editor/quote/"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
-                    <Route path={"/editor/quote/:qid"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
+                    <Route path={"/editor/quote/:quoteId"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
                 </Routes>
             </HashRouter>
         // </React.StrictMode>

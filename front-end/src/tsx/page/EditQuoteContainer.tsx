@@ -1,12 +1,6 @@
 import * as React from "react"
 import {LogHelper, PropertiesHelper, UrlHelper} from '../utils/UtilContainer';
-import {
-    AllOverviewInfo,
-    FileService,
-    HomePageService,
-    HyggeResponse,
-    UserService
-} from "../rest/ApiClient";
+import {FileService, HyggeResponse, QuoteDto, QuoteService, UserService} from "../rest/ApiClient";
 import {ReactRouter, withRouter} from "../utils/ReactRouterHelper";
 import zhCN from "antd/lib/locale/zh_CN";
 import {
@@ -20,8 +14,7 @@ import {
     Radio,
     Select,
     SelectProps,
-    Space,
-    TreeSelect
+    Space
 } from "antd";
 import {HyggeFooter} from "./component/HyggeFooter";
 
@@ -38,9 +31,8 @@ export interface EditQuoteContainerProps {
 
 // 描述该组件 states 数据类型
 export interface EditQuoteContainerState {
-    aid?: string;
-    backgroundMusicType?: string;
-    categoryTreeData?: any[];
+    quoteId?: string;
+    currentQuote?: QuoteDto;
     backgroundImageData?: SelectProps['options'];
     mdController?: Vditor;
 }
@@ -51,8 +43,6 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
     constructor(props: EditQuoteContainerProps) {
         super(props);
         this.state = {
-            backgroundMusicType: "NONE",
-            categoryTreeData: [],
             backgroundImageData: []
         };
 
@@ -83,11 +73,28 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
                                 margin: "40px auto 0 auto"
                             }}
                             onFinish={(value) => {
-                             
+                                value.content = _react.state.mdController?.getValue();
+                                if (value.action == "update") {
+                                    let quoteId = value.quoteId + "";
+                                    if (PropertiesHelper.isStringNotEmpty(quoteId)) {
+                                        QuoteService.updateQuote(quoteId, value, () => {
+                                                message.success("修改句子成功");
+                                            }
+                                        );
+                                    } else {
+                                        message.warn("修改句子时 quoteId 不可为空");
+                                    }
+                                } else if (value.action == "add") {
+                                    QuoteService.createQuote(value, (data) => {
+                                            _react.updateForm(data!, _react);
+                                            message.success("添加句子成功");
+                                        }
+                                    );
+                                }
                                 console.log(value);
                             }}
                         >
-                            <Form.Item name={['aid']} label="句子编号" rules={[{required: false}]}>
+                            <Form.Item name={['quoteId']} label="句子编号" rules={[{required: false}]}>
                                 <Input/>
                             </Form.Item>
                             <Form.Item name={['imageSrc']} label="句子配图"
@@ -109,12 +116,19 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
                             <Form.Item name={['portal']} label="传送门" rules={[{required: false}]}>
                                 <Input/>
                             </Form.Item>
+                            <Form.Item name={['quoteState']} label="句子状态"
+                                       rules={[{required: true}]}
+                                       initialValue={"ACTIVE"}
+                            >
+                                <Radio.Group>
+                                    <Radio value={"ACTIVE"}>启用</Radio>
+                                    <Radio value={"INACTIVE"}>禁用</Radio>
+                                </Radio.Group>
+                            </Form.Item>
                             <Form.Item style={{display: "none"}} name={['action']} label="操作类型"
                                        rules={[{required: true}]}
                                        initialValue={"add"}>
-                                <Radio.Group onChange={(event) => {
-                                    this.setState({backgroundMusicType: event.target.value});
-                                }}>
+                                <Radio.Group>
                                     <Radio value={"add"}>添加句子</Radio>
                                     <Radio value={"update"}>修改句子</Radio>
                                 </Radio.Group>
@@ -136,6 +150,7 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
                                         修改句子
                                     </Button>
                                     <Button type="ghost" htmlType="button" onClick={() => {
+                                        _react.fetchQuote(_react);
                                     }}>
                                         查询句子
                                     </Button>
@@ -170,7 +185,67 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
             },
             after() {
                 // 更新 MD 控制器
+                _react.setState({mdController: vditor});
+
+                _react.fetchQuote(_react);
             },
+        });
+
+        this.updateFileInfo();
+    }
+
+    fetchQuote(_react: this) {
+        let quoteId = _react.props.router.params.quoteId;
+        if (PropertiesHelper.isStringNotEmpty(quoteId)) {
+            QuoteService.findQuoteByQuoteId(quoteId, (data) => {
+                if (data != null) {
+                    _react.updateRootStatus({
+                        currentQuote: data.main
+                    })
+
+                    if (_react.state.mdController != null && data.main != null) {
+                        // 更新 MD 编辑器
+                        _react.state.mdController.setValue(data.main.content);
+                        _react.updateForm(data, _react);
+                    }
+
+                    message.info("句子信息已尝试拉取");
+                }
+            });
+        }
+    }
+
+    updateFileInfo() {
+        let _react = this;
+        let type = ["QUOTE"]
+
+        let container: SelectProps['options'] = [];
+
+        FileService.findFileInfo(type, (data) => {
+            data?.main?.forEach((item) => {
+                container?.push({
+                    label: item.name + " --- " + item.fileSize + " mb",
+                    value: UrlHelper.getBaseStaticSourceUrl() + item.src,
+                });
+            });
+
+            _react.updateRootStatus({backgroundImageData: container});
+
+            message.info("封面已尝试拉取");
+        });
+    }
+
+    updateForm(data: HyggeResponse<QuoteDto>, _react: this) {
+        console.log(data)
+
+        let quoteDto: QuoteDto = data.main!;
+        _react.formRef.current?.setFieldsValue({
+            quoteId: quoteDto.quoteId,
+            imageSrc: quoteDto.imageSrc,
+            remarks: quoteDto.remarks,
+            source: quoteDto.source,
+            portal: quoteDto.portal,
+            quoteState: quoteDto.quoteState,
         });
     }
 

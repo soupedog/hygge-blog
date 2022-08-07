@@ -1,5 +1,7 @@
 package hygge.blog.domain.dto;
 
+import hygge.blog.domain.enums.ArticleStateEnum;
+import hygge.blog.domain.enums.QuoteStateEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +37,6 @@ public class QuoteDto {
     private String remarks;
     @Schema(title = "排序优先级(越大越靠前)")
     private Integer orderVal;
+    @Schema(title = "句子状态", description = "启用,禁用")
+    private QuoteStateEnum quoteState;
 }
