@@ -7,6 +7,7 @@ import {LogHelper, TimeHelper} from '../../../utils/UtilContainer';
 import {HyggeFooter} from "../HyggeFooter";
 import HyggeIndexHeader from "../HyggeIndexHeader";
 import {ArticleOverviewContainer} from "./inner/ArticleOverviewContainer";
+import {QuoteContainer} from "./inner/QuoteContainer";
 
 const {Content} = Layout;
 const {TabPane} = Tabs;
@@ -56,7 +57,8 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                                                     offset={[10, -10]}></Badge>
                                                          </>
                                                      }>
-                                                <ArticleOverviewContainer tid={item.topicInfo.tid}/>
+                                                <ArticleOverviewContainer isMaintainer={state.currentUser != null}
+                                                                          tid={item.topicInfo.tid}/>
                                             </TabPane>
                                         )
                                     })
@@ -65,12 +67,13 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                     tab={
                                         <>
                                             <span>句子收藏</span>
-                                            <Badge count={111} overflowCount={9999} offset={[10, -10]}></Badge>
+                                            <Badge count={state.quoteResponse?.totalCount} overflowCount={9999}
+                                                   offset={[10, -10]}></Badge>
                                         </>
                                     }
                                     key="句子收藏"
                                 >
-                                    句子收藏
+                                    <QuoteContainer isMaintainer={state.currentUser != null}/>
                                 </TabPane>
                                 <TabPane
                                     tab={

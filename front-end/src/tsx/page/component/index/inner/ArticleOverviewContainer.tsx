@@ -1,13 +1,14 @@
 import * as React from "react"
 import {LogHelper, PropertiesHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer';
 
-import {DashboardTwoTone, EditTwoTone, EyeTwoTone} from '@ant-design/icons';
-import {List, Space} from 'antd';
+import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
+import {Badge, List, Space} from 'antd';
 import {ArticleSummaryInfo, HomePageService} from "../../../../rest/ApiClient";
 
 // 描述该组件 props 数据类型
 export interface ArticleOverviewContainerProps {
-    tid: string
+    tid: string,
+    isMaintainer: boolean
 }
 
 // 描述该组件 states 数据类型
@@ -39,7 +40,6 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                 pagination={{
                     onChange: (page, pageSize) => {
                         _react.fetchArticleInfo(page, pageSize);
-                        console.log(page + "  " + pageSize);
                     },
                     showSizeChanger: true,
                     current: _react.state.currentPage,
@@ -48,36 +48,73 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                 }}
                 dataSource={_react.state.articleSummaryList}
                 renderItem={item => (
-                    <List.Item
-                        key={item.title}
-                        actions={[
-                            <IconText icon={EditTwoTone} text={"字数 " + item.wordCount} key={"word_count_" + item.aid}/>,
-                            <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews} key={"word_count_" + item.aid}/>,
-                            <IconText icon={DashboardTwoTone}
-                                      text={"创建时间 " + TimeHelper.formatTimeStampToString(item.createTs)}
-                                      key={"create_ts_" + item.aid}/>,
-                        ]}
-                        extra={
-                            <img
-                                width={272}
-                                alt="logo"
-                                src={item.imageSrc}
+                    (item.orderGlobal != null && item.orderGlobal > 0) ?
+                        <Badge.Ribbon text="顶置" color="red">
+                            <List.Item
+                                key={item.title}
+                                actions={[
+                                    <IconText icon={EditTwoTone} text={"字数 " + item.wordCount}
+                                              key={"word_count_" + item.aid}/>,
+                                    <IconText icon={DashboardTwoTone}
+                                              text={"创建时间 " + TimeHelper.formatTimeStampToString(item.createTs)}
+                                              key={"create_ts_" + item.aid}/>,
+                                    <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews}
+                                              key={"page_view_" + item.aid}/>,
+                                    <IconText icon={EyeOutlined} text={"自浏览 " + item.selfPageViews}
+                                              hide={!this.props.isMaintainer}
+                                              key={"self_view_" + item.aid}/>
+                                ]}
+                                extra={
+                                    <img
+                                        width={272}
+                                        alt="logo"
+                                        src={item.imageSrc}
+                                    />
+                                }
+                            >
+                                <List.Item.Meta
+                                    title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
+                                              href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}
+                                              target="_blank">{item.title}</a>}
+                                    description={_react.getCategoryInfo(item)}
+                                />
+                                <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
+                                    {item.summary}
+                                </div>
+                            </List.Item>
+                        </Badge.Ribbon> :
+                        <List.Item
+                            key={item.title}
+                            actions={[
+                                <IconText icon={EditTwoTone} text={"字数 " + item.wordCount}
+                                          key={"word_count_" + item.aid}/>,
+                                <IconText icon={DashboardTwoTone}
+                                          text={"创建时间 " + TimeHelper.formatTimeStampToString(item.createTs)}
+                                          key={"create_ts_" + item.aid}/>,
+                                <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews}
+                                          key={"page_view_" + item.aid}/>,
+                                <IconText icon={EyeOutlined} text={"自浏览 " + item.selfPageViews}
+                                          hide={!this.props.isMaintainer}
+                                          key={"self_view_" + item.aid}/>
+                            ]}
+                            extra={
+                                <img
+                                    width={272}
+                                    alt="logo"
+                                    src={item.imageSrc}
+                                />
+                            }
+                        >
+                            <List.Item.Meta
+                                title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
+                                          href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}
+                                          target="_blank">{item.title}</a>}
+                                description={_react.getCategoryInfo(item)}
                             />
-                        }
-                        style={{
-                            // backgroundColor: "red"
-                        }}
-                    >
-                        <List.Item.Meta
-                            title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                                      href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}
-                                      target="_blank">{item.title}</a>}
-                            description={_react.getCategoryInfo(item)}
-                        />
-                        <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
-                            {item.summary}
-                        </div>
-                    </List.Item>
+                            <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
+                                {item.summary}
+                            </div>
+                        </List.Item>
                 )}
             />
         );
@@ -113,9 +150,10 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
     }
 }
 
-const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
-    <Space>
-        {React.createElement(icon)}
-        {text}
-    </Space>
+const IconText = ({icon, text, hide}: { icon: React.FC; text: string, hide?: boolean }) => (
+    hide ? null :
+        <Space>
+            {React.createElement(icon)}
+            {text}
+        </Space>
 );
