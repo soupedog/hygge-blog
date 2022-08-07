@@ -278,13 +278,12 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                         _react.updateRootStatus({
                             currentArticle: data.main
                         })
-
-                        if (_react.state.mdController != null) {
+                        if (_react.state.mdController != null && data.main != null) {
                             // 更新 MD 编辑器
-                            _react.state.mdController?.setValue(data.main?.content!);
-                        }
-                        _react.updateForm(data, _react);
+                            _react.state.mdController?.setValue(data.main.content);
 
+                            _react.updateForm(data, _react);
+                        }
                         message.info("文章信息已尝试拉取");
                     }
                 });
@@ -294,7 +293,7 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
         this.updateCategory();
     }
 
-     updateForm(data: HyggeResponse<ArticleDto>, _react: this) {
+    updateForm(data: HyggeResponse<ArticleDto>, _react: this) {
         let article: ArticleDto = data.main!;
         _react.formRef.current?.setFieldsValue({
             aid: article.aid,
