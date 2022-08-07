@@ -18,7 +18,7 @@ if (container != null) {
             <HashRouter>
                 <Routes>
                     <Route path={""} element={<IndexContainer key={"index"}/>}/>
-                    <Route path={"/browser"} element={<ArticleBrowserContainer key={"browser"}/>}/>
+                    <Route path={"/browser/:aid"} element={<ArticleBrowserContainer key={"browser"}/>}/>
                     <Route path={"/signin"} element={<SignInContainer key={"signin"}/>}/>
                     <Route path={"/signin/auto"} element={<SignInAutoContainer key={"signin-auto"}/>}/>
                     <Route path={"/editor/article"} element={<EditArticleContainer key={"editor-article"}/>}/>

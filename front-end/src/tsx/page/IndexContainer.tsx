@@ -8,7 +8,7 @@ import '../../css/icon.css';
 import 'antd/dist/antd.min.css';
 import '../../css/default.css';
 import '../../css/index.less';
-import {UserDto, UserService} from "../rest/ApiClient";
+import {HomePageService, TopicOverviewInfo, UserDto, UserService} from "../rest/ApiClient";
 import {IndexLeft} from "./component/index/IndexLeft";
 import {IndexRight} from "./component/index/IndexRight";
 
@@ -20,7 +20,8 @@ export interface IndexContainerProps {
 export interface IndexContainerState {
     currentUser?: UserDto | null;
     // 标记当前有多少网络请求
-    netWorkArrayCounter?: boolean[]
+    netWorkArrayCounter?: boolean[];
+    "topicOverviewInfoList"?: TopicOverviewInfo[];
     // 是否折叠收起
     folded?: boolean;
     searchType?: SearchType;
@@ -38,6 +39,15 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
         this.state = {
             currentUser: UserService.getCurrentUser(),
             netWorkArrayCounter: [],
+            topicOverviewInfoList: [{
+                topicInfo: {
+                    tid: "",
+                    topicName: "编程",
+                    orderVal: 0
+                },
+                categoryListInfo: [],
+                totalCount: 0
+            }],
             folded: true,
             searchType: SearchType.ARTICLE,
             updateRootStatus: this.updateRootStatus.bind(this)
@@ -56,6 +66,17 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 </IndexContainerContext.Provider>
             </ConfigProvider>
         );
+    }
+
+    componentDidMount() {
+        let _raact = this;
+        HomePageService.fetch((data) => {
+            if (data?.main?.topicOverviewInfoList != null) {
+                _raact.updateRootStatus({
+                    topicOverviewInfoList: data?.main?.topicOverviewInfoList
+                });
+            }
+        });
     }
 
     updateRootStatus(deltaInfo: IndexContainerState) {

@@ -64,6 +64,8 @@ public interface PoDtoMapper {
 
     Category dtoToPo(CategoryDto dto);
 
+    @Mapping(expression = "java(ObjectMappingConvert.timestampToLong(po.getCreateTs()))", target = "createTs")
+    @Mapping(expression = "java(ObjectMappingConvert.timestampToLong(po.getLastUpdateTs()))", target = "lastUpdateTs")
     ArticleDto poToDto(Article po);
 
     Article dtoToPo(ArticleDto dto);

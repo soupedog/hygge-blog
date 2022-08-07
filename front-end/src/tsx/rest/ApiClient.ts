@@ -312,6 +312,33 @@ export interface AllOverviewInfo {
     "topicOverviewInfoList": TopicOverviewInfo[];
 }
 
+export interface CategoryInfo {
+}
+
+export interface ArticleSummaryInfo {
+    "aid": string,
+    "categoryTreeInfo": {
+        "topicInfo": TopicDto,
+        "categoryList": CategoryDto[]
+    },
+    "cid": string,
+    "title": string,
+    "imageSrc": string,
+    "summary": string,
+    "wordCount": number,
+    "orderGlobal": number,
+    "orderCategory": number,
+    "pageViews": number,
+    "selfPageViews": number,
+    "createTs": number,
+    "lastUpdateTs": number
+}
+
+export interface ArticleSummaryResponse {
+    articleSummaryList: ArticleSummaryInfo[],
+    totalCount: number
+}
+
 export class HomePageService {
     static fetch(successHook?: (input?: HyggeResponse<AllOverviewInfo>) => void,
                  beforeHook?: () => void,
@@ -325,6 +352,32 @@ export class HomePageService {
         }).then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<AllOverviewInfo> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static fetchArticleSummaryByTid(tid: string,
+                                    currentPage: number,
+                                    pageSize: number,
+                                    successHook?: (input?: HyggeResponse<ArticleSummaryResponse>) => void,
+                                    beforeHook?: () => void,
+                                    finallyHook?: () => void): void {
+
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/fetch/topic/" + tid + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<ArticleSummaryResponse> = response.data;
                     successHook(data);
                 }
             }

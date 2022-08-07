@@ -6,6 +6,7 @@ import {IndexContainerState} from "../../IndexContainer";
 import {LogHelper} from '../../../utils/UtilContainer';
 import {HyggeFooter} from "../HyggeFooter";
 import HyggeIndexHeader from "../HyggeIndexHeader";
+import {ArticleOverviewContainer} from "./inner/ArticleOverviewContainer";
 
 const {Content} = Layout;
 const {TabPane} = Tabs;
@@ -44,39 +45,22 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                             }}
                         >
                             <Tabs defaultActiveKey="编程" type="card" size={"large"}>
-                                <TabPane
-                                    tab={
-                                        <>
-                                            <span>编程</span>
-                                            <Badge count={66} overflowCount={9999} offset={[10, -10]}></Badge>
-                                        </>
-                                    }
-                                    key="编程"
-                                >
-                                    Tab 1
-                                </TabPane>
-                                <TabPane
-                                    tab={
-                                        <>
-                                            <span>杂项</span>
-                                            <Badge count={5} overflowCount={9999} offset={[10, -10]}></Badge>
-                                        </>
-                                    }
-                                    key="杂项"
-                                >
-                                    杂项
-                                </TabPane>
-                                <TabPane
-                                    tab={
-                                        <>
-                                            <span>树洞</span>
-                                            <Badge count={5} overflowCount={9999} offset={[10, -10]}></Badge>
-                                        </>
-                                    }
-                                    key="树洞"
-                                >
-                                    树洞
-                                </TabPane>
+                                {
+                                    state.topicOverviewInfoList?.map((item) => {
+                                        return (
+                                            <TabPane key={"tab_pane"+item.topicInfo.topicName}
+                                                     tab={
+                                                <>
+                                                    <span>{item.topicInfo.topicName}</span>
+                                                    <Badge count={item.totalCount} overflowCount={9999}
+                                                           offset={[10, -10]}></Badge>
+                                                </>
+                                            }>
+                                                <ArticleOverviewContainer tid={item.topicInfo.tid} />
+                                            </TabPane>
+                                        )
+                                    })
+                                }
                                 <TabPane
                                     tab={
                                         <>

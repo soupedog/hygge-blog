@@ -2,7 +2,6 @@ package hygge.blog.domain.dto;
 
 import hygge.blog.domain.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.enums.ArticleStateEnum;
-import hygge.blog.domain.po.base.BasePo;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -25,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文章信息")
-public class ArticleDto extends BasePo {
+public class ArticleDto {
     @Schema(title = "文章编号", description = "系统自动生成文章编号")
     private String aid;
     private ArticleConfiguration configuration;
@@ -54,4 +53,8 @@ public class ArticleDto extends BasePo {
     private Integer orderCategory;
     @Schema(title = "文章状态", description = "草稿,启用,私人的")
     private ArticleStateEnum articleState;
+    @Schema(title = "创建时间", description = "UTC 毫秒级时间戳")
+    protected Long createTs;
+    @Schema(title = "最后修改时间", description = "UTC 毫秒级时间戳")
+    protected Long lastUpdateTs;
 }
