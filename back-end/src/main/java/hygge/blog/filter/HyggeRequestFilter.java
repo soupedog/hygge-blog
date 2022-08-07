@@ -41,9 +41,11 @@ public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
                     String uid = parameterHelper.string(request.getHeader("uid"));
                     String token = parameterHelper.string(request.getHeader("token"));
                     String secretKey = parameterHelper.string(request.getHeader("secretKey"));
+                    String refreshKey = parameterHelper.string(request.getHeader("refreshKey"));
                     context.saveObject(HyggeRequestContext.Key.UID, uid);
                     context.saveObject(HyggeRequestContext.Key.TOKEN, token);
                     context.saveObject(HyggeRequestContext.Key.SECRET_KEY, secretKey);
+                    context.saveObject(HyggeRequestContext.Key.REFRESH_KEY, refreshKey);
 
                     // x-forwarded-for 为 HTTP 头字段标准化草案中正式提出。详见 https://baike.baidu.com/item/X-Forwarded-For
                     String ipAddress = request.getHeader(HEADER_KEY_REAL_IP_NAME);
@@ -83,7 +85,7 @@ public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "OPTIONS,GET,POST,PUT,DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,uid,token,secretKey,scope");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,uid,token,refreshKey,secretKey,scope");
         response.setHeader("Access-Control-Max-Age", "2592000");
     }
 }

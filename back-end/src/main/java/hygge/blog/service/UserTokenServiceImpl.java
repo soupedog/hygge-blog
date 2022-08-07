@@ -57,7 +57,7 @@ public class UserTokenServiceImpl extends HyggeWebUtilContainer {
         UserToken userToken = getUserToken(targetLoginUser, targetUid, context);
 
         if (userToken.getDeadline().getTime() < System.currentTimeMillis()) {
-            throw new LightRuntimeException("User token has expired.", BlogSystemCode.LOGIN_ILLEGAL);
+            throw new LightRuntimeException("User token has expired.", BlogSystemCode.TOKEN_HAS_EXPIRED);
         }
 
         if (!userToken.getToken().equals(token)) {
@@ -71,7 +71,7 @@ public class UserTokenServiceImpl extends HyggeWebUtilContainer {
         UserToken userToken = getUserToken(targetLoginUser, targetUid, context);
 
         if (!userToken.getRefreshKey().equals(refreshKey)) {
-            throw new LightRuntimeException("Unexpected refreshKey.", BlogSystemCode.LOGIN_ILLEGAL);
+            throw new LightRuntimeException("Unexpected refreshKey.", BlogSystemCode.LOGIN_REFRESH_TOKEN_FAIL);
         }
 
         userToken.refresh(context.getServiceStartTs());

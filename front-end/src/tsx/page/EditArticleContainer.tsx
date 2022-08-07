@@ -227,13 +227,29 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                                             修改文章
                                         </Button>
                                         <Button type="ghost" htmlType="button" onClick={() => {
-                                            _react.updateCategory();
+
+                                            if (_react.props.router.params.aid != null) {
+                                                ArticleService.findArticleByAid(_react.props.router.params.aid, (data) => {
+                                                    if (data != null) {
+                                                        _react.updateRootStatus({
+                                                            currentArticle: data.main
+                                                        })
+
+                                                        if (_react.state.mdController != null) {
+                                                            // 更新 MD 编辑器
+                                                            _react.state.mdController?.setValue(data.main?.content!);
+                                                        }
+                                                        _react.updateForm(data, _react);
+                                                        message.success("文章信息拉取成功");
+                                                    }
+                                                });
+                                            }
                                         }}>
                                             查询文章
                                         </Button>
                                         <Button type="ghost" htmlType="button" onClick={() => {
+                                            // 里面自动会刷新 文件信息
                                             _react.updateCategory();
-                                            _react.updateFileInfo();
                                         }}>
                                             更新配置信息
                                         </Button>
@@ -281,13 +297,14 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                             _react.state.mdController?.setValue(data.main?.content!);
                         }
                         _react.updateForm(data, _react);
+
+                        message.info("文章信息已尝试拉取");
                     }
                 });
             },
         });
 
         this.updateCategory();
-        this.updateFileInfo();
     }
 
     private updateForm(data: HyggeResponse<ArticleDto>, _react: this) {
@@ -339,6 +356,10 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
             });
 
             _react.updateRootStatus({categoryTreeData: categoryContainer});
+
+            message.info("类别信息已尝试拉取");
+
+            _react.updateFileInfo();
         })
     }
 
@@ -357,6 +378,8 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
             });
 
             _react.updateRootStatus({backgroundImageData: container});
+
+            message.info("封面已尝试拉取");
         });
     }
 

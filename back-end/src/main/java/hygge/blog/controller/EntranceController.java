@@ -52,6 +52,10 @@ public class EntranceController extends HyggeWebUtilContainer implements Entranc
             String uid = parameterHelper.stringNotEmpty("uid", (Object) context.getObject(HyggeRequestContext.Key.UID));
 
             userToken = userTokenService.refreshToken(null, uid, refreshKey);
+
+
+            User user = userService.findUserByUserId(userToken.getUserId(), false);
+            context.setCurrentLoginUser(user);
         } else {
             // 登录
             parameterHelper.stringNotEmpty("userName", (Object) userDTO.getUserName());

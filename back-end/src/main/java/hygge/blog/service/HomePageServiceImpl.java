@@ -46,7 +46,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
 
-        List<ArticleCountInfo> articleCountInfoList = articleService.findArticleCountInfo(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
+        List<ArticleCountInfo> articleCountInfoList = articleService.findArticleCountInfo(accessibleCategoryIdList, context.isGuest() ? null :  currentUser.getUserId());
 
         HomepageFetchResult result = HomepageFetchResult.builder().topicOverviewInfoList(new ArrayList<>()).build();
         for (Topic topic : topicList) {

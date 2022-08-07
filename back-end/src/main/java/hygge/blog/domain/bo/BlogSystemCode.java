@@ -21,6 +21,14 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
      */
     INSUFFICIENT_PERMISSIONS(false, "Insufficient permissions.", 403001, null),
     /**
+     * 刷新令牌失败
+     */
+    LOGIN_REFRESH_TOKEN_FAIL(false, "Unexpected login info.", 403002, null),
+    /**
+     * 令牌已过期
+     */
+    TOKEN_HAS_EXPIRED(false, "Token has expired.", 403003, null),
+    /**
      * 登录账号或密码有误
      */
     LOGIN_FAIL(false, "AC was not found,or unexpected password.", 404000, null),

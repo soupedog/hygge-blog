@@ -3,7 +3,6 @@ import {message} from "antd";
 import {PropertiesHelper, UrlHelper} from "../utils/UtilContainer";
 
 axios.defaults.baseURL = "http://localhost:8080/blog-service/api";
-
 axios.interceptors.response.use(function (response) {
     if (response.data == null) {
         return null;
@@ -12,6 +11,19 @@ axios.interceptors.response.use(function (response) {
 
     // 对响应数据做点什么
     if (code == 200) {
+        return response;
+    } else if (code == 403002) {
+        // 令牌刷新失败，无法自动登录
+        message.warn("自动刷新令牌失败，2 秒内为您跳转回主页", 2);
+        UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
+        return null;
+    } else if (code == 403003) {
+        // 令牌过期，尝试自动刷新
+        UrlHelper.openNewPage({inNewTab: false, path: "#/signin/auto"});
+        return null;
+    } else if (code == 403000) {
+        // 账号、密码、令牌错误允许外部组件自行处理
+        message.warn(response.data.msg, 3);
         return response;
     } else if (code == 400 || code < 500000) {
         message.warn(response.data.msg, 5);
@@ -51,6 +63,11 @@ export interface SignInResponse {
     deadline: number;
 }
 
+export enum ClientScope {
+    WEB = "WEB",
+    PHONE = "PHONE",
+}
+
 export class UserService {
     static getCurrentUser(): UserDto | null | undefined {
         let currentUserStringValue = localStorage.getItem('currentUser');
@@ -67,6 +84,14 @@ export class UserService {
         localStorage.removeItem('currentUser');
     }
 
+    static getCurrentScope(): ClientScope {
+        return ClientScope.WEB;
+    }
+
+    static getContentType(): string {
+        return "application/json";
+    }
+
     static getHeader(currentHeader?: any): any {
         let result;
 
@@ -75,7 +100,8 @@ export class UserService {
         } else {
             result = currentHeader;
         }
-        result.scope = "WEB";
+        result["Content-Type"] = this.getContentType();
+        result.scope = this.getCurrentScope();
 
         let currentSecretKey = UrlHelper.getQueryString("secretKey");
         if (currentSecretKey != null) {
@@ -85,8 +111,8 @@ export class UserService {
         let currentUId = localStorage.getItem("uid");
         let currentToken = localStorage.getItem("token");
         let currentRefreshKey = localStorage.getItem("refreshKey");
-
         if (currentUId == null || currentToken == null || currentRefreshKey == null) {
+            message.warn("登录信息不完整，已清空")
             this.removeCurrentUser();
         } else {
             result.uid = currentUId;
@@ -95,7 +121,7 @@ export class UserService {
         return result;
     }
 
-    static signIn(ac: string, pw: string,
+    static signIn(ac?: string, pw?: string,
                   successHook?: (input?: HyggeResponse<SignInResponse>) => void,
                   beforeHook?: () => void,
                   finallyHook?: () => void): void {
@@ -103,26 +129,44 @@ export class UserService {
             beforeHook();
         }
 
+        let requestHeader = null;
         let requestData = null;
         if (PropertiesHelper.isStringNotNull(ac) && PropertiesHelper.isStringNotNull(pw)) {
             requestData = {
                 "password": pw,
                 "userName": ac
             };
+        } else {
+            requestHeader = UserService.getHeader();
+            if (PropertiesHelper.isStringNotNull(requestHeader.uid)) {
+                requestHeader.refreshKey = localStorage.getItem("refreshKey");
+            } else {
+                requestHeader = null;
+            }
+        }
+        let request;
+        if (requestHeader != null) {
+            message.info("尝试用令牌刷新秘钥自动登录")
+            // 刷新令牌
+            request = axios.post("/sign/in", {}, {headers: requestHeader});
+        } else {
+            // 账号密码登录
+            request = axios.post("/sign/in", requestData);
         }
 
-        axios.post("/sign/in", requestData).then((response) => {
+        request.then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<SignInResponse> = response.data;
-                    successHook(data);
-
                     if (data.main?.user != null) {
                         let user = data.main.user;
                         localStorage.setItem('uid', user.uid);
                         localStorage.setItem('token', data.main.token);
-                        localStorage.setItem('refreshKey', data.main.token);
+                        localStorage.setItem('refreshKey', data.main.refreshKey);
                         localStorage.setItem('currentUser', JSON.stringify(user));
+                        message.info("用户信息更新")
                     }
+
+                    successHook(data);
                 }
             }
         ).finally(() => {
@@ -249,7 +293,7 @@ export class HomePageService {
             beforeHook();
         }
 
-        axios.get("/home/fetch", {
+        axios.get("main/home/fetch", {
             headers: UserService.getHeader()
         }).then((response) => {
                 if (successHook != null && response != null) {
