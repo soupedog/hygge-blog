@@ -1,9 +1,8 @@
 import * as React from "react"
-import {LogHelper, PropertiesHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer';
-
-import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
-import {Badge, List, Space} from 'antd';
+import {LogHelper, PropertiesHelper} from '../../../../utils/UtilContainer';
+import {Badge, List} from 'antd';
 import {ArticleSummaryInfo, HomePageService} from "../../../../rest/ApiClient";
+import {ArticleOverviewViewItem} from "./ArticleOverviewViewItem";
 
 // 描述该组件 props 数据类型
 export interface ArticleOverviewContainerProps {
@@ -50,71 +49,10 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                 renderItem={item => (
                     (item.orderGlobal != null && item.orderGlobal > 0) ?
                         <Badge.Ribbon text="顶置" color="red">
-                            <List.Item
-                                key={item.title}
-                                actions={[
-                                    <IconText icon={EditTwoTone} text={"字数 " + item.wordCount}
-                                              key={"word_count_" + item.aid}/>,
-                                    <IconText icon={DashboardTwoTone}
-                                              text={TimeHelper.formatTimeStampToString(item.createTs)}
-                                              key={"create_ts_" + item.aid}/>,
-                                    <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews}
-                                              key={"page_view_" + item.aid}/>,
-                                    <IconText icon={EyeOutlined} text={"自浏览 " + item.selfPageViews}
-                                              hide={!this.props.isMaintainer}
-                                              key={"self_view_" + item.aid}/>
-                                ]}
-                                extra={
-                                    <img
-                                        width={272}
-                                        alt="logo"
-                                        src={item.imageSrc}
-                                    />
-                                }
-                            >
-                                <List.Item.Meta
-                                    title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                                              href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}
-                                              target="_blank">{item.title}</a>}
-                                    description={_react.getCategoryInfo(item)}
-                                />
-                                <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
-                                    {item.summary}
-                                </div>
-                            </List.Item>
+                            <ArticleOverviewViewItem key={item.aid} isMaintainer={this.props.isMaintainer}
+                                                     currentArticle={item}/>
                         </Badge.Ribbon> :
-                        <List.Item
-                            key={item.title}
-                            actions={[
-                                <IconText icon={EditTwoTone} text={"字数 " + item.wordCount}
-                                          key={"word_count_" + item.aid}/>,
-                                <IconText icon={DashboardTwoTone}
-                                          text={TimeHelper.formatTimeStampToString(item.createTs)}
-                                          key={"create_ts_" + item.aid}/>,
-                                <IconText icon={EyeTwoTone} text={"浏览量 " + item.pageViews}
-                                          key={"page_view_" + item.aid}/>,
-                                <IconText icon={EyeOutlined} text={"自浏览 " + item.selfPageViews}
-                                          hide={!this.props.isMaintainer}
-                                          key={"self_view_" + item.aid}/>
-                            ]}
-                            extra={
-                                <img
-                                    width={272}
-                                    alt="logo"
-                                    src={item.imageSrc}
-                                />
-                            }
-                        >
-                            <List.Item.Meta
-                                title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                                          href={UrlHelper.getBaseUrl() + "#/browser/" + item.aid}
-                                          target="_blank">{item.title}</a>}
-                                description={_react.getCategoryInfo(item)}
-                            />
-                            <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
-                                {item.summary}
-                            </div>
-                        </List.Item>
+                        <ArticleOverviewViewItem key={item.aid} isMaintainer={this.props.isMaintainer} currentArticle={item}/>
                 )}
             />
         );
@@ -139,21 +77,4 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
             });
         }
     }
-
-    getCategoryInfo(articleSummary: ArticleSummaryInfo): string {
-        let result = articleSummary.categoryTreeInfo.topicInfo.topicName;
-
-        articleSummary.categoryTreeInfo.categoryList.forEach((item) => {
-            result = result + " / " + item.categoryName
-        });
-        return result;
-    }
 }
-
-const IconText = ({icon, text, hide}: { icon: React.FC; text: string, hide?: boolean }) => (
-    hide ? null :
-        <Space>
-            {React.createElement(icon)}
-            {text}
-        </Space>
-);
