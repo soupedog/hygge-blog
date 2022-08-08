@@ -29,10 +29,13 @@ export interface IndexContainerState {
     // 标记当前有多少网络请求
     netWorkArrayCounter?: boolean[],
     topicOverviewInfoList?: TopicOverviewInfo[],
+    currentTid?: string,
     announcementDtoList?: AnnouncementDto[],
     quoteResponse?: QuoteResponse;
-    // 是否折叠收起
-    folded?: boolean,
+    // 菜单是否折叠收起
+    menuFolded?: boolean,
+    // 文章类别是否折叠收起
+    categoryFolded?: boolean,
     searchType?: SearchType,
     updateRootStatus?: Function,
 }
@@ -57,12 +60,14 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 categoryListInfo: [],
                 totalCount: 0
             }],
+            currentTid: "",
             announcementDtoList: [],
             quoteResponse: {
                 quoteList: [],
                 totalCount: 0
             },
-            folded: true,
+            menuFolded: true,
+            categoryFolded: false,
             searchType: SearchType.ARTICLE,
             updateRootStatus: this.updateRootStatus.bind(this)
         };
@@ -87,6 +92,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
         HomePageService.fetch((data) => {
             if (data?.main?.topicOverviewInfoList != null) {
                 _react.updateRootStatus({
+                    currentTid: data.main.topicOverviewInfoList[0].topicInfo.tid,
                     topicOverviewInfoList: data?.main?.topicOverviewInfoList
                 });
             }

@@ -41,14 +41,14 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
                                 color: "#fff"
                             }}>
                         <Row gutter={[0, 0]} justify="start" className={clsx({
-                            "headMenuSmallMode": !state.folded,
-                            "headMenuBigMode": state.folded
+                            "headMenuSmallMode": !state.menuFolded,
+                            "headMenuBigMode": state.menuFolded
                         })}>
                             <Col md={2} xl={12}>
-                                <Tooltip placement="bottom" title={state.folded ? "展开" : "收起"}>
-                                    {React.createElement(state.folded ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                                <Tooltip placement="bottom" title={state.menuFolded ? "展开" : "收起"}>
+                                    {React.createElement(state.menuFolded ? MenuUnfoldOutlined : MenuFoldOutlined, {
                                         className: 'trigger',
-                                        onClick: () => state.updateRootStatus!({folded: !state.folded}),
+                                        onClick: () => state.updateRootStatus!({folded: !state.menuFolded}),
                                     })}
                                 </Tooltip>
                             </Col>

@@ -26,8 +26,8 @@ export class IndexLeft extends React.Component<IndexLeftProps, IndexLeftState> {
         return (
             <IndexContainerContext.Consumer>
                 {(state: IndexContainerState) => (
-                    <Sider trigger={null} className={"left_box"} collapsible collapsed={state.folded}>
-                        <div className={"page-title autoWrap autoOmit"}>{state.folded ? "宅" : "我的小宅子"}</div>
+                    <Sider trigger={null} className={"left_box"} collapsible collapsed={state.menuFolded}>
+                        <div className={"page-title autoWrap autoOmit"}>{state.menuFolded ? "宅" : "我的小宅子"}</div>
                         <Menu theme={"dark"} mode={"inline"} selectable={false}
                               items={items}
                               onClick={this.menuOnClick}>

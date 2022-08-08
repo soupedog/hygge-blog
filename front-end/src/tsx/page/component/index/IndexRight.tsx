@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import {Badge, Layout, Tabs, Timeline} from 'antd';
+import {Badge, Collapse, Layout, Tabs, Timeline} from 'antd';
 import {IndexContainerContext} from "../../context/HyggeContext";
 import {IndexContainerState} from "../../IndexContainer";
 import {LogHelper, TimeHelper} from '../../../utils/UtilContainer';
@@ -8,7 +8,9 @@ import {HyggeFooter} from "../HyggeFooter";
 import HyggeIndexHeader from "../HyggeIndexHeader";
 import {ArticleOverviewContainer} from "./inner/ArticleOverviewContainer";
 import {QuoteContainer} from "./inner/QuoteContainer";
+import {CategoryContainer} from "./inner/CategoryContainer";
 
+const {Panel} = Collapse;
 const {Content} = Layout;
 const {TabPane} = Tabs;
 
@@ -28,6 +30,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
     }
 
     render() {
+        let _react = this;
         return (
             <IndexContainerContext.Consumer>
                 {(state: IndexContainerState) => (
@@ -45,7 +48,24 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                 minHeight: window.innerHeight - 282,
                             }}
                         >
-                            <Tabs defaultActiveKey="编程" type="card" size={"large"}>
+                            <CategoryContainer/>
+                            <br/>
+                            <Tabs defaultActiveKey="编程" type="card" size={"large"}
+                                  onChange={(key) => {
+                                      switch (key) {
+                                          case "句子收藏":
+                                          case "公告":
+                                              state.updateRootStatus!({categoryFolded: true});
+                                              break;
+                                          case "搜索结果":
+                                              break;
+                                          default :
+                                              state.updateRootStatus!({
+                                                  categoryFolded: false,
+                                                  currentTid: key.substring(8)
+                                              });
+                                      }
+                                  }}>
                                 {
                                     state.topicOverviewInfoList?.map((item) => {
                                         return (
