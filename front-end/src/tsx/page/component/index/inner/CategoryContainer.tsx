@@ -32,8 +32,8 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
         return (
             <IndexContainerContext.Consumer>
                 {(state: IndexContainerState) => (
-                    <Collapse defaultActiveKey={['default']}>
-                        <Panel header="文章类别目录" key={state.categoryFolded ? "folded" : "default"}>
+                    <Collapse activeKey={[state.categoryFolded ? "folded" : "default"]}>
+                        <Panel header="文章类别目录" key={"default"}>
                             <Card size={"small"}>
                                 {
                                     this.renderCategoryItem(state.currentTid, state.topicOverviewInfoList)
@@ -64,8 +64,9 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
             return (newOne[0].categoryListInfo.map(item => {
                 return (
                     <Card.Grid className={"pointer"} style={gridStyle} key={"card_" + item.categoryName}>
-                        <Badge.Ribbon style={{top:"-10px"}} text={item.articleCount == null ? "" : item.articleCount} color="red">
-                            <div style={{padding:"0 15px 0 15px"}}>
+                        <Badge.Ribbon style={{top: "-10px"}} text={item.articleCount == null ? "" : item.articleCount}
+                                      color="red">
+                            <div style={{padding: "0 15px 0 15px"}}>
                                 {item.categoryName}
                             </div>
                         </Badge.Ribbon>
