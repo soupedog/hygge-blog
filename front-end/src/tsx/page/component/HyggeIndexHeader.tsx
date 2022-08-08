@@ -48,7 +48,7 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
                                 <Tooltip placement="bottom" title={state.menuFolded ? "展开" : "收起"}>
                                     {React.createElement(state.menuFolded ? MenuUnfoldOutlined : MenuFoldOutlined, {
                                         className: 'trigger',
-                                        onClick: () => state.updateRootStatus!({folded: !state.menuFolded}),
+                                        onClick: () => state.updateRootStatus!({menuFolded: !state.menuFolded}),
                                     })}
                                 </Tooltip>
                             </Col>
