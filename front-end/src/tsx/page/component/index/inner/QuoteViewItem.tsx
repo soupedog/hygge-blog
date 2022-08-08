@@ -27,10 +27,11 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
         return (
             <List.Item
                 key={this.props.currentQuote.quoteId}
-                actions={[
-                    this.props.isMaintainer ? <IconText icon={EditTwoTone} text={"编辑"} quoteId={this.props.currentQuote.quoteId}
-                                                        key={"edit_" + this.props.currentQuote.quoteId}/> : null
-                ]}
+                actions={
+                    this.props.isMaintainer ? [<IconText icon={EditTwoTone} text={"编辑"}
+                                                         quoteId={this.props.currentQuote.quoteId}
+                                                         key={"edit_" + this.props.currentQuote.quoteId}/>] : []
+                }
                 extra={PropertiesHelper.isStringNotEmpty(this.props.currentQuote.imageSrc) ?
                     <img
                         width={272}
@@ -42,20 +43,23 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
                 <List.Item.Meta
                     title={
                         this.props.currentQuote.source == null ? null :
-                            <Tooltip placement="bottom" title={"可能的出处"}>
+                            <Tooltip placement="right" title={"可能的出处"}>
                                 {this.props.currentQuote.source}
                             </Tooltip>
                     }
                     description={
                         this.props.currentQuote.portal == null ? null :
                             <>
-                                <span>传送门:&emsp;</span>
+                                <span
+                                    style={{fontSize: "14px", color: "#0039f6", fontWeight: "bold"}}>传送门:&emsp;</span>
                                 <a href={this.props.currentQuote.portal}
                                    target="_blank">{this.props.currentQuote.portal}</a>
                             </>
                     }
                 />
-                <div id={"quote_content_" + this.props.currentQuote.quoteId}>
+                <div id={"quote_content_" + this.props.currentQuote.quoteId} style={{
+                    color: "#9a0707",
+                }}>
                 </div>
             </List.Item>
         );
