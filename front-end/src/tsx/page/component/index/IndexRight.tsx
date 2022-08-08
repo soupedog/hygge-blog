@@ -110,7 +110,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                     tab={
                                         <>
                                             <span>公告</span>
-                                            <Badge count={state.announcementDtoList!.length} overflowCount={9999}
+                                            <Badge count={state.announcementDtoList?.length} overflowCount={9999}
                                                    offset={[10, -10]}></Badge>
                                         </>
                                     }
@@ -118,7 +118,7 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                 >
                                     <Timeline mode={"left"} reverse={true} pending="To be continued...">
                                         {
-                                            state.announcementDtoList!.map(((item, index) => {
+                                            state.announcementDtoList?.map(((item, index) => {
                                                 return (
                                                     <Timeline.Item
                                                         key={"announcement_" + item.announcementId + "_" + index}
