@@ -51,14 +51,9 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
             return null;
         }
 
-        console.log(currentTid)
-        console.log(topicOverviewInfos)
-
         let newOne = topicOverviewInfos.filter(item => {
             return item.topicInfo.tid == currentTid
         });
-
-        console.log(newOne != null && newOne.length > 0)
 
         if (newOne != null && newOne.length > 0) {
             return (newOne[0].categoryListInfo.map(item => {

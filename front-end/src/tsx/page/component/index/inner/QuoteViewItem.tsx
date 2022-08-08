@@ -27,11 +27,6 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
         return (
             <List.Item
                 key={this.props.currentQuote.quoteId}
-                actions={
-                    this.props.isMaintainer ? [<IconText icon={EditTwoTone} text={"编辑"}
-                                                         quoteId={this.props.currentQuote.quoteId}
-                                                         key={"edit_" + this.props.currentQuote.quoteId}/>] : []
-                }
                 extra={PropertiesHelper.isStringNotEmpty(this.props.currentQuote.imageSrc) ?
                     <img
                         width={272}
@@ -43,9 +38,16 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
                 <List.Item.Meta
                     title={
                         this.props.currentQuote.source == null ? null :
-                            <Tooltip placement="right" title={"可能的出处"}>
-                                {this.props.currentQuote.source}
-                            </Tooltip>
+                            <>
+                                <Tooltip placement="right" title={"可能的出处"}>
+                                    {this.props.currentQuote.source}
+                                </Tooltip>
+                                {
+                                    this.props.isMaintainer ? <IconText icon={EditTwoTone} text={"编辑"}
+                                                                        quoteId={this.props.currentQuote.quoteId}
+                                                                        key={"edit_" + this.props.currentQuote.quoteId}></IconText> : null
+                                }
+                            </>
                     }
                     description={
                         this.props.currentQuote.portal == null ? null :
@@ -90,6 +92,10 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
 const IconText = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId: number }) => (
     <Space className={"pointer"} onClick={() => {
         UrlHelper.openNewPage({inNewTab: false, path: "#/editor/quote/" + quoteId})
+    }} style={{
+        float: "right",
+        marginRight: "20px",
+        fontSize: "14px"
     }}>
         {React.createElement(icon)}
         {text}
