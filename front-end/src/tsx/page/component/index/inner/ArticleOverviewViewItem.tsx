@@ -1,13 +1,14 @@
 import * as React from "react"
 import {LogHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer';
-import {List, Space} from 'antd';
+import {Badge, List, Space} from 'antd';
 import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
 
 // 描述该组件 props 数据类型
 export interface ArticleViewItemProps {
     currentArticle: ArticleSummaryInfo,
-    isMaintainer: boolean
+    isMaintainer: boolean,
+    topicQuery: boolean
 }
 
 // 描述该组件 states 数据类型
@@ -22,6 +23,32 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
     }
 
     render() {
+        let _react = this;
+
+        if (_react.props.topicQuery) {
+            if (_react.props.currentArticle.orderGlobal > 0) {
+                return (
+                    <Badge.Ribbon text="顶置" color="red">
+                        {_react.renderCore()}
+                    </Badge.Ribbon>
+                );
+            } else {
+                return _react.renderCore();
+            }
+        } else {
+            if (_react.props.currentArticle.orderCategory > 0) {
+                return (
+                    <Badge.Ribbon text="顶置" color="red">
+                        {_react.renderCore()}
+                    </Badge.Ribbon>
+                );
+            } else {
+                return _react.renderCore();
+            }
+        }
+    }
+
+    renderCore() {
         let _react = this;
         return (
             <List.Item

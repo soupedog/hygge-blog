@@ -1,6 +1,6 @@
 import * as React from "react"
 import {LogHelper, PropertiesHelper} from '../../../../utils/UtilContainer';
-import {Badge, List} from 'antd';
+import {List} from 'antd';
 import {ArticleSummaryInfo, HomePageService} from "../../../../rest/ApiClient";
 import {ArticleOverviewViewItem} from "./ArticleOverviewViewItem";
 
@@ -47,12 +47,8 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
                 }}
                 dataSource={_react.state.articleSummaryList}
                 renderItem={item => (
-                    (item.orderGlobal != null && item.orderGlobal > 0) ?
-                        <Badge.Ribbon text="顶置" color="red">
-                            <ArticleOverviewViewItem key={item.aid} isMaintainer={this.props.isMaintainer}
-                                                     currentArticle={item}/>
-                        </Badge.Ribbon> :
-                        <ArticleOverviewViewItem key={item.aid} isMaintainer={this.props.isMaintainer} currentArticle={item}/>
+                    <ArticleOverviewViewItem topicQuery={true} key={item.aid} isMaintainer={this.props.isMaintainer}
+                                             currentArticle={item}/>
                 )}
             />
         );
