@@ -58,7 +58,9 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
         if (newOne != null && newOne.length > 0) {
             return (newOne[0].categoryListInfo.map(item => {
                 return (
-                    <Card.Grid className={"pointer"} style={gridStyle} key={"card_" + item.categoryName}>
+                    <Card.Grid className={"pointer"} style={gridStyle} onClick={() => {
+                        document.getElementById("searchTap")?.click();
+                    }} key={"card_" + item.categoryName}>
                         <Badge.Ribbon style={{top: "-10px"}} text={item.articleCount == null ? "" : item.articleCount}
                                       color="red">
                             <div style={{padding: "0 15px 0 15px"}}>

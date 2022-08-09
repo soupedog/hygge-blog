@@ -9,6 +9,7 @@ import HyggeIndexHeader from "../HyggeIndexHeader";
 import {ArticleOverviewContainer} from "./inner/ArticleOverviewContainer";
 import {QuoteContainer} from "./inner/QuoteContainer";
 import {CategoryContainer} from "./inner/CategoryContainer";
+import {SearchResultContainer} from "./inner/SearchResultContainer";
 
 const {Panel} = Collapse;
 const {Content} = Layout;
@@ -98,13 +99,13 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
                                 <TabPane
                                     tab={
                                         <>
-                                            <span>搜索结果</span>
+                                            <span id={"searchTap"}>搜索结果</span>
                                             <Badge count={null} overflowCount={9999} offset={[10, -10]}></Badge>
                                         </>
                                     }
                                     key="搜索结果"
                                 >
-                                    搜索结果
+                                    <SearchResultContainer isMaintainer={state.currentUser != null}/>
                                 </TabPane>
                                 <TabPane
                                     tab={
