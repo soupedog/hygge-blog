@@ -1,6 +1,6 @@
 import * as React from "react"
 import {LogHelper} from '../../../../utils/UtilContainer';
-import {Badge, List} from 'antd';
+import {List} from 'antd';
 import {HomePageService, QuoteDto} from "../../../../rest/ApiClient";
 import {QuoteViewItem} from "./QuoteViewItem";
 
@@ -47,10 +47,7 @@ export class QuoteContainer extends React.Component<QuoteContainerProps, QuoteCo
                 }}
                 dataSource={_react.state.quoteList}
                 renderItem={(item) => (
-                    item.orderVal != null && item.orderVal > 0 ?
-                        <Badge.Ribbon text="顶置" color="red">
-                            <QuoteViewItem isMaintainer={this.props.isMaintainer} key={item.quoteId} currentQuote={item}/>
-                        </Badge.Ribbon> : <QuoteViewItem isMaintainer={this.props.isMaintainer} key={item.quoteId} currentQuote={item}/>
+                    <QuoteViewItem isMaintainer={this.props.isMaintainer} key={item.quoteId} currentQuote={item}/>
                 )}
             />
         );

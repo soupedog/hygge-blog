@@ -1,6 +1,6 @@
 import * as React from "react"
 import {LogHelper, PropertiesHelper, UrlHelper} from '../../../../utils/UtilContainer';
-import {List, Space, Tooltip} from 'antd';
+import {Badge, List, Space, Tooltip} from 'antd';
 import {QuoteDto} from "../../../../rest/ApiClient";
 import Vditor from "vditor";
 import {EditTwoTone} from "@ant-design/icons";
@@ -23,7 +23,39 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
     }
 
     render() {
-        let _react = this;
+        if (this.props.currentQuote.orderVal! > 0) {
+            return (
+                <Badge.Ribbon text="顶置" color="red">
+                    {this.renderCore()}
+                </Badge.Ribbon>
+            );
+        } else {
+            return this.renderCore();
+        }
+    }
+
+    componentDidMount() {
+        Vditor.preview(document.getElementById("quote_content_" + this.props.currentQuote.quoteId) as HTMLDivElement,
+            this.props.currentQuote.content,
+            {
+                mode: "dark",
+                // cdn: "https://www.xavierwang.cn/static/npm/vditor@3.8.5",
+                anchor: 0,
+                hljs: {
+                    style: "native",
+                    lineNumber: true
+                },
+                markdown: {
+                    sanitize: false,
+                    toc: true
+                },
+                after: () => {
+                    // 清除代码高度限制
+                }
+            });
+    }
+
+    renderCore() {
         return (
             <List.Item
                 key={this.props.currentQuote.quoteId}
@@ -65,27 +97,6 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
                 </div>
             </List.Item>
         );
-    }
-
-    componentDidMount() {
-        Vditor.preview(document.getElementById("quote_content_" + this.props.currentQuote.quoteId) as HTMLDivElement,
-            this.props.currentQuote.content,
-            {
-                mode: "dark",
-                // cdn: "https://www.xavierwang.cn/static/npm/vditor@3.8.5",
-                anchor: 0,
-                hljs: {
-                    style: "native",
-                    lineNumber: true
-                },
-                markdown: {
-                    sanitize: false,
-                    toc: true
-                },
-                after: () => {
-                    // 清除代码高度限制
-                }
-            });
     }
 }
 
