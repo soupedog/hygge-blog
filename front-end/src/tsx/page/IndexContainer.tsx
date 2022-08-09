@@ -4,7 +4,6 @@ import zhCN from "antd/lib/locale/zh_CN";
 import {ConfigProvider, Layout} from "antd";
 import {IndexContainerContext} from "./context/HyggeContext";
 
-import '../../css/icon.css';
 import 'antd/dist/antd.min.css';
 import '../../css/default.css';
 import '../../css/index.less';

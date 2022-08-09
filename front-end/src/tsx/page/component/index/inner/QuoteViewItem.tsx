@@ -3,7 +3,7 @@ import {LogHelper, PropertiesHelper, UrlHelper} from '../../../../utils/UtilCont
 import {Badge, List, Space, Tooltip} from 'antd';
 import {QuoteDto} from "../../../../rest/ApiClient";
 import Vditor from "vditor";
-import {EditTwoTone} from "@ant-design/icons";
+import {FormOutlined} from "@ant-design/icons";
 
 // 描述该组件 props 数据类型
 export interface QuoteViewItemProps {
@@ -75,9 +75,9 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
                                     {this.props.currentQuote.source}
                                 </Tooltip>
                                 {
-                                    this.props.isMaintainer ? <IconText icon={EditTwoTone} text={"编辑"}
+                                    this.props.isMaintainer ? <EditIcon icon={FormOutlined} text={"编辑"}
                                                                         quoteId={this.props.currentQuote.quoteId}
-                                                                        key={"edit_" + this.props.currentQuote.quoteId}></IconText> : null
+                                                                        key={"edit_" + this.props.currentQuote.quoteId}></EditIcon> : null
                                 }
                             </>
                     }
@@ -100,7 +100,7 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
     }
 }
 
-const IconText = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId: number }) => (
+const EditIcon = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId: number }) => (
     <Space className={"pointer"} onClick={() => {
         UrlHelper.openNewPage({inNewTab: false, path: "#/editor/quote/" + quoteId})
     }} style={{

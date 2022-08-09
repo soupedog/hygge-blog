@@ -2,7 +2,7 @@ import * as React from "react"
 import {LogHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer';
 import {Badge, List, Space} from 'antd';
 import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
-import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
+import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
 
 // 描述该组件 props 数据类型
 export interface ArticleViewItemProps {
@@ -63,9 +63,18 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
                 }
             >
                 <List.Item.Meta
-                    title={<a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                              href={UrlHelper.getBaseUrl() + "#/browser/" + this.props.currentArticle.aid}
-                              target="_blank">{this.props.currentArticle.title}</a>}
+                    title={
+                    <>
+                        <a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
+                           href={UrlHelper.getBaseUrl() + "#/browser/" + this.props.currentArticle.aid}
+                           target="_blank">{this.props.currentArticle.title}</a>
+                        {
+                            this.props.isMaintainer ? <EditIcon icon={FormOutlined} text={"编辑"}
+                                                                aid={this.props.currentArticle.aid}
+                                                                key={"edit_" + this.props.currentArticle.aid}></EditIcon> : null
+                        }
+                    </>
+                }
                     description={_react.getCategoryInfo(this.props.currentArticle)}
                 />
                 <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>
@@ -117,6 +126,19 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
 
 const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
     <Space>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+const EditIcon = ({icon, text, aid}: { icon: React.FC; text: string, aid: string }) => (
+    <Space className={"pointer"} onClick={() => {
+        UrlHelper.openNewPage({inNewTab: false, path: "#/editor/article/" + aid})
+    }} style={{
+        float: "right",
+        marginRight: "20px",
+        fontSize: "14px"
+    }}>
         {React.createElement(icon)}
         {text}
     </Space>
