@@ -334,6 +334,7 @@ export interface ArticleSummaryInfo {
     orderCategory: number,
     pageViews: number,
     selfPageViews: number,
+    articleState: string,
     createTs: number,
     lastUpdateTs: number
 }

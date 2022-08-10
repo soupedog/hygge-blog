@@ -104,7 +104,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
     componentDidMount() {
         let _react = this;
         HomePageService.fetch((data) => {
-            if (data?.main?.topicOverviewInfoList != null) {
+            if (data?.main?.topicOverviewInfoList[0] != null) {
                 _react.updateRootStatus({
                     currentTid: data.main.topicOverviewInfoList[0].topicInfo.tid,
                     topicOverviewInfoList: data?.main?.topicOverviewInfoList

@@ -3,6 +3,7 @@ import {LogHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer'
 import {Badge, List, Space} from 'antd';
 import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
+import clsx from "clsx";
 
 // 描述该组件 props 数据类型
 export interface ArticleViewItemProps {
@@ -32,6 +33,12 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
                         {_react.renderCore()}
                     </Badge.Ribbon>
                 );
+            } else if (_react.props.currentArticle.articleState == "PRIVATE") {
+                return (
+                    <Badge.Ribbon text="个人" color="blue">
+                        {_react.renderCore()}
+                    </Badge.Ribbon>
+                );
             } else {
                 return _react.renderCore();
             }
@@ -50,6 +57,7 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
 
     renderCore() {
         let _react = this;
+        let isDraft = _react.props.currentArticle.articleState == "DRAFT";
         return (
             <List.Item
                 key={this.props.currentArticle.title}
@@ -64,17 +72,19 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
             >
                 <List.Item.Meta
                     title={
-                    <>
-                        <a style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                           href={UrlHelper.getBaseUrl() + "#/browser/" + this.props.currentArticle.aid}
-                           target="_blank">{this.props.currentArticle.title}</a>
-                        {
-                            this.props.isMaintainer ? <EditIcon icon={FormOutlined} text={"编辑"}
-                                                                aid={this.props.currentArticle.aid}
-                                                                key={"edit_" + this.props.currentArticle.aid}></EditIcon> : null
-                        }
-                    </>
-                }
+                        <>
+                            <a className={clsx({
+                                "draftHighlight": isDraft
+                            })} style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
+                               href={UrlHelper.getBaseUrl() + "#/browser/" + this.props.currentArticle.aid}
+                               target="_blank">{this.props.currentArticle.title}{isDraft ? "【草稿】" : null}</a>
+                            {
+                                this.props.isMaintainer ? <EditIcon icon={FormOutlined} text={"编辑"}
+                                                                    aid={this.props.currentArticle.aid}
+                                                                    key={"edit_" + this.props.currentArticle.aid}></EditIcon> : null
+                            }
+                        </>
+                    }
                     description={_react.getCategoryInfo(this.props.currentArticle)}
                 />
                 <div style={{textIndent: "2em", fontSize: "14px", lineHeight: "24px"}}>

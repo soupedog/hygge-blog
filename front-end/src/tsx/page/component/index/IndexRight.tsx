@@ -31,12 +31,11 @@ export class IndexRight extends React.Component<IndexRightProps, IndexRightState
     }
 
     render() {
-        let _react = this;
         return (
             <IndexContainerContext.Consumer>
                 {(state: IndexContainerState) => (
                     <Layout className="right_box site-layout">
-                        <HyggeIndexHeader key={"he"}/>
+                        <HyggeIndexHeader key={"index_header"}/>
                         <Content
                             id={"myContent"}
                             className="site-layout-background"

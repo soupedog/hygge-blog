@@ -74,6 +74,23 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
                             }}
                             onFinish={(value) => {
                                 value.content = _react.state.mdController?.getValue();
+
+                                if (!PropertiesHelper.isStringNotEmpty(value.imageSrc)) {
+                                    value.imageSrc = null;
+                                }
+
+                                if (!PropertiesHelper.isStringNotEmpty(value.remarks)) {
+                                    value.remarks = null;
+                                }
+
+                                if (!PropertiesHelper.isStringNotEmpty(value.source)) {
+                                    value.source = null;
+                                }
+
+                                if (!PropertiesHelper.isStringNotEmpty(value.portal)) {
+                                    value.portal = null;
+                                }
+
                                 if (value.action == "update") {
                                     let quoteId = value.quoteId + "";
                                     if (PropertiesHelper.isStringNotEmpty(quoteId)) {
