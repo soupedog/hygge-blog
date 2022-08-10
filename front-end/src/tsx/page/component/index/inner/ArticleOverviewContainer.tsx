@@ -24,7 +24,7 @@ export class ArticleOverviewContainer extends React.Component<ArticleOverviewCon
         this.state = {
             totalCount: 0,
             currentPage: 1,
-            pageSize: 1,
+            pageSize: 5,
             articleSummaryList: []
         };
         LogHelper.info({className: "ArticleOverviewContainer", msg: "初始化成功"});

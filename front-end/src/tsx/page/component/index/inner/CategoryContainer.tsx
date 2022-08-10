@@ -36,7 +36,7 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
                         <Panel header="文章类别目录" key={"default"}>
                             <Card size={"small"}>
                                 {
-                                    this.renderCategoryItem(state.currentTid, state.topicOverviewInfoList)
+                                    this.renderCategoryItem(state)
                                 }
                             </Card>
                         </Panel>
@@ -46,7 +46,10 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
         );
     }
 
-    renderCategoryItem(currentTid?: string, topicOverviewInfos?: TopicOverviewInfo[]) {
+    renderCategoryItem(state: IndexContainerState) {
+        let currentTid: string | undefined = state.currentTid;
+        let topicOverviewInfos: TopicOverviewInfo[] | undefined = state.topicOverviewInfoList;
+
         if (topicOverviewInfos == null) {
             return null;
         }
@@ -59,6 +62,7 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
             return (newOne[0].categoryListInfo.map(item => {
                 return (
                     <Card.Grid className={"pointer"} style={gridStyle} onClick={() => {
+                        state.fetchSearchViewInfo!(1, 5, state, item.cid, null);
                         document.getElementById("searchTap")?.click();
                     }} key={"card_" + item.categoryName}>
                         <Badge.Ribbon style={{top: "-10px"}} text={item.articleCount == null ? "" : item.articleCount}

@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../utils/UtilContainer';
+import {LogHelper, PropertiesHelper} from '../utils/UtilContainer';
 import zhCN from "antd/lib/locale/zh_CN";
 import {ConfigProvider, Layout} from "antd";
 import {IndexContainerContext} from "./context/HyggeContext";
@@ -27,15 +27,23 @@ export interface IndexContainerState {
     currentUser?: UserDto | null,
     // 标记当前有多少网络请求
     netWorkArrayCounter?: boolean[],
-    topicOverviewInfoList?: TopicOverviewInfo[],
     currentTid?: string,
-    announcementDtoList?: AnnouncementDto[],
+    topicOverviewInfoList?: TopicOverviewInfo[],
     quoteResponse?: QuoteResponse;
+    currentCid?: string,
+    searchType?: SearchType,
+    searchKey?: string,
+    searchResultInfoList?: {
+        viewInfoList: any[],
+        totalCount: number
+    },
+    announcementDtoList?: AnnouncementDto[],
     // 菜单是否折叠收起
     menuFolded?: boolean,
     // 文章类别是否折叠收起
     categoryFolded?: boolean,
-    searchType?: SearchType,
+
+    fetchSearchViewInfo?: Function,
     updateRootStatus?: Function,
 }
 
@@ -50,6 +58,7 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
         this.state = {
             currentUser: UserService.getCurrentUser(),
             netWorkArrayCounter: [],
+            currentTid: "",
             topicOverviewInfoList: [{
                 topicInfo: {
                     tid: "",
@@ -59,15 +68,21 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 categoryListInfo: [],
                 totalCount: 0
             }],
-            currentTid: "",
-            announcementDtoList: [],
             quoteResponse: {
                 quoteList: [],
                 totalCount: 0
             },
+            currentCid: "",
+            searchType: SearchType.ARTICLE,
+            searchKey: "",
+            searchResultInfoList: {
+                viewInfoList: [],
+                totalCount: 0
+            },
+            announcementDtoList: [],
             menuFolded: true,
             categoryFolded: false,
-            searchType: SearchType.ARTICLE,
+            fetchSearchViewInfo: this.fetchSearchViewInfo.bind(this),
             updateRootStatus: this.updateRootStatus.bind(this)
         };
         LogHelper.info({className: "IndexContainer", msg: "初始化成功"});
@@ -108,6 +123,28 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 });
             });
         });
+    }
+
+    fetchSearchViewInfo(currentPage: number, pageSize: number, state: IndexContainerState,
+                        currentCid?: string,
+                        successHook?: (input?: any) => void) {
+
+        if (PropertiesHelper.isStringNotEmpty(currentCid)) {
+            HomePageService.fetchArticleSummaryByCid(currentCid!, currentPage, pageSize, (data) => {
+                let searchViewList = {
+                    viewInfoList: data?.main!.articleSummaryList!,
+                    totalCount: data?.main?.totalCount!
+                };
+
+                state.updateRootStatus!({
+                    currentCid: currentCid,
+                    searchResultInfoList: searchViewList
+                });
+                if (successHook != null) {
+                    successHook(searchViewList)
+                }
+            });
+        }
     }
 
     updateRootStatus(deltaInfo: IndexContainerState) {

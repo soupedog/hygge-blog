@@ -309,33 +309,33 @@ export interface TopicOverviewInfo {
 }
 
 export interface AllOverviewInfo {
-    "topicOverviewInfoList": TopicOverviewInfo[];
+    topicOverviewInfoList: TopicOverviewInfo[];
 }
 
 export interface AnnouncementDto {
-    "announcementId": number,
-    "paragraphList": string[],
-    "color": string,
-    "createTs": number
+    announcementId: number,
+    paragraphList: string[],
+    color: string,
+    createTs: number
 }
 
 export interface ArticleSummaryInfo {
-    "aid": string,
-    "categoryTreeInfo": {
-        "topicInfo": TopicDto,
-        "categoryList": CategoryDto[]
+    aid: string,
+    categoryTreeInfo: {
+        topicInfo: TopicDto,
+        categoryList: CategoryDto[]
     },
-    "cid": string,
-    "title": string,
-    "imageSrc": string,
-    "summary": string,
-    "wordCount": number,
-    "orderGlobal": number,
-    "orderCategory": number,
-    "pageViews": number,
-    "selfPageViews": number,
-    "createTs": number,
-    "lastUpdateTs": number
+    cid: string,
+    title: string,
+    imageSrc: string,
+    summary: string,
+    wordCount: number,
+    orderGlobal: number,
+    orderCategory: number,
+    pageViews: number,
+    selfPageViews: number,
+    createTs: number,
+    lastUpdateTs: number
 }
 
 export interface ArticleSummaryResponse {
@@ -344,19 +344,19 @@ export interface ArticleSummaryResponse {
 }
 
 export interface QuoteDto {
-    "quoteId": number,
-    "imageSrc"?: string,
-    "content": string,
-    "source"?: string,
-    "portal"?: string,
-    "remarks"?: string,
-    "orderVal"?: number,
-    "quoteState"?: string,
+    quoteId: number,
+    imageSrc?: string,
+    content: string,
+    source?: string,
+    portal?: string,
+    remarks?: string,
+    orderVal?: number,
+    quoteState?: string,
 }
 
 export interface QuoteResponse {
-    "quoteList": QuoteDto[],
-    "totalCount": number
+    quoteList: QuoteDto[],
+    totalCount: number
 }
 
 export class HomePageService {
@@ -453,6 +453,32 @@ export class HomePageService {
             }
         });
     }
+
+    static fetchArticleSummaryByCid(cid: string,
+                                    currentPage: number,
+                                    pageSize: number,
+                                    successHook?: (input?: HyggeResponse<ArticleSummaryResponse>) => void,
+                                    beforeHook?: () => void,
+                                    finallyHook?: () => void): void {
+
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/fetch/category/" + cid + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<ArticleSummaryResponse> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
 }
 
 export class QuoteService {
@@ -535,9 +561,9 @@ export class QuoteService {
 }
 
 export interface FileInfo {
-    "src": string,
-    "name": string,
-    "fileSize": number
+    src: string,
+    name: string,
+    fileSize: number
 }
 
 export class FileService {
