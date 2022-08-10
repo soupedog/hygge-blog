@@ -114,7 +114,7 @@ public class Article extends BasePo {
     /**
      * [PO_STATUS]文章状态:草稿,启用,私人的
      */
-    @Column(nullable = false, columnDefinition = "enum ('DRAFT', 'INACTIVE', 'ACTIVE') default 'DRAFT'")
+    @Column(nullable = false, columnDefinition = "enum ('DRAFT', 'PRIVATE', 'ACTIVE') default 'DRAFT'")
     @Enumerated(EnumType.STRING)
     private ArticleStateEnum articleState;
 

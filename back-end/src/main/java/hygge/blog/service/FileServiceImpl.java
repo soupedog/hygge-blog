@@ -88,6 +88,8 @@ public class FileServiceImpl extends HyggeWebUtilContainer {
                         .name(absolutePath.substring(absolutePath.lastIndexOf(File.separator) + 1, absolutePath.lastIndexOf(".")))
                         .build();
 
+                fileInfo.setSrc(fileInfo.getSrc().replace(File.separator,"/"));
+
                 fileInfo.setFileSizeWithByte(new BigDecimal(item.length()));
                 result.add(fileInfo);
             });

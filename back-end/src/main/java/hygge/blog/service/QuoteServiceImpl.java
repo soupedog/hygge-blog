@@ -49,11 +49,11 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo("imageSrc", null, ColumnTypeEnum.STRING, true, false, 1, 1000));
+        forUpdate.add(new ColumnInfo("imageSrc", null, ColumnTypeEnum.STRING, true, true, 0, 1000));
         forUpdate.add(new ColumnInfo("content", null, ColumnTypeEnum.STRING, true, false, 1, 5000));
-        forUpdate.add(new ColumnInfo("source", null, ColumnTypeEnum.STRING, true, false, 1, 2000));
-        forUpdate.add(new ColumnInfo("portal", null, ColumnTypeEnum.STRING, true, false, 1, 2000));
-        forUpdate.add(new ColumnInfo("remarks", null, ColumnTypeEnum.STRING, true, false, 1, 5000));
+        forUpdate.add(new ColumnInfo("source", null, ColumnTypeEnum.STRING, true, true, 0, 2000));
+        forUpdate.add(new ColumnInfo("portal", null, ColumnTypeEnum.STRING, true, true, 0, 2000));
+        forUpdate.add(new ColumnInfo("remarks", null, ColumnTypeEnum.STRING, true, true, 0, 5000));
         forUpdate.add(new ColumnInfo("orderVal", null, ColumnTypeEnum.INTEGER, true, true, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo("quoteState", null, ColumnTypeEnum.STRING, true, false, 1, 50));
     }

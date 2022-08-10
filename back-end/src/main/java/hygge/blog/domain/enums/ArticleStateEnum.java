@@ -47,7 +47,7 @@ public enum ArticleStateEnum {
             throw new IllegalArgumentException("Unexpected value of ArticleStateEnum,it can't be null.");
         }
         switch (value) {
-            case "INACTIVE":
+            case "DRAFT":
                 return ArticleStateEnum.DRAFT;
             case "ACTIVE":
                 return ArticleStateEnum.ACTIVE;
