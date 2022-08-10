@@ -20,7 +20,6 @@ export function withRouter(Component) {
         let params = useParams();
         let [searchParams, setSearchParams] = useSearchParams();
         // @ts-ignore
-        console.log(Component.name+"------")
         return <Component {...props} router={{location, navigate, params, searchParams, setSearchParams}}/>
     }
 

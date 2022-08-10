@@ -87,7 +87,7 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
 
                                     </Col>
                                     <Col md={2} xl={2} className={"textCenter"}>
-                                        <Spin spinning/>
+                                        <Spin spinning={state.netWorkArrayCounter!.length > 0}/>
                                     </Col>
                                 </Row>
                             </Col>

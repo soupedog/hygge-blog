@@ -115,20 +115,31 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 _react.updateRootStatus({
                     announcementDtoList: data?.main
                 });
+            }, () => {
+                _react.state.netWorkArrayCounter?.push(true);
+            }, () => {
+                _react.state.netWorkArrayCounter?.pop();
             });
 
             HomePageService.fetchQuote(1, 1, (data) => {
                 _react.updateRootStatus({
                     quoteResponse: data?.main,
                 });
+            }, () => {
+                _react.state.netWorkArrayCounter?.push(true);
+            }, () => {
+                _react.state.netWorkArrayCounter?.pop();
             });
+        }, () => {
+            _react.state.netWorkArrayCounter?.push(true);
+        }, () => {
+            _react.state.netWorkArrayCounter?.pop();
         });
     }
 
     fetchSearchViewInfo(currentPage: number, pageSize: number, state: IndexContainerState,
                         currentCid?: string,
                         successHook?: (input?: any) => void) {
-
         if (PropertiesHelper.isStringNotEmpty(currentCid)) {
             HomePageService.fetchArticleSummaryByCid(currentCid!, currentPage, pageSize, (data) => {
                 let searchViewList = {
