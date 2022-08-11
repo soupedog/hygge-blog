@@ -45,7 +45,8 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
                 <MusicPlayerBox configuration={_react.props.currentArticle.configuration}/>
                 <Layout>
                     <Content id="mainView">
-                        <Card title={_react.props.currentArticle.title} bordered={false}>
+                        <Card title={_react.props.currentArticle.title} bordered={false}
+                              style={{marginTop: '10px'}}>
                             <Breadcrumb>
                                 <Breadcrumb.Item>{this.props.currentArticle.categoryTreeInfo.topicInfo.topicName}</Breadcrumb.Item>
                                 {
