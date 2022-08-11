@@ -78,13 +78,12 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
                                     </Col>
                                     <Col md={1} xl={1}>{/*占位符*/}</Col>
                                     <Col md={3} xl={3}>
-                                        {state.currentUser != null ? <HyggeUserMenu/> :
+                                        {state.currentUser != null ? <HyggeUserMenu currentUser={state.currentUser}/> :
                                             <Button type="primary"
                                                     onClick={() => {
                                                         this.props.router.navigate("/signin");
                                                     }}
                                             >登录</Button>}
-
                                     </Col>
                                     <Col md={2} xl={2} className={"textCenter"}>
                                         <Spin spinning={state.netWorkArrayCounter!.length > 0}/>

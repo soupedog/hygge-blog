@@ -110,7 +110,7 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
                     <IconText icon={EditTwoTone} text={"字数 " + this.props.currentArticle.wordCount}
                               key={"word_count_" + this.props.currentArticle.aid}/>,
                     <IconText icon={DashboardTwoTone}
-                              text={TimeHelper.formatTimeStampToString(this.props.currentArticle.createTs)}
+                              text={"创建于 " + TimeHelper.formatTimeStampToString(this.props.currentArticle.createTs)}
                               key={"create_ts_" + this.props.currentArticle.aid}/>,
                     <IconText icon={EyeTwoTone} text={"浏览量 " + this.props.currentArticle.pageViews}
                               key={"page_view_" + this.props.currentArticle.aid}/>,

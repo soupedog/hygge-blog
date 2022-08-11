@@ -220,7 +220,9 @@ export interface ArticleDto {
     selfPageViews: number,
     orderGlobal: number,
     orderCategory: number,
-    articleState: string
+    articleState: string,
+    createTs: number,
+    lastUpdateTs: number
 }
 
 export class ArticleService {

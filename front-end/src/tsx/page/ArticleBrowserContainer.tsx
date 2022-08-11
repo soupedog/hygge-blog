@@ -1,8 +1,11 @@
 import * as React from "react"
 import {LogHelper, PropertiesHelper} from '../utils/UtilContainer';
-import {ArticleDto, ArticleService} from "../rest/ApiClient";
+import {ArticleDto, ArticleService, UserDto, UserService} from "../rest/ApiClient";
 import {Browser} from "./component/browser/Browser";
 import {ReactRouter, withRouter} from "../utils/ReactRouterHelper";
+import "./../../css/default.css"
+import 'APlayer/dist/APlayer.min.css';
+import "./../../css/browser.less"
 
 // 描述该组件 props 数据类型
 export interface ArticleBrowserContainerProps {
@@ -11,14 +14,15 @@ export interface ArticleBrowserContainerProps {
 
 // 描述该组件 states 数据类型
 export interface ArticleBrowserContainerStatus {
-    currentArticle: ArticleDto
+    currentArticle: ArticleDto,
+    currentUser?: UserDto | null,
 }
 
 class ArticleBrowserContainer extends React.Component<ArticleBrowserContainerProps, ArticleBrowserContainerStatus> {
     constructor(props: ArticleBrowserContainerProps) {
         super(props);
-
         this.state = {
+            currentUser: UserService.getCurrentUser(),
             currentArticle: {} as ArticleDto
         };
         LogHelper.info({className: "ArticleBrowserContainer", msg: "初始化成功"});
@@ -27,7 +31,7 @@ class ArticleBrowserContainer extends React.Component<ArticleBrowserContainerPro
     render() {
         if (PropertiesHelper.isStringNotEmpty(this.state.currentArticle.content)) {
             return (
-                <Browser currentArticle={this.state.currentArticle}/>
+                <Browser isMaintainer={this.state.currentUser != null} currentArticle={this.state.currentArticle}/>
             );
         } else {
             return null;

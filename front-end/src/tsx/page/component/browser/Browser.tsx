@@ -1,23 +1,24 @@
 import * as React from "react"
-import {LogHelper, UrlHelper, WindowsEventHelper} from "../../../utils/UtilContainer";
+import {LogHelper, TimeHelper} from "../../../utils/UtilContainer";
 
-import {Card, Layout, Tooltip} from 'antd';
-import {RollbackOutlined} from "@ant-design/icons";
-import clsx from "clsx";
+import {Breadcrumb, Card, Layout, Space} from 'antd';
 import {HyggeFooter} from "../HyggeFooter";
 import {ArticleDto} from "../../../rest/ApiClient";
 import Vditor from "vditor";
+import HyggeBrowserHeader from "../HyggeBrowserHeader";
+import {MusicPlayerBox} from "./inner/MusicPlayerBox";
+import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
 
 const {Header, Sider, Content} = Layout;
 
 // 描述该组件 props 数据类型
 export interface BrowserProps {
+    isMaintainer: boolean,
     currentArticle: ArticleDto
 }
 
 // 描述该组件 states 数据类型
 export interface BrowserStatus {
-    headerTransparent: boolean,
     rootTocTreeList: any[]
 }
 
@@ -25,7 +26,6 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
     constructor(props: BrowserProps) {
         super(props);
         this.state = {
-            headerTransparent: true,
             rootTocTreeList: []
         };
         LogHelper.info({className: "Browser", msg: "初始化成功"});
@@ -35,35 +35,50 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
         let _react = this;
         return (
             <Layout>
-                <Header style={{position: 'fixed', zIndex: 1, width: '100%'}}
-                        className={clsx({
-                            "backgroundTransparent": this.state.headerTransparent
-                        })}>
-                    <div className={"floatLeft"}>
-                        <Tooltip placement="bottom" title={"返回首页"}>
-                            <RollbackOutlined onClick={() => {
-                                UrlHelper.openNewPage({finalUrl: UrlHelper.getBaseUrl(), inNewTab: false});
-                            }} style={{color: "#fff", fontWeight: "bold", fontSize: "24px", lineHeight: "64px"}}/>
-                        </Tooltip>
-                    </div>
-                    <div className={"floatRight"}>
-                        {/*<HyggeIndexHeader key={"browser_header"}/>*/}
-                    </div>
-                </Header>
+                <HyggeBrowserHeader/>
                 <div id="mainImage" style={{
                     width: "100%",
                     height: "400px",
                     backgroundSize: "cover",
                     background: "url(" + _react.props.currentArticle.imageSrc + ") no-repeat center"
                 }}/>
-                {/*<MusicPlayerBox configuration={_react.props.currentArticle.configuration}/>*/}
+                <MusicPlayerBox configuration={_react.props.currentArticle.configuration}/>
                 <Layout>
                     <Content id="mainView">
-                        <Card title={_react.props.currentArticle.title} bordered={false}
-                              style={{marginTop: '10px'}}>
-                            {/*<ArticleCategoryBreadcrumb board={_react.props.article.board}*/}
-                            {/*                           articleCategoryList={_react.props.article.articleCategoryList}/>*/}
-                            <div style={{marginTop: "20px"}}>
+                        <Card title={_react.props.currentArticle.title} bordered={false}>
+                            <Breadcrumb>
+                                <Breadcrumb.Item>{this.props.currentArticle.categoryTreeInfo.topicInfo.topicName}</Breadcrumb.Item>
+                                {
+                                    this.props.currentArticle.categoryTreeInfo.categoryList?.map((articleCategoryInfo, index) => {
+                                        return (
+                                            <Breadcrumb.Item key={index}>
+                                                <span>{articleCategoryInfo.categoryName}</span>
+                                            </Breadcrumb.Item>
+                                        )
+                                    })
+                                }
+                            </Breadcrumb>
+                            <div style={{
+                                marginTop: "10px",
+                                fontSize: "12px",
+                                lineHeight: "20px",
+                                color: "#6a737d"
+                            }}>
+                                <Space size={"middle"}>
+                                    <IconText icon={EditTwoTone} text={"字数 " + this.props.currentArticle.wordCount}
+                                              key={"word_count_" + this.props.currentArticle.aid}/>
+                                    <IconText icon={DashboardTwoTone}
+                                              text={"创建于 " + TimeHelper.formatTimeStampToString(this.props.currentArticle.createTs)}
+                                              key={"create_ts_" + this.props.currentArticle.aid}/>
+                                    <IconText icon={DashboardTwoTone}
+                                              text={"最后修改于 " + TimeHelper.formatTimeStampToString(this.props.currentArticle.lastUpdateTs)}
+                                              key={"create_ts_" + this.props.currentArticle.aid}/>
+                                    <IconText icon={EyeTwoTone} text={"浏览量 " + this.props.currentArticle.pageViews}
+                                              key={"page_view_" + this.props.currentArticle.aid}/>
+                                    {this.props.isMaintainer ? <IconText icon={EyeOutlined}
+                                                                           text={"自浏览 " + this.props.currentArticle.selfPageViews}
+                                                                           key={"self_view_" + this.props.currentArticle.aid}/> : null}
+                                </Space>
                             </div>
                         </Card>
                         <Card style={{marginTop: "20px"}} bordered={false}>
@@ -114,17 +129,6 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
     componentDidMount() {
         let _react = this;
 
-        WindowsEventHelper.addCallback_Scroll({
-            name: "APPBar 透明判定", delta: 50, callbackFunction: function ({currentScrollY}) {
-                if (currentScrollY > 336) {
-                    _react.setState({headerTransparent: false});
-                } else {
-                    _react.setState({headerTransparent: true});
-                }
-            }
-        });
-        WindowsEventHelper.start_OnScroll();
-
         if (this.props.currentArticle != null) {
             Vditor.preview(document.getElementById('preview') as HTMLDivElement,
                 _react.props.currentArticle.content,
@@ -146,3 +150,10 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
         }
     }
 }
+
+const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
+    <Space>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);

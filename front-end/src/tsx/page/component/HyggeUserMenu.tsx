@@ -1,15 +1,14 @@
 import * as React from "react"
 import {LogHelper, UrlHelper} from '../../utils/UtilContainer';
-import {IndexContainerState} from "../IndexContainer";
-import {IndexContainerContext} from "../context/HyggeContext";
 import {Avatar, Dropdown, Menu, MenuProps, message} from "antd";
 import {CloseCircleOutlined, EditOutlined} from '@ant-design/icons';
-import {UserService} from "../../rest/ApiClient";
+import {UserDto, UserService} from "../../rest/ApiClient";
 import {ReactRouter, withRouter} from "../../utils/ReactRouterHelper";
 
 // 描述该组件 props 数据类型
 export interface HyggeUserMenuProps {
-    router: ReactRouter;
+    router: ReactRouter,
+    currentUser?: UserDto | null,
 }
 
 // 描述该组件 states 数据类型
@@ -25,42 +24,42 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
     }
 
     render() {
+        if (this.props.currentUser == null) {
+            return null;
+        }
+
         return (
-            <IndexContainerContext.Consumer>
-                {(state: IndexContainerState) => (
-                    <Dropdown overlay={
-                        <Menu items={items} onClick={(event) => {
-                            let aid = UrlHelper.getQueryString("aid");
-                            let finalUrl = UrlHelper.getBaseUrl();
-                            switch (event.key) {
-                                case "signOut":
-                                    UserService.removeCurrentUser();
-                                    message.success("登出成功，1 s 后将跳转回首页。");
-                                    let currentSecretKey = UrlHelper.getQueryString("secretKey");
-                                    if (currentSecretKey != null) {
-                                        finalUrl = finalUrl + "?secretKey=" + currentSecretKey;
-                                    } else {
-                                        this.props.router.navigate("")
-                                    }
-                                    UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
-                                    break;
-                                case "editArticle":
-                                    if (aid != null) {
-                                        this.props.router.navigate("editor/article/" + aid, {replace: false})
-                                    } else {
-                                        this.props.router.navigate("editor/article/")
-                                    }
-                                    break;
-                                case "editQuote":
-                                    this.props.router.navigate("editor/quote")
-                                    break;
+            <Dropdown overlay={
+                <Menu items={items} onClick={(event) => {
+                    let aid = this.props.router.params.aid;
+                    let finalUrl = UrlHelper.getBaseUrl();
+                    switch (event.key) {
+                        case "signOut":
+                            UserService.removeCurrentUser();
+                            message.success("登出成功，1 s 后将跳转回首页。");
+                            let currentSecretKey = UrlHelper.getQueryString("secretKey");
+                            if (currentSecretKey != null) {
+                                finalUrl = finalUrl + "?secretKey=" + currentSecretKey;
+                            } else {
+                                UrlHelper.openNewPage({inNewTab: false})
                             }
-                        }}/>
-                    }>
-                        <Avatar className={"pointer"} size={48} src={state.currentUser?.userAvatar}/>
-                    </Dropdown>
-                )}
-            </IndexContainerContext.Consumer>
+                            UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
+                            break;
+                        case "editArticle":
+                            if (aid != null) {
+                                UrlHelper.openNewPage({path: "#/editor/article/" + aid, inNewTab: false})
+                            } else {
+                                UrlHelper.openNewPage({path: "#/editor/article", inNewTab: false})
+                            }
+                            break;
+                        case "editQuote":
+                            UrlHelper.openNewPage({path: "#/editor/quote", inNewTab: false})
+                            break;
+                    }
+                }}/>
+            }>
+                <Avatar className={"pointer"} size={48} src={this.props.currentUser!.userAvatar}/>
+            </Dropdown>
         );
     }
 }
