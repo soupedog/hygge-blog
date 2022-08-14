@@ -27,7 +27,7 @@ public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
         long serviceStartTs = System.currentTimeMillis();
         HyggeRequestContext context = null;
         // 填充服务端信息，允许跨域访问
-        enableCrossOrigin(request, response);
+        enableCrossOrigin(response);
 
         try {
             switch (request.getMethod().toUpperCase()) {
@@ -81,8 +81,8 @@ public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
         }
     }
 
-    private void enableCrossOrigin(HttpServletRequest request, HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+    private void enableCrossOrigin(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "OPTIONS,GET,POST,PUT,DELETE");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,uid,token,refreshKey,secretKey,scope");
