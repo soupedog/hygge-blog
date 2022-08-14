@@ -23,7 +23,7 @@ export interface LogParam2 {
 }
 
 export class LogHelper {
-    static actualLogLevel: LogLevel = LogLevel.INFO;
+    static actualLogLevel: LogLevel = LogLevel.WARN;
 
     static log(inputParam: LogParam): void {
         if (LogHelper.actualLogLevel > inputParam.level) {
@@ -257,6 +257,7 @@ export class PropertiesHelper {
 // const baseUrl = "https://www.xavierwang.cn/";
 const baseUrl = "http://localhost:9000/";
 const baseStaticSourceUrl = "https://www.xavierwang.cn/static";
+const vditorCdnUrl = "https://cdn.jsdelivr.net/npm/vditor@3.8.17";
 
 export interface OpenNewPageConfig {
     inNewTab: boolean;
@@ -266,6 +267,9 @@ export interface OpenNewPageConfig {
 }
 
 export class UrlHelper {
+    static getVditorCdn():string{
+        return vditorCdnUrl;
+    }
 
     static getBaseUrl(): string {
         return baseUrl;

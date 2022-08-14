@@ -39,7 +39,7 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
             this.props.currentQuote.content,
             {
                 mode: "dark",
-                // cdn: "https://www.xavierwang.cn/static/npm/vditor@3.8.5",
+                cdn: UrlHelper.getVditorCdn(),
                 anchor: 0,
                 hljs: {
                     style: "native",

@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper, TimeHelper} from "../../../utils/UtilContainer";
+import {LogHelper, TimeHelper, UrlHelper} from "../../../utils/UtilContainer";
 
 import {Affix, Breadcrumb, Card, Layout, Space, Tree} from 'antd';
 import {HyggeFooter} from "../HyggeFooter";
@@ -10,7 +10,7 @@ import {MusicPlayerBox} from "./inner/MusicPlayerBox";
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
 import {AntdTreeNodeInfo, MdHelper} from "../../../utils/MdHelper";
 
-const {Header, Sider, Content} = Layout;
+const {Sider, Content} = Layout;
 
 // 描述该组件 props 数据类型
 export interface BrowserProps {
@@ -126,7 +126,7 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
         let _react = this;
 
         if (this.props.currentArticle != null) {
-            document.title =this.props.currentArticle.title;
+            document.title = this.props.currentArticle.title;
 
             Vditor.preview(document.getElementById('preview') as HTMLDivElement,
                 _react.props.currentArticle.content,
@@ -136,7 +136,7 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
                         sanitize: false,
                         toc: true
                     },
-                    // cdn:"https://www.xavierwang.cn/static/npm/vditor@3.8.5",
+                    cdn: UrlHelper.getVditorCdn(),
                     anchor: 0,
                     hljs: {
                         style: "native",

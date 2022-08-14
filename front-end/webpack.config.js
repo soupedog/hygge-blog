@@ -9,10 +9,11 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 module.exports = {
     // 指定下列依赖从远端获取，不打包进 .js 文件
-    // externals: {
-    //     "react": "React",
-    //     "react-dom": "ReactDOM"
-    // },
+    externals: {
+        // "react": "React",
+        // "react-dom": "ReactDOM"
+        // "vditor": "Vditor"
+    },
     // 添加需要解析的文件格式(import 时不需要再标注下列尾缀)
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json']
