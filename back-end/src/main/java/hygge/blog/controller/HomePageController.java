@@ -10,6 +10,7 @@ import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Announcement;
 import hygge.blog.service.AnnouncementServiceImpl;
 import hygge.blog.service.HomePageServiceImpl;
+import hygge.web.utils.log.annotation.ControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,12 +35,14 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch")
+    @ControllerLog(enable = false)
     public ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>> homepageFetch() {
         return (ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>>) success(homePageService.fetch());
     }
 
     @Override
     @GetMapping("/home/fetch/topic/{tid}")
+    @ControllerLog(enable = false)
     public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> topicInfoFetch(@PathVariable("tid") String tid,
                                                                                           @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                           @RequestParam(required = false, defaultValue = "5") int pageSize) {
@@ -48,6 +51,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch/category/{cid}")
+    @ControllerLog(enable = false)
     public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> categoryInfoFetch(@PathVariable("cid") String cid,
                                                                                              @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                              @RequestParam(required = false, defaultValue = "5") int pageSize) {
@@ -56,6 +60,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch/quote")
+    @ControllerLog(enable = false)
     public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                  @RequestParam(required = false, defaultValue = "5") int pageSize) {
         return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(homePageService.findQuoteInfo(currentPage, pageSize));
@@ -63,6 +68,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch/announcement")
+    @ControllerLog(enable = false)
     public ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>> announcementFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                                 @RequestParam(required = false, defaultValue = "100") int pageSize) {
 

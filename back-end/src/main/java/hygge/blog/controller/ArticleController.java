@@ -48,7 +48,7 @@ public class ArticleController implements ArticleControllerDoc {
 
     @Override
     @GetMapping("/article/{aid}")
-    @ControllerLog(outputParamExpressions = {@HyggeExpressionInfo(rootObjectName = "#root", name = "title", value = "title")})
+    @ControllerLog(outputParamExpressions = {@HyggeExpressionInfo(rootObjectName = "#root", name = "title", value = "main.title")})
     public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(@PathVariable("aid") String aid) {
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(articleService.findArticleDetailByAid(aid));
     }
