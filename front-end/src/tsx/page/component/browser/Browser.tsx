@@ -1,13 +1,14 @@
 import * as React from "react"
 import {LogHelper, TimeHelper} from "../../../utils/UtilContainer";
 
-import {Breadcrumb, Card, Layout, Space} from 'antd';
+import {Affix, Breadcrumb, Card, Layout, Space, Tree} from 'antd';
 import {HyggeFooter} from "../HyggeFooter";
 import {ArticleDto} from "../../../rest/ApiClient";
 import Vditor from "vditor";
 import HyggeBrowserHeader from "../HyggeBrowserHeader";
 import {MusicPlayerBox} from "./inner/MusicPlayerBox";
-import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
+import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
+import {AntdTreeNodeInfo, MdHelper} from "../../../utils/MdHelper";
 
 const {Header, Sider, Content} = Layout;
 
@@ -26,7 +27,7 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
     constructor(props: BrowserProps) {
         super(props);
         this.state = {
-            rootTocTreeList: []
+            rootTocTreeList: [{key: "test"}]
         };
         LogHelper.info({className: "Browser", msg: "初始化成功"});
     }
@@ -73,12 +74,12 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
                                               key={"create_ts_" + this.props.currentArticle.aid}/>
                                     <IconText icon={DashboardTwoTone}
                                               text={"最后修改于 " + TimeHelper.formatTimeStampToString(this.props.currentArticle.lastUpdateTs)}
-                                              key={"create_ts_" + this.props.currentArticle.aid}/>
+                                              key={"lastUpdate_ts_" + this.props.currentArticle.aid}/>
                                     <IconText icon={EyeTwoTone} text={"浏览量 " + this.props.currentArticle.pageViews}
                                               key={"page_view_" + this.props.currentArticle.aid}/>
                                     {this.props.isMaintainer ? <IconText icon={EyeOutlined}
-                                                                           text={"自浏览 " + this.props.currentArticle.selfPageViews}
-                                                                           key={"self_view_" + this.props.currentArticle.aid}/> : null}
+                                                                         text={"自浏览 " + this.props.currentArticle.selfPageViews}
+                                                                         key={"self_view_" + this.props.currentArticle.aid}/> : null}
                                 </Space>
                             </div>
                         </Card>
@@ -90,36 +91,30 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
                            collapsed={_react.state.rootTocTreeList.length < 1}
                            width={"20%"} collapsedWidth={0}
                            style={{backgroundColor: "#F0F2F5"}}>
-                        {/*<Affix style={{*/}
-                        {/*    zIndex: 9999,*/}
-                        {/*    position: 'absolute',*/}
-                        {/*    top: 164,*/}
-                        {/*    right: 0,*/}
-                        {/*    width: "100%"*/}
-                        {/*}} offsetTop={164}>*/}
-                        {/*    {(_react.state.rootTocTreeList.length < 1) ? null :*/}
-                        {/*        <div>*/}
-                        {/*            <div className="tocTitle">目录</div>*/}
-                        {/*            <Tree*/}
-                        {/*                showLine={true}*/}
-                        {/*                treeData={_react.state.rootTocTreeList}*/}
-                        {/*                switcherIcon={<DownOutlined/>}*/}
-                        {/*                onSelect={(selectedKeys, info) => {*/}
-                        {/*                    @ts-ignore*/}
-                        {/*                    $("#preview").find(info.node.nodeName).each(function () {*/}
-                        {/*                        let currentTarget = $(this);*/}
-                        {/*                        let title = currentTarget.text();*/}
-                        {/*                        if (title == info.node.title) {*/}
-                        {/*                            // @ts-ignore*/}
-                        {/*                            $('html, body').animate({scrollTop: currentTarget.offset().top - 64}, 300);*/}
-                        {/*                        }*/}
-                        {/*                    });*/}
-                        {/*                }}*/}
-                        {/*            >*/}
-                        {/*            </Tree>*/}
-                        {/*        </div>*/}
-                        {/*    }*/}
-                        {/*</Affix>*/}
+                        <Affix style={{
+                            zIndex: 9999,
+                            position: 'absolute',
+                            top: 164,
+                            right: 0,
+                            width: "100%"
+                        }} offsetTop={164}>
+                            {(_react.state.rootTocTreeList.length < 1) ? null :
+                                <div style={{paddingLeft: "20px"}}>
+                                    <div className="tocTitle">目录</div>
+                                    <Tree
+                                        showLine={true}
+                                        treeData={_react.state.rootTocTreeList}
+                                        switcherIcon={<DownOutlined/>}
+                                        onSelect={(selectedKeys, info) => {
+                                            let currentTarget: HTMLElement = document.getElementById(info.node.value)!;
+                                            let target: number = (currentTarget.offsetTop - 64) + (window.innerHeight - 64);
+                                            window.scrollTo({top: target});
+                                        }}
+                                    >
+                                    </Tree>
+                                </div>
+                            }
+                        </Affix>
                     </Sider>
                 </Layout>
                 <HyggeFooter/>
@@ -146,6 +141,38 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
                         lineNumber: true
                     },
                     after: () => {
+                        // 清除代码最大高度限制
+                        document.querySelectorAll("code").forEach(item => {
+                            item.style.maxHeight = "none";
+                        });
+
+                        let as: AntdTreeNodeInfo[] = [];
+                        let map: Map<number, AntdTreeNodeInfo> = new Map<number, AntdTreeNodeInfo>();
+                        document.querySelectorAll("h1,h2,h3,h4,h5").forEach((item, index) => {
+                            let antdTreeNode = {
+                                index: index,
+                                key: "toc_" + index,
+                                nodeName: item.tagName,
+                                level: null,
+                                title: item.textContent as string,
+                                value: item.id,
+                                parentNodeIndex: null,
+                                children: []
+                            };
+
+                            as.push(antdTreeNode);
+                            map.set(index, antdTreeNode);
+                        });
+
+                        let currentTOC = MdHelper.getTocTree({
+                            currentTOCArray: as,
+                            allTocNodeMap: map,
+                            errorCallback: null
+                        });
+
+                        console.log(currentTOC);
+
+                        _react.setState({rootTocTreeList: currentTOC});
                     }
                 });
         }

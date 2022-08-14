@@ -3,6 +3,7 @@ import {LogHelper, PropertiesHelper} from "./UtilContainer";
 export interface AntdTreeNodeInfo {
     index: number | null;
     title: string;
+    value: string;
     nodeName: string;
     level: number | null;
     parentNodeIndex: number | null;
