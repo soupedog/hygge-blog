@@ -111,19 +111,19 @@ module.exports = {
                 collapseWhitespace: true
             }
         }),
-        // new CompressionPlugin({
-        //     algorithm: 'gzip', // 类型
-        //     test: /\.(js|css)$/, // 匹配规则
-        //     threshold: 10240, // 字节数 只处理比这个大的资源
-        //     minRatio: 0.8 // 压缩率 只有比这个小的才会处理
-        // }),
+        new CompressionPlugin({
+            algorithm: 'gzip', // 类型
+            test: /\.(js|css)$/, // 匹配规则
+            threshold: 10240, // 字节数 只处理比这个大的资源
+            minRatio: 0.8 // 压缩率 只有比这个小的才会处理
+        }),
         new BundleAnalyzerPlugin()
     ],
     optimization: {
-        splitChunks: {
-            // 打包公共依赖
-            chunks: "all",
-            name: "commons"
-        }
+        // splitChunks: {
+        //     // 打包公共依赖
+        //     chunks: "all",
+        //     name: "commons"
+        // }
     }
 }

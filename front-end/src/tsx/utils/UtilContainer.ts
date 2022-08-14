@@ -254,8 +254,8 @@ export class PropertiesHelper {
     }
 }
 
-// const baseUrl = "https://www.xavierwang.cn/";
-const baseUrl = "http://localhost:9000/";
+const baseUrl = "https://www.xavierwang.cn/";
+// const baseUrl = "http://localhost:9000/";
 const baseStaticSourceUrl = "https://www.xavierwang.cn/static";
 const vditorCdnUrl = "https://cdn.jsdelivr.net/npm/vditor@3.8.17";
 

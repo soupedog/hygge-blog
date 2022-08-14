@@ -2,7 +2,8 @@ import axios from "axios";
 import {message} from "antd";
 import {PropertiesHelper, UrlHelper} from "../utils/UtilContainer";
 
-axios.defaults.baseURL = "http://localhost:8080/blog-service/api";
+// axios.defaults.baseURL = "http://localhost:8080/blog-service/api";
+axios.defaults.baseURL = "https://www.xavierwang.cn/blog-service/api";
 axios.interceptors.response.use(function (response) {
     if (response.data == null) {
         return null;
@@ -112,7 +113,6 @@ export class UserService {
         let currentToken = localStorage.getItem("token");
         let currentRefreshKey = localStorage.getItem("refreshKey");
         if (currentUId == null || currentToken == null || currentRefreshKey == null) {
-            message.warn("登录信息不完整，已清空")
             this.removeCurrentUser();
         } else {
             result.uid = currentUId;
