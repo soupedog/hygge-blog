@@ -252,6 +252,7 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
     }
 
     componentDidMount() {
+        document.title = "文章编辑器";
         let _react = this;
         let vditor = new Vditor('preview', {
             // cdn: "https://www.xavierwang.cn/static/npm/vditor@3.8.5",

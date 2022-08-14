@@ -182,6 +182,7 @@ class EditQuoteContainer extends React.Component<EditQuoteContainerProps, EditQu
     }
 
     componentDidMount() {
+        document.title = "句子编辑器";
         let _react = this;
         let vditor = new Vditor('preview', {
             // cdn: "https://www.xavierwang.cn/static/npm/vditor@3.8.5",

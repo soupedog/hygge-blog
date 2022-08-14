@@ -74,4 +74,8 @@ export class SignInContainer extends React.Component<SignInContainerProps, SignI
             </ConfigProvider>
         );
     }
+
+    componentDidMount() {
+        document.title = "登录";
+    }
 }

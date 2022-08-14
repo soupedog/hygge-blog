@@ -126,6 +126,8 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
         let _react = this;
 
         if (this.props.currentArticle != null) {
+            document.title =this.props.currentArticle.title;
+
             Vditor.preview(document.getElementById('preview') as HTMLDivElement,
                 _react.props.currentArticle.content,
                 {

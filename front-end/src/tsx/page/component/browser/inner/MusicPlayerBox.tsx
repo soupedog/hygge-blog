@@ -30,7 +30,7 @@ export class MusicPlayerBox extends React.Component<MusicPlayerBoxProps, MusicPl
             case "WANG_YI_YUN":
                 return (
                     <iframe width={"100%"}
-                            height={"100px"}
+                            height={"105px"}
                             src={this.props.configuration.src}></iframe>
                 )
             default:
