@@ -1,17 +1,4 @@
 @charset "utf-8";
-a, em {
-    text-decoration: none
-}
-
-a img {
-    border: 0
-}
-
-address, caption, cite, code, dfn, p, em, i, th, var {
-    font-style: normal;
-    font-weight: normal
-}
-
 .pointer {
     cursor: pointer;
 }
