@@ -6,6 +6,8 @@ import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Article;
 import hygge.blog.service.ArticleServiceImpl;
+import hygge.commons.templates.core.annotation.HyggeExpressionInfo;
+import hygge.web.utils.log.annotation.ControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +48,7 @@ public class ArticleController implements ArticleControllerDoc {
 
     @Override
     @GetMapping("/article/{aid}")
+    @ControllerLog(outputParamExpressions = {@HyggeExpressionInfo(rootObjectName = "#root", name = "title", value = "title")})
     public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(@PathVariable("aid") String aid) {
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(articleService.findArticleDetailByAid(aid));
     }

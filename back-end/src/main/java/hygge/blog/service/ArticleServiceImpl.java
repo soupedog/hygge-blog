@@ -26,6 +26,7 @@ import hygge.utils.UtilsCreator;
 import hygge.utils.bo.ColumnInfo;
 import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,11 +41,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Xavier
  * @date 2022/7/24
  */
+@Slf4j
 @Service
 public class ArticleServiceImpl extends HyggeWebUtilContainer {
     private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
@@ -230,6 +234,24 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         result.setCid(currentCategory.getCid());
 
         initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList, result);
+
+        if (article.getUserId().equals(Optional.ofNullable(currentUser)
+                .map(User::getUserId)
+                .orElse(null))) {
+            CompletableFuture.runAsync(() -> {
+                articleDao.increasePageViewsAndSelfView(article.getArticleId());
+            }).exceptionally(e -> {
+                log.error("更新文章(" + article.getArticleId() + ") 浏览量/自浏览 失败.", e);
+                return null;
+            });
+        } else {
+            CompletableFuture.runAsync(() -> {
+                articleDao.increasePageViews(article.getArticleId());
+            }).exceptionally(e -> {
+                log.error("更新文章(" + article.getArticleId() + ") 浏览量 失败.", e);
+                return null;
+            });
+        }
 
         return result;
     }
