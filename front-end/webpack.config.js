@@ -51,7 +51,11 @@ module.exports = {
                     plugins: [
                         // 支持装饰器(类似 java 的注解)
                         ["@babel/plugin-proposal-decorators", {"legacy": true}],
-                        "@babel/plugin-proposal-class-properties"
+                        "@babel/plugin-proposal-class-properties",
+                        ["import", {
+                            "libraryName": "antd",
+                            "style": 'css',   // or 'css'
+                        }]
                     ]
                 }
             },
@@ -107,12 +111,12 @@ module.exports = {
                 collapseWhitespace: true
             }
         }),
-        new CompressionPlugin({
-            algorithm: 'gzip', // 类型
-            test: /\.(js|css)$/, // 匹配规则
-            threshold: 10240, // 字节数 只处理比这个大的资源
-            minRatio: 0.8 // 压缩率 只有比这个小的才会处理
-        }),
+        // new CompressionPlugin({
+        //     algorithm: 'gzip', // 类型
+        //     test: /\.(js|css)$/, // 匹配规则
+        //     threshold: 10240, // 字节数 只处理比这个大的资源
+        //     minRatio: 0.8 // 压缩率 只有比这个小的才会处理
+        // }),
         new BundleAnalyzerPlugin()
     ],
     optimization: {

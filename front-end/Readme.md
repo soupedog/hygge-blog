@@ -48,6 +48,9 @@ npm install vditor
 // http 请求工具
 npm install axios
 
+// 按需加载插件
+npm install babel-plugin-import --save-dev
+
 ```
 
 ## 安装完 webpack 后需要添加配置文件 ``webpack.config.js``
