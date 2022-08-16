@@ -95,7 +95,7 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
         if (parameterHelper.isNotEmpty(categoryDto.getParentCid())) {
             Category parentCategory = findCategoryByCid(categoryDto.getParentCid(), false);
             ArticleCountInfo parentCategoryCountInfo = articleService.findArticleCountInfo(parentCategory.getCategoryId(), currentUser.getUserId());
-            if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT) && parentCategoryCountInfo.getCount() > 0) {
+            if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT) && parentCategoryCountInfo != null && parentCategoryCountInfo.getCount() > 0) {
                 throw new LightRuntimeException(String.format("Category(%s) can't contain article, but contains %d.", parentCategory.getCategoryName(), parentCategoryCountInfo.getCount()), BlogSystemCode.ARTICLE_CATEGORY_SUB_ARTICLE_NOT_EMPTY);
             }
             // 更新 parent Type
