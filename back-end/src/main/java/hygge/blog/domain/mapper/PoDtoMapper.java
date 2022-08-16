@@ -61,7 +61,6 @@ public interface PoDtoMapper {
 
     @Mapping(source = "accessRuleList", target = "accessRuleList", ignore = true)
     @Mapping(source = "categoryState", target = "categoryState", ignore = true)
-    @Mapping(source = "categoryType", target = "categoryType", ignore = true)
     CategoryDto poToDto(Category po);
 
     Category dtoToPo(CategoryDto dto);
