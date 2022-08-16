@@ -33,8 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Xavier
@@ -185,6 +187,19 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
             result = result.stream().filter(category -> topicIdRequirement.contains(category.getTopicId())).toList();
         }
         return result;
+    }
+
+    public List<Category> initRootCategory(List<Category> currentCategoryList) {
+        Set<Integer> allCategoryIdSet = new HashSet<>();
+
+        for (Category category : currentCategoryList) {
+            allCategoryIdSet.add(category.getCategoryId());
+            if (category.getParentId() != null) {
+                allCategoryIdSet.add(category.getParentId());
+            }
+        }
+
+        return categoryDao.findCategoryByCategoryIdList(allCategoryIdSet);
     }
 
     private void nameConflictCheck(String categoryName) {

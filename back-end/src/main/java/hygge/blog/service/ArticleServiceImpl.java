@@ -189,6 +189,8 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
             Topic topic = null;
             TopicDto topicDto = null;
 
+            List<Category> allCategoryList = categoryService.initRootCategory(categoryList);
+
             for (ArticleDto articleDto : articleSummaryList) {
                 // 确认不会空指针
                 Category category = categoryList.stream().filter(item -> item.getCid().equals(articleDto.getCid())).findFirst().get();
@@ -200,7 +202,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
                     topicDto = PoDtoMapper.INSTANCE.poToDto(topic);
                 }
 
-                initCategoryTreeInfo(topicDto, category, categoryList, articleDto);
+                initCategoryTreeInfo(topicDto, category, allCategoryList, articleDto);
             }
         }
         result.setArticleSummaryList(articleSummaryList);
@@ -256,17 +258,21 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         return result;
     }
 
-    private void initCategoryTreeInfo(TopicDto currentTopicDto, Category currentCategory, List<Category> categoryList, ArticleDto result) {
+    private void initCategoryTreeInfo(TopicDto currentTopicDto, Category currentCategory, List<Category> allCategoryList, ArticleDto result) {
         CategoryTreeInfo categoryTreeInfo = new CategoryTreeInfo();
         categoryTreeInfo.setTopicInfo(currentTopicDto);
         categoryTreeInfo.setCategoryList(new ArrayList<>(0));
 
         // 确保当前节点一定被添加
-        while (categoryTreeInfo.getCategoryList().isEmpty() || (currentCategory != null && currentCategory.getParentId() != null)) {
+        while (categoryTreeInfo.getCategoryList().isEmpty() || currentCategory != null) {
             categoryTreeInfo.getCategoryList().add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
             // 确认不会空指针
             Integer parentId = currentCategory.getParentId();
-            currentCategory = categoryList.stream().filter(item -> item.getCategoryId().equals(parentId)).findFirst().orElse(null);
+            if (currentCategory.getParentId() != null) {
+                currentCategory = allCategoryList.stream().filter(item -> item.getCategoryId().equals(parentId)).findFirst().orElse(null);
+            } else {
+                currentCategory = null;
+            }
         }
 
         // 上面是从当前找到根节点，所以需要反转数组才是从根到当前节点
