@@ -120,10 +120,10 @@ module.exports = {
         new BundleAnalyzerPlugin()
     ],
     optimization: {
-        // splitChunks: {
-        //     // 打包公共依赖
-        //     chunks: "all",
-        //     name: "commons"
-        // }
+        splitChunks: {
+            // 打包公共依赖
+            // chunks: "all",
+            // name: "commons"
+        }
     }
 }

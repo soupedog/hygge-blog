@@ -60,6 +60,9 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
 
         if (newOne != null && newOne.length > 0) {
             return (newOne[0].categoryListInfo.map(item => {
+                if (item.articleCount! <= 0) {
+                    return null;
+                }
                 return (
                     <Card.Grid className={"pointer"} style={gridStyle} onClick={() => {
                         state.fetchSearchViewInfo!(1, 5, state, item.cid, null);

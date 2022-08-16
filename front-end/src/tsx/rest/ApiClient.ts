@@ -14,6 +14,7 @@ axios.interceptors.response.use(function (response) {
     if (code == 200) {
         return response;
     } else if (code == 403002) {
+        UserService.removeCurrentUser();
         // 令牌刷新失败，无法自动登录
         message.warn("自动刷新令牌失败，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
@@ -112,9 +113,7 @@ export class UserService {
         let currentUId = localStorage.getItem("uid");
         let currentToken = localStorage.getItem("token");
         let currentRefreshKey = localStorage.getItem("refreshKey");
-        if (currentUId == null || currentToken == null || currentRefreshKey == null) {
-            this.removeCurrentUser();
-        } else {
+        if (currentUId != null && currentToken != null && currentRefreshKey != null) {
             result.uid = currentUId;
             result.token = currentToken;
         }
