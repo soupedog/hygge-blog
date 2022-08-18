@@ -162,13 +162,13 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         Page<Article> articleListTemp;
         Sort sort;
-        if (accessibleCategoryIdList.size() == 1) {
+        if (accessibleCategoryIdList.size() != 1) {
             sort = Sort.by(Sort.Order.desc("orderGlobal"), Sort.Order.desc("createTs"));
         } else {
             sort = Sort.by(Sort.Order.desc("orderCategory"), Sort.Order.desc("createTs"));
         }
 
-        Pageable pageable = PageRequest.of((currentPage - 1) * pageSize, pageSize, sort);
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
 
         if (currentUserId != null) {
             articleListTemp = articleDao.findArticleSummary(accessibleCategoryIdList, currentUserId, pageable);
