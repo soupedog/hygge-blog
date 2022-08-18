@@ -12,7 +12,7 @@ module.exports = {
     externals: {
         // "react": "React",
         // "react-dom": "ReactDOM"
-        // "vditor": "Vditor"
+        "vditor": "Vditor"
     },
     // 添加需要解析的文件格式(import 时不需要再标注下列尾缀)
     resolve: {

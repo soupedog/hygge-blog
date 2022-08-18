@@ -131,6 +131,8 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
             Vditor.preview(document.getElementById('preview') as HTMLDivElement,
                 _react.props.currentArticle.content,
                 {
+                    // @ts-ignore
+                    mediaRenderEnable: false,
                     mode: "dark",
                     markdown: {
                         sanitize: false,
