@@ -150,7 +150,7 @@ export class UserService {
             request = axios.post("/sign/in", {}, {headers: requestHeader});
         } else {
             // 账号密码登录
-            request = axios.post("/sign/in", requestData);
+            request = axios.post("/sign/in", requestData, {headers: UserService.getHeader()});
         }
 
         request.then((response) => {
@@ -196,6 +196,7 @@ export interface TopicDto {
 export interface CategoryDto {
     cid: string,
     categoryName: string,
+    categoryType: string,
     orderVal: number,
     articleCount?: number
 }

@@ -326,10 +326,12 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
                 let childrenList: any = [];
 
                 topicOverviewInfo.categoryListInfo.forEach((item) => {
-                    childrenList.push({
-                        title: item.categoryName + " --- " + item.articleCount,
-                        value: item.cid,
-                    });
+                    if (item.categoryType == "DEFAULT") {
+                        childrenList.push({
+                            title: item.categoryName + " --- " + item.articleCount,
+                            value: item.cid,
+                        });
+                    }
                 });
 
                 let parent = {
