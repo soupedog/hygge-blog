@@ -161,7 +161,13 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         }
 
         Page<Article> articleListTemp;
-        Sort sort = Sort.by(Sort.Order.desc("orderGlobal"), Sort.Order.desc("createTs"));
+        Sort sort;
+        if (accessibleCategoryIdList.size() == 1) {
+            sort = Sort.by(Sort.Order.desc("orderGlobal"), Sort.Order.desc("createTs"));
+        } else {
+            sort = Sort.by(Sort.Order.desc("orderCategory"), Sort.Order.desc("createTs"));
+        }
+
         Pageable pageable = PageRequest.of((currentPage - 1) * pageSize, pageSize, sort);
 
         if (currentUserId != null) {
