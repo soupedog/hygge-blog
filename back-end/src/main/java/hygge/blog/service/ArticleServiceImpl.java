@@ -8,6 +8,7 @@ import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.CategoryTreeInfo;
+import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.BackgroundMusicTypeEnum;
 import hygge.blog.domain.enums.MediaPlayTypeEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
@@ -243,22 +244,25 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList, result);
 
-        if (article.getUserId().equals(Optional.ofNullable(currentUser)
-                .map(User::getUserId)
-                .orElse(null))) {
-            CompletableFuture.runAsync(() -> {
-                articleDao.increasePageViewsAndSelfView(article.getArticleId());
-            }).exceptionally(e -> {
-                log.error("更新文章(" + article.getArticleId() + ") 浏览量/自浏览 失败.", e);
-                return null;
-            });
-        } else {
-            CompletableFuture.runAsync(() -> {
-                articleDao.increasePageViews(article.getArticleId());
-            }).exceptionally(e -> {
-                log.error("更新文章(" + article.getArticleId() + ") 浏览量 失败.", e);
-                return null;
-            });
+        if (article.getArticleState().equals(ArticleStateEnum.ACTIVE)) {
+            // 仅在文章公开状态下才记录浏览量
+            if (article.getUserId().equals(Optional.ofNullable(currentUser)
+                    .map(User::getUserId)
+                    .orElse(null))) {
+                CompletableFuture.runAsync(() -> {
+                    articleDao.increasePageViewsAndSelfView(article.getArticleId());
+                }).exceptionally(e -> {
+                    log.error("更新文章(" + article.getArticleId() + ") 浏览量/自浏览 失败.", e);
+                    return null;
+                });
+            } else {
+                CompletableFuture.runAsync(() -> {
+                    articleDao.increasePageViews(article.getArticleId());
+                }).exceptionally(e -> {
+                    log.error("更新文章(" + article.getArticleId() + ") 浏览量 失败.", e);
+                    return null;
+                });
+            }
         }
 
         return result;
