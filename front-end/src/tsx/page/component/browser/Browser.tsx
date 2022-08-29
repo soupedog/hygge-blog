@@ -5,6 +5,7 @@ import {Affix, Breadcrumb, Card, Layout, Space, Tree} from 'antd';
 import {HyggeFooter} from "../HyggeFooter";
 import {ArticleDto} from "../../../rest/ApiClient";
 import Vditor from "vditor";
+import $ from "jquery";
 import HyggeBrowserHeader from "../HyggeBrowserHeader";
 import {MusicPlayerBox} from "./inner/MusicPlayerBox";
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
@@ -106,9 +107,8 @@ export class Browser extends React.Component<BrowserProps, BrowserStatus> {
                                         treeData={_react.state.rootTocTreeList}
                                         switcherIcon={<DownOutlined/>}
                                         onSelect={(selectedKeys, info) => {
-                                            let currentTarget: HTMLElement = document.getElementById(info.node.value)!;
-                                            let target: number = (currentTarget.offsetTop - 64) + (window.innerHeight - 64);
-                                            window.scrollTo({top: target});
+                                            let anchor = $("#" + info.node.value);
+                                            $('html, body').animate({scrollTop: anchor.offset()!.top - 64}, 300);
                                         }}
                                     >
                                     </Tree>

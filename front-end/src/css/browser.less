@@ -9,9 +9,10 @@
 }
 
 #preview {
-  code:not(.hljs) {
-    background-color: rgba(141, 65, 10, 0.63);
-    color: #ffffff;
+  // 没有 class 属性的 code 标签
+  code:not([class]) {
+    background-color: rgb(150, 0, 0);
+    color: #dacdcd;
     font-weight: 600;
   }
 }
