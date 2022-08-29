@@ -1,6 +1,5 @@
 package hygge.blog.domain.dto;
 
-import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.QuoteStateEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
