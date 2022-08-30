@@ -14,8 +14,9 @@ import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
-import hygge.blog.elasticsearch.SearchingCacheDao;
+import hygge.blog.elasticsearch.dao.SearchingCacheDao;
 import hygge.blog.elasticsearch.dto.FuzzySearchCache;
+import hygge.blog.service.ArticleServiceImpl;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,8 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private ArticleDao articleDao;
     @Autowired
+    private ArticleServiceImpl articleService;
+    @Autowired
     private CategoryDao categoryDao;
     @Autowired
     private TopicDao topicDao;
@@ -48,6 +51,24 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     private QuoteDao quoteDao;
     @Autowired
     private SearchingCacheDao searchingCacheDao;
+
+    public void freshSingleArticle(String aid, Integer articleId) {
+        ArticleDto articleDto = articleService.findArticleDetailByAid(false, aid);
+        FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
+        fuzzySearchCache.setEsId(articleId);
+        fuzzySearchCache.setType(FuzzySearchCache.Type.ARTICLE);
+        searchingCacheDao.save(fuzzySearchCache);
+    }
+
+    public void freshSingleQuote(Integer quoteId) {
+        Quote quote = quoteDao.findById(quoteId).get();
+        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
+
+        FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
+        fuzzySearchCache.setEsId(quoteId + FuzzySearchCache.INTERVAL);
+        fuzzySearchCache.setType(FuzzySearchCache.Type.QUOTE);
+        searchingCacheDao.save(fuzzySearchCache);
+    }
 
     public void freshArticle() {
         long startTs = System.currentTimeMillis();

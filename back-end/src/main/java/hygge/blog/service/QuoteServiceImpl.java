@@ -13,12 +13,14 @@ import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.User;
+import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
 import hygge.commons.enums.ColumnTypeEnum;
 import hygge.commons.exceptions.LightRuntimeException;
 import hygge.utils.UtilsCreator;
 import hygge.utils.bo.ColumnInfo;
 import hygge.utils.definitions.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -33,11 +35,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Xavier
  * @date 2022/8/2
  */
+@Slf4j
 @Service
 public class QuoteServiceImpl extends HyggeWebUtilContainer {
     private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
@@ -45,6 +49,8 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
     private QuoteDao quoteDao;
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private RefreshElasticSearchServiceImpl refreshElasticSearchService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -69,7 +75,16 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
         quote.setQuoteState(parameterHelper.parseObjectOfNullable("quoteState", quote.getQuoteState(), QuoteStateEnum.ACTIVE));
         quote.setUserId(currentUser.getUserId());
 
-        return quoteDao.save(quote);
+        Quote result = quoteDao.save(quote);
+
+        CompletableFuture.runAsync(() -> {
+            refreshElasticSearchService.freshSingleQuote(result.getQuoteId());
+        }).exceptionally(e -> {
+            log.error("刷新句子(" + result.getQuoteId() + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
+
+        return result;
     }
 
     public Quote updateQuote(Integer quoteId, Map<String, Object> data) {
@@ -82,6 +97,13 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
         Quote newOne = MapToAnyMapper.INSTANCE.mapToQuote(finalData);
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
+
+        CompletableFuture.runAsync(() -> {
+            refreshElasticSearchService.freshSingleQuote(old.getQuoteId());
+        }).exceptionally(e -> {
+            log.error("刷新句子(" + old.getQuoteId() + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
 
         return quoteDao.save(old);
     }

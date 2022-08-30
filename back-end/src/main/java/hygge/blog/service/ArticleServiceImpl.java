@@ -20,6 +20,7 @@ import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
+import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
 import hygge.commons.enums.ColumnTypeEnum;
 import hygge.commons.exceptions.LightRuntimeException;
 import hygge.utils.UtilsCreator;
@@ -59,6 +60,8 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
     private CategoryServiceImpl categoryService;
     @Autowired
     private TopicServiceImpl topicService;
+    @Autowired
+    private RefreshElasticSearchServiceImpl refreshElasticSearchService;
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
@@ -97,7 +100,19 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         article.setOrderGlobal(parameterHelper.parseObjectOfNullable("orderGlobal", article.getOrderGlobal(), 0));
         article.setOrderCategory(parameterHelper.parseObjectOfNullable("orderCategory", article.getOrderCategory(), 0));
 
-        return articleDao.save(article);
+
+        Article result = articleDao.save(article);
+
+        String aid = result.getAid();
+        Integer articleId = result.getArticleId();
+        CompletableFuture.runAsync(() -> {
+            refreshElasticSearchService.freshSingleArticle(aid, articleId);
+        }).exceptionally(e -> {
+            log.error("刷新文章(" + article.getArticleId() + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
+
+        return result;
     }
 
 
@@ -132,6 +147,14 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         }
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
+
+        Integer articleId = old.getArticleId();
+        CompletableFuture.runAsync(() -> {
+            refreshElasticSearchService.freshSingleArticle(aid, articleId);
+        }).exceptionally(e -> {
+            log.error("刷新文章(" + old.getArticleId() + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
 
         return articleDao.save(old);
     }
@@ -215,7 +238,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         return result;
     }
 
-    public ArticleDto findArticleDetailByAid(String aid) {
+    public ArticleDto findArticleDetailByAid(boolean pageViewsIncrease, String aid) {
         parameterHelper.stringNotEmpty("aid", (Object) aid);
 
         Article article = articleDao.findArticleByAid(aid);
@@ -242,7 +265,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         result.initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList);
 
-        if (article.getArticleState().equals(ArticleStateEnum.ACTIVE)) {
+        if (pageViewsIncrease && article.getArticleState().equals(ArticleStateEnum.ACTIVE)) {
             // 仅在文章公开状态下才记录浏览量
             if (article.getUserId().equals(Optional.ofNullable(currentUser)
                     .map(User::getUserId)

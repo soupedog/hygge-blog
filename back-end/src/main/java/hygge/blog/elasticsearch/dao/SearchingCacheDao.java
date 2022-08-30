@@ -1,4 +1,4 @@
-package hygge.blog.elasticsearch;
+package hygge.blog.elasticsearch.dao;
 
 import hygge.blog.elasticsearch.dto.FuzzySearchCache;
 import org.springframework.data.repository.CrudRepository;
