@@ -98,14 +98,16 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
 
+        Quote result = quoteDao.save(old);
+
         CompletableFuture.runAsync(() -> {
-            refreshElasticSearchService.freshSingleQuote(old.getQuoteId());
+            refreshElasticSearchService.freshSingleQuote(result.getQuoteId());
         }).exceptionally(e -> {
-            log.error("刷新句子(" + old.getQuoteId() + ") 模糊搜索数据 失败.", e);
+            log.error("刷新句子(" + result.getQuoteId() + ") 模糊搜索数据 失败.", e);
             return null;
         });
 
-        return quoteDao.save(old);
+        return result;
     }
 
     public QuoteInfo findQuoteInfo(int currentPage, int pageSize) {

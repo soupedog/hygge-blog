@@ -67,6 +67,8 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
         fuzzySearchCache.setEsId(quoteId + FuzzySearchCache.INTERVAL);
         fuzzySearchCache.setType(FuzzySearchCache.Type.QUOTE);
+        // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
+        fuzzySearchCache.setCreateTs(new Timestamp(System.currentTimeMillis()));
         searchingCacheDao.save(fuzzySearchCache);
     }
 

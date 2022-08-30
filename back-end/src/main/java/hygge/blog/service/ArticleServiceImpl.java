@@ -148,15 +148,17 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
 
-        Integer articleId = old.getArticleId();
+        Article result = articleDao.save(old);
+
+        Integer articleId = result.getArticleId();
         CompletableFuture.runAsync(() -> {
             refreshElasticSearchService.freshSingleArticle(aid, articleId);
         }).exceptionally(e -> {
-            log.error("刷新文章(" + old.getArticleId() + ") 模糊搜索数据 失败.", e);
+            log.error("刷新文章(" + result.getArticleId() + ") 模糊搜索数据 失败.", e);
             return null;
         });
 
-        return articleDao.save(old);
+        return result;
     }
 
     public List<ArticleCountInfo> findArticleCountInfo(List<Integer> accessibleCategoryIdList, Integer currentUserId) {
