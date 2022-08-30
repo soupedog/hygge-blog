@@ -27,31 +27,33 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
         let _react = this;
 
         if (_react.props.topicQuery) {
+            // 按板块查询时，顶置基于 全局排序
             if (_react.props.currentArticle.orderGlobal > 0) {
                 return (
                     <Badge.Ribbon text="顶置" color="red">
                         {_react.renderCore()}
                     </Badge.Ribbon>
                 );
-            } else if (_react.props.currentArticle.articleState == "PRIVATE") {
-                return (
-                    <Badge.Ribbon text="个人" color="blue">
-                        {_react.renderCore()}
-                    </Badge.Ribbon>
-                );
-            } else {
-                return _react.renderCore();
             }
         } else {
+            // 按文章类别查询时，顶置基于 文章类别排序(搜索时，后端和清除排序值，所以不会触发顶置)
             if (_react.props.currentArticle.orderCategory > 0) {
                 return (
                     <Badge.Ribbon text="顶置" color="red">
                         {_react.renderCore()}
                     </Badge.Ribbon>
                 );
-            } else {
-                return _react.renderCore();
             }
+        }
+
+        if (_react.props.currentArticle.articleState == "PRIVATE") {
+            return (
+                <Badge.Ribbon text="个人" color="blue">
+                    {_react.renderCore()}
+                </Badge.Ribbon>
+            );
+        } else {
+            return _react.renderCore();
         }
     }
 
