@@ -248,9 +248,9 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
                     .map(User::getUserId)
                     .orElse(null))) {
                 CompletableFuture.runAsync(() -> {
-                    articleDao.increasePageViewsAndSelfView(article.getArticleId());
+                    articleDao.increaseSelfView(article.getArticleId());
                 }).exceptionally(e -> {
-                    log.error("更新文章(" + article.getArticleId() + ") 浏览量/自浏览 失败.", e);
+                    log.error("更新文章(" + article.getArticleId() + ") 自浏览 失败.", e);
                     return null;
                 });
             } else {

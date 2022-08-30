@@ -33,6 +33,11 @@ public interface ArticleDao extends JpaRepository<Article, Integer> {
     @Query(value = "update article set pageViews=pageViews+1,selfPageViews=selfPageViews+1 where articleId=:articleId", nativeQuery = true)
     int increasePageViewsAndSelfView(@Param("articleId") int articleId);
 
+    @Modifying
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Query(value = "update article set selfPageViews=selfPageViews+1 where articleId=:articleId", nativeQuery = true)
+    int increaseSelfView(@Param("articleId") int articleId);
+
     Article findArticleByAid(String aid);
 
     @Query(countQuery = "select count(*) from article where categoryId in :accessibleCategoryList and (articleState='ACTIVE' or userId=:userId) ",
