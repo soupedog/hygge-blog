@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-DB_HOST=$1
+DB_URL=$1
 DB_USER=$2
 DB_PW=$3
-ES_HOST=$4
+ES_URIS=$4
 
 cat > Dockerfile <<END_TEXT
 FROM openjdk:17-jdk-alpine
@@ -12,5 +12,5 @@ COPY *.jar /hygge-blog-back-end.jar
 
 ENV JVM_OPTS="-Xmx640M -Xms640M"
 
-ENTRYPOINT ["/bin/sh","-c","java \$JVM_OPTS -jar -Ddatabase.url=${DB_HOST} -Ddatabase.userName=${DB_USER} -Ddatabase.password=${DB_PW} -DesHost=${ES_HOST} -Dspring.profiles.active=prod hygge-blog-back-end.jar"]
+ENTRYPOINT ["/bin/sh","-c","java \$JVM_OPTS -jar -Ddatabase.url=${DB_URL} -Ddatabase.userName=${DB_USER} -Ddatabase.password=${DB_PW} -DesUris=${ES_URIS} -Dspring.profiles.active=prod hygge-blog-back-end.jar"]
 END_TEXT
