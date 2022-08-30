@@ -97,7 +97,7 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
 
         List<QuoteDto> list = collectionHelper.filterNonemptyItemAsArrayList(false, resultTemp.getContent(), (PoDtoMapper.INSTANCE::poToDto));
         result.setQuoteList(list);
-        result.setTotalCount(parameterHelper.integerFormat("totalCount", resultTemp.getTotalElements()));
+        result.setTotalCount(resultTemp.getTotalElements());
         return result;
     }
 

@@ -8,6 +8,7 @@ import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Announcement;
+import hygge.blog.elasticsearch.service.FuzzySearchServiceImpl;
 import hygge.blog.service.AnnouncementServiceImpl;
 import hygge.blog.service.HomePageServiceImpl;
 import hygge.web.utils.log.annotation.ControllerLog;
@@ -32,6 +33,8 @@ public class HomePageController implements HomePageControllerDoc {
     private HomePageServiceImpl homePageService;
     @Autowired
     private AnnouncementServiceImpl announcementService;
+    @Autowired
+    private FuzzySearchServiceImpl fuzzySearchService;
 
     @Override
     @GetMapping("/home/fetch")
@@ -64,6 +67,23 @@ public class HomePageController implements HomePageControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                  @RequestParam(required = false, defaultValue = "5") int pageSize) {
         return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(homePageService.findQuoteInfo(currentPage, pageSize));
+    }
+
+    @Override
+    @GetMapping("/home/search/article")
+    public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> articleFuzzySearch(@RequestParam(value = "keyword") String keyword,
+                                                                                              @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                              @RequestParam(required = false, defaultValue = "5") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>>) success(fuzzySearchService.doArticleFuzzySearch(keyword, currentPage, pageSize));
+    }
+
+    @Override
+    @GetMapping("/home/search/quote")
+    @ControllerLog(enable = false)
+    public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteFuzzySearch(@RequestParam(value = "keyword") String keyword,
+                                                                                   @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                   @RequestParam(required = false, defaultValue = "5") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(fuzzySearchService.doQuoteFuzzySearch(keyword, currentPage, pageSize));
     }
 
     @Override

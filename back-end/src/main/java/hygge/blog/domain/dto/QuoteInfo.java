@@ -25,5 +25,5 @@ public class QuoteInfo {
     @Schema(title = "句子收藏信息数组")
     private List<QuoteDto> quoteList;
     @Schema(title = "句子收藏总数")
-    private int totalCount;
+    private long totalCount;
 }

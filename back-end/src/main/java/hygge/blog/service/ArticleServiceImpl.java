@@ -7,7 +7,6 @@ import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
-import hygge.blog.domain.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.BackgroundMusicTypeEnum;
 import hygge.blog.domain.enums.MediaPlayTypeEnum;
@@ -38,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,7 +207,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
                     topicDto = PoDtoMapper.INSTANCE.poToDto(topic);
                 }
 
-                initCategoryTreeInfo(topicDto, category, allCategoryList, articleDto);
+                articleDto.initCategoryTreeInfo(topicDto, category, allCategoryList);
             }
         }
         result.setArticleSummaryList(articleSummaryList);
@@ -242,7 +240,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(article);
         result.setCid(currentCategory.getCid());
 
-        initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList, result);
+        result.initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList);
 
         if (article.getArticleState().equals(ArticleStateEnum.ACTIVE)) {
             // 仅在文章公开状态下才记录浏览量
@@ -266,28 +264,6 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         }
 
         return result;
-    }
-
-    private void initCategoryTreeInfo(TopicDto currentTopicDto, Category currentCategory, List<Category> allCategoryList, ArticleDto result) {
-        CategoryTreeInfo categoryTreeInfo = new CategoryTreeInfo();
-        categoryTreeInfo.setTopicInfo(currentTopicDto);
-        categoryTreeInfo.setCategoryList(new ArrayList<>(0));
-
-        // 确保当前节点一定被添加
-        while (categoryTreeInfo.getCategoryList().isEmpty() || currentCategory != null) {
-            categoryTreeInfo.getCategoryList().add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
-            // 确认不会空指针
-            Integer parentId = currentCategory.getParentId();
-            if (currentCategory.getParentId() != null) {
-                currentCategory = allCategoryList.stream().filter(item -> item.getCategoryId().equals(parentId)).findFirst().orElse(null);
-            } else {
-                currentCategory = null;
-            }
-        }
-
-        // 上面是从当前找到根节点，所以需要反转数组才是从根到当前节点
-        Collections.reverse(categoryTreeInfo.getCategoryList());
-        result.setCategoryTreeInfo(categoryTreeInfo);
     }
 
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {

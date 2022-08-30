@@ -30,6 +30,12 @@ public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntit
     @Operation(summary = "查询句子收藏", description = "在句子收藏加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(int currentPage, int pageSize);
 
+    @Operation(summary = "模糊查询文章", description = "根据关键字寻找与之相关的文章")
+    ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> articleFuzzySearch(String keyword, int currentPage, int pageSize);
+
+    @Operation(summary = "模糊查询句子收藏", description = "根据关键字寻找与之相关的句子收藏")
+    ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteFuzzySearch(String keyword, int currentPage, int pageSize);
+
     @Operation(summary = "公告查询", description = "在公告加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>> announcementFetch(int currentPage, int pageSize);
 }

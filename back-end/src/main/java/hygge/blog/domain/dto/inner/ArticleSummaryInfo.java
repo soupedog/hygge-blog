@@ -1,6 +1,10 @@
 package hygge.blog.domain.dto.inner;
 
 import hygge.blog.domain.dto.ArticleDto;
+import hygge.commons.templates.core.HyggeLogInfoObject;
+import hygge.utils.UtilsCreator;
+import hygge.utils.definitions.CollectionHelper;
+import hygge.utils.definitions.JsonHelper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -22,9 +27,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文章摘要信息")
-public class ArticleSummaryInfo {
+public class ArticleSummaryInfo implements HyggeLogInfoObject {
+    private static final CollectionHelper collectionHelper = UtilsCreator.INSTANCE.getDefaultInstance(CollectionHelper.class);
+    private static final JsonHelper<?> jsonHelper = UtilsCreator.INSTANCE.getDefaultJsonHelperInstance(false);
     @Schema(title = "文章摘要信息数组")
     private List<ArticleDto> articleSummaryList;
     @Schema(title = "文章总数")
     private long totalCount;
+
+    @Override
+    public String toJsonLogInfo() {
+        LinkedHashMap<String, Object> logInfo = new LinkedHashMap<>();
+        logInfo.put("titleList", collectionHelper.filterNonemptyItemAsArrayList(false, articleSummaryList, ArticleDto::getTitle));
+        logInfo.put("totalCount", totalCount);
+        return jsonHelper.formatAsString(logInfo);
+    }
 }

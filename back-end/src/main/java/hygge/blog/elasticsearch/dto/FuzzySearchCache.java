@@ -1,10 +1,9 @@
 package hygge.blog.elasticsearch.dto;
 
-import hygge.blog.domain.dto.inner.CategoryTreeInfo;
-import hygge.blog.domain.po.inner.ArticleConfiguration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -21,6 +20,7 @@ import java.sql.Timestamp;
  * @date 2020/9/4
  * @since Jdk 1.8
  */
+@TypeAlias("article_quote")
 @Document(indexName = "fuzzy_search_cache")
 @Setting(shards = 1, replicas = 1)
 @Getter
@@ -29,7 +29,7 @@ public class FuzzySearchCache {
     /**
      * 文章、句子收藏间 ID 的间隔(防止 ES 文档覆盖)
      */
-    public static final int INTERVAL = 100000;
+    public static final int INTERVAL = 1000000;
     /**
      * 内容唯一标示
      */
