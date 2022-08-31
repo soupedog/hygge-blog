@@ -65,7 +65,7 @@ export class CategoryContainer extends React.Component<CategoryContainerProps, C
                 }
                 return (
                     <Card.Grid className={"pointer"} style={gridStyle} onClick={() => {
-                        state.fetchSearchViewInfo!(1, 5, state, item.cid, null);
+                        state.fetchCategoryArticleSearchViewInfo!(1, 5, state, item.cid, null);
                         document.getElementById("searchTap")?.click();
                     }} key={"card_" + item.categoryName}>
                         <Badge.Ribbon style={{top: "-10px"}} text={item.articleCount == null ? "" : item.articleCount}

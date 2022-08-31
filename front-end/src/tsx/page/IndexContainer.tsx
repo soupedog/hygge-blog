@@ -41,8 +41,8 @@ export interface IndexContainerState {
     menuFolded?: boolean,
     // 文章类别是否折叠收起
     categoryFolded?: boolean,
-
-    fetchSearchViewInfo?: Function,
+    fetchCategoryArticleSearchViewInfo?: Function,
+    fetchFuzzySearchViewInfo?: Function,
     updateRootStatus?: Function,
 }
 
@@ -81,7 +81,8 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
             announcementDtoList: [],
             menuFolded: true,
             categoryFolded: false,
-            fetchSearchViewInfo: this.fetchSearchViewInfo.bind(this),
+            fetchCategoryArticleSearchViewInfo: this.fetchCategoryArticleSearchViewInfo.bind(this),
+            fetchFuzzySearchViewInfo: this.fetchFuzzySearchViewInfo.bind(this),
             updateRootStatus: this.updateRootStatus.bind(this)
         };
         LogHelper.info({className: "IndexContainer", msg: "初始化成功"});
@@ -136,10 +137,16 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
         });
     }
 
-    fetchSearchViewInfo(currentPage: number, pageSize: number, state: IndexContainerState,
-                        currentCid?: string,
-                        successHook?: (input?: any) => void) {
+    fetchCategoryArticleSearchViewInfo(currentPage: number, pageSize: number, state: IndexContainerState,
+                                       currentCid?: string,
+                                       successHook?: (input?: any) => void) {
         if (PropertiesHelper.isStringNotEmpty(currentCid)) {
+            this.updateRootStatus({
+                searchKey: undefined,
+                searchType: SearchType.ARTICLE,
+                searchResultInfoList: {viewInfoList: [], totalCount: 0}
+            });
+
             HomePageService.fetchArticleSummaryByCid(currentCid!, currentPage, pageSize, (data) => {
                 let searchViewList = {
                     viewInfoList: data?.main!.articleSummaryList!,
@@ -153,6 +160,48 @@ export class IndexContainer extends React.Component<IndexContainerProps, IndexCo
                 if (successHook != null) {
                     successHook(searchViewList)
                 }
+            });
+        }
+    }
+
+    fetchFuzzySearchViewInfo(currentPage: number, pageSize: number, searchKey: string, searchType: SearchType,
+                             successHook?: (input?: any) => void) {
+        document.getElementById("searchTap")?.click();
+        let _react = this;
+        this.updateRootStatus({
+            searchKey: searchKey, searchType: searchType,
+            searchResultInfoList: {viewInfoList: [], totalCount: 0}
+        });
+
+        if (searchType == SearchType.ARTICLE) {
+            HomePageService.fetchArticleSummaryByKeyword(searchKey, currentPage, pageSize, (data) => {
+                if (successHook != null) {
+                    successHook(data);
+                }
+
+                let searchViewList = {
+                    viewInfoList: data?.main!.articleSummaryList!,
+                    totalCount: data?.main?.totalCount!
+                };
+
+                _react.updateRootStatus({
+                    searchResultInfoList: searchViewList
+                });
+            });
+        } else {
+            HomePageService.fetchQuoteByKeyword(searchKey, currentPage, pageSize, (data) => {
+                if (successHook != null) {
+                    successHook(data);
+                }
+
+                let searchViewList = {
+                    viewInfoList: data?.main!.quoteList!,
+                    totalCount: data?.main?.totalCount!
+                };
+
+                _react.updateRootStatus({
+                    searchResultInfoList: searchViewList
+                });
             });
         }
     }

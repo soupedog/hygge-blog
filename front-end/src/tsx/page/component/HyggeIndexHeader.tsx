@@ -7,7 +7,6 @@ import clsx from "clsx";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import HyggeUserMenu from "./HyggeUserMenu";
 import {ReactRouter, withRouter} from "../../utils/ReactRouterHelper";
-import {HomePageService} from "../../rest/ApiClient";
 
 const {Search} = Input;
 const {Header} = Layout;
@@ -77,33 +76,10 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
                                                     let searchType: SearchType;
                                                     if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
                                                         searchType = SearchType.ARTICLE;
-                                                        HomePageService.fetchArticleSummaryByKeyword(value, 1, 5, (data) => {
-                                                            let searchViewList = {
-                                                                viewInfoList: data?.main!.articleSummaryList!,
-                                                                totalCount: data?.main?.totalCount!
-                                                            };
-
-                                                            state.updateRootStatus!({
-                                                                searchType: searchType,
-                                                                searchResultInfoList: searchViewList
-                                                            });
-                                                            document.getElementById("searchTap")?.click();
-                                                        });
                                                     } else {
                                                         searchType = SearchType.QUOTE;
-                                                        HomePageService.fetchQuoteByKeyword(value, 1, 5, (data) => {
-                                                            let searchViewList = {
-                                                                viewInfoList: data?.main!.quoteList!,
-                                                                totalCount: data?.main?.totalCount!
-                                                            };
-
-                                                            state.updateRootStatus!({
-                                                                searchType: searchType,
-                                                                searchResultInfoList: searchViewList
-                                                            });
-                                                            document.getElementById("searchTap")?.click();
-                                                        });
                                                     }
+                                                    state.fetchFuzzySearchViewInfo!(1, 5, value, searchType);
                                                 }}
                                         />
                                     </Col>

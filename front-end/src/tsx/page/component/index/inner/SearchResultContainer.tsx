@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper} from '../../../../utils/UtilContainer';
+import {LogHelper, PropertiesHelper} from '../../../../utils/UtilContainer';
 import {List} from 'antd';
 import {QuoteViewItem} from "./QuoteViewItem";
 import {ArticleOverviewViewItem} from "./ArticleOverviewViewItem";
@@ -40,13 +40,23 @@ export class SearchResultContainer extends React.Component<SearchResultProps, Se
                         size="large"
                         pagination={{
                             onChange: (page, pageSize) => {
-                                state.fetchSearchViewInfo!(page, pageSize, state, state.currentCid, (data: any) => {
-                                    _react.setState({
-                                        totalCount: data.totalCount,
-                                        currentPage: page,
-                                        pageSize: pageSize
+                                if (PropertiesHelper.isStringNotEmpty(state.searchKey)) {
+                                    state.fetchFuzzySearchViewInfo!(page, pageSize, state.searchKey, state.searchType, (data: any) => {
+                                        _react.setState({
+                                            totalCount: data.totalCount,
+                                            currentPage: page,
+                                            pageSize: pageSize
+                                        });
                                     });
-                                });
+                                } else {
+                                    state.fetchCategoryArticleSearchViewInfo!(page, pageSize, state, state.currentCid, (data: any) => {
+                                        _react.setState({
+                                            totalCount: data.totalCount,
+                                            currentPage: page,
+                                            pageSize: pageSize
+                                        });
+                                    });
+                                }
                             },
                             showSizeChanger: true,
                             current: _react.state.currentPage,
