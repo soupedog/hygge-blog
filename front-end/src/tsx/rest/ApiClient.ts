@@ -482,6 +482,56 @@ export class HomePageService {
             }
         });
     }
+
+    static fetchArticleSummaryByKeyword(keyword: string,
+                                    currentPage: number,
+                                    pageSize: number,
+                                    successHook?: (input?: HyggeResponse<ArticleSummaryResponse>) => void,
+                                    beforeHook?: () => void,
+                                    finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/search/article?keyword=" + keyword + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<ArticleSummaryResponse> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static fetchQuoteByKeyword(keyword: string,
+                                    currentPage: number,
+                                    pageSize: number,
+                                    successHook?: (input?: HyggeResponse<QuoteResponse>) => void,
+                                    beforeHook?: () => void,
+                                    finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/search/quote?keyword=" + keyword + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<QuoteResponse> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
 }
 
 export class QuoteService {

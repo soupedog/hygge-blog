@@ -1,12 +1,13 @@
 import * as React from "react"
-import {LogHelper} from '../../utils/UtilContainer';
+import {LogHelper, PropertiesHelper} from '../../utils/UtilContainer';
 import {IndexContainerState, SearchType} from "../IndexContainer";
 import {IndexContainerContext} from "../context/HyggeContext";
-import {Button, Col, Input, Layout, Row, Spin, Switch, Tooltip} from "antd";
+import {Button, Col, Input, Layout, message, Row, Spin, Switch, Tooltip} from "antd";
 import clsx from "clsx";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import HyggeUserMenu from "./HyggeUserMenu";
 import {ReactRouter, withRouter} from "../../utils/ReactRouterHelper";
+import {HomePageService} from "../../rest/ApiClient";
 
 const {Search} = Input;
 const {Header} = Layout;
@@ -55,7 +56,7 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
                             <Col md={22} xl={12}>
                                 <Row gutter={[0, 0]} justify="end">
                                     <Col md={1} xl={4}>{/*占位符*/}</Col>
-                                    <Col md={3} xl={3}>
+                                    <Col id={"searchModeSwitch"} md={3} xl={3}>
                                         <Tooltip placement="bottom" title={"搜索类型"}>
                                             <Switch checkedChildren="文章" unCheckedChildren="句子" defaultChecked/>
                                         </Tooltip>
@@ -66,13 +67,43 @@ class HyggeIndexHeader extends React.Component<HyggeIndexHeaderProps, HyggeIndex
                                                 enterButton
                                                 size="middle"
                                                 onSearch={(value) => {
+                                                    console.log(value)
+                                                    console.log(!PropertiesHelper.isStringNotEmpty(value))
+                                                    if (!PropertiesHelper.isStringNotEmpty(value)) {
+                                                        message.warn("查询关键字不可为空", 3);
+                                                        return;
+                                                    }
+
                                                     let searchType: SearchType;
                                                     if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
                                                         searchType = SearchType.ARTICLE;
+                                                        HomePageService.fetchArticleSummaryByKeyword(value, 1, 5, (data) => {
+                                                            let searchViewList = {
+                                                                viewInfoList: data?.main!.articleSummaryList!,
+                                                                totalCount: data?.main?.totalCount!
+                                                            };
+
+                                                            state.updateRootStatus!({
+                                                                searchType: searchType,
+                                                                searchResultInfoList: searchViewList
+                                                            });
+                                                            document.getElementById("searchTap")?.click();
+                                                        });
                                                     } else {
                                                         searchType = SearchType.QUOTE;
+                                                        HomePageService.fetchQuoteByKeyword(value, 1, 5, (data) => {
+                                                            let searchViewList = {
+                                                                viewInfoList: data?.main!.quoteList!,
+                                                                totalCount: data?.main?.totalCount!
+                                                            };
+
+                                                            state.updateRootStatus!({
+                                                                searchType: searchType,
+                                                                searchResultInfoList: searchViewList
+                                                            });
+                                                            document.getElementById("searchTap")?.click();
+                                                        });
                                                     }
-                                                    console.log(searchType)
                                                 }}
                                         />
                                     </Col>
