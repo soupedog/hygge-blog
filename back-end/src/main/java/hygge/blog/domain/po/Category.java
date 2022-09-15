@@ -28,6 +28,7 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 文章类别
@@ -45,6 +46,7 @@ import java.util.List;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "category", indexes = {@Index(name = "index_cid", columnList = "cid", unique = true)})
+@SuppressWarnings({"java:S3776"})
 public class Category extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -105,14 +107,21 @@ public class Category extends BasePo {
             return false;
         }
 
+        boolean result = false;
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
+
         if (targetUser == null) {
             // 访客
-            return accessRuleList.stream().anyMatch(categoryAccessRule -> AccessRuleTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
+            if (parameterHelper.isNotEmpty(secretKey)) {
+                Optional<CategoryAccessRule> secretKeyAccessRuleTemp = accessRuleList.stream().filter(categoryAccessRule -> AccessRuleTypeEnum.SECRET_KEY.equals(categoryAccessRule.getAccessRuleType())).findFirst();
+                result = secretKey.equals(secretKeyAccessRuleTemp.map(CategoryAccessRule::getExtendString).orElse(null));
+            }
+
+            return result || accessRuleList.stream().anyMatch(categoryAccessRule -> AccessRuleTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
         }
 
-        boolean result = false;
 
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
         for (CategoryAccessRule categoryAccessRule : accessRuleList) {
             boolean itemResult = false;
             switch (categoryAccessRule.getAccessRuleType()) {

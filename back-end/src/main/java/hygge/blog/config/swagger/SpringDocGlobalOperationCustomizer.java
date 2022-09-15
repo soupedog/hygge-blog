@@ -30,6 +30,12 @@ public class SpringDocGlobalOperationCustomizer implements GlobalOperationCustom
                 .description("当前登录用户的用户令牌").schema(new StringSchema()).required(false);
         operation.addParametersItem(tokenInfo);
 
+        Parameter secretKeyInfo = new Parameter()
+                .in(ParameterIn.HEADER.toString())
+                .name("secretKey")
+                .description("秘钥").schema(new StringSchema()).required(false);
+        operation.addParametersItem(secretKeyInfo);
+
         Parameter scope = new Parameter()
                 .in(ParameterIn.HEADER.toString())
                 .name("scope")

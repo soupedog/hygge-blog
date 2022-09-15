@@ -3,12 +3,14 @@ package hygge.blog.config.backgroundjob;
 import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * @author Xavier
  * @date 2022/8/29
  */
+@Profile("!dev")
 @Configuration
 public class BackgroundJobConfig {
     @Autowired
