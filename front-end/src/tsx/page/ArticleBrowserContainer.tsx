@@ -1,11 +1,12 @@
 import * as React from "react"
-import {LogHelper, PropertiesHelper} from '../utils/UtilContainer';
+import {LogHelper, PropertiesHelper, UrlHelper} from '../utils/UtilContainer';
 import {ArticleDto, ArticleService, UserDto, UserService} from "../rest/ApiClient";
 import {Browser} from "./component/browser/Browser";
 import {ReactRouter, withRouter} from "../utils/ReactRouterHelper";
 import "./../../css/default.css"
 import 'APlayer/dist/APlayer.min.css';
 import "./../../css/browser.less"
+import {message} from "antd";
 
 // 描述该组件 props 数据类型
 export interface ArticleBrowserContainerProps {
@@ -41,9 +42,14 @@ class ArticleBrowserContainer extends React.Component<ArticleBrowserContainerPro
     componentDidMount() {
         let _react = this;
         ArticleService.findArticleByAid(_react.props.router.params.aid, (data) => {
-            _react.setState({
-                currentArticle: data?.main!
-            });
+            if (data?.main == null) {
+                message.info("目标文章不存在，2 秒内自动跳转回主页，请稍后", 2000);
+                UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
+            } else {
+                _react.setState({
+                    currentArticle: data?.main!
+                });
+            }
         })
     }
 }
