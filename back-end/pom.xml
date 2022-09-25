@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.1</version>
+        <version>2.7.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -22,13 +22,13 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <hygge.version>0.0.1-SNAPSHOT</hygge.version>
+        <hygge.version>0.0.1</hygge.version>
         <org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>io.github.hyggeproject</groupId>
+            <groupId>io.github.soupedog</groupId>
             <artifactId>hygge-web-toolkit</artifactId>
             <version>${hygge.version}</version>
         </dependency>
