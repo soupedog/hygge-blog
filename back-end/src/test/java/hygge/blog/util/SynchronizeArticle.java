@@ -12,6 +12,7 @@ import hygge.blog.service.ArticleServiceImpl;
 import hygge.commons.enums.DateTimeFormatMode;
 import hygge.utils.UtilsCreator;
 import hygge.utils.definitions.FileHelper;
+import hygge.web.config.ControllerLogAutoConfiguration;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,8 @@ import java.util.List;
 
 @EnableAutoConfiguration(exclude = {
         ElasticsearchRestClientAutoConfiguration.class,
-        ElasticsearchRepositoriesAutoConfiguration.class
+        ElasticsearchRepositoriesAutoConfiguration.class,
+        ControllerLogAutoConfiguration.class
 })
 @SuppressWarnings("java:S2699")
 @Slf4j
