@@ -40,7 +40,7 @@ export class HyggeFooter extends React.Component<HyggeFooterProps, HyggeFooterSt
                     </Text>
                 </Paragraph>
                 <Paragraph strong={true}>
-                    Copyright© 20019-{currentYear} 我的小宅子 Power by Xavier
+                    Copyright© 2019-{currentYear} 我的小宅子 Power by Xavier
                 </Paragraph>
                 <Paragraph>
                     <a className="textItem policeLink" target="_blank"
