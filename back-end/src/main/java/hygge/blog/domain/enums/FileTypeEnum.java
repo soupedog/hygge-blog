@@ -27,6 +27,10 @@ public enum FileTypeEnum {
      * 文章背景音乐
      */
     BGM(File.separator + "bgm" + File.separator),
+    /**
+     * 杂项文件
+     */
+    OTHERS(File.separator + "others" + File.separator),
     ;
     private final String path;
 
