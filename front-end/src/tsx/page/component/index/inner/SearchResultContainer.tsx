@@ -2,7 +2,7 @@ import * as React from "react"
 import {LogHelper, PropertiesHelper} from '../../../../utils/UtilContainer';
 import {List} from 'antd';
 import {QuoteViewItem} from "./QuoteViewItem";
-import {ArticleOverviewViewItem} from "./ArticleOverviewViewItem";
+import ArticleOverviewViewItem from "./ArticleOverviewViewItem";
 import {IndexContainerState, SearchType} from "../../../IndexContainer";
 import {IndexContainerContext} from "../../../context/HyggeContext";
 

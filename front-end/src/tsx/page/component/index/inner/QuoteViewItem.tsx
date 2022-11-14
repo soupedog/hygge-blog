@@ -102,7 +102,7 @@ export class QuoteViewItem extends React.Component<QuoteViewItemProps, QuoteView
 
 const EditIcon = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId: number }) => (
     <Space className={"pointer"} onClick={() => {
-        UrlHelper.openNewPage({inNewTab: false, path: "#/editor/quote/" + quoteId})
+        UrlHelper.openNewPage({inNewTab: false, path: "editor/quote/" + quoteId})
     }} style={{
         float: "right",
         marginRight: "20px",

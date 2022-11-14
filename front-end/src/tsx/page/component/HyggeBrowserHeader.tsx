@@ -1,5 +1,5 @@
 import * as React from "react"
-import {LogHelper, UrlHelper, WindowsEventHelper} from '../../utils/UtilContainer';
+import {LogHelper, WindowsEventHelper} from '../../utils/UtilContainer';
 import {Layout, Tooltip} from "antd";
 import clsx from "clsx";
 import {RollbackOutlined} from "@ant-design/icons";
@@ -37,7 +37,11 @@ class HyggeBrowserHeader extends React.Component<HyggeBrowserHeaderProps, HyggeB
                 <div className={"floatToLeft"}>
                     <Tooltip placement="bottom" title={"返回首页"}>
                         <RollbackOutlined onClick={() => {
-                            UrlHelper.openNewPage({finalUrl: UrlHelper.getBaseUrl(), inNewTab: false});
+                            let finalPath = "/";
+                            if (this.props.router.searchParams.has("secretKey")) {
+                                finalPath = finalPath + "?secretKey=" + this.props.router.searchParams.get("secretKey")
+                            }
+                            this.props.router.navigate(finalPath);
                         }} style={{color: "#fff", fontWeight: "bold", fontSize: "24px", lineHeight: "64px"}}/>
                     </Tooltip>
                 </div>

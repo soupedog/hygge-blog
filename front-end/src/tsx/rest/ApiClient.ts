@@ -21,7 +21,7 @@ axios.interceptors.response.use(function (response) {
         return null;
     } else if (code == 403003) {
         // 令牌过期，尝试自动刷新
-        UrlHelper.openNewPage({inNewTab: false, path: "#/signin/auto"});
+        UrlHelper.openNewPage({inNewTab: false, path: "signin/auto"});
         return null;
     } else if (code == 403000) {
         // 账号、密码、令牌错误允许外部组件自行处理

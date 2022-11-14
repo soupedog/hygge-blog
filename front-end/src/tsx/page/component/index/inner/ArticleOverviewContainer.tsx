@@ -2,7 +2,7 @@ import * as React from "react"
 import {LogHelper, PropertiesHelper} from '../../../../utils/UtilContainer';
 import {List} from 'antd';
 import {ArticleSummaryInfo, HomePageService} from "../../../../rest/ApiClient";
-import {ArticleOverviewViewItem} from "./ArticleOverviewViewItem";
+import ArticleOverviewViewItem from "./ArticleOverviewViewItem";
 
 // 描述该组件 props 数据类型
 export interface ArticleOverviewContainerProps {

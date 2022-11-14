@@ -25,14 +25,15 @@ module.exports = {
         index: "./src/tsx/app.tsx"
     },
     output: {
-        publicPath: "",
-        path: path.resolve(__dirname, "./dist"),
+        publicPath: "/",
+        path: path.join(__dirname, "./dist"),
         filename: "./js/[name]-[chunkhash].js"
     },
     devServer: {
         static: path.join(__dirname, "./dist"),
-        open: true,
+        historyApiFallback: true,
         compress: true,
+        open: true,
         port: 9000,
         // host: "192.168.18.12"
     },
@@ -95,7 +96,7 @@ module.exports = {
         new CleanWebpackPlugin(
             {
                 cleanOnceBeforeBuildPatterns: [
-                    path.resolve(__dirname, "dist")
+                    path.join(__dirname, "dist")
                 ]
             }
         ),

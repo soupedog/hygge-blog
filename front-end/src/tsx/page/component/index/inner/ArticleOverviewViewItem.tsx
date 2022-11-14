@@ -1,12 +1,14 @@
 import * as React from "react"
-import {LogHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer';
+import {LogHelper, PropertiesHelper, TimeHelper, UrlHelper} from '../../../../utils/UtilContainer';
 import {Badge, List, Space} from 'antd';
 import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
 import clsx from "clsx";
+import {ReactRouter, withRouter} from "../../../../utils/ReactRouterHelper";
 
 // 描述该组件 props 数据类型
 export interface ArticleViewItemProps {
+    router: ReactRouter;
     currentArticle: ArticleSummaryInfo,
     isMaintainer: boolean,
     topicQuery: boolean
@@ -16,7 +18,27 @@ export interface ArticleViewItemProps {
 export interface ArticleViewItemStatus {
 }
 
-export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProps, ArticleViewItemStatus> {
+const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
+    <Space>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+const EditIcon = ({icon, text, aid}: { icon: React.FC; text: string, aid: string }) => (
+    <Space className={"pointer"} onClick={() => {
+        UrlHelper.openNewPage({inNewTab: false, path: "editor/article/" + aid})
+    }} style={{
+        float: "right",
+        marginRight: "20px",
+        fontSize: "14px"
+    }}>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+class ArticleOverviewViewItem extends React.Component<ArticleViewItemProps, ArticleViewItemStatus> {
     constructor(props: ArticleViewItemProps) {
         super(props);
         this.state = {};
@@ -59,6 +81,7 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
 
     renderCore() {
         let _react = this;
+        let secretKey = _react.props.router.searchParams.get("secretKey");
         let isDraft = _react.props.currentArticle.articleState == "DRAFT";
         return (
             <List.Item
@@ -78,7 +101,8 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
                             <a className={clsx({
                                 "draftHighlight": isDraft
                             })} style={{fontSize: "32px", fontWeight: 900, lineHeight: "40px"}}
-                               href={UrlHelper.getBaseUrl() + "#/browser/" + this.props.currentArticle.aid}
+                               href={PropertiesHelper.isStringNotEmpty(secretKey) ? UrlHelper.getBaseUrl() + "browser/" + this.props.currentArticle.aid + "?secretKey=" + secretKey
+                                   : UrlHelper.getBaseUrl() + "browser/" + this.props.currentArticle.aid}
                                target="_blank">{this.props.currentArticle.title}{isDraft ? "【草稿】" : null}</a>
                             {
                                 this.props.isMaintainer ? <EditIcon icon={FormOutlined} text={"编辑"}
@@ -136,22 +160,4 @@ export class ArticleOverviewViewItem extends React.Component<ArticleViewItemProp
     }
 }
 
-const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
-    <Space>
-        {React.createElement(icon)}
-        {text}
-    </Space>
-);
-
-const EditIcon = ({icon, text, aid}: { icon: React.FC; text: string, aid: string }) => (
-    <Space className={"pointer"} onClick={() => {
-        UrlHelper.openNewPage({inNewTab: false, path: "#/editor/article/" + aid})
-    }} style={{
-        float: "right",
-        marginRight: "20px",
-        fontSize: "14px"
-    }}>
-        {React.createElement(icon)}
-        {text}
-    </Space>
-);
+export default withRouter(ArticleOverviewViewItem)

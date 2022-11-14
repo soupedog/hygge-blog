@@ -1,6 +1,6 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {HashRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {IndexContainer} from "./page/IndexContainer";
 import ArticleBrowserContainer from "./page/ArticleBrowserContainer";
 import {SignInContainer} from "./page/SignInContainer";
@@ -35,9 +35,9 @@ if (container != null) {
 
     root.render(
         // <React.StrictMode>
-        <HashRouter>
+        <BrowserRouter>
             <Routes>
-                <Route path={""} element={<IndexContainer key={"index"}/>}/>
+                <Route path={"/"} element={<IndexContainer key={"index"}/>}/>
                 <Route path={"/browser/:aid"} element={<ArticleBrowserContainer key={"browser"}/>}/>
                 <Route path={"/signin"} element={<SignInContainer key={"signin"}/>}/>
                 <Route path={"/signin/auto"} element={<SignInAutoContainer key={"signin-auto"}/>}/>
@@ -46,7 +46,7 @@ if (container != null) {
                 <Route path={"/editor/quote/"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
                 <Route path={"/editor/quote/:quoteId"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
             </Routes>
-        </HashRouter>
+        </BrowserRouter>
         // </React.StrictMode>
     );
 }

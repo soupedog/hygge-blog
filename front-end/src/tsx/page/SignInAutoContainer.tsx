@@ -34,7 +34,7 @@ export class SignInAutoContainer extends React.Component<SignInAutoContainerProp
                 UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
             } else {
                 message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
-                UrlHelper.openNewPage({inNewTab: false, path: "#/signin", delayTime: 1000});
+                UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
             }
         });
     }
