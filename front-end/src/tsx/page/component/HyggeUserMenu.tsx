@@ -47,13 +47,13 @@ export class HyggeUserMenu extends React.Component<HyggeUserMenuProps, HyggeUser
                             break;
                         case "editArticle":
                             if (aid != null) {
-                                UrlHelper.openNewPage({path: "/editor/article/" + aid, inNewTab: false})
+                                UrlHelper.openNewPage({path: "editor/article/" + aid, inNewTab: false})
                             } else {
-                                UrlHelper.openNewPage({path: "/editor/article", inNewTab: false})
+                                UrlHelper.openNewPage({path: "editor/article", inNewTab: false})
                             }
                             break;
                         case "editQuote":
-                            UrlHelper.openNewPage({path: "/editor/quote", inNewTab: false})
+                            UrlHelper.openNewPage({path: "editor/quote", inNewTab: false})
                             break;
                     }
                 }}/>
