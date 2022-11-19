@@ -32,7 +32,8 @@ public abstract class AbstractHyggeRequestFilter extends OncePerRequestFilter {
     @DurationUnit(ChronoUnit.MILLIS)
     protected static Duration requestTimeLimit = Duration.ofMillis(200);
 
-    public static final String HEADER_KEY_REAL_IP_NAME = "x-forwarded-for";
+    public static final String HEADER_KEY_REMOTE_ADDR = "remote_addr";
+    public static final String HEADER_KEY_HTTP_USER_AGENT = "http_user_agent";
 
     protected void onError(HttpServletResponse response, String message, HyggeInfo hyggeInfo) {
         initResponse(response, hyggeInfo.getHyggeCode().getCode(), message == null ? hyggeInfo.getHyggeCode().getPublicMessage() : message);

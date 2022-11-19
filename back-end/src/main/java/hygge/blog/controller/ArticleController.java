@@ -1,8 +1,11 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.controller.doc.ArticleControllerDoc;
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.dto.ArticleDto;
+import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Article;
 import hygge.blog.service.ArticleServiceImpl;
@@ -50,6 +53,14 @@ public class ArticleController implements ArticleControllerDoc {
     @GetMapping("/article/{aid}")
     @ControllerLog(outputParamExpressions = {@HyggeExpressionInfo(rootObjectName = "#root", name = "title", value = "main == null ? null : main.title")})
     public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(@PathVariable("aid") String aid) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+
+        if (context.getCurrentLoginUser() == null || context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT)) {
+            log.info("访客记录： {}  {}",
+                    context.getObject(HyggeRequestContext.Key.IP_ADDRESS)
+                    , context.getObject(HyggeRequestContext.Key.USER_AGENT));
+        }
+
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(articleService.findArticleDetailByAid(true, aid));
     }
 }

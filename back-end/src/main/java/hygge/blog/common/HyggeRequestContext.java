@@ -5,7 +5,6 @@ import hygge.blog.domain.enums.TokenScopeEnum;
 import hygge.blog.domain.po.User;
 import hygge.commons.templates.container.base.AbstractHyggeContext;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +45,6 @@ public class HyggeRequestContext extends AbstractHyggeContext<HyggeRequestContex
     private boolean guest = false;
 
     public enum Key {
-        UID, TOKEN, REFRESH_KEY, SECRET_KEY, IP_ADDRESS
+        UID, TOKEN, REFRESH_KEY, SECRET_KEY, IP_ADDRESS, USER_AGENT
     }
 }
