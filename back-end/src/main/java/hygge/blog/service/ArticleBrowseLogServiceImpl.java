@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+
 /**
  * @author Xavier
  * @date 2022/11/19
@@ -34,6 +36,7 @@ public class ArticleBrowseLogServiceImpl extends HyggeWebUtilContainer {
 
     public void freshIpLocationBackgroundJob() {
         boolean continueFlag = true;
+        Timestamp currentTimeStamp = new Timestamp(System.currentTimeMillis());
 
         while (continueFlag) {
             String targetIp = articleBrowseLogDao.findAnIpWithoutLocation();
@@ -49,7 +52,7 @@ public class ArticleBrowseLogServiceImpl extends HyggeWebUtilContainer {
                 }
 
                 if (parameterHelper.isNotEmpty(ipLocation)) {
-                    articleBrowseLogDao.updateIpLocationForAll(targetIp, ipLocation);
+                    articleBrowseLogDao.updateIpLocationForAll(targetIp, ipLocation, currentTimeStamp);
                 } else {
                     continueFlag = false;
                     log.error("解析 ipLocation({}) 失败.", targetIp);

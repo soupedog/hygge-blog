@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+
 /**
  * @author Xavier
  * @date 2022/11/19
@@ -23,6 +25,6 @@ public interface ArticleBrowseLogDao extends JpaRepository<ArticleBrowseLog, Int
 
     @Modifying
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Query(value = "update article_browse_log set ipLocation=:ipLocation where ip=:ip", nativeQuery = true)
-    int updateIpLocationForAll(@Param("ip") String ip, @Param("ipLocation") String ipLocation);
+    @Query(value = "update article_browse_log set ipLocation=:ipLocation,lastUpdateTs=:currentTimeStamp where ip=:ip", nativeQuery = true)
+    int updateIpLocationForAll(@Param("ip") String ip, @Param("ipLocation") String ipLocation, @Param("currentTimeStamp") Timestamp currentTimeStamp);
 }
