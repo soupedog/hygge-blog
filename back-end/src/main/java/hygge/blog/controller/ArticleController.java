@@ -8,6 +8,8 @@ import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Article;
+import hygge.blog.domain.po.User;
+import hygge.blog.service.ArticleBrowseLogServiceImpl;
 import hygge.blog.service.ArticleServiceImpl;
 import hygge.commons.templates.core.annotation.HyggeExpressionInfo;
 import hygge.web.utils.log.annotation.ControllerLog;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Xavier
@@ -32,6 +36,8 @@ import java.util.Map;
 public class ArticleController implements ArticleControllerDoc {
     @Autowired
     private ArticleServiceImpl articleService;
+    @Autowired
+    private ArticleBrowseLogServiceImpl articleBrowseLogService;
 
     @Override
     @PostMapping("/article")
@@ -55,12 +61,20 @@ public class ArticleController implements ArticleControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(@PathVariable("aid") String aid) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
 
-        if (context.getCurrentLoginUser() == null || context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT)) {
-            log.info("访客记录： {}  {}",
-                    context.getObject(HyggeRequestContext.Key.IP_ADDRESS)
-                    , context.getObject(HyggeRequestContext.Key.USER_AGENT));
-        }
+        ArticleDto result = articleService.findArticleDetailByAid(true, aid);
 
-        return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(articleService.findArticleDetailByAid(true, aid));
+        boolean isVisitor = context.getCurrentLoginUser() == null || context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT);
+        if (isVisitor) {
+            CompletableFuture.runAsync(() -> articleBrowseLogService.insertArticleBrowseLog(result.getAid(),
+                            result.getTitle(),
+                            context.getObject(HyggeRequestContext.Key.IP_ADDRESS),
+                            Optional.ofNullable(context.getCurrentLoginUser()).map(User::getUserId).orElse(null),
+                            context.getObject(HyggeRequestContext.Key.USER_AGENT)))
+                    .exceptionally(e -> {
+                        log.error("Fail to insert articleBrowseLog.", e);
+                        return null;
+                    });
+        }
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(result);
     }
 }
