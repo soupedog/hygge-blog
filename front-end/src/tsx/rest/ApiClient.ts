@@ -2,8 +2,7 @@ import axios from "axios";
 import {message} from "antd";
 import {PropertiesHelper, UrlHelper} from "../utils/UtilContainer";
 
-// axios.defaults.baseURL = "http://localhost:8080/blog-service/api";
-axios.defaults.baseURL = "https://www.xavierwang.cn/blog-service/api";
+axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
 axios.interceptors.response.use(function (response) {
     if (response.data == null) {
         return null;
@@ -99,10 +98,11 @@ export class UserService {
 
         if (currentHeader == null) {
             result = {};
+            // @ts-ignore
+            result["Content-Type"] = this.getContentType();
         } else {
             result = currentHeader;
         }
-        result["Content-Type"] = this.getContentType();
         result.scope = this.getCurrentScope();
 
         let currentSecretKey = UrlHelper.getQueryString("secretKey");

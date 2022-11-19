@@ -256,6 +256,8 @@ export class PropertiesHelper {
 
 const baseUrl = "https://www.xavierwang.cn/";
 // const baseUrl = "http://localhost:9000/";
+const baseApiUrl = "https://www.xavierwang.cn/blog-service/api";
+// const baseApiUrl = "http://localhost:8080/blog-service/api";
 const baseStaticSourceUrl = "https://www.xavierwang.cn/static";
 const vditorCdnUrl = "https://cdn.jsdelivr.net/npm/vditor@3.8.17";
 
@@ -273,6 +275,10 @@ export class UrlHelper {
 
     static getBaseUrl(): string {
         return baseUrl;
+    }
+
+    static getBaseApiUrl(): string {
+        return baseApiUrl;
     }
 
     static getBaseStaticSourceUrl(): string {

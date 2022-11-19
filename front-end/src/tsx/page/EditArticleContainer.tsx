@@ -271,6 +271,33 @@ class EditArticleContainer extends React.Component<EditArticleContainerProps, Ed
             cache: {
                 enable: false,
             },
+            upload: {
+                url: UrlHelper.getBaseApiUrl() + "/main/file?type=ARTICLE",
+                headers: UserService.getHeader({}),
+                // 200 MB
+                max: 209715200,
+                fieldName: "files",
+                multiple: true,
+                success: (editor: HTMLPreElement, msg: string) => {
+                    let response = JSON.parse(msg);
+                    if (response.code == 200) {
+                        response.main?.map((fileName: string) => {
+                            // @ts-ignore
+                            _react.state.mdController?.insertValue("[" + fileName.name + "](" + UrlHelper.getBaseStaticSourceUrl() + fileName.src + ")\r\n");
+                        });
+                    } else {
+                        message.warning(response.msg);
+                    }
+                },
+                error: (msg: string) => {
+                    message.error(msg);
+                    LogHelper.error({
+                        className: "EditArticleContainer",
+                        msg: "Fail to upload file",
+                        isJson: false
+                    });
+                }
+            },
             after() {
                 // 更新 MD 控制器
                 _react.setState({mdController: vditor});
