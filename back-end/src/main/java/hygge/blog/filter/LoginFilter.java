@@ -2,6 +2,7 @@ package hygge.blog.filter;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.po.User;
 import hygge.blog.filter.base.AbstractHyggeRequestFilter;
 import hygge.blog.service.UserServiceImpl;
@@ -34,7 +35,6 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
             String uid = context.getObject(HyggeRequestContext.Key.UID);
 
             if (parameterHelper.isNotEmpty(uid)) {
-                // 非访客用户
                 User targetUser = userService.findUserByUid(uid, false);
                 String token = context.getObject(HyggeRequestContext.Key.TOKEN);
                 parameterHelper.stringNotEmpty("token", (Object) token);
@@ -43,9 +43,10 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
 
                 // 身份验证成功
                 context.setCurrentLoginUser(targetUser);
-            } else {
-                // 访客用户
-                context.setGuest(true);
+                // 非访客用户
+                context.setGuest(false);
+                // 是否是管理员(不是访客且用户身份是管理员)
+                context.setMaintainer(context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT));
             }
 
             filterChain.doFilter(request, response);

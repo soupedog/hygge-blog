@@ -41,8 +41,6 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-        boolean isMaintainer = !context.isGuest() && UserTypeEnum.ROOT.equals(currentUser.getUserType());
-
         List<Topic> topicList = topicService.findAllTopic();
 
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
@@ -65,7 +63,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
                 Optional<ArticleCountInfo> articleCountInfoTemp = articleCountInfoList.stream().filter(articleCountInfo -> articleCountInfo.getCategoryId().equals(category.getCategoryId())).findFirst();
                 Integer count = articleCountInfoTemp.map(articleCountInfo -> articleCountInfo.getCount().intValue()).orElse(0);
 
-                if (!isMaintainer && count < 1) {
+                if (!context.isMaintainer() && count < 1) {
                     continue;
                 }
 
@@ -74,7 +72,7 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
                 topicOverviewInfo.setTotalCount(topicOverviewInfo.getTotalCount() + count);
             }
 
-            if (!isMaintainer && topicOverviewInfo.getCategoryListInfo().isEmpty()) {
+            if (!context.isMaintainer() && topicOverviewInfo.getCategoryListInfo().isEmpty()) {
                 continue;
             }
             result.getTopicOverviewInfoList().add(topicOverviewInfo);

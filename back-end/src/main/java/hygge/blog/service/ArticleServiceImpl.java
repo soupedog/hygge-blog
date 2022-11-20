@@ -7,7 +7,6 @@ import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.TopicDto;
 import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
-import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.BackgroundMusicTypeEnum;
 import hygge.blog.domain.enums.MediaPlayTypeEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
@@ -253,7 +252,6 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
 
-
         Category currentCategory = categoryList.stream().filter(item -> item.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
         if (currentCategory == null) {
             // 当前用户无权访问
@@ -267,11 +265,13 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         result.initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList);
 
-        if (pageViewsIncrease && article.getArticleState().equals(ArticleStateEnum.ACTIVE)) {
-            // 仅在文章公开状态下才记录浏览量
-            if (article.getUserId().equals(Optional.ofNullable(currentUser)
-                    .map(User::getUserId)
-                    .orElse(null))) {
+        // 如果允许更新浏览量
+        if (pageViewsIncrease) {
+            // 文章作者自己
+            if (article.getUserId()
+                    .equals(Optional.ofNullable(currentUser)
+                            .map(User::getUserId)
+                            .orElse(null))) {
                 CompletableFuture.runAsync(() -> {
                     articleDao.increaseSelfView(article.getArticleId());
                 }).exceptionally(e -> {
@@ -279,6 +279,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
                     return null;
                 });
             } else {
+                // 不是文章作者自己
                 CompletableFuture.runAsync(() -> {
                     articleDao.increasePageViews(article.getArticleId());
                 }).exceptionally(e -> {

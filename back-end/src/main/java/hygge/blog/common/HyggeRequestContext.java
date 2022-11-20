@@ -42,7 +42,9 @@ public class HyggeRequestContext extends AbstractHyggeContext<HyggeRequestContex
      */
     private User currentLoginUser;
 
-    private boolean guest = false;
+    private boolean guest = true;
+
+    private boolean maintainer = false;
 
     public enum Key {
         UID, TOKEN, REFRESH_KEY, SECRET_KEY, IP_ADDRESS, USER_AGENT
