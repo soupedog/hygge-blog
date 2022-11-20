@@ -63,7 +63,7 @@ public class ArticleController implements ArticleControllerDoc {
 
         ArticleDto result = articleService.findArticleDetailByAid(true, aid);
 
-        boolean isVisitor = context.getCurrentLoginUser() == null || context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT);
+        boolean isVisitor = context.getCurrentLoginUser() == null || !context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT);
         if (isVisitor) {
             CompletableFuture.runAsync(() -> articleBrowseLogService.insertArticleBrowseLog(result.getAid(),
                             result.getTitle(),
