@@ -2,6 +2,7 @@ package hygge.blog.controller.base;
 
 import hygge.blog.domain.bo.HyggeBlogControllerResponse;
 import hygge.commons.exceptions.code.GlobalHyggeCode;
+import hygge.commons.exceptions.code.HyggeInfo;
 import hygge.web.template.HyggeController;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
@@ -78,8 +79,8 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
      * 取消非严重异常的日志打印
      */
     @Override
-    default boolean muteLessSeriousException() {
-        return true;
+    default boolean printNonSeriousExceptionLog(HyggeInfo exception) {
+        return false;
     }
 
     /**

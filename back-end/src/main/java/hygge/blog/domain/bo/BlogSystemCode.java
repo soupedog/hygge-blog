@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
  * @date 2022/7/17
  */
 @Getter
-public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
+public enum BlogSystemCode implements HyggeCode {
     /**
      * 用户登录信息有误
      */
@@ -168,25 +168,5 @@ public enum BlogSystemCode implements HyggeCode<Integer, HttpStatus> {
         this.publicMessage = publicMessage;
         this.code = code;
         this.extraInfo = extraInfo;
-    }
-
-    @Override
-    public boolean serious() {
-        return serious;
-    }
-
-    @Override
-    public String getPublicMessage() {
-        return publicMessage;
-    }
-
-    @Override
-    public <Co> Co getCode() {
-        return (Co) code;
-    }
-
-    @Override
-    public <Ex> Ex getExtraInfo() {
-        return (Ex) extraInfo;
     }
 }

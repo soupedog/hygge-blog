@@ -47,7 +47,7 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
     private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     private static final CategoryAccessRule DEFAULT_CATEGORY_ACCESS_RULE = CategoryAccessRule.builder().accessRuleType(AccessRuleTypeEnum.PERSONAL).requirement(false).build();
 
-    private static TypeReference<ArrayList<CategoryAccessRule>> TYPE_INFO_ACCESS_RULE_LIST = new TypeReference<>() {
+    private static TypeReference<ArrayList<CategoryAccessRule>> TYPE_INFO_ACCESS_RULE_LIST = new TypeReference<ArrayList<CategoryAccessRule>>() {
     };
     @Autowired
     private UserServiceImpl userService;
