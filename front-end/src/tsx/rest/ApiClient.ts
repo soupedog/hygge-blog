@@ -518,7 +518,7 @@ export class HomePageService {
             beforeHook();
         }
 
-        axios.get("main/home/search/quote?keyword=" + keyword + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
+        axios.get("main/home/search/quote?keyword=" + keyword + "&currentPage=" + currentPage + "&pageSize=" + pageSize, {
             headers: UserService.getHeader()
         }).then((response) => {
                 if (successHook != null && response != null) {
