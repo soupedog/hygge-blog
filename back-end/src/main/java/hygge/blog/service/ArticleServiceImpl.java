@@ -176,7 +176,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         return articleCountInfoList.get(0);
     }
 
-    public ArticleSummaryInfo findArticleSummaryInfoByCategoryId(List<Integer> accessibleCategoryIdList, List<Category> categoryList, Integer currentUserId, int currentPage, int pageSize) {
+    public ArticleSummaryInfo findArticleSummaryInfoByCategoryId(List<Integer> accessibleCategoryIdList, List<Category> accessibleCategoryList, Integer currentUserId, int currentPage, int pageSize) {
         ArticleSummaryInfo result = new ArticleSummaryInfo();
         if (accessibleCategoryIdList.isEmpty()) {
             result.setArticleSummaryList(new ArrayList<>(0));
@@ -203,8 +203,8 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         List<ArticleDto> articleSummaryList = collectionHelper.filterNonemptyItemAsArrayList(false, articleListTemp.getContent(), (item -> {
             ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(item);
-            if (categoryList != null) {
-                categoryList.stream()
+            if (accessibleCategoryList != null) {
+                accessibleCategoryList.stream()
                         .filter(category -> category.getCategoryId().equals(item.getCategoryId()))
                         .findFirst()
                         .ifPresent(category -> articleDto.setCid(category.getCid()));
@@ -218,11 +218,11 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
             Topic topic = null;
             TopicDto topicDto = null;
 
-            List<Category> allCategoryList = categoryService.initRootCategory(categoryList);
+            List<Category> allCategoryList = categoryService.initRootCategory(accessibleCategoryList);
 
             for (ArticleDto articleDto : articleSummaryList) {
                 // 确认不会空指针
-                Category category = categoryList.stream().filter(item -> item.getCid().equals(articleDto.getCid())).findFirst().get();
+                Category category = accessibleCategoryList.stream().filter(item -> item.getCid().equals(articleDto.getCid())).findFirst().get();
 
                 if (topic == null) {
                     topic = topicService.findTopicByTopicId(category.getTopicId(), false);

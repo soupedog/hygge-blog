@@ -86,10 +86,10 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         User currentUser = context.getCurrentLoginUser();
 
         Topic topic = topicService.findTopicByTid(tid, false);
-        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, collectionHelper.createCollection(topic.getTopicId()));
+        List<Category> accessibleCategoryList = categoryService.getAccessibleCategoryList(currentUser, collectionHelper.createCollection(topic.getTopicId()));
 
-        List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
-        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, categoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+        List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, accessibleCategoryList, Category::getCategoryId);
+        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, accessibleCategoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
     }
 
     public ArticleSummaryInfo findArticleSummaryOfCategory(String cid, int currentPage, int pageSize) {
@@ -97,16 +97,16 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         User currentUser = context.getCurrentLoginUser();
 
         Category category = categoryService.findCategoryByCid(cid, true);
-        List<Category> categoryList;
+        List<Category> accessibleCategoryList;
         if (category != null) {
-            categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
-            categoryList = categoryList.stream().filter(item -> item.getCategoryId().equals(category.getCategoryId())).toList();
+            accessibleCategoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+            accessibleCategoryList = accessibleCategoryList.stream().filter(item -> item.getCategoryId().equals(category.getCategoryId())).toList();
         } else {
-            categoryList = new ArrayList<>(0);
+            accessibleCategoryList = new ArrayList<>(0);
         }
 
-        List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
-        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, categoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
+        List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, accessibleCategoryList, Category::getCategoryId);
+        return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, accessibleCategoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
     }
 
     public QuoteInfo findQuoteInfo(int currentPage, int pageSize) {
