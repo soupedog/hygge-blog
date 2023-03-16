@@ -1,7 +1,7 @@
 package hygge.blog.config.database;
 
 import com.zaxxer.hikari.HikariDataSource;
-import hygge.commons.spring.config.HyggeAutoConfiguration;
+import hygge.commons.spring.config.configuration.definition.HyggeAutoConfiguration;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.MySQL57Dialect;
 import org.springframework.beans.factory.annotation.Autowired;

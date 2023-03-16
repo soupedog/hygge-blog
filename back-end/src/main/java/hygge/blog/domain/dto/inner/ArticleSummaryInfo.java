@@ -1,10 +1,10 @@
 package hygge.blog.domain.dto.inner;
 
 import hygge.blog.domain.dto.ArticleDto;
-import hygge.commons.templates.core.HyggeLogInfoObject;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.CollectionHelper;
-import hygge.utils.definitions.JsonHelper;
+import hygge.commons.template.definition.HyggeLogInfoObject;
+import hygge.util.UtilCreator;
+import hygge.util.definition.CollectionHelper;
+import hygge.util.definition.JsonHelper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +28,8 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(title = "文章摘要信息")
 public class ArticleSummaryInfo implements HyggeLogInfoObject {
-    private static final CollectionHelper collectionHelper = UtilsCreator.INSTANCE.getDefaultInstance(CollectionHelper.class);
-    private static final JsonHelper<?> jsonHelper = UtilsCreator.INSTANCE.getDefaultJsonHelperInstance(false);
+    private static final CollectionHelper collectionHelper = UtilCreator.INSTANCE.getDefaultInstance(CollectionHelper.class);
+    private static final JsonHelper<?> jsonHelper = UtilCreator.INSTANCE.getDefaultJsonHelperInstance(false);
     @Schema(title = "文章摘要信息数组")
     private List<ArticleDto> articleSummaryList;
     @Schema(title = "文章总数")

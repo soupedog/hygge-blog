@@ -10,11 +10,11 @@ import hygge.blog.domain.mapper.MapToAnyMapper;
 import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
-import hygge.commons.enums.ColumnTypeEnum;
-import hygge.commons.exceptions.LightRuntimeException;
-import hygge.utils.UtilsCreator;
-import hygge.utils.bo.ColumnInfo;
-import hygge.utils.definitions.DaoHelper;
+import hygge.commons.constant.enums.ColumnTypeEnum;
+import hygge.commons.exception.LightRuntimeException;
+import hygge.util.UtilCreator;
+import hygge.util.bo.ColumnInfo;
+import hygge.util.definition.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @Service
 public class TopicServiceImpl extends HyggeWebUtilContainer {
-    private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
+    private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private UserServiceImpl userService;
     @Autowired

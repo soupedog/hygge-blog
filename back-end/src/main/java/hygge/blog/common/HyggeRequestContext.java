@@ -3,7 +3,7 @@ package hygge.blog.common;
 
 import hygge.blog.domain.enums.TokenScopeEnum;
 import hygge.blog.domain.po.User;
-import hygge.commons.templates.container.base.AbstractHyggeContext;
+import hygge.commons.template.container.base.AbstractHyggeContext;
 import lombok.AllArgsConstructor;
 import lombok.Generated;
 import lombok.Getter;

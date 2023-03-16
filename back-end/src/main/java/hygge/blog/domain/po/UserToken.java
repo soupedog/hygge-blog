@@ -1,8 +1,8 @@
 package hygge.blog.domain.po;
 
 import hygge.blog.domain.enums.TokenScopeEnum;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.RandomHelper;
+import hygge.util.UtilCreator;
+import hygge.util.definition.RandomHelper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -40,7 +40,7 @@ import java.sql.Timestamp;
         indexes = {@Index(name = "index_userId_scope", columnList = "userId,scope", unique = true)}
 )
 public class UserToken {
-    private static final RandomHelper randomHelper = UtilsCreator.INSTANCE.getDefaultInstance(RandomHelper.class);
+    private static final RandomHelper randomHelper = UtilCreator.INSTANCE.getDefaultInstance(RandomHelper.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

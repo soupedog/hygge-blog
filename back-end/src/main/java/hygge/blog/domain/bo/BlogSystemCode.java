@@ -1,6 +1,6 @@
 package hygge.blog.domain.bo;
 
-import hygge.commons.exceptions.code.HyggeCode;
+import hygge.commons.template.definition.HyggeCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

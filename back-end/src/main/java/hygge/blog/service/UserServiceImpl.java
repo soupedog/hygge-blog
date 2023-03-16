@@ -10,12 +10,12 @@ import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.MapToAnyMapper;
 import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.po.User;
-import hygge.commons.enums.ColumnTypeEnum;
-import hygge.commons.enums.StringFormatModeEnum;
-import hygge.commons.exceptions.LightRuntimeException;
-import hygge.utils.UtilsCreator;
-import hygge.utils.bo.ColumnInfo;
-import hygge.utils.definitions.DaoHelper;
+import hygge.commons.constant.enums.ColumnTypeEnum;
+import hygge.commons.constant.enums.StringFormatModeEnum;
+import hygge.commons.exception.LightRuntimeException;
+import hygge.util.UtilCreator;
+import hygge.util.bo.ColumnInfo;
+import hygge.util.definition.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -34,7 +34,7 @@ import java.util.Optional;
 @Service
 @SuppressWarnings("java:S1192")
 public class UserServiceImpl extends HyggeWebUtilContainer {
-    private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
+    private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private UserDao userDao;
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();

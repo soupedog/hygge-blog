@@ -9,9 +9,10 @@ import hygge.blog.domain.dto.CategoryDto;
 import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.po.User;
 import hygge.blog.service.ArticleServiceImpl;
-import hygge.commons.enums.DateTimeFormatMode;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.FileHelper;
+import hygge.commons.constant.enums.DateTimeFormatModeEnum;
+import hygge.commons.template.definition.DateTimeFormatMode;
+import hygge.util.UtilCreator;
+import hygge.util.definition.FileHelper;
 import hygge.web.config.ControllerLogAutoConfiguration;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +64,7 @@ class SynchronizeArticle extends HyggeWebUtilContainer {
     private static final String path = "E:\\文档\\md文档\\";
     private static final String backup = "E:\\文档\\md文档backup\\";
 
-    private static final FileHelper fileHelper = UtilsCreator.INSTANCE.getDefaultInstance(FileHelper.class);
+    private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     @Autowired
     private ArticleDao articleDao;
     @Autowired
@@ -83,7 +84,7 @@ class SynchronizeArticle extends HyggeWebUtilContainer {
         hyggeRequestContext.setCurrentLoginUser(user);
 
         File rootDirectory = fileHelper.getOrCreateDirectoryIfNotExit(path);
-        File backupDirectory = new File(backup + File.separator + timeHelper.format(System.currentTimeMillis(), DateTimeFormatMode.DateTimeFormatModeEnum.FULL_TRIM));
+        File backupDirectory = new File(backup + File.separator + timeHelper.format(System.currentTimeMillis(), DateTimeFormatModeEnum.FULL_TRIM));
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("articleId")));
 

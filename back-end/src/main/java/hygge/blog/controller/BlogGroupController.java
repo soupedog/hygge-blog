@@ -8,7 +8,7 @@ import hygge.blog.domain.dto.GroupBindInfo;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.BlogGroup;
 import hygge.blog.service.BlogGroupServiceImpl;
-import hygge.commons.exceptions.code.GlobalHyggeCode;
+import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +42,7 @@ public class BlogGroupController implements BlogGroupControllerDoc {
     @PostMapping("/blogGroup/admission")
     public ResponseEntity<HyggeBlogControllerResponse<Void>> groupAdmission(@RequestBody GroupBindInfo groupBindInfo) {
         if (blogGroupService.admission(groupBindInfo)) {
-            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCode.SUCCESS, "success", null);
+            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCodeEnum.SUCCESS, "success", null);
         } else {
             return (ResponseEntity<HyggeBlogControllerResponse<Void>>) fail(HttpStatus.OK, null, BlogSystemCode.BLOG_GROUP_BIND_CHANGE_EXCEPTION, "no update", null, null, (HyggeControllerResponseWrapper<ResponseEntity<?>>) LIGHT_ERROR_WRAPPER);
         }
@@ -52,9 +52,9 @@ public class BlogGroupController implements BlogGroupControllerDoc {
     @PostMapping("/blogGroup/eviction")
     public ResponseEntity<HyggeBlogControllerResponse<Void>> groupEviction(@RequestBody GroupBindInfo groupBindInfo) {
         if (blogGroupService.eviction(groupBindInfo)) {
-            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCode.SUCCESS, "success", null);
+            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCodeEnum.SUCCESS, "success", null);
         } else {
-            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCode.SUCCESS, "no update", null);
+            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCodeEnum.SUCCESS, "no update", null);
         }
     }
 }

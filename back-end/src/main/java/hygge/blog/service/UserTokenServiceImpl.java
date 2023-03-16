@@ -6,7 +6,7 @@ import hygge.blog.dao.UserTokenDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;
-import hygge.commons.exceptions.LightRuntimeException;
+import hygge.commons.exception.LightRuntimeException;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

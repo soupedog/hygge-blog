@@ -7,7 +7,7 @@ import hygge.blog.domain.po.User;
 import hygge.blog.filter.base.AbstractHyggeRequestFilter;
 import hygge.blog.service.UserServiceImpl;
 import hygge.blog.service.UserTokenServiceImpl;
-import hygge.commons.exceptions.core.HyggeRuntimeException;
+import hygge.commons.exception.main.HyggeRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

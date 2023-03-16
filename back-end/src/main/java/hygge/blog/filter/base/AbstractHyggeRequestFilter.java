@@ -1,8 +1,8 @@
 package hygge.blog.filter.base;
 
-import hygge.commons.exceptions.code.HyggeInfo;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.ParameterHelper;
+import hygge.commons.template.definition.HyggeInfo;
+import hygge.util.UtilCreator;
+import hygge.util.definition.ParameterHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.convert.DurationUnit;
@@ -24,7 +24,7 @@ import java.time.temporal.ChronoUnit;
 @Component
 public abstract class AbstractHyggeRequestFilter extends OncePerRequestFilter {
     protected static final Logger log = LoggerFactory.getLogger(AbstractHyggeRequestFilter.class);
-    protected static final ParameterHelper parameterHelper = UtilsCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
+    protected static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
 
     /**
      * 慢请求耗时门槛(毫秒)

@@ -14,11 +14,11 @@ import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.User;
 import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
-import hygge.commons.enums.ColumnTypeEnum;
-import hygge.commons.exceptions.LightRuntimeException;
-import hygge.utils.UtilsCreator;
-import hygge.utils.bo.ColumnInfo;
-import hygge.utils.definitions.DaoHelper;
+import hygge.commons.constant.enums.ColumnTypeEnum;
+import hygge.commons.exception.LightRuntimeException;
+import hygge.util.UtilCreator;
+import hygge.util.bo.ColumnInfo;
+import hygge.util.definition.DaoHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Service
 public class QuoteServiceImpl extends HyggeWebUtilContainer {
-    private static final DaoHelper daoHelper = UtilsCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
+    private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private QuoteDao quoteDao;
     @Autowired

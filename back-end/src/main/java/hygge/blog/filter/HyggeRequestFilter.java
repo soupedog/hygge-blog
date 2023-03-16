@@ -5,7 +5,7 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.enums.TokenScopeEnum;
 import hygge.blog.domain.po.User;
 import hygge.blog.filter.base.AbstractHyggeRequestFilter;
-import hygge.commons.exceptions.core.HyggeRuntimeException;
+import hygge.commons.exception.main.HyggeRuntimeException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;

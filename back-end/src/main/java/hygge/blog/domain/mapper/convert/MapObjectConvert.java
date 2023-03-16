@@ -11,9 +11,9 @@ import hygge.blog.domain.enums.UserStateEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
 import hygge.blog.domain.po.inner.CategoryAccessRule;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.JsonHelper;
-import hygge.utils.definitions.ParameterHelper;
+import hygge.util.UtilCreator;
+import hygge.util.definition.JsonHelper;
+import hygge.util.definition.ParameterHelper;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ import java.util.List;
  * @date 2022/7/18
  */
 public class MapObjectConvert {
-    private static final ParameterHelper parameterHelper = UtilsCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
-    private static final JsonHelper<?> jsonHelper = UtilsCreator.INSTANCE.getDefaultJsonHelperInstance(false);
+    private static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
+    private static final JsonHelper<?> jsonHelper = UtilCreator.INSTANCE.getDefaultJsonHelperInstance(false);
 
     private static TypeReference<ArrayList<CategoryAccessRule>> TYPE_INFO_ACCESS_RULE_LIST = new TypeReference<>() {
     };
@@ -89,6 +89,7 @@ public class MapObjectConvert {
     public ArticleStateEnum asArticleStateEnum(Object target) {
         return ArticleStateEnum.parse(parameterHelper.string(target));
     }
+
     public QuoteStateEnum asQuoteStateEnum(Object target) {
         return QuoteStateEnum.parse(parameterHelper.string(target));
     }

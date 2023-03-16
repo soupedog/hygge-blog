@@ -5,7 +5,7 @@ import hygge.blog.domain.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.dto.FileInfo;
 import hygge.blog.domain.enums.FileTypeEnum;
 import hygge.blog.service.FileServiceImpl;
-import hygge.web.utils.log.annotation.ControllerLog;
+import hygge.web.util.log.annotation.ControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

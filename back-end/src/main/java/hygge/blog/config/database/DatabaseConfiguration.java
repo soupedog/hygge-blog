@@ -1,6 +1,6 @@
 package hygge.blog.config.database;
 
-import hygge.commons.spring.config.configuration.HyggeSpringProperties;
+import hygge.commons.spring.config.configuration.definition.HyggeSpringConfigurationProperties;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Generated
 @NoArgsConstructor
 @ConfigurationProperties(prefix = "hygge.blog.database")
-public class DatabaseConfiguration implements HyggeSpringProperties {
+public class DatabaseConfiguration implements HyggeSpringConfigurationProperties {
     private String url;
     private String userName;
     private String password;

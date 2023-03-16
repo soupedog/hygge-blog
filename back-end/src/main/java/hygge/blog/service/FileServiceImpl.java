@@ -7,9 +7,9 @@ import hygge.blog.domain.dto.FileInfo;
 import hygge.blog.domain.enums.FileTypeEnum;
 import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.po.User;
-import hygge.commons.exceptions.LightRuntimeException;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.FileHelper;
+import hygge.commons.exception.LightRuntimeException;
+import hygge.util.UtilCreator;
+import hygge.util.definition.FileHelper;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 @Service
 public class FileServiceImpl extends HyggeWebUtilContainer {
-    private static final FileHelper fileHelper = UtilsCreator.INSTANCE.getDefaultInstance(FileHelper.class);
+    private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     @Value("${file.upload.path}")
     private String filePath;
     @Autowired

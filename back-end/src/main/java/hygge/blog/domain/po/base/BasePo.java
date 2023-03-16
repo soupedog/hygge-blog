@@ -1,8 +1,8 @@
 package hygge.blog.domain.po.base;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
-import hygge.utils.UtilsCreator;
-import hygge.utils.definitions.ParameterHelper;
+import hygge.util.UtilCreator;
+import hygge.util.definition.ParameterHelper;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +24,7 @@ import java.sql.Timestamp;
 @Generated
 @MappedSuperclass
 public abstract class BasePo {
-    protected static final ParameterHelper parameterHelper = UtilsCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
+    protected static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
 
     protected BasePo() {
     }

@@ -22,8 +22,8 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <hygge.version>0.0.4</hygge.version>
-        <org.mapstruct.version>1.5.1.Final</org.mapstruct.version>
+        <hygge.version>0.0.5</hygge.version>
+        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
     </properties>
 
     <dependencies>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-55</artifactId>
-            <version>2.16.3</version>
+            <version>2.21.1</version>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.14</version>
+            <version>1.6.15</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -85,7 +85,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.24</version>
+                            <version>1.18.26</version>
                         </path>
                         <!-- 先得让 lombok 生成 get/set 等方法后，mapstruct 再进行处理，故此处先后顺序不可调换-->
                         <path>

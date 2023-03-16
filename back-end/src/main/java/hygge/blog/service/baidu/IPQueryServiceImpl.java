@@ -1,8 +1,8 @@
 package hygge.blog.service.baidu;
 
 import hygge.blog.domain.dto.baidu.BaiDuIpQueryResponseDto;
-import hygge.web.utils.http.bo.HttpResponse;
-import hygge.web.utils.http.definitions.HttpHelper;
+import hygge.web.util.http.bo.HttpResponse;
+import hygge.web.util.http.definition.HttpHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;

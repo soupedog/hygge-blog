@@ -8,7 +8,7 @@ import hygge.blog.domain.dto.GroupBindInfo;
 import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.po.BlogGroup;
 import hygge.blog.domain.po.User;
-import hygge.commons.exceptions.LightRuntimeException;
+import hygge.commons.exception.LightRuntimeException;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
