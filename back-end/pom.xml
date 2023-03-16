@@ -85,7 +85,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.26</version>
+                            <version>${lombok.version}</version>
                         </path>
                         <!-- 先得让 lombok 生成 get/set 等方法后，mapstruct 再进行处理，故此处先后顺序不可调换-->
                         <path>
