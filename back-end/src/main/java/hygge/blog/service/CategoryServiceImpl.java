@@ -191,7 +191,7 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
 
     public List<Category> initRootCategory(List<Category> currentCategoryList) {
         Set<Integer> allCategoryIdSet = new HashSet<>();
-
+        // TODO 层级超过 2 级爷爷节点无法被加入
         for (Category category : currentCategoryList) {
             allCategoryIdSet.add(category.getCategoryId());
             if (category.getParentId() != null) {
