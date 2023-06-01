@@ -18,7 +18,6 @@ import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.inner.CategoryAccessRule;
-import hygge.commons.constant.enums.ColumnTypeEnum;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -60,13 +59,13 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo("accessRuleList", null, ColumnTypeEnum.OTHER_OBJECT, true, false, 0, 0));
-        forUpdate.add(new ColumnInfo("categoryName", null, ColumnTypeEnum.STRING, true, false, 1, 500));
-        forUpdate.add(new ColumnInfo("tid", null, ColumnTypeEnum.STRING, true, false, 0, 500));
-        forUpdate.add(new ColumnInfo("uid", null, ColumnTypeEnum.STRING, true, false, 0, 500));
-        forUpdate.add(new ColumnInfo("parentCid", null, ColumnTypeEnum.STRING, true, false, 0, 500));
-        forUpdate.add(new ColumnInfo("orderVal", null, ColumnTypeEnum.INTEGER, true, false, 0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("categoryState", null, ColumnTypeEnum.STRING, true, false, 0, 50));
+        forUpdate.add(new ColumnInfo(true, false, "accessRuleList", null));
+        forUpdate.add(new ColumnInfo(true, false, "categoryName", null).toStringColumn(1, 500));
+        forUpdate.add(new ColumnInfo(true, false, "tid", null).toStringColumn(0, 500));
+        forUpdate.add(new ColumnInfo(true, false, "uid", null).toStringColumn(0, 500));
+        forUpdate.add(new ColumnInfo(true, false, "parentCid", null).toStringColumn(0, 500));
+        forUpdate.add(new ColumnInfo(true, false, "orderVal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "categoryState", null).toStringColumn(0, 50));
     }
 
     @Transactional

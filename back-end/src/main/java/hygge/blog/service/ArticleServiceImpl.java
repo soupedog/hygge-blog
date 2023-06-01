@@ -20,7 +20,6 @@ import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
 import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
-import hygge.commons.constant.enums.ColumnTypeEnum;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -64,15 +63,15 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo("configuration", null, ColumnTypeEnum.OTHER_OBJECT, true, false, 0, 0));
-        forUpdate.add(new ColumnInfo("cid", null, ColumnTypeEnum.STRING, true, false, 1, 50));
-        forUpdate.add(new ColumnInfo("title", null, ColumnTypeEnum.STRING, true, false, 1, 500));
-        forUpdate.add(new ColumnInfo("imageSrc", null, ColumnTypeEnum.STRING, true, true, 0, 1000));
-        forUpdate.add(new ColumnInfo("summary", null, ColumnTypeEnum.STRING, true, true, 0, 3000));
-        forUpdate.add(new ColumnInfo("content", null, ColumnTypeEnum.STRING, true, true, 0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("orderGlobal", null, ColumnTypeEnum.INTEGER, true, false, 0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("orderCategory", null, ColumnTypeEnum.INTEGER, true, false, 0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("articleState", null, ColumnTypeEnum.STRING, true, false, 1, 50));
+        forUpdate.add(new ColumnInfo(true, false, "configuration", null));
+        forUpdate.add(new ColumnInfo(true, false, "cid", null).toStringColumn(1, 50));
+        forUpdate.add(new ColumnInfo(true, false, "title", null).toStringColumn(1, 500));
+        forUpdate.add(new ColumnInfo(true, true, "imageSrc", null).toStringColumn(0, 1000));
+        forUpdate.add(new ColumnInfo(true, true, "summary", null).toStringColumn(0, 3000));
+        forUpdate.add(new ColumnInfo(true, true, "content", null).toStringColumn(0, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "orderGlobal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "orderCategory", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
     @Transactional
@@ -312,5 +311,4 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
             throw new LightRuntimeException(String.format("Article(%s) already exists.", title), BlogSystemCode.ARTICLE_ALREADY_EXISTS);
         }
     }
-
 }

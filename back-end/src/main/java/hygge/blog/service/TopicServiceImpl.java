@@ -10,7 +10,6 @@ import hygge.blog.domain.mapper.MapToAnyMapper;
 import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
-import hygge.commons.constant.enums.ColumnTypeEnum;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -42,12 +41,11 @@ public class TopicServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo("topicName", null, ColumnTypeEnum.STRING, true, false, 1, 500));
-        forUpdate.add(new ColumnInfo("uid", null, ColumnTypeEnum.STRING, true, false, 0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("orderVal", null, ColumnTypeEnum.INTEGER, true, false, 0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("topicState", null, ColumnTypeEnum.STRING, true, false, 6, 50));
+        forUpdate.add(new ColumnInfo(true, false, "topicName", null).toStringColumn(1, 500));
+        forUpdate.add(new ColumnInfo(true, false, "uid", null).toStringColumn(0, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "orderVal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "topicState", null).toStringColumn(0, 50));
     }
-
 
     public Topic createTopic(Topic topic) {
         parameterHelper.stringNotEmpty("topicName", (Object) topic.getTopicName());

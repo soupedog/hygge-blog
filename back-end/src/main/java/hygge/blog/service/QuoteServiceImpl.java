@@ -14,7 +14,6 @@ import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.User;
 import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
-import hygge.commons.constant.enums.ColumnTypeEnum;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -55,13 +54,13 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo("imageSrc", null, ColumnTypeEnum.STRING, true, true, 0, 1000));
-        forUpdate.add(new ColumnInfo("content", null, ColumnTypeEnum.STRING, true, false, 1, 5000));
-        forUpdate.add(new ColumnInfo("source", null, ColumnTypeEnum.STRING, true, true, 0, 2000));
-        forUpdate.add(new ColumnInfo("portal", null, ColumnTypeEnum.STRING, true, true, 0, 2000));
-        forUpdate.add(new ColumnInfo("remarks", null, ColumnTypeEnum.STRING, true, true, 0, 5000));
-        forUpdate.add(new ColumnInfo("orderVal", null, ColumnTypeEnum.INTEGER, true, true, Integer.MIN_VALUE, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("quoteState", null, ColumnTypeEnum.STRING, true, false, 1, 50));
+        forUpdate.add(new ColumnInfo(true, true, "imageSrc", null).toStringColumn(0, 1000));
+        forUpdate.add(new ColumnInfo(true, false, "content", null).toStringColumn(1, 5000));
+        forUpdate.add(new ColumnInfo(true, true, "source", null).toStringColumn(0, 2000));
+        forUpdate.add(new ColumnInfo(true, true, "portal", null).toStringColumn(0, 2000));
+        forUpdate.add(new ColumnInfo(true, true, "remarks", null).toStringColumn(0, 5000));
+        forUpdate.add(new ColumnInfo(true, true, "orderVal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "quoteState", null).toStringColumn(0, 50));
     }
 
     public Quote createQuote(Quote quote) {
@@ -136,5 +135,4 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
         }
         return quoteTemp.orElse(null);
     }
-
 }

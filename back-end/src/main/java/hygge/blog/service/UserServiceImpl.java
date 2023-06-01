@@ -10,7 +10,6 @@ import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.MapToAnyMapper;
 import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.po.User;
-import hygge.commons.constant.enums.ColumnTypeEnum;
 import hygge.commons.constant.enums.StringFormatModeEnum;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
@@ -40,14 +39,15 @@ public class UserServiceImpl extends HyggeWebUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo("biography", null, ColumnTypeEnum.STRING, true, false, 1, 500));
-        forUpdate.add(new ColumnInfo("birthday", null, ColumnTypeEnum.LONG, true, false, 0, Long.MAX_VALUE));
-        forUpdate.add(new ColumnInfo("email", null, ColumnTypeEnum.STRING, true, false, 1, 500));
-        forUpdate.add(new ColumnInfo("password", null, ColumnTypeEnum.STRING, true, false, 6, 50));
-        forUpdate.add(new ColumnInfo("phone", null, ColumnTypeEnum.STRING, true, false, 11, 20));
-        forUpdate.add(new ColumnInfo("userAvatar", null, ColumnTypeEnum.STRING, true, false, 0, 500));
-        forUpdate.add(new ColumnInfo("userName", null, ColumnTypeEnum.STRING, true, false, 1, 100));
-        forUpdate.add(new ColumnInfo("userSex", null, ColumnTypeEnum.STRING, true, false, 1, 100));
+        forUpdate.add(new ColumnInfo(true, false, "biography", null).toStringColumn(1, 500));
+        // mapstruct 在后续步骤会将 Long 转化为 Timestamp
+        forUpdate.add(new ColumnInfo(true, false, "birthday", null, 0L, Long.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, false, "email", null).toStringColumn(1, 500));
+        forUpdate.add(new ColumnInfo(true, false, "password", null).toStringColumn(6, 50));
+        forUpdate.add(new ColumnInfo(true, false, "phone", null).toStringColumn(11, 20));
+        forUpdate.add(new ColumnInfo(true, false, "userAvatar", null).toStringColumn(1, 500));
+        forUpdate.add(new ColumnInfo(true, false, "userName", null).toStringColumn(1, 100));
+        forUpdate.add(new ColumnInfo(true, false, "userSex", null).toStringColumn(1, 100));
     }
 
     public User findUserByUserId(Integer userId, boolean nullable) {
