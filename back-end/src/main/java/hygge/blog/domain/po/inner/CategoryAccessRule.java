@@ -4,6 +4,7 @@ import hygge.blog.domain.enums.AccessRuleTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ import javax.persistence.Enumerated;
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Embeddable
 @Schema(title = "文章类别访问规则")
 public class CategoryAccessRule {
