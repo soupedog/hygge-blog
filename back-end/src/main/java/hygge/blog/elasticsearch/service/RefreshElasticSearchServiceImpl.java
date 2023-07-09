@@ -57,7 +57,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
         fuzzySearchCache.setEsId(articleId);
         fuzzySearchCache.setType(FuzzySearchCache.Type.ARTICLE);
-        searchingCacheDao.save(fuzzySearchCache);
+        try {
+            searchingCacheDao.save(fuzzySearchCache);
+        } catch (Exception e) {
+            // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
+        }
     }
 
     public void freshSingleQuote(Integer quoteId) {
@@ -69,7 +73,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         fuzzySearchCache.setType(FuzzySearchCache.Type.QUOTE);
         // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
         fuzzySearchCache.setCreateTs(new Timestamp(System.currentTimeMillis()));
-        searchingCacheDao.save(fuzzySearchCache);
+        try {
+            searchingCacheDao.save(fuzzySearchCache);
+        } catch (Exception e) {
+            // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
+        }
     }
 
     public void freshArticle() {
@@ -107,7 +115,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
                 fuzzySearchCache.setEsId(article.getArticleId());
                 fuzzySearchCache.setType(FuzzySearchCache.Type.ARTICLE);
 
-                searchingCacheDao.save(fuzzySearchCache);
+                try {
+                    searchingCacheDao.save(fuzzySearchCache);
+                } catch (Exception e) {
+                    // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
+                }
                 totalCount.incrementAndGet();
             });
         } while (!articleTemp.isLast());
@@ -141,7 +153,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
                 // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
                 fuzzySearchCache.setCreateTs(new Timestamp(startTs + totalCount.get()));
 
-                searchingCacheDao.save(fuzzySearchCache);
+                try {
+                    searchingCacheDao.save(fuzzySearchCache);
+                } catch (Exception e) {
+                    // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
+                }
                 totalCount.incrementAndGet();
             });
         } while (!quoteTemp.isLast());
