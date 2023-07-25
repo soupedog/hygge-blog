@@ -1,4 +1,4 @@
-package hygge.blog.elasticsearch.service;
+package hygge.blog.service;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
@@ -10,8 +10,7 @@ import hygge.blog.domain.enums.UserTypeEnum;
 import hygge.blog.domain.mapper.ElasticToDtoMapper;
 import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.User;
-import hygge.blog.elasticsearch.dto.FuzzySearchCache;
-import hygge.blog.service.CategoryServiceImpl;
+import hygge.blog.domain.dto.ArticleQuoteSearchCache;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -55,12 +54,12 @@ public class FuzzySearchServiceImpl {
 
         List<Category> allowableCategoryList = categoryService.getAccessibleCategoryList(currentUser, null);
 
-        SearchHits<FuzzySearchCache> resultTemp = doFuzzySearch(keyword, FuzzySearchCache.Type.ARTICLE, allowableCategoryList, currentPage, pageSize);
+        SearchHits<ArticleQuoteSearchCache> resultTemp = doFuzzySearch(keyword, ArticleQuoteSearchCache.Type.ARTICLE, allowableCategoryList, currentPage, pageSize);
 
         List<ArticleDto> articleSummaryList = new ArrayList<>(pageSize);
 
-        for (SearchHit<FuzzySearchCache> itemTemp : resultTemp) {
-            FuzzySearchCache item = itemTemp.getContent();
+        for (SearchHit<ArticleQuoteSearchCache> itemTemp : resultTemp) {
+            ArticleQuoteSearchCache item = itemTemp.getContent();
             ArticleDto articleDto = ElasticToDtoMapper.INSTANCE.esToArticleDto(item);
             // 模糊查询配合前端不显示顶置
             articleDto.setOrderGlobal(null);
@@ -75,12 +74,12 @@ public class FuzzySearchServiceImpl {
     }
 
     public QuoteInfo doQuoteFuzzySearch(String keyword, Integer currentPage, Integer pageSize) {
-        SearchHits<FuzzySearchCache> resultTemp = doFuzzySearch(keyword, FuzzySearchCache.Type.QUOTE, null, currentPage, pageSize);
+        SearchHits<ArticleQuoteSearchCache> resultTemp = doFuzzySearch(keyword, ArticleQuoteSearchCache.Type.QUOTE, null, currentPage, pageSize);
 
         List<QuoteDto> quoteList = new ArrayList<>(pageSize);
 
-        for (SearchHit<FuzzySearchCache> itemTemp : resultTemp) {
-            FuzzySearchCache item = itemTemp.getContent();
+        for (SearchHit<ArticleQuoteSearchCache> itemTemp : resultTemp) {
+            ArticleQuoteSearchCache item = itemTemp.getContent();
             QuoteDto quoteDto = ElasticToDtoMapper.INSTANCE.esToQuoteDto(item);
             quoteList.add(quoteDto);
         }
@@ -91,7 +90,7 @@ public class FuzzySearchServiceImpl {
                 .build();
     }
 
-    public SearchHits<FuzzySearchCache> doFuzzySearch(String keyword, FuzzySearchCache.Type type, Collection<Category> allowableCategoryList, Integer currentPage, Integer pageSize) {
+    public SearchHits<ArticleQuoteSearchCache> doFuzzySearch(String keyword, ArticleQuoteSearchCache.Type type, Collection<Category> allowableCategoryList, Integer currentPage, Integer pageSize) {
         // 聚合后的最终条件构造器
         BoolQueryBuilder rootQueryBuilder = QueryBuilders.boolQuery();
 
@@ -102,7 +101,7 @@ public class FuzzySearchServiceImpl {
 
         // 关键字要求
         MultiMatchQueryBuilder keywordRequirement;
-        if (type.equals(FuzzySearchCache.Type.ARTICLE)) {
+        if (type.equals(ArticleQuoteSearchCache.Type.ARTICLE)) {
             // 文章类别展示编号必须与下列之一匹配
             BoolQueryBuilder cidRequirement = QueryBuilders.boolQuery();
             List<String> allowableCidList = allowableCategoryList.stream()
@@ -132,14 +131,14 @@ public class FuzzySearchServiceImpl {
         if (currentUser == null || !currentUser.getUserType().equals(UserTypeEnum.ROOT)) {
             // 状态要求(非管理员只允许查询 ACTIVE 状态内容)
             BoolQueryBuilder stateRequirement = QueryBuilders.boolQuery();
-            stateRequirement.should(QueryBuilders.termQuery("state", FuzzySearchCache.StateEnum.ACTIVE.name()));
+            stateRequirement.should(QueryBuilders.termQuery("state", ArticleQuoteSearchCache.StateEnum.ACTIVE.name()));
             rootQueryBuilder.must(stateRequirement);
         }
 
         String source = rootQueryBuilder.toString();
         StringQuery rootQuery = new StringQuery(source);
 
-        if (type.equals(FuzzySearchCache.Type.ARTICLE)) {
+        if (type.equals(ArticleQuoteSearchCache.Type.ARTICLE)) {
             // 设置查询结果过虑掉 content(用于展示文章摘要信息而已，所以不需要主体内容)
             rootQuery.addSourceFilter(ARTICLE_SUMMARY_SOURCE_FILTER);
         }
@@ -147,7 +146,7 @@ public class FuzzySearchServiceImpl {
         // 设置分页 当前页(从 0 开始为第一页) 页容量
         PageRequest pageRequest = PageRequest.of(currentPage - 1, pageSize, SCORE_DESC_SORT);
         rootQuery.setPageable(pageRequest);
-        return elasticsearchRestTemplate.search(rootQuery, FuzzySearchCache.class);
+        return elasticsearchRestTemplate.search(rootQuery, ArticleQuoteSearchCache.class);
     }
 
 }

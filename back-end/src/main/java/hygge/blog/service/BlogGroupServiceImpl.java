@@ -2,7 +2,7 @@ package hygge.blog.service;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.dao.BlogGroupDao;
+import hygge.blog.repository.database.BlogGroupDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.GroupBindInfo;
 import hygge.blog.domain.enums.UserTypeEnum;

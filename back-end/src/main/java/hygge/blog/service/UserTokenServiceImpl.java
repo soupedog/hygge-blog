@@ -2,7 +2,7 @@ package hygge.blog.service;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.dao.UserTokenDao;
+import hygge.blog.repository.database.UserTokenDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.UserToken;

@@ -2,7 +2,7 @@ package hygge.blog.service;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.dao.ArticleDao;
+import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.TopicDto;
@@ -19,7 +19,6 @@ import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
-import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;

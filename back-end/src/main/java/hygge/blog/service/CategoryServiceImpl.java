@@ -3,7 +3,7 @@ package hygge.blog.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.dao.CategoryDao;
+import hygge.blog.repository.database.CategoryDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.CategoryDto;
 import hygge.blog.domain.enums.AccessRuleTypeEnum;

@@ -1,4 +1,4 @@
-package hygge.blog.dao;
+package hygge.blog.repository.database;
 
 import hygge.blog.domain.po.ArticleBrowseLog;
 import org.springframework.data.jpa.repository.JpaRepository;

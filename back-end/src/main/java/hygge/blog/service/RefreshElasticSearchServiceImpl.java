@@ -1,10 +1,10 @@
-package hygge.blog.elasticsearch.service;
+package hygge.blog.service;
 
-import hygge.blog.dao.ArticleDao;
-import hygge.blog.dao.CategoryDao;
-import hygge.blog.dao.QuoteDao;
-import hygge.blog.dao.TopicDao;
-import hygge.blog.dao.UserDao;
+import hygge.blog.repository.database.ArticleDao;
+import hygge.blog.repository.database.CategoryDao;
+import hygge.blog.repository.database.QuoteDao;
+import hygge.blog.repository.database.TopicDao;
+import hygge.blog.repository.database.UserDao;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.QuoteDto;
 import hygge.blog.domain.mapper.ElasticToDtoMapper;
@@ -14,9 +14,8 @@ import hygge.blog.domain.po.Category;
 import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.Topic;
 import hygge.blog.domain.po.User;
-import hygge.blog.elasticsearch.dao.SearchingCacheDao;
-import hygge.blog.elasticsearch.dto.FuzzySearchCache;
-import hygge.blog.service.ArticleServiceImpl;
+import hygge.blog.repository.elasticsearch.SearchingCacheDao;
+import hygge.blog.domain.dto.ArticleQuoteSearchCache;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,11 +53,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
 
     public void freshSingleArticle(String aid, Integer articleId) {
         ArticleDto articleDto = articleService.findArticleDetailByAid(false, aid);
-        FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
-        fuzzySearchCache.setEsId(articleId);
-        fuzzySearchCache.setType(FuzzySearchCache.Type.ARTICLE);
+        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
+        articleQuoteSearchCache.setEsId(articleId);
+        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
         try {
-            searchingCacheDao.save(fuzzySearchCache);
+            searchingCacheDao.save(articleQuoteSearchCache);
         } catch (Exception e) {
             // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
         }
@@ -68,13 +67,13 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         Quote quote = quoteDao.findById(quoteId).get();
         QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
 
-        FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-        fuzzySearchCache.setEsId(quoteId + FuzzySearchCache.INTERVAL);
-        fuzzySearchCache.setType(FuzzySearchCache.Type.QUOTE);
+        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
+        articleQuoteSearchCache.setEsId(quoteId + ArticleQuoteSearchCache.INTERVAL);
+        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
         // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
-        fuzzySearchCache.setCreateTs(new Timestamp(System.currentTimeMillis()));
+        articleQuoteSearchCache.setCreateTs(new Timestamp(System.currentTimeMillis()));
         try {
-            searchingCacheDao.save(fuzzySearchCache);
+            searchingCacheDao.save(articleQuoteSearchCache);
         } catch (Exception e) {
             // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
         }
@@ -111,12 +110,12 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
 
                 articleDto.initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, allCategoryList);
 
-                FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
-                fuzzySearchCache.setEsId(article.getArticleId());
-                fuzzySearchCache.setType(FuzzySearchCache.Type.ARTICLE);
+                ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
+                articleQuoteSearchCache.setEsId(article.getArticleId());
+                articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
 
                 try {
-                    searchingCacheDao.save(fuzzySearchCache);
+                    searchingCacheDao.save(articleQuoteSearchCache);
                 } catch (Exception e) {
                     // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
                 }
@@ -147,14 +146,14 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
             quoteList.forEach(quote -> {
                 QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
 
-                FuzzySearchCache fuzzySearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-                fuzzySearchCache.setEsId(quote.getQuoteId() + FuzzySearchCache.INTERVAL);
-                fuzzySearchCache.setType(FuzzySearchCache.Type.QUOTE);
+                ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
+                articleQuoteSearchCache.setEsId(quote.getQuoteId() + ArticleQuoteSearchCache.INTERVAL);
+                articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
                 // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
-                fuzzySearchCache.setCreateTs(new Timestamp(startTs + totalCount.get()));
+                articleQuoteSearchCache.setCreateTs(new Timestamp(startTs + totalCount.get()));
 
                 try {
-                    searchingCacheDao.save(fuzzySearchCache);
+                    searchingCacheDao.save(articleQuoteSearchCache);
                 } catch (Exception e) {
                     // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
                 }

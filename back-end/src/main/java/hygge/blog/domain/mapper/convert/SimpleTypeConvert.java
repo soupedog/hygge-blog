@@ -4,7 +4,7 @@ import hygge.blog.domain.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.enums.ArticleStateEnum;
 import hygge.blog.domain.enums.QuoteStateEnum;
 import hygge.blog.domain.po.inner.ArticleConfiguration;
-import hygge.blog.elasticsearch.dto.FuzzySearchCache;
+import hygge.blog.domain.dto.ArticleQuoteSearchCache;
 import hygge.web.template.HyggeWebUtilContainer;
 
 import java.sql.Timestamp;
@@ -39,8 +39,8 @@ public class SimpleTypeConvert extends HyggeWebUtilContainer {
         return jsonHelper.readAsObject(target, CategoryTreeInfo.class);
     }
 
-    public FuzzySearchCache.StateEnum asStateEnum(Enum<?> target) {
-        return target == null ? null : FuzzySearchCache.StateEnum.valueOf(target.name());
+    public ArticleQuoteSearchCache.StateEnum asStateEnum(Enum<?> target) {
+        return target == null ? null : ArticleQuoteSearchCache.StateEnum.valueOf(target.name());
     }
 
     public ArticleStateEnum asArticleStateEnum(Enum<?> target) {

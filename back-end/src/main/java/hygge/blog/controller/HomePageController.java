@@ -8,7 +8,7 @@ import hygge.blog.domain.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.dto.inner.TopicOverviewInfo;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Announcement;
-import hygge.blog.elasticsearch.service.FuzzySearchServiceImpl;
+import hygge.blog.service.FuzzySearchServiceImpl;
 import hygge.blog.service.AnnouncementServiceImpl;
 import hygge.blog.service.HomePageServiceImpl;
 import hygge.web.util.log.annotation.ControllerLog;

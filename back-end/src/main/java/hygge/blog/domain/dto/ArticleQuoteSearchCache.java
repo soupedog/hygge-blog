@@ -1,4 +1,4 @@
-package hygge.blog.elasticsearch.dto;
+package hygge.blog.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +25,7 @@ import java.sql.Timestamp;
 @Setting(shards = 1, replicas = 1)
 @Getter
 @Setter
-public class FuzzySearchCache {
+public class ArticleQuoteSearchCache {
     /**
      * 文章、句子收藏间 ID 的间隔(防止 ES 文档覆盖)
      */

@@ -3,6 +3,7 @@ package hygge.blog.service.baidu;
 import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.domain.dto.baidu.BaiDuIpQueryResponseDto;
 import hygge.blog.domain.dto.baidu.BaiduGatewayDto;
+import hygge.blog.domain.dto.baidu.inner.BaiDuIpQueryResponseItem;
 import hygge.blog.domain.dto.baidu.inner.BaiduIpInfoDto;
 import hygge.web.util.http.bo.HttpResponse;
 import hygge.web.util.http.impl.DefaultHttpHelper;
@@ -10,13 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Optional;
+
 /**
  * @author Xavier
  * @date 2022/11/19
  */
 @Service
 public class IPQueryServiceImpl {
-    private static final TypeReference<BaiduGatewayDto<BaiduIpInfoDto>> typeReference = new TypeReference<BaiduGatewayDto<BaiduIpInfoDto>>() {
+    private static final TypeReference<BaiduGatewayDto<BaiduIpInfoDto>> typeReference = new TypeReference<>() {
     };
     @Autowired
     private DefaultHttpHelper httpHelper;
@@ -30,9 +33,12 @@ public class IPQueryServiceImpl {
                 .toUriString();
 
         HttpResponse<Void, BaiDuIpQueryResponseDto> resultTemp = httpHelper.get(url, BaiDuIpQueryResponseDto.class);
-        if (resultTemp.isSuccess() &&
-                resultTemp.getData() != null && resultTemp.getData().getData() != null && !resultTemp.getData().getData().isEmpty()) {
-            return resultTemp.getData().getData().get(0).getLocation();
+        if (resultTemp.isSuccess()) {
+            return Optional.ofNullable(resultTemp.getData())
+                    .map(BaiDuIpQueryResponseDto::getData)
+                    .map(list -> list.isEmpty() ? null : list.get(0))
+                    .map(BaiDuIpQueryResponseItem::getLocation)
+                    .orElse(null);
         }
         return null;
     }
@@ -69,7 +75,7 @@ public class IPQueryServiceImpl {
      * }
      * </pre>
      */
-    public String queryIpInfo(String ip) {
+    public HttpResponse<Void, BaiduGatewayDto<BaiduIpInfoDto>> queryIpInfo(String ip) {
         String url = UriComponentsBuilder
                 .fromUriString("https://qifu-api.baidubce.com/ip/geo/v1/district?ip={ip}")
                 .encode()
@@ -77,20 +83,7 @@ public class IPQueryServiceImpl {
                 .expand(ip)
                 .toUriString();
 
-        HttpResponse<Void, BaiduGatewayDto<BaiduIpInfoDto>> resultTemp = httpHelper.get(url, typeReference);
-        if (resultTemp.isSuccess() &&
-                resultTemp.getData() != null && "Success".equals(resultTemp.getData().getCode())) {
-
-            BaiduIpInfoDto baiduIpInfoDto = resultTemp.getData().getData();
-
-            if (baiduIpInfoDto.getProv().equals(baiduIpInfoDto.getCity())) {
-                // 直辖市
-                return baiduIpInfoDto.getCountry() + "-" + baiduIpInfoDto.getCity() + "-" + baiduIpInfoDto.getDistrict();
-            } else {
-                return baiduIpInfoDto.getCountry() + "-" + baiduIpInfoDto.getProv() + "-" + baiduIpInfoDto.getCity() + "-" + baiduIpInfoDto.getDistrict();
-            }
-        }
-        return null;
+        return httpHelper.get(url, typeReference);
     }
 
 }

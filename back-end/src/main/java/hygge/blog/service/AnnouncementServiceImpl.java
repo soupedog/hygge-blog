@@ -1,6 +1,6 @@
 package hygge.blog.service;
 
-import hygge.blog.dao.AnnouncementDao;
+import hygge.blog.repository.database.AnnouncementDao;
 import hygge.blog.domain.po.Announcement;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package hygge.blog.domain.mapper;
 import hygge.blog.domain.dto.ArticleDto;
 import hygge.blog.domain.dto.QuoteDto;
 import hygge.blog.domain.mapper.convert.SimpleTypeConvert;
-import hygge.blog.elasticsearch.dto.FuzzySearchCache;
+import hygge.blog.domain.dto.ArticleQuoteSearchCache;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -17,14 +17,14 @@ public interface ElasticToDtoMapper {
     ElasticToDtoMapper INSTANCE = Mappers.getMapper(ElasticToDtoMapper.class);
 
     @Mapping(source = "articleState", target = "state")
-    FuzzySearchCache articleDtoToEs(ArticleDto dto);
+    ArticleQuoteSearchCache articleDtoToEs(ArticleDto dto);
 
     @Mapping(source = "state", target = "articleState")
-    ArticleDto esToArticleDto(FuzzySearchCache dto);
+    ArticleDto esToArticleDto(ArticleQuoteSearchCache dto);
 
     @Mapping(source = "state", target = "quoteState")
-    QuoteDto esToQuoteDto(FuzzySearchCache fuzzySearchCache);
+    QuoteDto esToQuoteDto(ArticleQuoteSearchCache articleQuoteSearchCache);
 
     @Mapping(source = "quoteState", target = "state")
-    FuzzySearchCache quoteDtoToEs(QuoteDto dto);
+    ArticleQuoteSearchCache quoteDtoToEs(QuoteDto dto);
 }

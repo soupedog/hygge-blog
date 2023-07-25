@@ -1,6 +1,6 @@
 package hygge.blog.config.backgroundjob;
 
-import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.RefreshElasticSearchServiceImpl;
 import hygge.blog.service.ArticleBrowseLogServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

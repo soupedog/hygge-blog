@@ -1,7 +1,7 @@
 package hygge.blog.util;
 
-import hygge.blog.elasticsearch.dao.SearchingCacheDao;
-import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
+import hygge.blog.repository.elasticsearch.SearchingCacheDao;
+import hygge.blog.service.RefreshElasticSearchServiceImpl;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

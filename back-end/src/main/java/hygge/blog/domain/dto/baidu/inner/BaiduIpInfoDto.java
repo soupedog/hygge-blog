@@ -36,4 +36,13 @@ public class BaiduIpInfoDto {
     private String prov;
     private String city;
     private String district;
+
+    public String toLocationInfo() {
+        if (prov.equals(city)) {
+            // 直辖市
+            return String.format("%s-%s-%s-%s", isp, country, city, district);
+        } else {
+            return String.format("%s-%s-%s-%s-%s", isp, country, prov, city, district);
+        }
+    }
 }

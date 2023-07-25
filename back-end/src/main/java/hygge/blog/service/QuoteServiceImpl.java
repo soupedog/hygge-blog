@@ -2,7 +2,7 @@ package hygge.blog.service;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.dao.QuoteDao;
+import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.domain.bo.BlogSystemCode;
 import hygge.blog.domain.dto.QuoteDto;
 import hygge.blog.domain.dto.QuoteInfo;
@@ -13,7 +13,6 @@ import hygge.blog.domain.mapper.OverrideMapper;
 import hygge.blog.domain.mapper.PoDtoMapper;
 import hygge.blog.domain.po.Quote;
 import hygge.blog.domain.po.User;
-import hygge.blog.elasticsearch.service.RefreshElasticSearchServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
