@@ -1,11 +1,11 @@
 package hygge.blog.controller;
 
 import hygge.blog.controller.doc.UserControllerDoc;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.UserDto;
-import hygge.blog.domain.mapper.PoDtoMapper;
-import hygge.blog.domain.po.User;
-import hygge.blog.service.UserServiceImpl;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.UserDto;
+import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.po.User;
+import hygge.blog.service.local.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

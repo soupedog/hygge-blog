@@ -1,6 +1,6 @@
 package hygge.blog.repository.elasticsearch;
 
-import hygge.blog.domain.dto.ArticleQuoteSearchCache;
+import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

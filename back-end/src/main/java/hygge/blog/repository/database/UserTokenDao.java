@@ -1,7 +1,7 @@
 package hygge.blog.repository.database;
 
-import hygge.blog.domain.enums.TokenScopeEnum;
-import hygge.blog.domain.po.UserToken;
+import hygge.blog.domain.local.enums.TokenScopeEnum;
+import hygge.blog.domain.local.po.UserToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

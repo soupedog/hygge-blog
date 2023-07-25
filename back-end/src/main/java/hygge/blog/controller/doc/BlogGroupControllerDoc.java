@@ -1,9 +1,9 @@
 package hygge.blog.controller.doc;
 
 import hygge.blog.controller.base.HyggeBlogController;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.BlogGroupDto;
-import hygge.blog.domain.dto.GroupBindInfo;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.BlogGroupDto;
+import hygge.blog.domain.local.dto.GroupBindInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

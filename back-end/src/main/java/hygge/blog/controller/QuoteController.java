@@ -1,11 +1,11 @@
 package hygge.blog.controller;
 
 import hygge.blog.controller.doc.QuoteControllerDoc;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.QuoteDto;
-import hygge.blog.domain.mapper.PoDtoMapper;
-import hygge.blog.domain.po.Quote;
-import hygge.blog.service.QuoteServiceImpl;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.QuoteDto;
+import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.po.Quote;
+import hygge.blog.service.local.QuoteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

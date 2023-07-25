@@ -1,6 +1,6 @@
 package hygge.blog.repository.database;
 
-import hygge.blog.domain.po.ArticleBrowseLog;
+import hygge.blog.domain.local.po.ArticleBrowseLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

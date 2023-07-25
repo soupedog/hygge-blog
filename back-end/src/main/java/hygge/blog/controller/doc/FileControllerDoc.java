@@ -1,9 +1,9 @@
 package hygge.blog.controller.doc;
 
 import hygge.blog.controller.base.HyggeBlogController;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.FileInfo;
-import hygge.blog.domain.enums.FileTypeEnum;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.FileInfo;
+import hygge.blog.domain.local.enums.FileTypeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

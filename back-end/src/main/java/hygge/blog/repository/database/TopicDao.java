@@ -1,6 +1,6 @@
 package hygge.blog.repository.database;
 
-import hygge.blog.domain.po.Topic;
+import hygge.blog.domain.local.po.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
 package hygge.blog.config.elasticsearche.converter;
 
-import hygge.blog.domain.dto.ArticleQuoteSearchCache;
+import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 

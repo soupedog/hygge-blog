@@ -1,6 +1,6 @@
 package hygge.blog.controller.base;
 
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
 import hygge.commons.template.definition.HyggeInfo;
 import hygge.web.template.definition.HyggeController;

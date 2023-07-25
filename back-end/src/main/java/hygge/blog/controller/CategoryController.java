@@ -1,11 +1,11 @@
 package hygge.blog.controller;
 
 import hygge.blog.controller.doc.CategoryControllerDoc;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.CategoryDto;
-import hygge.blog.domain.mapper.PoDtoMapper;
-import hygge.blog.domain.po.Category;
-import hygge.blog.service.CategoryServiceImpl;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.CategoryDto;
+import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.po.Category;
+import hygge.blog.service.local.CategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

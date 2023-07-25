@@ -1,13 +1,13 @@
 package hygge.blog.controller;
 
 import hygge.blog.controller.doc.BlogGroupControllerDoc;
-import hygge.blog.domain.bo.BlogSystemCode;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.BlogGroupDto;
-import hygge.blog.domain.dto.GroupBindInfo;
-import hygge.blog.domain.mapper.PoDtoMapper;
-import hygge.blog.domain.po.BlogGroup;
-import hygge.blog.service.BlogGroupServiceImpl;
+import hygge.blog.domain.local.bo.BlogSystemCode;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.BlogGroupDto;
+import hygge.blog.domain.local.dto.GroupBindInfo;
+import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.po.BlogGroup;
+import hygge.blog.service.local.BlogGroupServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,10 +1,10 @@
 package hygge.blog.controller;
 
 import hygge.blog.controller.doc.FileControllerDoc;
-import hygge.blog.domain.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.dto.FileInfo;
-import hygge.blog.domain.enums.FileTypeEnum;
-import hygge.blog.service.FileServiceImpl;
+import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.dto.FileInfo;
+import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.service.local.FileServiceImpl;
 import hygge.web.util.log.annotation.ControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

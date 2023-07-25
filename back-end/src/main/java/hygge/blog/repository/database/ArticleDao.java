@@ -1,7 +1,7 @@
 package hygge.blog.repository.database;
 
-import hygge.blog.domain.po.Article;
-import hygge.blog.domain.po.ArticleCountInfo;
+import hygge.blog.domain.local.po.Article;
+import hygge.blog.domain.local.po.ArticleCountInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

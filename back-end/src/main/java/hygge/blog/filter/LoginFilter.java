@@ -2,11 +2,11 @@ package hygge.blog.filter;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.domain.enums.UserTypeEnum;
-import hygge.blog.domain.po.User;
+import hygge.blog.domain.local.enums.UserTypeEnum;
+import hygge.blog.domain.local.po.User;
 import hygge.blog.filter.base.AbstractHyggeRequestFilter;
-import hygge.blog.service.UserServiceImpl;
-import hygge.blog.service.UserTokenServiceImpl;
+import hygge.blog.service.local.UserServiceImpl;
+import hygge.blog.service.local.UserTokenServiceImpl;
 import hygge.commons.exception.main.HyggeRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
