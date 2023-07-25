@@ -28,8 +28,8 @@ public class FilterConfig {
     public FilterRegistrationBean<LoginFilter> loginFilterRegistration(LoginFilter loginFilter) {
         FilterRegistrationBean<LoginFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(loginFilter);
+        // 非登录接口都进行 token 校验
         filterRegistrationBean.addUrlPatterns("/blog-service/api/main/*");
-        // 排除登录接口
         filterRegistrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
         return filterRegistrationBean;
     }

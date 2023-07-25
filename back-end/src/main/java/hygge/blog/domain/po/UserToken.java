@@ -22,6 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author Xavier
@@ -48,7 +50,7 @@ public class UserToken {
     private Integer tokenId;
     @Column(nullable = false)
     private Integer userId;
-    @Column(nullable = false,columnDefinition = "enum ('WEB', 'PHONE') default 'WEB'")
+    @Column(nullable = false, columnDefinition = "enum ('WEB', 'PHONE') default 'WEB'")
     @Enumerated(EnumType.STRING)
     private TokenScopeEnum scope;
     @Column(nullable = false)
@@ -61,7 +63,11 @@ public class UserToken {
     public void refresh(long currentTimeStamp) {
         this.token = randomHelper.getUniversallyUniqueIdentifier(true);
         this.refreshKey = randomHelper.getUniversallyUniqueIdentifier(true);
+
+        long nextDeadline = Instant.ofEpochMilli(currentTimeStamp)
+                .plus(3, ChronoUnit.HOURS)
+                .toEpochMilli();
         // 往后有效 3 小时
-        this.deadline = new Timestamp(currentTimeStamp + 10800000L);
+        this.deadline = new Timestamp(nextDeadline);
     }
 }

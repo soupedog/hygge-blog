@@ -9,6 +9,10 @@ package hygge.blog.common;
 public class HyggeRequestTracker {
     private static final InheritableThreadLocal<HyggeRequestContext> HYGGE_REQUEST_CONTEXT_THREAD_LOCAL = new InheritableThreadLocal<>();
 
+    private HyggeRequestTracker() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static HyggeRequestContext getContext() {
         HyggeRequestContext fullLinkContext = HYGGE_REQUEST_CONTEXT_THREAD_LOCAL.get();
         if (fullLinkContext == null) {

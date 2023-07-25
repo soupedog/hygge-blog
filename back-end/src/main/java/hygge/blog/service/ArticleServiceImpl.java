@@ -113,7 +113,6 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         return result;
     }
 
-
     @Transactional
     public Article updateArticle(String aid, Map<String, Object> data) {
         parameterHelper.stringNotEmpty("cid", (Object) aid);
@@ -296,9 +295,11 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
             articleConfiguration.setBackgroundMusicType(parameterHelper.parseObjectOfNullable("backgroundMusicType", articleConfiguration.getBackgroundMusicType(), BackgroundMusicTypeEnum.NONE));
             articleConfiguration.setMediaPlayType(parameterHelper.parseObjectOfNullable("mediaPlayType", articleConfiguration.getMediaPlayType(), MediaPlayTypeEnum.SUGGEST_AUTO_PLAY));
 
-            if (!articleConfiguration.getBackgroundMusicType().equals(BackgroundMusicTypeEnum.NONE)) {
+            if (!BackgroundMusicTypeEnum.NONE.equals(articleConfiguration.getBackgroundMusicType())) {
                 parameterHelper.stringNotEmpty("src", (Object) articleConfiguration.getSrc());
-            } else if (BackgroundMusicTypeEnum.DEFAULT.equals(articleConfiguration.getBackgroundMusicType())) {
+            }
+
+            if (BackgroundMusicTypeEnum.DEFAULT.equals(articleConfiguration.getBackgroundMusicType())) {
                 parameterHelper.stringNotEmpty("name", (Object) articleConfiguration.getName());
                 parameterHelper.stringNotEmpty("artist", (Object) articleConfiguration.getArtist());
             }

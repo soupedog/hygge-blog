@@ -1,5 +1,6 @@
 package hygge.blog.filter.base;
 
+import hygge.commons.constant.ConstantParameters;
 import hygge.commons.template.definition.HyggeInfo;
 import hygge.util.UtilCreator;
 import hygge.util.definition.ParameterHelper;
@@ -47,9 +48,9 @@ public abstract class AbstractHyggeRequestFilter extends OncePerRequestFilter {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         response.setStatus(200);
-        String responseBody = "{" + System.lineSeparator() +
-                "    \"code\":" + stateCode + "," + System.lineSeparator() +
-                "    \"msg\":\"" + message + "\"" + System.lineSeparator() +
+        String responseBody = "{" + ConstantParameters.LINE_SEPARATOR +
+                "    \"code\":" + stateCode + "," + ConstantParameters.LINE_SEPARATOR +
+                "    \"msg\":\"" + message + "\"" + ConstantParameters.LINE_SEPARATOR +
                 "}";
         try (PrintWriter out = response.getWriter()) {
             out.append(responseBody);
