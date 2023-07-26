@@ -1,4 +1,4 @@
-package hygge.blog.service.local;
+package hygge.blog.service.local.normal;
 
 import hygge.blog.repository.database.AnnouncementDao;
 import hygge.blog.domain.local.po.Announcement;

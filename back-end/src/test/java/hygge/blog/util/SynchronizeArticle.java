@@ -8,7 +8,7 @@ import hygge.blog.domain.local.dto.ArticleDto;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.User;
-import hygge.blog.service.local.ArticleServiceImpl;
+import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.commons.constant.enums.DateTimeFormatModeEnum;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;

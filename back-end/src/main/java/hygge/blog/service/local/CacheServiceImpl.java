@@ -5,6 +5,8 @@ import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.TopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

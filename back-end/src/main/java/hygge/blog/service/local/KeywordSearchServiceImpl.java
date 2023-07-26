@@ -11,6 +11,7 @@ import hygge.blog.common.mapper.ElasticToDtoMapper;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;

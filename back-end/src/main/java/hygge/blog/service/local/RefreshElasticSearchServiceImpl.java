@@ -15,6 +15,7 @@ import hygge.blog.repository.database.CategoryDao;
 import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.repository.database.UserDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
+import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

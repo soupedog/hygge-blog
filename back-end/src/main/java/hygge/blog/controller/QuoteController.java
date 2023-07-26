@@ -5,7 +5,7 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.QuoteDto;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Quote;
-import hygge.blog.service.local.QuoteServiceImpl;
+import hygge.blog.service.local.normal.QuoteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -5,7 +5,7 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.TopicDto;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Topic;
-import hygge.blog.service.local.TopicServiceImpl;
+import hygge.blog.service.local.normal.TopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

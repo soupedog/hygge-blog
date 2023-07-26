@@ -30,7 +30,7 @@ import java.util.Map;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "webAppEntityManagerFactory",
         transactionManagerRef = "webAppTransactionManager",
-        basePackages = {"hygge.blog.repository"}
+        basePackages = {"hygge.blog.repository.database"}
 )
 @Configuration
 @EnableConfigurationProperties(DatabaseConfiguration.class)

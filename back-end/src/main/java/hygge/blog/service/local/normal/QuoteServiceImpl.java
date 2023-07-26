@@ -1,4 +1,4 @@
-package hygge.blog.service.local;
+package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
@@ -13,6 +13,7 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Quote;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.service.local.RefreshElasticSearchServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;

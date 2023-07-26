@@ -6,7 +6,7 @@ import hygge.blog.controller.doc.CacheControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.User;
-import hygge.blog.service.local.UserServiceImpl;
+import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;

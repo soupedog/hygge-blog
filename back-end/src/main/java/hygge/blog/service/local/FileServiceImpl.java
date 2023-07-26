@@ -7,6 +7,7 @@ import hygge.blog.domain.local.dto.FileInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
