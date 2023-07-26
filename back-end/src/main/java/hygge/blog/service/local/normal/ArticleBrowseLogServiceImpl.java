@@ -60,7 +60,7 @@ public class ArticleBrowseLogServiceImpl extends HyggeWebUtilContainer {
                             resultTemp.getData() != null && "Success".equals(resultTemp.getData().getCode())) {
                         BaiduIpInfoDto baiduIpInfoDto = resultTemp.getData().getData();
 
-                        targetIp = baiduIpInfoDto.toLocationInfo();
+                        ipLocation = baiduIpInfoDto.toLocationInfo();
                     }
                     // 至少进行过一次远端查询了，终止查询
                     continueFlag = false;
