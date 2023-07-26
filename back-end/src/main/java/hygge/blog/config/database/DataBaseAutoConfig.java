@@ -69,7 +69,7 @@ public class DataBaseAutoConfig implements HyggeAutoConfiguration {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(hikariDataSource);
         entityManagerFactoryBean.setJpaVendorAdapter(hibernateJpaVendorAdapter);
-        entityManagerFactoryBean.setPackagesToScan("hygge.blog.domain.po");
+        entityManagerFactoryBean.setPackagesToScan("hygge.blog.domain.local.po");
         // 当前线程不存在事务、事务已关闭时，也允许懒加载查询(异步线程时通常用得上)
         Map<String, Object> jpaPropertyMap = entityManagerFactoryBean.getJpaPropertyMap();
         jpaPropertyMap.put(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");

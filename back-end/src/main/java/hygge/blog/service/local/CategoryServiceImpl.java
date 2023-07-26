@@ -1,23 +1,22 @@
 package hygge.blog.service.local;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.CategoryDao;
+import hygge.blog.common.mapper.MapToAnyMapper;
+import hygge.blog.common.mapper.OverrideMapper;
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.common.mapper.MapToAnyMapper;
-import hygge.blog.common.mapper.OverrideMapper;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.CategoryAccessRule;
+import hygge.blog.repository.database.CategoryDao;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -32,10 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Xavier
@@ -46,8 +43,6 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     private static final CategoryAccessRule DEFAULT_CATEGORY_ACCESS_RULE = CategoryAccessRule.builder().accessRuleType(AccessRuleTypeEnum.PERSONAL).requirement(false).build();
 
-    private static TypeReference<ArrayList<CategoryAccessRule>> TYPE_INFO_ACCESS_RULE_LIST = new TypeReference<ArrayList<CategoryAccessRule>>() {
-    };
     @Autowired
     private UserServiceImpl userService;
     @Autowired
@@ -188,24 +183,16 @@ public class CategoryServiceImpl extends HyggeWebUtilContainer {
         return result;
     }
 
-    public List<Category> initRootCategory(List<Category> currentCategoryList) {
-        Set<Integer> allCategoryIdSet = new HashSet<>();
-        // TODO 层级超过 2 级爷爷节点无法被加入
-        for (Category category : currentCategoryList) {
-            allCategoryIdSet.add(category.getCategoryId());
-            if (category.getParentId() != null) {
-                allCategoryIdSet.add(category.getParentId());
-            }
-        }
-
-        return categoryDao.findCategoryByCategoryIdList(allCategoryIdSet);
-    }
-
     private void nameConflictCheck(String categoryName) {
         Category old = categoryDao.findCategoryByCategoryName(categoryName);
         if (old != null) {
             throw new LightRuntimeException(String.format("Category(%s) already exists.", categoryName), BlogSystemCode.ARTICLE_CATEGORY_ALREADY_EXISTS);
         }
+    }
+
+    public Category findCategoryByCategoryId(Integer categoryId, boolean nullable) {
+        Category result = categoryDao.findById(categoryId).orElse(null);
+        return checkCategoryResult(result, parameterHelper.string(categoryId), nullable);
     }
 
     public Category findCategoryByCid(String cid, boolean nullable) {

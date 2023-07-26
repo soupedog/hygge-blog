@@ -1,21 +1,20 @@
 package hygge.blog.service.local;
 
-import hygge.blog.repository.database.ArticleDao;
-import hygge.blog.repository.database.CategoryDao;
-import hygge.blog.repository.database.QuoteDao;
-import hygge.blog.repository.database.TopicDao;
-import hygge.blog.repository.database.UserDao;
-import hygge.blog.domain.local.dto.ArticleDto;
-import hygge.blog.domain.local.dto.QuoteDto;
 import hygge.blog.common.mapper.ElasticToDtoMapper;
 import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.dto.ArticleDto;
+import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
+import hygge.blog.domain.local.dto.QuoteDto;
+import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Quote;
-import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.ArticleDao;
+import hygge.blog.repository.database.CategoryDao;
+import hygge.blog.repository.database.QuoteDao;
+import hygge.blog.repository.database.UserDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
-import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +42,13 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private CategoryDao categoryDao;
     @Autowired
-    private TopicDao topicDao;
-    @Autowired
     private UserDao userDao;
     @Autowired
     private QuoteDao quoteDao;
     @Autowired
     private SearchingCacheDao searchingCacheDao;
+    @Autowired
+    private CacheServiceImpl cacheService;
 
     public void freshSingleArticle(String aid, Integer articleId) {
         ArticleDto articleDto = articleService.findArticleDetailByAid(false, aid);
@@ -64,7 +63,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     }
 
     public void freshSingleQuote(Integer quoteId) {
-        Quote quote = quoteDao.findById(quoteId).get();
+        Quote quote = quoteDao.findById(quoteId).orElse(null);
         QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
@@ -84,7 +83,6 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         AtomicInteger totalCount = new AtomicInteger(0);
 
         List<Category> allCategoryList = categoryDao.findAll();
-        List<Topic> allTopicList = topicDao.findAll();
         List<User> allUserList = userDao.findAll();
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("articleId")));
 
@@ -101,14 +99,14 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
 
             articleList.forEach(article -> {
                 Category currentCategory = allCategoryList.stream().filter(category -> category.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
-                Topic currentTopic = allTopicList.stream().filter(topic -> topic.getTopicId().equals(currentCategory.getTopicId())).findFirst().orElse(null);
                 User currentUser = allUserList.stream().filter(user -> user.getUserId().equals(article.getUserId())).findFirst().orElse(null);
 
                 ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
                 articleDto.setUid(currentUser.getUid());
                 articleDto.setCid(currentCategory.getCid());
 
-                articleDto.initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, allCategoryList);
+                CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
+                articleDto.setCategoryTreeInfo(categoryTreeInfo);
 
                 ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
                 articleQuoteSearchCache.setEsId(article.getArticleId());

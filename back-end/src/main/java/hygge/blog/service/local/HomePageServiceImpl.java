@@ -53,23 +53,18 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
             TopicDto topicDto = PoDtoMapper.INSTANCE.poToDto(topic);
             TopicOverviewInfo topicOverviewInfo = TopicOverviewInfo.builder().topicInfo(topicDto).categoryListInfo(new ArrayList<>()).build();
 
-            for (Category category : categoryList) {
-                if (!category.getTopicId().equals(topic.getTopicId())) {
-                    continue;
-                }
+            categoryList.stream().filter(category -> category.getTopicId().equals(topic.getTopicId())).forEach(category -> {
                 CategoryDto categoryDto = PoDtoMapper.INSTANCE.poToDto(category);
-
                 Optional<ArticleCountInfo> articleCountInfoTemp = articleCountInfoList.stream().filter(articleCountInfo -> articleCountInfo.getCategoryId().equals(category.getCategoryId())).findFirst();
                 Integer count = articleCountInfoTemp.map(articleCountInfo -> articleCountInfo.getCount().intValue()).orElse(0);
-
+                // 非管理员隐藏挂载文章数目为 0 的类别
                 if (!context.isMaintainer() && count < 1) {
-                    continue;
+                    return;
                 }
-
                 categoryDto.setArticleCount(count);
                 topicOverviewInfo.getCategoryListInfo().add(categoryDto);
                 topicOverviewInfo.setTotalCount(topicOverviewInfo.getTotalCount() + count);
-            }
+            });
 
             if (!context.isMaintainer() && topicOverviewInfo.getCategoryListInfo().isEmpty()) {
                 continue;

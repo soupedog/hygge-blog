@@ -2,6 +2,7 @@ package hygge.blog;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -11,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author Xavier
  * @date 2022/7/17
  */
+@EnableCaching
 @EnableScheduling
 @SpringBootApplication
 public class HyggeBlogApplication {

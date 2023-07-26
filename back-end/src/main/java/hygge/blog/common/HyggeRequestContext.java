@@ -26,7 +26,7 @@ import java.util.EnumMap;
 public class HyggeRequestContext extends AbstractHyggeContext<HyggeRequestContext.Key> {
     @Override
     protected void initContainer(int initialCapacity, float loadFactor) {
-        this.container = new EnumMap<>(HyggeRequestContext.Key.class);
+        this.container = new EnumMap<>(Key.class);
     }
 
     /**

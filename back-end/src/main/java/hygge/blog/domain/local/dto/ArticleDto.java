@@ -2,8 +2,6 @@ package hygge.blog.domain.local.dto;
 
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.enums.ArticleStateEnum;
-import hygge.blog.common.mapper.PoDtoMapper;
-import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -12,10 +10,6 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * 文章
@@ -63,26 +57,4 @@ public class ArticleDto {
     protected Long createTs;
     @Schema(title = "最后修改时间", description = "UTC 毫秒级时间戳")
     protected Long lastUpdateTs;
-
-    public void initCategoryTreeInfo(TopicDto currentTopicDto, Category currentCategory, List<Category> allCategoryList) {
-        CategoryTreeInfo categoryTreeInfo = new CategoryTreeInfo();
-        categoryTreeInfo.setTopicInfo(currentTopicDto);
-        categoryTreeInfo.setCategoryList(new ArrayList<>(0));
-
-        // 确保当前节点一定被添加
-        while (categoryTreeInfo.getCategoryList().isEmpty() || currentCategory != null) {
-            categoryTreeInfo.getCategoryList().add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
-            // 确认不会空指针
-            Integer parentId = currentCategory.getParentId();
-            if (currentCategory.getParentId() != null) {
-                currentCategory = allCategoryList.stream().filter(item -> item.getCategoryId().equals(parentId)).findFirst().orElse(null);
-            } else {
-                currentCategory = null;
-            }
-        }
-
-        // 上面是从当前找到根节点，所以需要反转数组才是从根到当前节点
-        Collections.reverse(categoryTreeInfo.getCategoryList());
-        this.setCategoryTreeInfo(categoryTreeInfo);
-    }
 }

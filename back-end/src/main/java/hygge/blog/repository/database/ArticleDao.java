@@ -51,9 +51,9 @@ public interface ArticleDao extends JpaRepository<Article, Integer> {
             value = "select null as configuration,null as content,createTs,lastUpdateTs,articleId,aid,categoryId,userId,title,imageSrc,summary,wordCount,pageViews,selfPageViews,orderGlobal,orderCategory,articleState from article where categoryId in :accessibleCategoryList and articleState='ACTIVE' ", nativeQuery = true)
     Page<Article> findArticleSummary(@Param("accessibleCategoryList") List<Integer> accessibleCategoryList, Pageable pageable);
 
-    @Query(value = "select new hygge.blog.domain.po.ArticleCountInfo(categoryId, count(articleId)) from Article where categoryId in :accessibleCategoryList and articleState='ACTIVE' group by categoryId")
+    @Query(value = "select new hygge.blog.domain.local.po.ArticleCountInfo(categoryId, count(articleId)) from Article where categoryId in :accessibleCategoryList and articleState='ACTIVE' group by categoryId")
     List<ArticleCountInfo> findArticleCountsOfCategory(@Param("accessibleCategoryList") List<Integer> accessibleCategoryList);
 
-    @Query(value = "select new hygge.blog.domain.po.ArticleCountInfo(categoryId, count(articleId)) from Article where categoryId in :accessibleCategoryList and (articleState='ACTIVE' or userId=:userId) group by categoryId")
+    @Query(value = "select new hygge.blog.domain.local.po.ArticleCountInfo(categoryId, count(articleId)) from Article where categoryId in :accessibleCategoryList and (articleState='ACTIVE' or userId=:userId) group by categoryId")
     List<ArticleCountInfo> findArticleCountsOfCategory(@Param("accessibleCategoryList") List<Integer> accessibleCategoryList, @Param("userId") Integer userId);
 }

@@ -2,23 +2,22 @@ package hygge.blog.service.local;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.ArticleDao;
-import hygge.blog.domain.local.bo.BlogSystemCode;
-import hygge.blog.domain.local.dto.ArticleDto;
-import hygge.blog.domain.local.dto.TopicDto;
-import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
-import hygge.blog.domain.local.enums.BackgroundMusicTypeEnum;
-import hygge.blog.domain.local.enums.MediaPlayTypeEnum;
-import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.common.mapper.MapToAnyMapper;
 import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.bo.BlogSystemCode;
+import hygge.blog.domain.local.dto.ArticleDto;
+import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
+import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
+import hygge.blog.domain.local.enums.BackgroundMusicTypeEnum;
+import hygge.blog.domain.local.enums.MediaPlayTypeEnum;
+import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
-import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
+import hygge.blog.repository.database.ArticleDao;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -56,7 +55,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private CategoryServiceImpl categoryService;
     @Autowired
-    private TopicServiceImpl topicService;
+    private CacheServiceImpl cacheService;
     @Autowired
     private RefreshElasticSearchServiceImpl refreshElasticSearchService;
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
@@ -210,25 +209,13 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         }));
 
         if (articleSummaryList != null && !articleSummaryList.isEmpty()) {
-            // 构建类别树严格来说前端做合适
-            // 已确定不会出现多 topic 的情景
-            Topic topic = null;
-            TopicDto topicDto = null;
-
-            List<Category> allCategoryList = categoryService.initRootCategory(accessibleCategoryList);
-
+            // 为全部文章摘要构建类别树
             for (ArticleDto articleDto : articleSummaryList) {
-                // 确认不会空指针
+                // 查询出的文章摘要都是允许访问类别下的，所以不会空指针
                 Category category = accessibleCategoryList.stream().filter(item -> item.getCid().equals(articleDto.getCid())).findFirst().get();
 
-                if (topic == null) {
-                    topic = topicService.findTopicByTopicId(category.getTopicId(), false);
-                }
-                if (topicDto == null) {
-                    topicDto = PoDtoMapper.INSTANCE.poToDto(topic);
-                }
-
-                articleDto.initCategoryTreeInfo(topicDto, category, allCategoryList);
+                CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(category.getCategoryId());
+                articleDto.setCategoryTreeInfo(categoryTreeInfo);
             }
         }
         result.setArticleSummaryList(articleSummaryList);
@@ -255,12 +242,11 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
             return null;
         }
 
-        Topic currentTopic = topicService.findTopicByTopicId(currentCategory.getTopicId(), false);
-
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(article);
         result.setCid(currentCategory.getCid());
 
-        result.initCategoryTreeInfo(PoDtoMapper.INSTANCE.poToDto(currentTopic), currentCategory, categoryList);
+        CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
+        result.setCategoryTreeInfo(categoryTreeInfo);
 
         // 如果允许更新浏览量
         if (pageViewsIncrease) {
