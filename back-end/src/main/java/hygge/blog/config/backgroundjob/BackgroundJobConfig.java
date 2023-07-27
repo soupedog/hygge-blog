@@ -29,7 +29,10 @@ public class BackgroundJobConfig {
         refreshElasticSearchService.freshQuote();
     }
 
-    @Scheduled(fixedDelay = 1000 * 3600, initialDelay = 1000 * 300)
+    /**
+     * ip 查询接口频率限制比想象中更严格，现在设定每天三次调用
+     */
+    @Scheduled(fixedDelay = 1000 * 3600 * 8, initialDelay = 1000 * 300)
     public void toFreshIpLocationData() {
         articleBrowseLogService.freshIpLocationBackgroundJob();
     }
