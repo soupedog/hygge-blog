@@ -42,8 +42,11 @@ public class CacheServiceImpl {
 
         categoryList.add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
 
-        boolean continueFlag = true;
+
         Category currentNode = currentCategory;
+
+        // 已经是根节点类型的话直接结束，否则继续
+        boolean continueFlag = !currentNode.getRootId().equals(currentNode.getCategoryId());
 
         while (continueFlag) {
             Category parentNode = categoryService.findCategoryByCategoryId(currentNode.getParentId(), false);
