@@ -2,11 +2,10 @@ package hygge.blog.controller;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.ArticleControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.ArticleDto;
-import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
@@ -63,8 +62,7 @@ public class ArticleController implements ArticleControllerDoc {
 
         ArticleDto result = articleService.findArticleDetailByAid(true, aid);
 
-        boolean isVisitor = context.getCurrentLoginUser() == null || !context.getCurrentLoginUser().getUserType().equals(UserTypeEnum.ROOT);
-        if (isVisitor) {
+        if (!context.isMaintainer()) {
             CompletableFuture.runAsync(() -> articleBrowseLogService.insertArticleBrowseLog(result.getAid(),
                             result.getTitle(),
                             context.getObject(HyggeRequestContext.Key.IP_ADDRESS),
