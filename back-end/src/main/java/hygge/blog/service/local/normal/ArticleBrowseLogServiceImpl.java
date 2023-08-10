@@ -1,9 +1,9 @@
 package hygge.blog.service.local.normal;
 
-import hygge.blog.repository.database.ArticleBrowseLogDao;
 import hygge.blog.domain.baidu.dto.BaiduGatewayDto;
 import hygge.blog.domain.baidu.dto.inner.BaiduIpInfoDto;
 import hygge.blog.domain.local.po.ArticleBrowseLog;
+import hygge.blog.repository.database.ArticleBrowseLogDao;
 import hygge.blog.service.client.IPQueryClient;
 import hygge.web.template.HyggeWebUtilContainer;
 import hygge.web.util.http.bo.HttpResponse;
@@ -51,23 +51,28 @@ public class ArticleBrowseLogServiceImpl extends HyggeWebUtilContainer {
                 continueFlag = false;
             } else {
                 // 尝试从本地解析 IP location
-                String ipLocation = articleBrowseLogDao.findIpLocationFromLocal(targetIp);
+                ArticleBrowseLog ipLocationInfoResult = articleBrowseLogDao.findIpLocationInfoFromLocal(targetIp);
 
                 // 本地不存在相关 IP 信息时，尝试从百度解析 IP location
-                if (parameterHelper.isEmpty(ipLocation)) {
+                if (parameterHelper.isEmpty(ipLocationInfoResult)) {
                     HttpResponse<Void, BaiduGatewayDto<BaiduIpInfoDto>> resultTemp = ipQueryService.queryIpInfo(targetIp);
                     if (resultTemp.isSuccess() &&
                             resultTemp.getData() != null && "Success".equals(resultTemp.getData().getCode())) {
                         BaiduIpInfoDto baiduIpInfoDto = resultTemp.getData().getData();
 
-                        ipLocation = baiduIpInfoDto.toLocationInfo();
+                        ipLocationInfoResult = ArticleBrowseLog.builder()
+                                .ip(targetIp)
+                                .ipLocation(baiduIpInfoDto.toLocationInfo())
+                                .latitude(baiduIpInfoDto.getLat())
+                                .longitude(baiduIpInfoDto.getLng())
+                                .build();
                     }
                     // 至少进行过一次远端查询了，终止查询
                     continueFlag = false;
                 }
 
-                if (parameterHelper.isNotEmpty(ipLocation)) {
-                    articleBrowseLogDao.updateIpLocationForAll(targetIp, ipLocation, currentTimeStamp);
+                if (parameterHelper.isNotEmpty(ipLocationInfoResult)) {
+                    articleBrowseLogDao.updateIpLocationInfoForAll(targetIp, ipLocationInfoResult.getLatitude(), ipLocationInfoResult.getLongitude(), ipLocationInfoResult.getIpLocation(), currentTimeStamp);
                 } else {
                     log.error("解析 ipLocation({}) 失败.", targetIp);
                 }

@@ -39,7 +39,7 @@ public class ArticleBrowseLog extends BasePo {
     private String ipLocation;
     private String aid;
     /**
-     * 维度
+     * 纬度
      */
     private String latitude;
     /**

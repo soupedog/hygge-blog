@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /**
  * @author Xavier
@@ -17,14 +18,17 @@ import java.sql.Timestamp;
  */
 @Repository
 public interface ArticleBrowseLogDao extends JpaRepository<ArticleBrowseLog, Integer> {
-    @Query(value = "select ip from article_browse_log where ipLocation is null group by ip limit 1", nativeQuery = true)
+    @Query(value = "SELECT ip FROM article_browse_log WHERE ipLocation IS NULL GROUP BY ip limit 1", nativeQuery = true)
     String findAnIpWithoutLocation();
 
-    @Query(value = "select ipLocation from article_browse_log where ip=:ip and ipLocation is not null limit 1", nativeQuery = true)
-    String findIpLocationFromLocal(@Param("ip") String ip);
+    @Query(value = "SELECT * FROM article_browse_log WHERE ip=:ip AND ipLocation IS NOT NULL AND latitude IS NOT NULL AND longitude IS NOT NULL limit 1", nativeQuery = true)
+    ArticleBrowseLog findIpLocationInfoFromLocal(@Param("ip") String ip);
 
     @Modifying
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @Query(value = "update article_browse_log set ipLocation=:ipLocation,lastUpdateTs=:currentTimeStamp where ip=:ip", nativeQuery = true)
-    int updateIpLocationForAll(@Param("ip") String ip, @Param("ipLocation") String ipLocation, @Param("currentTimeStamp") Timestamp currentTimeStamp);
+    @Query(value = "UPDATE article_browse_log SET ipLocation=:ipLocation,latitude=:latitude,longitude=:longitude,lastUpdateTs=:currentTimeStamp WHERE ip=:ip AND (ipLocation IS NULL OR (latitude IS NULL OR longitude IS NULL))", nativeQuery = true)
+    int updateIpLocationInfoForAll(@Param("ip") String ip, @Param("latitude") String latitude, @Param("longitude") String longitude, @Param("ipLocation") String ipLocation, @Param("currentTimeStamp") Timestamp currentTimeStamp);
+
+    @Query(value = "SELECT * FROM article_browse_log WHERE ip=:ip AND (ipLocation IS NULL OR (latitude IS NULL OR longitude IS NULL))", nativeQuery = true)
+    ArrayList<ArticleBrowseLog> findSameIpAndMissingDataTargetList(@Param("ip") String ip);
 }
