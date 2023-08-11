@@ -4,13 +4,13 @@ import hygge.commons.constant.ConstantParameters;
 import hygge.commons.template.definition.HyggeInfo;
 import hygge.util.UtilCreator;
 import hygge.util.definition.ParameterHelper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.Duration;

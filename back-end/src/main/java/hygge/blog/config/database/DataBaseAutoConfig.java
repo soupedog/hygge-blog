@@ -2,6 +2,7 @@ package hygge.blog.config.database;
 
 import com.zaxxer.hikari.HikariDataSource;
 import hygge.commons.spring.config.configuration.definition.HyggeAutoConfiguration;
+import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.MySQL57Dialect;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.Map;
 
 /**

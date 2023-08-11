@@ -1,5 +1,12 @@
 package hygge.blog.service.local;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.SourceConfig;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.dto.ArticleDto;
@@ -91,6 +98,56 @@ public class KeywordSearchServiceImpl {
                 .build();
     }
 
+    public SearchHits<ArticleQuoteSearchCache> keywordSearch2(String keyword, ArticleQuoteSearchCache.Type type, Collection<Category> allowableCategoryList, Integer currentPage, Integer pageSize) {
+        // 查询结果返回值不需要 content 字段节省带宽
+        SourceConfig sourceConfig = SourceConfig.of(builder -> builder.filter(filter -> filter.excludes("content")));
+
+        // 多重字段进行全文搜索
+        Query keywordRequirement = new MultiMatchQuery.Builder()
+                .fields("title", "summary", "content")
+                // BestFields 指多重字段匹配得分最高的作为当前记录的最终得分，MostFields 代表多字段匹配得分求和作为最终得分，查询结果中，得分高的会排在前面
+                // 其他类型见 https://www.elastic.co/guide/cn/elasticsearch/guide/current/_cross_fields_queries.html
+                .type(TextQueryType.MostFields)
+                // 查询容错步长，可选项有四个 0、1、2、auto(不开查询容错，查询效率肯定是最高的)
+                // 1 代表输入 cat ，可能会查到 car ，默认为 0 ，即不允许容错，需要关键字完全匹配
+                // auto 则是根据输入内容长度自适应容错步长，输入的内容长容错也就长
+                .fuzziness("0")
+                .query(keyword).build()
+                ._toQuery();
+
+        Query statusRequirement = BoolQuery.of(b -> b.should(TermQuery.of(t -> t.field("state").value("DRAFT"))._toQuery()))._toQuery();
+
+        SearchRequest searchRequest = SearchRequest.of(builder ->
+                builder.index("fuzzy_search_cache")
+                        .query(q -> q
+                                .bool(q2 -> q2
+                                        .must(keywordRequirement)
+                                        .must(statusRequirement)
+                                ))
+                        // 从第几个开始
+                        .from((currentPage - 1) * pageSize)
+                        // 从开始位置往后读取多少个结果(包括开始位置)
+                        .size(pageSize)
+                        .source(sourceConfig)
+        );
+
+        log.info("查询语句：{}", searchRequest);
+
+        try {
+            SearchResponse<FuzzySearchCache> responseTemp = elasticsearchClient.search(searchRequest, FuzzySearchCache.class);
+            log.info("共计： {}", Optional.ofNullable(responseTemp.hits().total()).map(TotalHits::value).orElse(0L));
+
+            List<FuzzySearchCache> result = new ArrayList<>();
+
+            responseTemp.hits().hits().forEach(item -> result.add(item.source()));
+
+            return success(result);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
     public SearchHits<ArticleQuoteSearchCache> keywordSearch(String keyword, ArticleQuoteSearchCache.Type type, Collection<Category> allowableCategoryList, Integer currentPage, Integer pageSize) {
         // 聚合后的最终条件构造器
         BoolQueryBuilder rootQueryBuilder = QueryBuilders.boolQuery();
