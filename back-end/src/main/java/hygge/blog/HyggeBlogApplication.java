@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @EnableCaching
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "hygge.*")
 public class HyggeBlogApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(HyggeBlogApplication.class);

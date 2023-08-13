@@ -5,7 +5,7 @@ import hygge.blog.service.local.RefreshElasticSearchServiceImpl;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
 /**
  * 模拟本地工具不需要的类
@@ -26,7 +26,7 @@ public class MyMockBean {
     }
 
     @Bean
-    public ElasticsearchRestTemplate elasticsearchRestTemplate() {
-        return Mockito.mock(ElasticsearchRestTemplate.class);
+    public ElasticsearchOperations operations() {
+        return Mockito.mock(ElasticsearchOperations.class);
     }
 }

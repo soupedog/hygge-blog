@@ -23,6 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -50,17 +52,28 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     private SearchingCacheDao searchingCacheDao;
     @Autowired
     private CacheServiceImpl cacheService;
+    @Autowired
+    private ElasticsearchOperations operations;
+
+    public void checkAndInitIndex() {
+        // Spring 提供的注解生成索引方案
+        IndexOperations indexOperations = operations.indexOps(ArticleQuoteSearchCache.class);
+
+        if (!indexOperations.exists()) {
+            log.info("{} 索引不存在，开始创建", ArticleQuoteSearchCache.class.getSimpleName());
+            // 创建索引
+            indexOperations.create();
+            // 配置映射
+            indexOperations.putMapping(indexOperations.createMapping());
+        }
+    }
 
     public void freshSingleArticle(String aid, Integer articleId) {
         ArticleDto articleDto = articleService.findArticleDetailByAid(false, aid);
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
         articleQuoteSearchCache.setEsId(articleId);
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
-        try {
-            searchingCacheDao.save(articleQuoteSearchCache);
-        } catch (Exception e) {
-            // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
-        }
+        searchingCacheDao.save(articleQuoteSearchCache);
     }
 
     public void freshSingleQuote(Integer quoteId) {
@@ -72,11 +85,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
         // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
         articleQuoteSearchCache.setCreateTs(new Timestamp(System.currentTimeMillis()));
-        try {
-            searchingCacheDao.save(articleQuoteSearchCache);
-        } catch (Exception e) {
-            // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
-        }
+        searchingCacheDao.save(articleQuoteSearchCache);
     }
 
     public void freshArticle() {
@@ -113,11 +122,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
                 articleQuoteSearchCache.setEsId(article.getArticleId());
                 articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
 
-                try {
-                    searchingCacheDao.save(articleQuoteSearchCache);
-                } catch (Exception e) {
-                    // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
-                }
+                searchingCacheDao.save(articleQuoteSearchCache);
                 totalCount.incrementAndGet();
             });
         } while (!articleTemp.isLast());
@@ -148,14 +153,10 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
                 ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
                 articleQuoteSearchCache.setEsId(quote.getQuoteId() + ArticleQuoteSearchCache.INTERVAL);
                 articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-                // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
+                // 时间对句子本身来说其实没有意义，只因落到 ES 要求时间必填
                 articleQuoteSearchCache.setCreateTs(new Timestamp(startTs + totalCount.get()));
 
-                try {
-                    searchingCacheDao.save(articleQuoteSearchCache);
-                } catch (Exception e) {
-                    // 7.x 的客户端 能写入，但是无法正常解析 8.x 服务端的返回值(workaround)
-                }
+                searchingCacheDao.save(articleQuoteSearchCache);
                 totalCount.incrementAndGet();
             });
         } while (!quoteTemp.isLast());
