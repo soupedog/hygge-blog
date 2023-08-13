@@ -13,7 +13,7 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Quote;
 import hygge.blog.domain.local.po.User;
-import hygge.blog.service.local.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;

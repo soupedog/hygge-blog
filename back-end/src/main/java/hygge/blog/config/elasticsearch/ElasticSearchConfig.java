@@ -1,4 +1,4 @@
-package hygge.blog.config.elasticsearche;
+package hygge.blog.config.elasticsearch;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
@@ -17,4 +17,3 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
                 .build();
     }
 }
-

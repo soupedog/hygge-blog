@@ -8,7 +8,7 @@ import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.local.dto.inner.TopicOverviewInfo;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Announcement;
-import hygge.blog.service.local.KeywordSearchServiceImpl;
+import hygge.blog.service.elasticsearch.KeywordSearchServiceImpl;
 import hygge.blog.service.local.normal.AnnouncementServiceImpl;
 import hygge.blog.service.local.normal.HomePageServiceImpl;
 import hygge.web.util.log.annotation.ControllerLog;
@@ -74,7 +74,7 @@ public class HomePageController implements HomePageControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> articleFuzzySearch(@RequestParam(value = "keyword") String keyword,
                                                                                               @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                               @RequestParam(required = false, defaultValue = "5") int pageSize) {
-        return (ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>>) success(fuzzySearchService.doArticleFuzzySearch(keyword, currentPage, pageSize));
+        return (ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>>) success(fuzzySearchService.articleKeyWordSearch(keyword, currentPage, pageSize));
     }
 
     @Override
@@ -83,7 +83,7 @@ public class HomePageController implements HomePageControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> keywordSearch(@RequestParam(value = "keyword") String keyword,
                                                                                 @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                 @RequestParam(required = false, defaultValue = "5") int pageSize) {
-        return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(fuzzySearchService.doKeywordSearch(keyword, currentPage, pageSize));
+        return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(fuzzySearchService.quoteKeyWordSearch(keyword, currentPage, pageSize));
     }
 
     @Override

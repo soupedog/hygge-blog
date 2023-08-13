@@ -19,7 +19,7 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.service.local.CacheServiceImpl;
-import hygge.blog.service.local.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;

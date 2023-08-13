@@ -1,4 +1,4 @@
-package hygge.blog.service.local;
+package hygge.blog.service.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ScoreSort;
@@ -49,7 +49,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private ElasticsearchClient elasticsearchClient;
 
-    public ArticleSummaryInfo doArticleFuzzySearch(String keyword, Integer currentPage, Integer pageSize) {
+    public ArticleSummaryInfo articleKeyWordSearch(String keyword, Integer currentPage, Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
@@ -74,7 +74,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
                 .build();
     }
 
-    public QuoteInfo doKeywordSearch(String keyword, Integer currentPage, Integer pageSize) {
+    public QuoteInfo quoteKeyWordSearch(String keyword, Integer currentPage, Integer pageSize) {
         SearchResponse<ArticleQuoteSearchCache> resultTemp = keywordSearch(keyword, ArticleQuoteSearchCache.Type.QUOTE, null, currentPage, pageSize);
 
         List<QuoteDto> quoteList = new ArrayList<>(pageSize);
