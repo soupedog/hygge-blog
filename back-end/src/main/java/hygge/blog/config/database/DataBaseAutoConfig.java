@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import hygge.commons.spring.config.configuration.definition.HyggeAutoConfiguration;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.dialect.MySQL57Dialect;
+import org.hibernate.dialect.MySQLDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -63,8 +63,8 @@ public class DataBaseAutoConfig implements HyggeAutoConfiguration {
         // 设置数据库类型
         hibernateJpaVendorAdapter.setDatabase(Database.MYSQL);
         // 设置数据库方言 (此参数的 key 实际上是 "AvailableSettings.DIALECT" 其 value 可选项参见 "org.hibernate.dialect" 这个包下的类)
-        // 事实上这个参数非必填，会自动根据数据库类型识别，JPA 当前版本中， Mysql 数据库默认值是 "org.hibernate.dialect.MySQL57Dialect"
-        hibernateJpaVendorAdapter.setDatabasePlatform(MySQL57Dialect.class.getName());
+        // 事实上这个参数非必填，会自动根据数据库类型识别
+        hibernateJpaVendorAdapter.setDatabasePlatform(MySQLDialect.class.getName());
 
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(hikariDataSource);
