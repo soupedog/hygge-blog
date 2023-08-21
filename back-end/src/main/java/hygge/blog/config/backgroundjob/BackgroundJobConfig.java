@@ -21,6 +21,8 @@ public class BackgroundJobConfig {
 
     @Scheduled(fixedDelay = 1000 * 3600)
     public void toFreshArticleSearchData() {
+        refreshElasticSearchService.checkAndInitIndex();
+
         refreshElasticSearchService.freshArticle();
     }
 

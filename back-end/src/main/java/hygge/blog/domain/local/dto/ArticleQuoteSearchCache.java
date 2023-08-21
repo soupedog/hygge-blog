@@ -21,7 +21,7 @@ import java.sql.Timestamp;
  * @since Jdk 1.8
  */
 @TypeAlias("article_quote")
-@Document(indexName = "fuzzy_search_cache")
+@Document(indexName = "article_quote_search_cache")
 @Setting(shards = 1, replicas = 1)
 @Getter
 @Setter
