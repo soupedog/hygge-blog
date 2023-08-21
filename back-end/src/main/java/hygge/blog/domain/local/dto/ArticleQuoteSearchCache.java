@@ -24,7 +24,7 @@ import static hygge.blog.domain.local.dto.ArticleQuoteSearchCache.INDEX_NAME;
  */
 @TypeAlias("article_quote")
 @Document(indexName = INDEX_NAME)
-@Setting(shards = 1, replicas = 1)
+@Setting(shards = 1, replicas = 0)
 @Getter
 @Setter
 public class ArticleQuoteSearchCache {
