@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static hygge.blog.domain.local.dto.ArticleQuoteSearchCache.INDEX_NAME;
+
 /**
  * @author Xavier
  * @date 2022/8/30
@@ -145,7 +147,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
         SortOptions sortOptions = SortOptions.of(builder -> builder.score(scoreSort));
 
         SearchRequest searchRequest = SearchRequest.of(builder ->
-                builder.index("fuzzy_search_cache")
+                builder.index(INDEX_NAME)
                         .query(q -> q
                                 .bool(q2 -> {
                                             // 可空要求全不为空
@@ -173,6 +175,8 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
                         .sort(sortOptions)
                         .source(sourceConfig)
         );
+
+        System.out.println(searchRequest);
 
         try {
             return elasticsearchClient.search(searchRequest, ArticleQuoteSearchCache.class);

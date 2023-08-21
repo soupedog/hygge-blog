@@ -12,6 +12,8 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.sql.Timestamp;
 
+import static hygge.blog.domain.local.dto.ArticleQuoteSearchCache.INDEX_NAME;
+
 /**
  * 描述信息：<br/>
  *
@@ -21,15 +23,18 @@ import java.sql.Timestamp;
  * @since Jdk 1.8
  */
 @TypeAlias("article_quote")
-@Document(indexName = "article_quote_search_cache")
+@Document(indexName = INDEX_NAME)
 @Setting(shards = 1, replicas = 1)
 @Getter
 @Setter
 public class ArticleQuoteSearchCache {
+    public static final String INDEX_NAME = "article_quote_search_cache";
+
     /**
      * 文章、句子收藏间 ID 的间隔(防止 ES 文档覆盖)
      */
     public static final int INTERVAL = 1000000;
+
     /**
      * 内容唯一标示
      */
