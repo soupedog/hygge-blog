@@ -16,7 +16,6 @@ import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.repository.database.UserDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
 import hygge.blog.service.local.CacheServiceImpl;
-import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,8 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,8 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private ArticleDao articleDao;
-    @Autowired
-    private ArticleServiceImpl articleService;
     @Autowired
     private CategoryDao categoryDao;
     @Autowired
@@ -69,10 +66,33 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         }
     }
 
-    public void freshSingleArticle(String aid, Integer articleId) {
-        ArticleDto articleDto = articleService.findArticleDetailByAid(false, aid);
+    public void freshSingleArticleAsync(Integer articleId) {
+        CompletableFuture.runAsync(() -> {
+            freshSingleArticle(articleId);
+        }).exceptionally(e -> {
+            log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
+    }
+
+    public void freshSingleArticle(Integer articleId) {
+        Article article = articleDao.findById(articleId).orElse(null);
+        Category currentCategory = categoryDao.findById(article.getCategoryId()).orElse(null);
+        CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
+        User currentUser = userDao.findById(article.getUserId()).orElse(null);
+
+        freshSingleArticle(article, currentCategory, categoryTreeInfo, currentUser);
+    }
+
+    public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo, User currentUser) {
+        ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
+        articleDto.setUid(currentUser.getUid());
+        articleDto.setCid(currentCategory.getCid());
+
+        articleDto.setCategoryTreeInfo(categoryTreeInfo);
+
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
-        articleQuoteSearchCache.setEsId(articleId);
+        articleQuoteSearchCache.initEsId(article.getArticleId(), ArticleQuoteSearchCache.Type.ARTICLE);
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
         searchingCacheDao.save(articleQuoteSearchCache);
     }
@@ -82,14 +102,12 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-        articleQuoteSearchCache.setEsId(quoteId + ArticleQuoteSearchCache.INTERVAL);
+        articleQuoteSearchCache.initEsId(quoteId, ArticleQuoteSearchCache.Type.QUOTE);
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-        // 时间对句子本身来说其实没有意义，为了落到 ES 时间必填
-        articleQuoteSearchCache.setCreateTs(new Timestamp(System.currentTimeMillis()));
         searchingCacheDao.save(articleQuoteSearchCache);
     }
 
-    public void freshArticle() {
+    public void freshAllArticle() {
         long startTs = System.currentTimeMillis();
         AtomicInteger totalCount = new AtomicInteger(0);
 
@@ -101,29 +119,18 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
 
         List<Article> articleList = null;
         do {
-            if (articleList == null) {
-                articleList = articleTemp.getContent();
-            } else {
+            if (articleList != null) {
                 articleTemp = articleDao.findAll(articleTemp.nextPageable());
-                articleList = articleTemp.getContent();
             }
+            articleList = articleTemp.getContent();
 
             articleList.forEach(article -> {
                 Category currentCategory = allCategoryList.stream().filter(category -> category.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
+                CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
                 User currentUser = allUserList.stream().filter(user -> user.getUserId().equals(article.getUserId())).findFirst().orElse(null);
 
-                ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
-                articleDto.setUid(currentUser.getUid());
-                articleDto.setCid(currentCategory.getCid());
+                freshSingleArticle(article, currentCategory, categoryTreeInfo, currentUser);
 
-                CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
-                articleDto.setCategoryTreeInfo(categoryTreeInfo);
-
-                ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
-                articleQuoteSearchCache.setEsId(article.getArticleId());
-                articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
-
-                searchingCacheDao.save(articleQuoteSearchCache);
                 totalCount.incrementAndGet();
             });
         } while (!articleTemp.isLast());
@@ -141,21 +148,17 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
 
         List<Quote> quoteList = null;
         do {
-            if (quoteList == null) {
-                quoteList = quoteTemp.getContent();
-            } else {
+            if (quoteList != null) {
                 quoteTemp = quoteDao.findAll(quoteTemp.nextPageable());
-                quoteList = quoteTemp.getContent();
             }
+            quoteList = quoteTemp.getContent();
 
             quoteList.forEach(quote -> {
                 QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
 
                 ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-                articleQuoteSearchCache.setEsId(quote.getQuoteId() + ArticleQuoteSearchCache.INTERVAL);
+                articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
                 articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-                // 时间对句子本身来说其实没有意义，只因落到 ES 要求时间必填
-                articleQuoteSearchCache.setCreateTs(new Timestamp(startTs + totalCount.get()));
 
                 searchingCacheDao.save(articleQuoteSearchCache);
                 totalCount.incrementAndGet();

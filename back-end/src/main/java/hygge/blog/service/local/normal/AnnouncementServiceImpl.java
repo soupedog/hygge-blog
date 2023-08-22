@@ -1,7 +1,7 @@
 package hygge.blog.service.local.normal;
 
-import hygge.blog.repository.database.AnnouncementDao;
 import hygge.blog.domain.local.po.Announcement;
+import hygge.blog.repository.database.AnnouncementDao;
 import hygge.web.template.HyggeWebUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,5 +28,4 @@ public class AnnouncementServiceImpl extends HyggeWebUtilContainer {
 
         return resultTemp.getContent();
     }
-
 }

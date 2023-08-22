@@ -1,5 +1,6 @@
 package hygge.blog.domain.local.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -12,8 +13,6 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.sql.Timestamp;
 
-import static hygge.blog.domain.local.dto.ArticleQuoteSearchCache.INDEX_NAME;
-
 /**
  * 描述信息：<br/>
  *
@@ -22,19 +21,18 @@ import static hygge.blog.domain.local.dto.ArticleQuoteSearchCache.INDEX_NAME;
  * @date 2020/9/4
  * @since Jdk 1.8
  */
-@TypeAlias("article_quote")
-@Document(indexName = INDEX_NAME)
-@Setting(shards = 1, replicas = 0)
+@TypeAlias("ArticleQuoteSearchCache")// 默认是包路径，替换成恒定值更好
+@Document(indexName = ArticleQuoteSearchCache.INDEX_NAME)
+@Setting(shards = 1, replicas = 0)// 单机非集群 replicas 应设为 0(否则索引状态不会是 green)
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ArticleQuoteSearchCache {
     public static final String INDEX_NAME = "article_quote_search_cache";
-
     /**
      * 文章、句子收藏间 ID 的间隔(防止 ES 文档覆盖)
      */
     public static final int INTERVAL = 1000000;
-
     /**
      * 内容唯一标示
      */
@@ -143,6 +141,15 @@ public class ArticleQuoteSearchCache {
      */
     @Field(type = FieldType.Text, analyzer = "smartcn")
     private String remarks;
+
+    public Integer initEsId(Integer idTemp, Type type) {
+        if (Type.QUOTE.equals(type)) {
+            esId = idTemp + INTERVAL;
+        } else {
+            esId = idTemp;
+        }
+        return esId;
+    }
 
     public enum StateEnum {
         /**

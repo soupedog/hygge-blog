@@ -21,9 +21,7 @@ public class BackgroundJobConfig {
 
     @Scheduled(fixedDelay = 1000 * 3600)
     public void toFreshArticleSearchData() {
-        refreshElasticSearchService.checkAndInitIndex();
-
-        refreshElasticSearchService.freshArticle();
+        refreshElasticSearchService.freshAllArticle();
     }
 
     @Scheduled(fixedDelay = 1000 * 3600, initialDelay = 1000 * 1800)
@@ -32,7 +30,7 @@ public class BackgroundJobConfig {
     }
 
     /**
-     * ip 查询接口频率限制比想象中更严格，现在设定每天三次调用
+     * ip 查询接口是第三方提供的公共服务，频率限制比想象中更严格，每 8 小时调用一次
      */
     @Scheduled(fixedDelay = 1000 * 3600 * 8, initialDelay = 1000 * 300)
     public void toFreshIpLocationData() {

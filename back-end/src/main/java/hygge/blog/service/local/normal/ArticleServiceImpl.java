@@ -18,8 +18,8 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.repository.database.ArticleDao;
-import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.local.CacheServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -101,15 +101,8 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
 
         Article result = articleDao.save(article);
 
-        String aid = result.getAid();
         Integer articleId = result.getArticleId();
-        CompletableFuture.runAsync(() -> {
-            refreshElasticSearchService.freshSingleArticle(aid, articleId);
-        }).exceptionally(e -> {
-            log.error("刷新文章(" + article.getArticleId() + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
-
+        refreshElasticSearchService.freshSingleArticleAsync(articleId);
         return result;
     }
 
@@ -148,13 +141,7 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         Article result = articleDao.save(old);
 
         Integer articleId = result.getArticleId();
-        CompletableFuture.runAsync(() -> {
-            refreshElasticSearchService.freshSingleArticle(aid, articleId);
-        }).exceptionally(e -> {
-            log.error("刷新文章(" + result.getArticleId() + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
-
+        refreshElasticSearchService.freshSingleArticleAsync(articleId);
         return result;
     }
 

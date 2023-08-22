@@ -25,6 +25,7 @@ import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.commons.constant.ConstantParameters;
 import hygge.commons.exception.ExternalRuntimeException;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +37,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import static hygge.blog.domain.local.dto.ArticleQuoteSearchCache.INDEX_NAME;
 
 /**
  * @author Xavier
@@ -129,7 +128,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
                 // 查询容错步长，可选项有四个 0、1、2、auto(不开查询容错，查询效率肯定是最高的)
                 // 1 代表输入 cat ，可能会查到 car ，默认为 0 ，即不允许容错，需要关键字完全匹配
                 // auto 则是根据输入内容长度自适应容错步长，输入的内容长容错也就长
-                .fuzziness("2")
+                .fuzziness("auto")
                 .query(keyword).build()
                 ._toQuery();
 
@@ -147,7 +146,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
         SortOptions sortOptions = SortOptions.of(builder -> builder.score(scoreSort));
 
         SearchRequest searchRequest = SearchRequest.of(builder ->
-                builder.index(INDEX_NAME)
+                builder.index(ArticleQuoteSearchCache.INDEX_NAME)
                         .query(q -> q
                                 .bool(q2 -> {
                                             // 可空要求全不为空
@@ -176,7 +175,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
                         .source(sourceConfig)
         );
 
-        System.out.println(searchRequest);
+        log.debug("Keyword Search:{} {}", ConstantParameters.LINE_SEPARATOR, searchRequest);
 
         try {
             return elasticsearchClient.search(searchRequest, ArticleQuoteSearchCache.class);

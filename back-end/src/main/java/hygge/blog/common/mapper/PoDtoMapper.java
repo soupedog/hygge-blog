@@ -1,5 +1,7 @@
 package hygge.blog.common.mapper;
 
+import hygge.blog.common.mapper.convert.ObjectMappingConvert;
+import hygge.blog.common.mapper.convert.SimpleTypeConvert;
 import hygge.blog.domain.local.dto.AnnouncementDto;
 import hygge.blog.domain.local.dto.ArticleDto;
 import hygge.blog.domain.local.dto.BlogGroupDto;
@@ -8,7 +10,6 @@ import hygge.blog.domain.local.dto.QuoteDto;
 import hygge.blog.domain.local.dto.TopicDto;
 import hygge.blog.domain.local.dto.UserDto;
 import hygge.blog.domain.local.dto.UserTokenDto;
-import hygge.blog.common.mapper.convert.ObjectMappingConvert;
 import hygge.blog.domain.local.po.Announcement;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.BlogGroup;
@@ -26,7 +27,7 @@ import org.mapstruct.factory.Mappers;
  * @author Xavier
  * @date 2022/7/17
  */
-@Mapper(imports = ObjectMappingConvert.class)
+@Mapper(uses = SimpleTypeConvert.class, imports = ObjectMappingConvert.class)
 public interface PoDtoMapper {
     PoDtoMapper INSTANCE = Mappers.getMapper(PoDtoMapper.class);
 
