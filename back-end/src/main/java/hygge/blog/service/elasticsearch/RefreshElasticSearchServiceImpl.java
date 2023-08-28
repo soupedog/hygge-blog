@@ -93,6 +93,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
         articleQuoteSearchCache.initEsId(article.getArticleId(), ArticleQuoteSearchCache.Type.ARTICLE);
+        articleQuoteSearchCache.setCategoryId(article.getCategoryId());
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
         searchingCacheDao.save(articleQuoteSearchCache);
     }

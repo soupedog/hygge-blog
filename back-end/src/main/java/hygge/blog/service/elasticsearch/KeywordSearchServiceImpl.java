@@ -113,8 +113,11 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
         Query categoryRequirement;
         if (isArticle && notMaintainer) {
             // 非管理员仅允许查询有权限的类别文章
-            ArrayList<String> allowableCategoryIdStringValList = collectionHelper.filterNonemptyItemAsArrayList(false, allowableCategoryList, (item -> parameterHelper.string(item.getCategoryId())));
-            categoryRequirement = BoolQuery.of(bool -> bool.should(TermsSetQuery.of(termsSet -> termsSet.field("categoryId").terms(allowableCategoryIdStringValList))._toQuery()))._toQuery();
+            ArrayList<Query> allowableCategoryIdStringValList = collectionHelper.filterNonemptyItemAsArrayList(false, allowableCategoryList, (item ->
+                    TermQuery.of(term -> term.field("categoryId").value(parameterHelper.string(item.getCategoryId())))._toQuery())
+            );
+
+            categoryRequirement = BoolQuery.of(bool -> bool.minimumShouldMatch("1").should(allowableCategoryIdStringValList))._toQuery();
         } else {
             categoryRequirement = null;
         }
