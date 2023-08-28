@@ -1,26 +1,31 @@
 package hygge.blog.util;
 
-import hygge.blog.HyggeBlogApplication;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.ArticleDao;
+import hygge.blog.config.database.DataBaseAutoConfig;
+import hygge.blog.config.util.http.HttpHelperAutoConfigurationForSpringBoot3;
 import hygge.blog.domain.local.dto.ArticleDto;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.ArticleDao;
+import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.TopicServiceImpl;
+import hygge.blog.service.local.normal.UserServiceImpl;
+import hygge.commons.constant.ConstantParameters;
 import hygge.commons.constant.enums.DateTimeFormatModeEnum;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
-import hygge.web.config.ControllerLogAutoConfiguration;
+import hygge.web.config.HttpHelperAutoConfiguration;
 import hygge.web.template.HyggeWebUtilContainer;
+import hygge.web.util.http.configuration.HttpHelperConfiguration;
+import hygge.web.util.http.impl.DefaultHttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,23 +46,30 @@ import java.util.List;
  * @date 2022/1/12
  */
 @ActiveProfiles("dev")
+// Junit 5 中这其实是个可以省略的注解 "https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing.spring-boot-applications"
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MyMockBean.class)
 @SpringBootTest(
+        // 等效于提供环境变量的键值对
         args = {
-                "--logging.level.org.hibernate.type.descriptor.sql.BasicBinder=INFO",
-                "--logging.level.org.hibernate.engine.transaction.internal.*=INFO",
+                "--logging.level.org.hibernate.engine.transaction.internal.*=WARN",
+                "--logging.level.org.hibernate.orm.jdbc.*=WARN",
                 "--hygge.blog.database.showSql=false",
         },
-        classes = HyggeBlogApplication.class
+        // 在这之外的类不加载，classes 中类的上下顺序对执行有影响
+        classes = {
+                HttpHelperAutoConfigurationForSpringBoot3.class,
+                HttpHelperConfiguration.class,
+                HttpHelperAutoConfiguration.class,
+                DataBaseAutoConfig.class,
+                ArticleServiceImpl.class,
+                UserServiceImpl.class,
+                CategoryServiceImpl.class,
+                TopicServiceImpl.class,
+                CacheServiceImpl.class
+        }
 )
-
-@EnableAutoConfiguration(exclude = {
-        ElasticsearchRestClientAutoConfiguration.class,
-        ElasticsearchRepositoriesAutoConfiguration.class,
-        ControllerLogAutoConfiguration.class
-})
-@SuppressWarnings("java:S2699")
+@SuppressWarnings({"java:S2699", "java:S3577"})
 @Slf4j
 class SynchronizeArticle extends HyggeWebUtilContainer {
     private static final String path = "H:\\Xavier\\Documents\\md文档\\";
@@ -69,6 +81,13 @@ class SynchronizeArticle extends HyggeWebUtilContainer {
     @Autowired
     private ArticleServiceImpl articleService;
     private LinkedHashMap<String, String> resultMap = new LinkedHashMap<>();
+    @Autowired
+    private DefaultHttpHelper httpHelper;
+
+    @Test
+    void doHttpRequest() {
+        httpHelper.get("http://www.baidu.com", String.class);
+    }
 
     @Test
     void doSynchronize() {
@@ -83,7 +102,7 @@ class SynchronizeArticle extends HyggeWebUtilContainer {
         hyggeRequestContext.setCurrentLoginUser(user);
 
         File rootDirectory = fileHelper.getOrCreateDirectoryIfNotExit(path);
-        File backupDirectory = new File(backup + File.separator + timeHelper.format(System.currentTimeMillis(), DateTimeFormatModeEnum.FULL_TRIM));
+        File backupDirectory = new File(backup + ConstantParameters.FILE_SEPARATOR + timeHelper.format(System.currentTimeMillis(), DateTimeFormatModeEnum.FULL_TRIM));
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("articleId")));
 
@@ -105,7 +124,7 @@ class SynchronizeArticle extends HyggeWebUtilContainer {
             pageable = aidListTemp.nextPageable();
         } while (!aidListTemp.isLast());
 
-        log.info(jsonHelperIndent.formatAsString(resultMap));
+        log.info("info：" + ConstantParameters.LINE_SEPARATOR + jsonHelperIndent.formatAsString(resultMap));
         log.info("cost:" + (System.currentTimeMillis() - start) + " ms");
     }
 

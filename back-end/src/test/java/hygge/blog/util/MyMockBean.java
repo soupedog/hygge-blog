@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
 /**
- * 模拟本地工具不需要的类
+ * 模拟本地工具不需要真实加载的类
  *
  * @author Xavier
  * @date 2022/9/27
