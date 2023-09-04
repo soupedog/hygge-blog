@@ -19,7 +19,7 @@ npm install webpack webpack-cli webpack-dev-server --save-dev
 npm install react @types/react react-dom @types/react-dom react-router-dom --save-dev
 
 // 安装 babel
-npm install babel-loader @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript --save-dev
+npm install babel-loader @babel/core @babel/preset-env @babel/preset-react @babel/preset-typescript @babel/plugin-proposal-class-properties --save-dev
 
 // 安装各种 css loader
 npm install css-loader style-loader sass sass-loader less less-loader --save-dev

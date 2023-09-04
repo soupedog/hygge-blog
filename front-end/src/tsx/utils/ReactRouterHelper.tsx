@@ -1,8 +1,6 @@
 import {Params, URLSearchParamsInit, useLocation, useNavigate, useParams, useSearchParams,} from "react-router-dom";
 import * as React from "react";
-import {Location} from "history";
-import {NavigateFunction} from "react-router/lib/hooks";
-
+import {NavigateFunction} from "react-router/dist/lib/hooks";
 
 export interface ReactRouter {
     location: Location;
