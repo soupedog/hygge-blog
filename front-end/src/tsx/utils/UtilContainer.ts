@@ -414,10 +414,7 @@ export class TimeHelper {
 
     // 目标毫秒级时间戳格式化成字符串,默认格式为 yyyy-mm-dd hh:mm:ss
     static formatTimeStampToString(timeStamp: number, type?: TimeType): string {
-        // 默认 Long 型都是 0 时区毫秒时间戳，此处添加 8 小时偏移量
-        let timeOffSetMillisecond = 28800000;
-
-        let currentDate = new Date(timeStamp + timeOffSetMillisecond);
+        let currentDate = new Date(timeStamp);
         let year = currentDate.getFullYear();
         let month = currentDate.getMonth() + 1;
         let day = currentDate.getDate();
