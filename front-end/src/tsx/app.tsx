@@ -1,15 +1,16 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {IndexContainer} from "./page/IndexContainer";
-import ArticleBrowserContainer from "./page/ArticleBrowserContainer";
-import {SignInContainer} from "./page/SignInContainer";
-import EditQuoteContainer from "./page/EditQuoteContainer";
-import EditArticleContainer from "./page/EditArticleContainer";
-import {SignInAutoContainer} from "./page/SignInAutoContainer";
 import {PropertiesHelper} from "./utils/UtilContainer";
 import {Modal} from "antd";
 import isMobile from "rc-util/es/isMobile"
+import Editor from "./v2/page/Editor";
+import Index from "./v2/page/Index";
+
+import "../style/markdownCustomStyle.less"
+import "highlight.js/styles/atom-one-dark-reasonable.css"
+import "katex/dist/katex.min.css"
+import "../style/default.css"
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -37,14 +38,15 @@ if (container != null) {
         // <React.StrictMode>
         <BrowserRouter>
             <Routes>
-                <Route path={"/"} element={<IndexContainer key={"index"}/>}/>
-                <Route path={"/browser/:aid"} element={<ArticleBrowserContainer key={"browser"}/>}/>
-                <Route path={"/signin"} element={<SignInContainer key={"signin"}/>}/>
-                <Route path={"/signin/auto"} element={<SignInAutoContainer key={"signin-auto"}/>}/>
-                <Route path={"/editor/article"} element={<EditArticleContainer key={"editor-article"}/>}/>
-                <Route path={"/editor/article/:aid"} element={<EditArticleContainer key={"editor-article"}/>}/>
-                <Route path={"/editor/quote/"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
-                <Route path={"/editor/quote/:quoteId"} element={<EditQuoteContainer key={"editor-quote"}/>}/>
+                <Route path={"/"} element={<Index key={"index"}/>}/>
+                <Route path={"/browser/:aid"} element={<Editor key={"browser"}/>}/>
+                <Route path={"/signin"} element={<Editor key={"signin"}/>}/>
+                <Route path={"/signin/auto"} element={<Editor key={"signin-auto"}/>}/>
+                <Route path={"/editor/article"} element={<Editor key={"editor-article"}/>}/>
+                <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>
+                <Route path={"/editor/quote/"} element={<Editor key={"editor-quote"}/>}/>
+                <Route path={"/editor/quote/:quoteId"} element={<Editor key={"editor-quote"}/>}/>
+                <Route path={"*"} element={<Editor key={"notFound"}/>}/>
             </Routes>
         </BrowserRouter>
         // </React.StrictMode>

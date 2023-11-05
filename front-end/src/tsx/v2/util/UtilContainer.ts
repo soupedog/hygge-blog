@@ -254,13 +254,9 @@ export class PropertiesHelper {
     }
 }
 
-const baseUrl = "https://www.xavierwang.cn/";
-// const baseUrl = "http://localhost:9000/";
-const baseApiUrl = "https://www.xavierwang.cn/blog-service/api";
-// const baseApiUrl = "http://localhost:8080/blog-service/api";
-const baseStaticSourceUrl = "https://www.xavierwang.cn/static";
-// const vditorCdnUrl = "https://cdn.jsdelivr.net/npm/vditor@3.8.17";
-const vditorCdnUrl = "https://www.xavierwang.cn/static/npm/vditor@3.8.17";
+const baseUrl = "http://localhost:9000/";
+const baseApiUrl = "http://localhost:8080/blog-service/api";
+const baseStaticSourceUrl = "http://localhost:8080/static";
 
 export interface OpenNewPageConfig {
     inNewTab: boolean;
@@ -270,10 +266,6 @@ export interface OpenNewPageConfig {
 }
 
 export class UrlHelper {
-    static getVditorCdn(): string {
-        return vditorCdnUrl;
-    }
-
     static getBaseUrl(): string {
         return baseUrl;
     }

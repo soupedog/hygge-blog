@@ -1,0 +1,144 @@
+.md-preview {
+  font-size: 16px;
+  line-height: 1.6;
+
+  pre {
+    line-height: 1.2;
+  }
+
+  // 没有 class 属性的 code 标签
+  code:not([class]) {
+    line-height: 1.4;
+    display: inline-block;
+    padding: 0 8px 0 8px;
+    background-color: #EEE;
+    border-radius: 4px;
+  }
+
+  ul, ol {
+    padding-left: 2em;
+  }
+
+  // class 为 contains-task-list 的 ul 标签去掉点标记
+  ul[class=contains-task-list] {
+    list-style-type: none;
+  }
+
+  dl {
+    padding: 0;
+  }
+
+  dl dt {
+    font-size: 1em;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  dl dd {
+    margin: 0 0 1em;
+    padding: 0 1em;
+  }
+
+  blockquote, q {
+    border-left: 4px solid #DDD;
+    padding: 0 1em;
+    color: #777;
+    quotes: none;
+  }
+
+  blockquote::before, blockquote::after, q::before, q::after {
+    content: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 5px 0 5px;
+    padding: 0 0 5px 0;
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+  h3 {
+    font-size: 26px;
+  }
+
+  h4 {
+    font-size: 24px;
+  }
+
+  h5 {
+    font-size: 20px;
+  }
+
+  h6 {
+    font-size: 16px;
+  }
+
+  table {
+    padding: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font: inherit;
+    border: 0;
+  }
+
+  tbody {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  table tr {
+    border: 0;
+    border-top: 1px solid #CCC;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+  }
+
+  table tr:nth-child(2n) {
+    background-color: #F8F8F8;
+  }
+
+  table tr th, table tr td {
+    border: 1px solid #CCC;
+    margin: 0;
+    padding: 0.5em 1em;
+  }
+
+  table tr th {
+    font-weight: bold;
+    background-color: #F0F0F0;
+  }
+
+  p {
+    // 调整段落间的各种间距
+    padding-right: 0.5em !important;
+    padding-left: 0.5em !important;
+    margin-block-start: 0.5em !important;
+    margin-block-end: 0.5em !important;
+    // 保留文本中的空白、换行符
+    white-space: pre-wrap;
+  }
+
+  a {
+    color: dodgerblue;
+    text-decoration: none; /* 去除下划线 */
+  }
+
+  a:hover {
+    color: hotpink;
+    text-decoration: underline;
+  }
+
+  a:active {
+    color: red;
+    text-decoration: none; /* 去除下划线 */
+  }
+}
