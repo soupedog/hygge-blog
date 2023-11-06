@@ -1,16 +1,18 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {PropertiesHelper} from "./utils/UtilContainer";
-import {Modal} from "antd";
-import isMobile from "rc-util/es/isMobile"
-import Editor from "./v2/page/Editor";
-import Index from "./v2/page/Index";
 
 import "../style/markdownCustomStyle.less"
 import "highlight.js/styles/atom-one-dark-reasonable.css"
 import "katex/dist/katex.min.css"
 import "../style/default.css"
+
+import {PropertiesHelper} from "./utils/UtilContainer";
+import {Modal} from "antd";
+import isMobile from "rc-util/es/isMobile"
+import Editor from "./v2/page/Editor";
+import Index from "./v2/page/Index";
+import NotFound from "./v2/page/NotFound";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -46,7 +48,7 @@ if (container != null) {
                 <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>
                 <Route path={"/editor/quote/"} element={<Editor key={"editor-quote"}/>}/>
                 <Route path={"/editor/quote/:quoteId"} element={<Editor key={"editor-quote"}/>}/>
-                <Route path={"*"} element={<Editor key={"notFound"}/>}/>
+                <Route path={"*"} element={<NotFound key={"notFound"}/>}/>
             </Routes>
         </BrowserRouter>
         // </React.StrictMode>
