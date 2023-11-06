@@ -4,12 +4,17 @@ import IndexLeft from "../component/index/IndexLeft";
 import IndexRight from "../component/index/IndexRight";
 
 import "../../../style/index.less"
+import {HomePageService} from "../../rest/ApiClient";
 
 export interface IndexState {
     // 菜单是否折叠收起
     menuFolded: boolean;
     updateMenuFolded: Function;
 }
+
+HomePageService.fetch(data=>{
+    console.log(data);
+});
 
 function Index() {
     const [menuFolded, updateMenuFolded] = useState(true);
