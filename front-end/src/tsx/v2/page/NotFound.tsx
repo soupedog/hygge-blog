@@ -2,10 +2,10 @@ import React from 'react';
 import {Button, Result} from "antd";
 import {UrlHelper} from "../../utils/UtilContainer";
 
-// 3 秒内自动跳转到主页
-UrlHelper.openNewPage({inNewTab: false, delayTime: 3000})
-
 function NotFound() {
+    // 3 秒内自动跳转到主页
+    UrlHelper.openNewPage({inNewTab: false, delayTime: 3000});
+
     return (
         <Result
             status="404"
