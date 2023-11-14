@@ -2,10 +2,10 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
+import "../style/default.css"
 import "../style/markdownCustomStyle.less"
 import "highlight.js/styles/atom-one-dark-reasonable.css"
 import "katex/dist/katex.min.css"
-import "../style/default.css"
 
 import {PropertiesHelper} from "./utils/UtilContainer";
 import {Modal} from "antd";
@@ -13,6 +13,8 @@ import isMobile from "rc-util/es/isMobile"
 import Editor from "./v2/page/Editor";
 import Index from "./v2/page/Index";
 import NotFound from "./v2/page/NotFound";
+import SignIn from "./v2/page/SignIn";
+import SigninAutoRefresh from "./v2/page/SigninAutoRefresh";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -42,8 +44,8 @@ if (container != null) {
             <Routes>
                 <Route path={"/"} element={<Index key={"index"}/>}/>
                 <Route path={"/browser/:aid"} element={<Editor key={"browser"}/>}/>
-                <Route path={"/signin"} element={<Editor key={"signin"}/>}/>
-                <Route path={"/signin/auto"} element={<Editor key={"signin-auto"}/>}/>
+                <Route path={"/signin"} element={<SignIn key={"signin"}/>}/>
+                <Route path={"/signin/auto"} element={<SigninAutoRefresh key={"signin-auto-refresh"}/>}/>
                 <Route path={"/editor/article"} element={<Editor key={"editor-article"}/>}/>
                 <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>
                 <Route path={"/editor/quote/"} element={<Editor key={"editor-quote"}/>}/>

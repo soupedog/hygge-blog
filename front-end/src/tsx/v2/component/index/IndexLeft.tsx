@@ -2,7 +2,7 @@ import React from 'react';
 import {Menu, MenuProps, message, notification} from "antd";
 import Sider from "antd/es/layout/Sider";
 import {LinkOutlined, QuestionCircleOutlined} from "@ant-design/icons";
-import {IndexContext} from '../../page/Index';
+import {IndexContext} from "../../page/Index";
 import {class_index_title} from "../properties/ElementNameContainer";
 
 function IndexLeft() {

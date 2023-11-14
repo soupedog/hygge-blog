@@ -13,12 +13,12 @@ function IndexRight() {
                     <IndexHeader/>
                     <Content
                         style={{
-                            borderRadius: 15,
+                            borderRadius: "15px",
                             background: "#fff",
                             margin: '24px 60px',
-                            marginTop: 100,
-                            padding: 24,
-                            minHeight: window.innerHeight - 282,
+                            marginTop: "100px",
+                            padding: "24px",
+                            minHeight: window.innerHeight - 284 + "px",
                         }}
                     >
                     </Content>
