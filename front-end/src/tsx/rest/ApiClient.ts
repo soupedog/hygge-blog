@@ -20,8 +20,17 @@ axios.interceptors.response.use(function (response) {
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
         return Promise.reject(response);
     } else if (code == 403003) {
-        // 令牌过期，尝试自动刷新
-        UrlHelper.openNewPage({inNewTab: false, path: "signin/auto"});
+        let flag = localStorage.getItem('autoRefreshDisableFlag');
+
+        if (flag == null) {
+            localStorage.setItem('autoRefreshDisableFlag', "已禁止再次触发自动登陆");
+            // 令牌过期，尝试自动刷新
+            UrlHelper.openNewPage({inNewTab: false, path: "signin/auto"});
+        } else {
+            UserService.removeCurrentUser();
+            message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
+            UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 2000});
+        }
         return Promise.reject(response);
     } else if (code == 403000) {
         // 账号、密码、令牌错误允许外部组件自行处理
@@ -130,13 +139,14 @@ export class UserService {
         }
 
         let requestHeader = null;
-        let requestData = null;
+        let requestData;
         if (PropertiesHelper.isStringNotEmpty(ac) && PropertiesHelper.isStringNotEmpty(pw)) {
             requestData = {
                 "password": pw,
                 "userName": ac
             };
         } else {
+            requestData = {};
             requestHeader = UserService.getHeader();
             if (PropertiesHelper.isStringNotEmpty(requestHeader.uid)) {
                 requestHeader.refreshKey = localStorage.getItem("refreshKey");

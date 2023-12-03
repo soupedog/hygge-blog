@@ -26,6 +26,7 @@ function SignIn() {
                     className={class_signin_form}
                     onFinish={(val) => {
                         UserService.signIn(val.account, val.password, () => {
+                            localStorage.removeItem('autoRefreshDisableFlag');
                             message.success("登录成功，1 秒内自动跳转回主页，请稍后", 1000);
                             // this.props.router.navigate("/signin");
                             UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});

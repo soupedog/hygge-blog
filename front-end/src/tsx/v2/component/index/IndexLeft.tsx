@@ -16,7 +16,7 @@ function IndexLeft() {
                     duration: 5,
                     message: '关于',
                     description:
-                        '本站前端基于 React 、Antd、Vditor、APlayer 开发，后端基于 Spring Boot 全家桶开发。目标使用场景为 PC ，对手机端提供少数功能，平板将被视为手机端。本站全部音频、图片素材来源于网络，若侵犯了您的权益，请联系 xavierpe@qq.com 以便及时删除争议素材。',
+                        '本站前端页面基于 React 、Antd、APlayer、React-Markdown 开发，后端基于 Spring Boot 全家桶开发。目标使用场景为 PC ，对手机端提供少数功能，平板将被视为手机端。本站全部音频、图片素材来源于网络，若侵犯了您的权益，请联系 xavierpe@qq.com 以便及时删除争议素材。',
                 });
                 break;
         }
