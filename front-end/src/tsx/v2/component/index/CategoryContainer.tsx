@@ -3,8 +3,6 @@ import {Badge, Card, Collapse} from "antd";
 import {IndexContext} from '../../page/Index';
 import {TopicOverviewInfo} from "../../../rest/ApiClient";
 
-const {Panel} = Collapse;
-
 function CategoryContainer() {
     return (
         <IndexContext.Consumer>
@@ -43,7 +41,7 @@ function CategoryContainer() {
 
         let topicOverviewInfos: TopicOverviewInfo[] | undefined = infos;
 
-        if (topicOverviewInfos == null) {
+        if (topicOverviewInfos == null || topicOverviewInfos.length < 1) {
             return null;
         }
 
@@ -74,13 +72,12 @@ function CategoryContainer() {
             return null;
         }
     }
-
-    const gridStyle: React.CSSProperties = {
-        width: '20%',
-        padding: "10px",
-        textAlign: 'center',
-    };
-
 }
+
+const gridStyle: React.CSSProperties = {
+    width: '20%',
+    padding: "10px",
+    textAlign: 'center',
+};
 
 export default CategoryContainer;

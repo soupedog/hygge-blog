@@ -1,14 +1,19 @@
-import React, {createContext, useMemo, useState} from 'react';
-import {Header} from "antd/es/layout/layout";
-import {Col, Row, Switch, Tooltip} from "antd";
+import React from 'react';
 import clsx from "clsx";
+import {Header} from "antd/es/layout/layout";
+import {Button, Col, message, Row, Switch, Tooltip} from "antd";
+import Search from "antd/es/input/Search";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
-import { IndexContext } from '../../page/Index';
+import {IndexContext} from '../../page/Index';
+import {PropertiesHelper} from "../../util/UtilContainer";
+import {useNavigate} from "react-router-dom";
 
 function IndexHeader() {
+    const navigate = useNavigate();
+
     return (
         <IndexContext.Consumer>
-            {({menuFolded, updateMenuFolded}) => (
+            {({menuFolded, updateMenuFolded, currentUser}) => (
                 <Header className="site-layout-background"
                         style={{
                             padding: 0,
@@ -39,36 +44,36 @@ function IndexHeader() {
                                     </Tooltip>
                                 </Col>
                                 <Col md={8} xl={11}>
-                                    {/*<Search style={{marginTop: 16}} placeholder="搜索关键字"*/}
-                                    {/*        allowClear*/}
-                                    {/*        enterButton*/}
-                                    {/*        size="middle"*/}
-                                    {/*        onSearch={(value) => {*/}
-                                    {/*            console.log(value)*/}
-                                    {/*            console.log(!PropertiesHelper.isStringNotEmpty(value))*/}
-                                    {/*            if (!PropertiesHelper.isStringNotEmpty(value)) {*/}
-                                    {/*                message.warn("查询关键字不可为空", 3);*/}
-                                    {/*                return;*/}
-                                    {/*            }*/}
-
-                                    {/*            let searchType: SearchType;*/}
-                                    {/*            if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {*/}
-                                    {/*                searchType = SearchType.ARTICLE;*/}
-                                    {/*            } else {*/}
-                                    {/*                searchType = SearchType.QUOTE;*/}
-                                    {/*            }*/}
-                                    {/*            state.fetchFuzzySearchViewInfo!(1, 5, value, searchType);*/}
-                                    {/*        }}*/}
-                                    {/*/>*/}
+                                    <Search style={{marginTop: 16}} placeholder="搜索关键字"
+                                            allowClear
+                                            enterButton
+                                            size="middle"
+                                            onSearch={(value) => {
+                                                console.log(value)
+                                                // console.log(!PropertiesHelper.isStringNotEmpty(value))
+                                                if (!PropertiesHelper.isStringNotEmpty(value)) {
+                                                    message.warning("查询关键字不可为空", 3);
+                                                    return;
+                                                }
+                                                //
+                                                // let searchType: SearchType;
+                                                // if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
+                                                //     searchType = SearchType.ARTICLE;
+                                                // } else {
+                                                //     searchType = SearchType.QUOTE;
+                                                // }
+                                                // state.fetchFuzzySearchViewInfo!(1, 5, value, searchType);
+                                            }}
+                                    />
                                 </Col>
                                 <Col md={1} xl={1}>{/*占位符*/}</Col>
                                 <Col md={3} xl={3}>
-                                    {/*{state.currentUser != null ? <HyggeUserMenu currentUser={state.currentUser}/> :*/}
-                                    {/*    <Button type="primary"*/}
-                                    {/*            onClick={() => {*/}
-                                    {/*                this.props.router.navigate("/signin");*/}
-                                    {/*            }}*/}
-                                    {/*    >登录</Button>}*/}
+                                    {currentUser != null ? <></> :
+                                        <Button type="primary" onClick={() => {
+                                            navigate("/signin");
+                                        }}>
+                                            登录
+                                        </Button>}
                                 </Col>
                                 <Col md={2} xl={2} className={"textCenter"}>
                                     {/*<Spin spinning={state.netWorkArrayCounter!.length > 0}/>*/}
