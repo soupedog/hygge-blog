@@ -24,8 +24,18 @@ axios.interceptors.response.use(function (response) {
 
         if (flag == null) {
             localStorage.setItem('autoRefreshDisableFlag', "已禁止再次触发自动登陆");
-            // 令牌过期，尝试自动刷新
-            UrlHelper.openNewPage({inNewTab: false, path: "signin/auto"});
+
+            UserService.signIn(undefined, undefined, (data) => {
+                if (data?.code == 200) {
+                    message.info("已为您成功自动登录，1 秒内为您跳转回主页", 1);
+                    UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
+                } else {
+                    message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
+                    // 刷新秘钥自动登录失败，需要清空本地身份信息
+                    UserService.removeCurrentUser();
+                    UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
+                }
+            });
         } else {
             UserService.removeCurrentUser();
             message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
@@ -33,8 +43,10 @@ axios.interceptors.response.use(function (response) {
         }
         return Promise.reject(response);
     } else if (code == 403000) {
-        // 账号、密码、令牌错误允许外部组件自行处理
-        message.warning(data.msg, 3);
+        // 账号、密码、令牌错误
+        UserService.removeCurrentUser();
+        message.warning("已清空错误登陆信息，2 秒内为您跳转回主页", 2);
+        UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
         return response;
     } else if (code == 400 || code < 500000) {
         message.warning(data.msg, 5);
