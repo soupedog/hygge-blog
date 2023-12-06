@@ -2,8 +2,8 @@ package hygge.blog.service.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.domain.baidu.BaiDuIpQueryResponseDto;
-import hygge.blog.domain.baidu.dto.BaiduGatewayDto;
 import hygge.blog.domain.baidu.BaiDuIpQueryResponseItem;
+import hygge.blog.domain.baidu.dto.BaiduGatewayDto;
 import hygge.blog.domain.baidu.dto.inner.BaiduIpInfoDto;
 import hygge.web.util.http.bo.HttpResponse;
 import hygge.web.util.http.impl.DefaultHttpHelper;
@@ -24,6 +24,9 @@ public class IPQueryClient {
     @Autowired
     private DefaultHttpHelper httpHelper;
 
+    /**
+     * 功能相对较弱，使用优先级低
+     */
     public String queryIpLocation(String ip) {
         String url = UriComponentsBuilder
                 .fromUriString("https://sp1.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?query={ip}&resource_id=5809")
@@ -44,7 +47,8 @@ public class IPQueryClient {
     }
 
     /**
-     * 百度企服 "https://qifu.baidu.com/" 中的 IP 查询
+     * 百度企服 "https://qifu.baidu.com/" 中的 IP 查询(本服务由百度智能云和埃文科技联合提供)<br/>
+     * 埃文科技：我们每天提供多达 3 个 IP 地址/域名的免费查询
      *
      * <pre>
      *     {

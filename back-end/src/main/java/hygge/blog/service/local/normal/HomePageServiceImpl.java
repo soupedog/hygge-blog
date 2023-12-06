@@ -2,13 +2,13 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.HomepageFetchResult;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.dto.TopicDto;
 import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.local.dto.inner.TopicOverviewInfo;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
@@ -36,7 +36,12 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private QuoteServiceImpl quoteService;
 
-    public HomepageFetchResult fetch() {
+    /**
+     * 如果页容量不为空，将拉取首个主题下的文章摘要,以它为页容量进行分页查询第一页(如果主题存在的话)
+     *
+     * @param pageSize 页容量
+     */
+    public HomepageFetchResult fetch(Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
@@ -49,7 +54,15 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         List<ArticleCountInfo> articleCountInfoList = articleService.findArticleCountInfo(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
 
         HomepageFetchResult result = HomepageFetchResult.builder().topicOverviewInfoList(new ArrayList<>()).build();
+
+        // 记录首个 Topic 对象
+        Topic firstTopic = null;
+
         for (Topic topic : topicList) {
+            if (firstTopic == null) {
+                firstTopic = topic;
+            }
+
             TopicDto topicDto = PoDtoMapper.INSTANCE.poToDto(topic);
             TopicOverviewInfo topicOverviewInfo = TopicOverviewInfo.builder().topicInfo(topicDto).categoryListInfo(new ArrayList<>()).build();
 
@@ -70,6 +83,15 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
                 continue;
             }
             result.getTopicOverviewInfoList().add(topicOverviewInfo);
+        }
+
+        if (firstTopic != null) {
+            // 尝试加载首个 topic 下的文章摘要
+            Integer topicId = firstTopic.getTopicId();
+            List<Category> accessibleCategoryListForFirstTopic = categoryList.stream().filter(category -> category.getTopicId().equals(topicId)).toList();
+            List<Integer> accessibleCategoryIdListForFirstTopic = collectionHelper.filterNonemptyItemAsArrayList(false, accessibleCategoryListForFirstTopic, Category::getCategoryId);
+            ArticleSummaryInfo firstTopicArticleSummaryInfo = articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdListForFirstTopic, accessibleCategoryListForFirstTopic, context.isGuest() ? null : currentUser.getUserId(), 1, pageSize);
+            result.setArticleSummaryInfo(firstTopicArticleSummaryInfo);
         }
 
         return result;

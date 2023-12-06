@@ -3,9 +3,9 @@ package hygge.blog.controller.doc;
 import hygge.blog.controller.base.HyggeBlogController;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.AnnouncementDto;
+import hygge.blog.domain.local.dto.HomepageFetchResult;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
-import hygge.blog.domain.local.dto.inner.TopicOverviewInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,10 @@ import java.util.List;
 @Tag(name = "主页 Controller", description = "主页展示所需的各种 API")
 public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntity<?>> {
     @Operation(summary = "主页数据拉取", description = "在主页初次加载时需要拉取的数据")
-    ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>> homepageFetch();
+    ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> homepageFetch(int pageSize);
+
+    @Operation(summary = "主题概览数据拉取", description = "展示全部主题概要信息时需要拉取的数据")
+    ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> topicOverviewFetch();
 
     @Operation(summary = "查询特定主题下的文章", description = "在主题加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> topicInfoFetch(String tid, int currentPage, int pageSize);

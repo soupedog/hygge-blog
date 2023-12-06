@@ -22,7 +22,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <hygge.version>0.0.12</hygge.version>
+        <hygge.version>0.0.13</hygge.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
     </properties>
 

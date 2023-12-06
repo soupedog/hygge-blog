@@ -1,12 +1,12 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.HomePageControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.AnnouncementDto;
+import hygge.blog.domain.local.dto.HomepageFetchResult;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
-import hygge.blog.domain.local.dto.inner.TopicOverviewInfo;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Announcement;
 import hygge.blog.service.elasticsearch.KeywordSearchServiceImpl;
 import hygge.blog.service.local.normal.AnnouncementServiceImpl;
@@ -39,8 +39,15 @@ public class HomePageController implements HomePageControllerDoc {
     @Override
     @GetMapping("/home/fetch")
     @ControllerLog(enable = false)
-    public ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>> homepageFetch() {
-        return (ResponseEntity<HyggeBlogControllerResponse<TopicOverviewInfo>>) success(homePageService.fetch());
+    public ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> homepageFetch(@RequestParam(required = false, defaultValue = "5") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>>) success(homePageService.fetch(pageSize));
+    }
+
+    @Override
+    @GetMapping("/home/fetch/topic/overview")
+    @ControllerLog(enable = false)
+    public ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> topicOverviewFetch() {
+        return (ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>>) success(homePageService.fetch(null));
     }
 
     @Override

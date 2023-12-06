@@ -1,6 +1,8 @@
 package hygge.blog.domain.local.dto;
 
+import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.local.dto.inner.TopicOverviewInfo;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -20,6 +22,8 @@ import java.util.List;
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(title = "首页初始化信息", description = "首页初始化所需要的信息")
 public class HomepageFetchResult {
     private List<TopicOverviewInfo> topicOverviewInfoList;
+    private ArticleSummaryInfo articleSummaryInfo;
 }
