@@ -88,6 +88,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
                     <source>${java.version}</source> <!-- depending on your project -->
                     <target>${java.version}</target> <!-- depending on your project -->
                     <annotationProcessorPaths>
