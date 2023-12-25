@@ -7,13 +7,15 @@ import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import {IndexContext} from '../../page/Index';
 import {PropertiesHelper} from "../../util/UtilContainer";
 import {useNavigate} from "react-router-dom";
+import {UserService} from "../../../rest/ApiClient";
+import HyggeUserMenu from "../HyggeUserMenu";
 
 function IndexHeader() {
     const navigate = useNavigate();
 
     return (
         <IndexContext.Consumer>
-            {({menuFolded, updateMenuFolded, currentUser}) => (
+            {({menuFolded, updateMenuFolded}) => (
                 <Header className="site-layout-background"
                         style={{
                             padding: 0,
@@ -68,7 +70,7 @@ function IndexHeader() {
                                 </Col>
                                 <Col md={1} xl={1}>{/*占位符*/}</Col>
                                 <Col md={3} xl={3}>
-                                    {currentUser != null ? <></> :
+                                    {UserService.getCurrentUser() != null ? <HyggeUserMenu/> :
                                         <Button type="primary" onClick={() => {
                                             navigate("/signin");
                                         }}>
