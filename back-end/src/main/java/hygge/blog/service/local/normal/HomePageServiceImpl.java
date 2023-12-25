@@ -98,8 +98,8 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
             result.setArticleSummaryInfo(firstTopicArticleSummaryInfo);
         }
 
-        // 追加公告信息
-        List<Announcement> announcementList = announcementService.fetchAnnouncement(1, pageSize);
+        // 追加公告信息(默认拉去全部公告)
+        List<Announcement> announcementList = announcementService.fetchAnnouncement(1, 9999);
         List<AnnouncementDto> announcementDtoList = announcementList.stream().map(PoDtoMapper.INSTANCE::poToDto).toList();
         result.setAnnouncementInfoList(announcementDtoList);
 
