@@ -1,10 +1,10 @@
-import React, {createContext, useMemo, useState} from 'react';
+import React, {createContext, useEffect, useMemo, useState} from 'react';
 import {Layout} from "antd";
 import IndexLeft from "../component/index/IndexLeft";
 import IndexRight from "../component/index/IndexRight";
 
 import "../../../style/index.less"
-import {TopicOverviewInfo} from "../../rest/ApiClient";
+import {HomePageService, TopicOverviewInfo} from "../../rest/ApiClient";
 
 export interface IndexState {
     // 菜单是否折叠收起
@@ -21,11 +21,11 @@ export interface IndexState {
 }
 
 
-function Index({topicOverviewInfo}: any) {
+function Index() {
     const [menuFolded, updateMenuFolded] = useState(true);
     const [categoryFolded, updateCategoryFolded] = useState(false);
     // 请求远端成功必然文章目录元素大于 0
-    const [currentTopicId, updateCurrentTopicId] = useState(topicOverviewInfo[0].topicInfo.tid);
+    const [currentTopicId, updateCurrentTopicId] = useState("");
     const [topicOverviewInfos, updateTopicOverviewInfos] = useState([]);
 
     const state = useMemo(() => ({
@@ -35,9 +35,21 @@ function Index({topicOverviewInfo}: any) {
         updateCategoryFolded: updateCategoryFolded,
         currentTopicId: currentTopicId,
         updateCurrentTopicId: updateCurrentTopicId,
-        topicOverviewInfos: topicOverviewInfo,
+        topicOverviewInfos: topicOverviewInfos,
         updateTopicOverviewInfos: updateTopicOverviewInfos,
     }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos]);
+
+    useEffect(() => {
+        // 成功获取到初始化数据后再开始渲染页面
+        HomePageService.fetch(data => {
+            let firstInitTopicOverviewInfo = data!.main!.topicOverviewInfoList;
+
+            // @ts-ignore
+            updateTopicOverviewInfos(firstInitTopicOverviewInfo);
+            updateCurrentTopicId(firstInitTopicOverviewInfo[0].topicInfo.tid);
+        });
+        // 依赖静态值表示仅初始化时调用一次
+    }, []);
 
     return (
         <IndexContext.Provider value={state}>

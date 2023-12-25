@@ -14,7 +14,6 @@ import Editor from "./v2/page/Editor";
 import Index from "./v2/page/Index";
 import NotFound from "./v2/page/NotFound";
 import SignIn from "./v2/page/SignIn";
-import {HomePageService} from "./rest/ApiClient";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -36,26 +35,22 @@ if (PropertiesHelper.booleanOfNullable({target: enableClientDeviceWarning, defau
 const container: Element | null = document.getElementById('root');
 
 if (container != null) {
+    let root = createRoot(container);
 
-    // 成功获取到初始化数据后再开始渲染页面
-    HomePageService.fetch(data => {
-        let root = createRoot(container);
-
-        root.render(
-            // <React.StrictMode>
-            <BrowserRouter>
-                <Routes>
-                    <Route path={"/"} element={<Index key={"index"} topicOverviewInfo={data!.main!.topicOverviewInfoList}/>}/>
-                    <Route path={"/browser/:aid"} element={<Editor key={"browser"}/>}/>
-                    <Route path={"/signin"} element={<SignIn key={"signin"}/>}/>
-                    <Route path={"/editor/article"} element={<Editor key={"editor-article"}/>}/>
-                    <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>
-                    <Route path={"/editor/quote/"} element={<Editor key={"editor-quote"}/>}/>
-                    <Route path={"/editor/quote/:quoteId"} element={<Editor key={"editor-quote"}/>}/>
-                    <Route path={"*"} element={<NotFound key={"notFound"}/>}/>
-                </Routes>
-            </BrowserRouter>
-            // </React.StrictMode>
-        );
-    });
+    root.render(
+        // <React.StrictMode>
+        <BrowserRouter>
+            <Routes>
+                <Route path={"/"} element={<Index key={"index"}/>}/>
+                <Route path={"/browser/:aid"} element={<Editor key={"browser"}/>}/>
+                <Route path={"/signin"} element={<SignIn key={"signin"}/>}/>
+                <Route path={"/editor/article"} element={<Editor key={"editor-article"}/>}/>
+                <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>
+                <Route path={"/editor/quote/"} element={<Editor key={"editor-quote"}/>}/>
+                <Route path={"/editor/quote/:quoteId"} element={<Editor key={"editor-quote"}/>}/>
+                <Route path={"*"} element={<NotFound key={"notFound"}/>}/>
+            </Routes>
+        </BrowserRouter>
+        // </React.StrictMode>
+    );
 }
