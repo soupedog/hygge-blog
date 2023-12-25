@@ -4,7 +4,7 @@ import IndexLeft from "../component/index/IndexLeft";
 import IndexRight from "../component/index/IndexRight";
 
 import "../../../style/index.less"
-import {HomePageService, TopicOverviewInfo} from "../../rest/ApiClient";
+import {AnnouncementDto, ArticleSummaryResponse, HomePageService, TopicOverviewInfo} from "../../rest/ApiClient";
 
 export interface IndexState {
     // 菜单是否折叠收起
@@ -18,6 +18,10 @@ export interface IndexState {
     updateCurrentTopicId: Function;
     topicOverviewInfos: TopicOverviewInfo[];
     updateTopicOverviewInfos: Function;
+    articleSummaryInfo: ArticleSummaryResponse;
+    updateArticleSummaryInfo: Function;
+    announcementInfos: AnnouncementDto[];
+    updateAnnouncementInfos: Function;
 }
 
 
@@ -28,6 +32,14 @@ function Index() {
     const [currentTopicId, updateCurrentTopicId] = useState("");
     const [topicOverviewInfos, updateTopicOverviewInfos] = useState([]);
 
+    const [articleSummaryInfo, updateArticleSummaryInfo] = useState(
+        {
+            articleSummaryList: [],
+            totalCount: 0
+        } as ArticleSummaryResponse
+    );
+    const [announcementInfos, updateAnnouncementInfos] = useState([]);
+
     const state = useMemo(() => ({
         menuFolded: menuFolded,
         updateMenuFolded: updateMenuFolded,
@@ -37,16 +49,24 @@ function Index() {
         updateCurrentTopicId: updateCurrentTopicId,
         topicOverviewInfos: topicOverviewInfos,
         updateTopicOverviewInfos: updateTopicOverviewInfos,
-    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos]);
+        articleSummaryInfo: articleSummaryInfo,
+        updateArticleSummaryInfo: updateArticleSummaryInfo,
+        announcementInfos: announcementInfos,
+        updateAnnouncementInfos: updateAnnouncementInfos
+    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, announcementInfos]);
 
     useEffect(() => {
-        // 成功获取到初始化数据后再开始渲染页面
         HomePageService.fetch(data => {
-            let firstInitTopicOverviewInfo = data!.main!.topicOverviewInfoList;
+            let response = data!.main!;
+            let firstInitTopicOverviewInfo = response.topicOverviewInfoList;
 
             // @ts-ignore
             updateTopicOverviewInfos(firstInitTopicOverviewInfo);
             updateCurrentTopicId(firstInitTopicOverviewInfo[0].topicInfo.tid);
+            // @ts-ignore
+            updateArticleSummaryInfo(response.articleSummaryInfo);
+            // @ts-ignore
+            updateAnnouncementInfos(response.announcementInfoList);
         });
         // 依赖静态值表示仅初始化时调用一次
     }, []);

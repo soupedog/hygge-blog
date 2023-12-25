@@ -5,6 +5,7 @@ import {Layout} from "antd";
 import IndexHeader from "./IndexHeader";
 import HyggeFooter from "../HyggeFooter";
 import CategoryContainer from "./CategoryContainer";
+import IndexMainView from "./IndexMainView";
 
 function IndexRight() {
     return (
@@ -23,6 +24,8 @@ function IndexRight() {
                         }}
                     >
                         <CategoryContainer/>
+                        <br/>
+                        <IndexMainView/>
                     </Content>
                     <HyggeFooter/>
                 </Layout>

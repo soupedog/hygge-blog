@@ -336,6 +336,7 @@ export interface TopicOverviewInfo {
 export interface AllOverviewInfo {
     topicOverviewInfoList: TopicOverviewInfo[];
     articleSummaryInfo: ArticleSummaryInfo[];
+    announcementInfoList: AnnouncementDto[];
 }
 
 export interface AnnouncementDto {
