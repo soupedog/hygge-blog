@@ -26,4 +26,5 @@ import java.util.List;
 public class HomepageFetchResult {
     private List<TopicOverviewInfo> topicOverviewInfoList;
     private ArticleSummaryInfo articleSummaryInfo;
+    private List<AnnouncementDto> announcementInfoList;
 }

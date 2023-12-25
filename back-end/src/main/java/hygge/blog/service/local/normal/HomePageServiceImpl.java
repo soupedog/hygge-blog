@@ -3,12 +3,14 @@ package hygge.blog.service.local.normal;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.dto.AnnouncementDto;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.HomepageFetchResult;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.dto.TopicDto;
 import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.local.dto.inner.TopicOverviewInfo;
+import hygge.blog.domain.local.po.Announcement;
 import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
@@ -35,6 +37,8 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
     private ArticleServiceImpl articleService;
     @Autowired
     private QuoteServiceImpl quoteService;
+    @Autowired
+    private AnnouncementServiceImpl announcementService;
 
     /**
      * 如果页容量不为空，将拉取首个主题下的文章摘要,以它为页容量进行分页查询第一页(如果主题存在的话)
@@ -93,6 +97,11 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
             ArticleSummaryInfo firstTopicArticleSummaryInfo = articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdListForFirstTopic, accessibleCategoryListForFirstTopic, context.isGuest() ? null : currentUser.getUserId(), 1, pageSize);
             result.setArticleSummaryInfo(firstTopicArticleSummaryInfo);
         }
+
+        // 追加公告信息
+        List<Announcement> announcementList = announcementService.fetchAnnouncement(1, pageSize);
+        List<AnnouncementDto> announcementDtoList = announcementList.stream().map(PoDtoMapper.INSTANCE::poToDto).toList();
+        result.setAnnouncementInfoList(announcementDtoList);
 
         return result;
     }
