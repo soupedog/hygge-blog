@@ -54,34 +54,13 @@
     }
   }
 
-  .ant-tabs-tab {
-    border-radius: 10px 10px 0 0 !important;
-  }
-
-  .ant-timeline.ant-timeline-label .ant-timeline-item-label {
-    width: calc(30% - 12px);
-  }
-
-  .ant-timeline.ant-timeline-alternate .ant-timeline-item-head, .ant-timeline.ant-timeline-alternate .ant-timeline-item-head-custom, .ant-timeline.ant-timeline-alternate .ant-timeline-item-tail, .ant-timeline.ant-timeline-label .ant-timeline-item-head, .ant-timeline.ant-timeline-label .ant-timeline-item-head-custom, .ant-timeline.ant-timeline-label .ant-timeline-item-tail, .ant-timeline.ant-timeline-right .ant-timeline-item-head, .ant-timeline.ant-timeline-right .ant-timeline-item-head-custom, .ant-timeline.ant-timeline-right .ant-timeline-item-tail {
-    left: 30%;
-  }
-
-  .ant-timeline.ant-timeline-alternate .ant-timeline-item-left .ant-timeline-item-content, .ant-timeline.ant-timeline-label .ant-timeline-item-left .ant-timeline-item-content, .ant-timeline.ant-timeline-right .ant-timeline-item-left .ant-timeline-item-content {
-    left: calc(30% - 4px);
-    width: calc(70% - 14px);
-  }
-
-  .ant-list-vertical .ant-list-item-meta-title {
-    font-size: 18px;
-    font-weight: bold;
-  }
-
+  // 明示折叠不可点击
   .ant-collapse > .ant-collapse-item > .ant-collapse-header {
     cursor: default !important;
   }
 
-  //给草稿高亮
+  // 给草稿高亮
   .ant-list-item-meta-content > .ant-list-item-meta-title > .draftHighlight {
-    color: #a32001;
+    color: #a32001 !important;
   }
 }

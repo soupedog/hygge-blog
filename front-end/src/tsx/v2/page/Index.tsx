@@ -1,10 +1,11 @@
 import React, {createContext, useEffect, useMemo, useState} from 'react';
-import {Layout} from "antd";
+import {ConfigProvider, Layout} from "antd";
 import IndexLeft from "../component/index/IndexLeft";
 import IndexRight from "../component/index/IndexRight";
 
 import "../../../style/index.less"
 import {AnnouncementDto, ArticleSummaryResponse, HomePageService, TopicOverviewInfo} from "../../rest/ApiClient";
+import zhCN from "antd/lib/locale/zh_CN";
 
 export interface IndexState {
     // 菜单是否折叠收起
@@ -72,12 +73,14 @@ function Index() {
     }, []);
 
     return (
-        <IndexContext.Provider value={state}>
-            <Layout>
-                <IndexLeft/>
-                <IndexRight/>
-            </Layout>
-        </IndexContext.Provider>
+        <ConfigProvider locale={zhCN}>
+            <IndexContext.Provider value={state}>
+                <Layout>
+                    <IndexLeft/>
+                    <IndexRight/>
+                </Layout>
+            </IndexContext.Provider>
+        </ConfigProvider>
     );
 }
 

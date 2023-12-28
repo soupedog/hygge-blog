@@ -26,7 +26,7 @@ function createTimelineItems(announcementList: AnnouncementDto[]) {
     return result;
 }
 
-function AnnouncementTabPane({announcementDtoList}: any) {
+function AnnouncementTabPane({announcementDtoList}: { announcementDtoList: AnnouncementDto[] }) {
     return (
         <Timeline items={createTimelineItems(announcementDtoList)}
                   mode={"left"}
