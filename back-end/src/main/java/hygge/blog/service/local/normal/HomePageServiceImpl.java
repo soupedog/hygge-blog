@@ -39,6 +39,8 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
     private QuoteServiceImpl quoteService;
     @Autowired
     private AnnouncementServiceImpl announcementService;
+    @Autowired
+    private HomePageServiceImpl homePageService;
 
     /**
      * 如果页容量不为空，将拉取首个主题下的文章摘要,以它为页容量进行分页查询第一页(如果主题存在的话)
@@ -102,6 +104,10 @@ public class HomePageServiceImpl extends HyggeWebUtilContainer {
         List<Announcement> announcementList = announcementService.fetchAnnouncement(1, 9999);
         List<AnnouncementDto> announcementDtoList = announcementList.stream().map(PoDtoMapper.INSTANCE::poToDto).toList();
         result.setAnnouncementInfoList(announcementDtoList);
+
+        // 加载句子收藏的首页信息
+        QuoteInfo quoteInfo = homePageService.findQuoteInfo(1, pageSize);
+        result.setQuoteInfo(quoteInfo);
 
         return result;
     }
