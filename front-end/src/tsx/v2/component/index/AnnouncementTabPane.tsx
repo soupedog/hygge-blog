@@ -3,6 +3,16 @@ import {Timeline} from "antd";
 import {TimeHelper} from "../../../utils/UtilContainer";
 import {AnnouncementDto} from "../../../rest/ApiClient";
 
+function AnnouncementTabPane({announcementDtoList}: { announcementDtoList: AnnouncementDto[] }) {
+    return (
+        <Timeline items={createTimelineItems(announcementDtoList)}
+                  mode={"left"}
+                  reverse={true}
+                  pending="To be continued..."
+        />
+    );
+}
+
 function createTimelineItems(announcementList: AnnouncementDto[]) {
     let result = new Array<any>();
 
@@ -24,16 +34,6 @@ function createTimelineItems(announcementList: AnnouncementDto[]) {
         );
     });
     return result;
-}
-
-function AnnouncementTabPane({announcementDtoList}: { announcementDtoList: AnnouncementDto[] }) {
-    return (
-        <Timeline items={createTimelineItems(announcementDtoList)}
-                  mode={"left"}
-                  reverse={true}
-                  pending="To be continued..."
-        />
-    );
 }
 
 export default AnnouncementTabPane;

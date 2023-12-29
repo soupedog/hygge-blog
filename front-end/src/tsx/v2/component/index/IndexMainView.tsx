@@ -1,10 +1,50 @@
 import React from 'react';
 import {Badge, Tabs, TabsProps} from "antd";
 import {IndexContext} from '../../page/Index';
-import {AnnouncementDto, ArticleSummaryResponse, TopicOverviewInfo} from "../../../rest/ApiClient";
+import {AnnouncementDto, ArticleSummaryResponse, HomePageService, TopicOverviewInfo} from "../../../rest/ApiClient";
 import AnnouncementTabPane from "./AnnouncementTabPane";
-import ArticleSummaryContainer from "./ArticleSummaryContainer";
-import {ArticleSummaryOrderType} from "./ArticleSummaryItem";
+import ArticleSummaryTabPane from "./ArticleSummaryTabPane";
+import {ArticleSummaryOrderType} from "./ArticleSummaryTabPaneItem";
+
+function IndexMainView() {
+    return (
+        <IndexContext.Consumer>
+            {({
+                  updateCategoryFolded,
+                  topicOverviewInfos,
+                  articleSummaryInfo,
+                  updateArticleSummaryInfo,
+                  updateCurrentTopicId,
+                  announcementInfos
+              }) => (
+                <Tabs type="card" size={"large"}
+                    // @ts-ignore
+                      items={createTabs({
+                          topicOverviewInfo: topicOverviewInfos,
+                          articleSummaryInfo: articleSummaryInfo,
+                          announcementInfos: announcementInfos
+                      })}
+                      onChange={(key) => {
+                          switch (key) {
+                              case "句子收藏":
+                              case "公告":
+                                  updateCategoryFolded(true);
+                                  break;
+                              case "搜索结果":
+                                  break;
+                              default :
+                                  updateCategoryFolded(false);
+                                  updateCurrentTopicId(key)
+                                  HomePageService.fetchArticleSummaryByTid(key, 1, 5, (data) => {
+                                      updateArticleSummaryInfo(data?.main);
+                                  });
+                          }
+                      }}>
+                </Tabs>
+            )}
+        </IndexContext.Consumer>
+    );
+}
 
 function createTabs({topicOverviewInfo, articleSummaryInfo, announcementInfos}: {
     topicOverviewInfo: TopicOverviewInfo[],
@@ -16,15 +56,15 @@ function createTabs({topicOverviewInfo, articleSummaryInfo, announcementInfos}: 
     topicOverviewInfo.map(item => {
         result.push(
             {
-                key: item.topicInfo.topicName,
+                key: item.topicInfo.tid,
                 label: (
                     <>
                         {item.topicInfo.topicName}
                         <Badge count={item.totalCount} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
-                children: <ArticleSummaryContainer orderType={ArticleSummaryOrderType.GLOBAL}
-                                                   articleSummaryInfo={articleSummaryInfo}/>,
+                children: <ArticleSummaryTabPane orderType={ArticleSummaryOrderType.GLOBAL}
+                                                 articleSummaryInfo={articleSummaryInfo}/>,
             } as TabsProps
         );
     });
@@ -75,46 +115,6 @@ function createTabs({topicOverviewInfo, articleSummaryInfo, announcementInfos}: 
         } as TabsProps
     );
     return result;
-}
-
-
-function IndexMainView() {
-    return (
-        <IndexContext.Consumer>
-            {({
-                  updateCategoryFolded,
-                  topicOverviewInfos,
-                  articleSummaryInfo,
-                  updateArticleSummaryInfo,
-                  announcementInfos
-              }) => (
-                <Tabs type="card" size={"large"}
-                    // @ts-ignore
-                      items={createTabs({
-                          topicOverviewInfo: topicOverviewInfos,
-                          articleSummaryInfo: articleSummaryInfo,
-                          announcementInfos: announcementInfos
-                      })}
-                      onChange={(key) => {
-                          switch (key) {
-                              case "句子收藏":
-                              case "公告":
-                                  updateCategoryFolded(true);
-                                  break;
-                              case "搜索结果":
-                                  break;
-                              default :
-                                  updateCategoryFolded(false);
-                              // state.updateRootStatus!({
-                              //     categoryFolded: false,
-                              //     currentTid: key.substring(8)
-                              // });
-                          }
-                      }}>
-                </Tabs>
-            )}
-        </IndexContext.Consumer>
-    );
 }
 
 export default IndexMainView;

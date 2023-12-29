@@ -1,22 +1,14 @@
 import React, {useState} from 'react';
-import {List, Space} from "antd";
-import ArticleSummaryItem, {ArticleSummaryOrderType} from "./ArticleSummaryItem";
+import {List} from "antd";
+import ArticleSummaryTabPaneItem, {ArticleSummaryOrderType} from "./ArticleSummaryTabPaneItem";
 import {ArticleSummaryResponse, HomePageService, UserService} from "../../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
 import {IndexContext} from '../../page/Index';
 
-const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
-    <Space>
-        {React.createElement(icon)}
-        {text}
-    </Space>
-);
-
-function ArticleSummaryContainer({orderType, articleSummaryInfo}: {
+function ArticleSummaryTabPane({orderType, articleSummaryInfo}: {
     orderType: ArticleSummaryOrderType,
     articleSummaryInfo: ArticleSummaryResponse
 }) {
-    const [currentPage, updateCurrentPage] = useState(1);
     const [currentPageSize, updateCurrentPageSize] = useState(5);
 
     return (
@@ -42,7 +34,7 @@ function ArticleSummaryContainer({orderType, articleSummaryInfo}: {
                     }}
                     dataSource={articleSummaryInfo.articleSummaryList}
                     renderItem={(item) => (
-                        <ArticleSummaryItem
+                        <ArticleSummaryTabPaneItem
                             //TODO isAuthor 语义判断不准确，有待调整
                             isAuthor={UserService.getCurrentUser() != null}
                             articleSummary={item}
@@ -57,4 +49,4 @@ function ArticleSummaryContainer({orderType, articleSummaryInfo}: {
     );
 }
 
-export default ArticleSummaryContainer;
+export default ArticleSummaryTabPane;

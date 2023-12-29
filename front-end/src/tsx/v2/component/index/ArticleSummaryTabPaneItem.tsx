@@ -5,13 +5,7 @@ import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../utils/UtilContai
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
 import {ArticleSummaryInfo} from "../../../rest/ApiClient";
 
-export enum ArticleSummaryOrderType {
-    DEFAULT,
-    CATEGORY,
-    GLOBAL
-}
-
-function ArticleSummaryItem({isAuthor, secretKey, orderType, articleSummary}: {
+function ArticleSummaryTabPaneItem({isAuthor, secretKey, orderType, articleSummary}: {
     isAuthor: Boolean,
     secretKey: string | null,
     orderType: ArticleSummaryOrderType,
@@ -167,4 +161,10 @@ const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
     </Space>
 );
 
-export default ArticleSummaryItem;
+export enum ArticleSummaryOrderType {
+    DEFAULT,
+    CATEGORY,
+    GLOBAL
+}
+
+export default ArticleSummaryTabPaneItem;

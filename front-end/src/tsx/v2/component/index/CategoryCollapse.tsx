@@ -3,7 +3,7 @@ import {Badge, Card, Collapse} from "antd";
 import {IndexContext} from '../../page/Index';
 import {TopicOverviewInfo} from "../../../rest/ApiClient";
 
-function CategoryContainer() {
+function CategoryCollapse() {
     return (
         <IndexContext.Consumer>
             {({
@@ -83,4 +83,4 @@ const gridStyle: React.CSSProperties = {
     textAlign: 'center',
 };
 
-export default CategoryContainer;
+export default CategoryCollapse;

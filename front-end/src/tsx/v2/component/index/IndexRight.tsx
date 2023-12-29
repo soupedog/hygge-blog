@@ -4,7 +4,7 @@ import {Content} from "antd/es/layout/layout";
 import {Layout} from "antd";
 import IndexHeader from "./IndexHeader";
 import HyggeFooter from "../HyggeFooter";
-import CategoryContainer from "./CategoryContainer";
+import CategoryCollapse from "./CategoryCollapse";
 import IndexMainView from "./IndexMainView";
 
 function IndexRight() {
@@ -23,7 +23,7 @@ function IndexRight() {
                             minHeight: window.innerHeight - 284 + "px",
                         }}
                     >
-                        <CategoryContainer/>
+                        <CategoryCollapse/>
                         <br/>
                         <IndexMainView/>
                     </Content>
