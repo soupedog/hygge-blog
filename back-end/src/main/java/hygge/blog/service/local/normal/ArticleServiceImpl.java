@@ -194,6 +194,11 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
                         .findFirst()
                         .ifPresent(category -> articleDto.setCid(category.getCid()));
             }
+
+            // userId → uid
+            String authorUid = cacheService.userIdToUid(item.getUserId());
+            articleDto.setUid(authorUid);
+
             return articleDto;
         }));
 
@@ -232,6 +237,9 @@ public class ArticleServiceImpl extends HyggeWebUtilContainer {
         }
 
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(article);
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(article.getUserId());
+        result.setUid(authorUid);
         result.setCid(currentCategory.getCid());
 
         CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());

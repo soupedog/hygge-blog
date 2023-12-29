@@ -5,8 +5,10 @@ import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
+import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.TopicServiceImpl;
+import hygge.blog.service.local.normal.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class CacheServiceImpl {
     private CategoryServiceImpl categoryService;
     @Autowired
     private TopicServiceImpl topicService;
+    @Autowired
+    private UserServiceImpl userService;
 
     /**
      * 从传入的文章类型构造类别树一直到根节点
@@ -68,5 +72,14 @@ public class CacheServiceImpl {
         result.setCategoryList(categoryList);
 
         return result;
+    }
+
+    /**
+     * 根据 userId 获取对应的 uid
+     */
+    @Cacheable(cacheNames = "userIdToUidMappingCache", key = "'UserIdToUid'+#userId", unless = "#result == null")
+    public String userIdToUid(Integer userId) {
+        User user = userService.findUserByUserId(userId, true);
+        return user == null ? null : user.getUid();
     }
 }
