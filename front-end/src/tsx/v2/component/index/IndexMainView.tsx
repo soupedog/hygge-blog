@@ -8,10 +8,10 @@ import {
     QuoteResponse,
     TopicOverviewInfo
 } from "../../../rest/ApiClient";
-import AnnouncementTabPane from "./AnnouncementTabPane";
-import ArticleSummaryTabPane from "./ArticleSummaryTabPane";
-import {ArticleSummaryOrderType} from "./ArticleSummaryTabPaneItem";
-import QuoteTabPane from "./QuoteTabPane";
+import AnnouncementTabPane from "./tabs/AnnouncementTabPane";
+import ArticleSummaryTabPane from "./tabs/ArticleSummaryTabPane";
+import {ArticleSummaryOrderType} from "./tabs/ArticleSummaryTabPaneItem";
+import QuoteTabPane from "./tabs/QuoteTabPane";
 
 function IndexMainView() {
     return (

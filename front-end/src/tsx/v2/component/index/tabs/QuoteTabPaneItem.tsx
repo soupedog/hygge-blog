@@ -1,9 +1,9 @@
 import React from 'react';
 import {Badge, List, Space, Tooltip} from "antd";
-import {PropertiesHelper, UrlHelper} from "../../../utils/UtilContainer";
-import {QuoteDto} from "../../../rest/ApiClient";
+import {PropertiesHelper, UrlHelper} from "../../../../utils/UtilContainer";
+import {QuoteDto} from "../../../../rest/ApiClient";
 import {FormOutlined} from "@ant-design/icons";
-import {class_md_preview} from "../properties/ElementNameContainer";
+import {class_md_preview} from "../../properties/ElementNameContainer";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";

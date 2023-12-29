@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {List} from "antd";
-import {HomePageService, QuoteResponse, UserService} from "../../../rest/ApiClient";
+import {HomePageService, QuoteResponse, UserService} from "../../../../rest/ApiClient";
 import QuoteTabPaneItem from "./QuoteTabPaneItem";
-import {IndexContext} from '../../page/Index';
+import {IndexContext} from "../../../page/Index";
 
 function QuoteTabPane({quoteInfo}: { quoteInfo: QuoteResponse }) {
     const [currentPageSize, updateCurrentPageSize] = useState(5);

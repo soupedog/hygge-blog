@@ -1,9 +1,9 @@
 import React from 'react';
 import {Badge, List, Space} from "antd";
 import clsx from "clsx";
-import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../utils/UtilContainer";
+import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../../utils/UtilContainer";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
-import {ArticleSummaryInfo} from "../../../rest/ApiClient";
+import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
 
 function ArticleSummaryTabPaneItem({isAuthor, secretKey, orderType, articleSummary}: {
     isAuthor: Boolean,
