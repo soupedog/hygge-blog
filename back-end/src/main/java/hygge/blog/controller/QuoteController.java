@@ -1,10 +1,11 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.QuoteControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.QuoteDto;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Quote;
+import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,8 @@ import java.util.Map;
 public class QuoteController implements QuoteControllerDoc {
     @Autowired
     private QuoteServiceImpl quoteService;
+    @Autowired
+    private CacheServiceImpl cacheService;
 
     @Override
     @PostMapping("/quote")
@@ -50,6 +53,9 @@ public class QuoteController implements QuoteControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<QuoteDto>> findQuote(@PathVariable("quoteId") Integer quoteId) {
         Quote resultTemp = quoteService.findQuoteByQuoteId(quoteId, true);
         QuoteDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(resultTemp.getUserId());
+        result.setUid(authorUid);
         return (ResponseEntity<HyggeBlogControllerResponse<QuoteDto>>) success(result);
     }
 }

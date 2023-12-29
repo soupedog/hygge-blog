@@ -2,18 +2,19 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.QuoteDao;
+import hygge.blog.common.mapper.MapToAnyMapper;
+import hygge.blog.common.mapper.OverrideMapper;
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.QuoteDto;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.enums.QuoteStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.common.mapper.MapToAnyMapper;
-import hygge.blog.common.mapper.OverrideMapper;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Quote;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.local.CacheServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -48,6 +49,8 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
     private QuoteDao quoteDao;
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private CacheServiceImpl cacheService;
     @Autowired
     private RefreshElasticSearchServiceImpl refreshElasticSearchService;
 
@@ -118,7 +121,13 @@ public class QuoteServiceImpl extends HyggeWebUtilContainer {
 
         QuoteInfo result = QuoteInfo.builder().build();
 
-        List<QuoteDto> list = collectionHelper.filterNonemptyItemAsArrayList(false, resultTemp.getContent(), (PoDtoMapper.INSTANCE::poToDto));
+        List<QuoteDto> list = collectionHelper.filterNonemptyItemAsArrayList(false, resultTemp.getContent(), (item -> {
+            QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(item);
+            // userId → uid
+            String authorUid = cacheService.userIdToUid(item.getUserId());
+            quoteDto.setUid(authorUid);
+            return quoteDto;
+        }));
         result.setQuoteList(list);
         result.setTotalCount(resultTemp.getTotalElements());
         return result;

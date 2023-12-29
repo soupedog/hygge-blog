@@ -24,6 +24,8 @@ import lombok.Setter;
 public class QuoteDto {
     @Schema(title = "句子 ID", description = "系统自动生成句子 ID")
     private Integer quoteId;
+    @Schema(title = "用户编号", description = "系统自动生成用户编号", example = "U00000001")
+    private String uid;
     @Schema(title = "主图绝对路径")
     private String imageSrc;
     @Schema(title = "内容")

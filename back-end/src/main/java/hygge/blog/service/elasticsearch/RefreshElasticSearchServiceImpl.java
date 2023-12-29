@@ -9,13 +9,12 @@ import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Quote;
-import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.repository.database.CategoryDao;
 import hygge.blog.repository.database.QuoteDao;
-import hygge.blog.repository.database.UserDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.normal.QuoteServiceImpl;
 import hygge.web.template.HyggeWebUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +42,13 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     @Autowired
     private CategoryDao categoryDao;
     @Autowired
-    private UserDao userDao;
-    @Autowired
     private QuoteDao quoteDao;
     @Autowired
-    private SearchingCacheDao searchingCacheDao;
+    private QuoteServiceImpl quoteService;
     @Autowired
     private CacheServiceImpl cacheService;
+    @Autowired
+    private SearchingCacheDao searchingCacheDao;
     @Autowired
     private ElasticsearchOperations operations;
 
@@ -79,14 +78,13 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         Article article = articleDao.findById(articleId).orElse(null);
         Category currentCategory = categoryDao.findById(article.getCategoryId()).orElse(null);
         CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
-        User currentUser = userDao.findById(article.getUserId()).orElse(null);
 
-        freshSingleArticle(article, currentCategory, categoryTreeInfo, currentUser);
+        freshSingleArticle(article, currentCategory, categoryTreeInfo);
     }
 
-    public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo, User currentUser) {
+    public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
         ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
-        articleDto.setUid(currentUser.getUid());
+        articleDto.setUid(cacheService.userIdToUid(article.getUserId()));
         articleDto.setCid(currentCategory.getCid());
 
         articleDto.setCategoryTreeInfo(categoryTreeInfo);
@@ -99,8 +97,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
     }
 
     public void freshSingleQuote(Integer quoteId) {
-        Quote quote = quoteDao.findById(quoteId).orElse(null);
+        Quote quote = quoteService.findQuoteByQuoteId(quoteId, false);
         QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(quote.getUserId());
+        quoteDto.setUid(authorUid);
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
         articleQuoteSearchCache.initEsId(quoteId, ArticleQuoteSearchCache.Type.QUOTE);
@@ -113,7 +114,6 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
         AtomicInteger totalCount = new AtomicInteger(0);
 
         List<Category> allCategoryList = categoryDao.findAll();
-        List<User> allUserList = userDao.findAll();
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("articleId")));
 
         Page<Article> articleTemp = articleDao.findAll(pageable);
@@ -128,9 +128,8 @@ public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
             articleList.forEach(article -> {
                 Category currentCategory = allCategoryList.stream().filter(category -> category.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
                 CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
-                User currentUser = allUserList.stream().filter(user -> user.getUserId().equals(article.getUserId())).findFirst().orElse(null);
 
-                freshSingleArticle(article, currentCategory, categoryTreeInfo, currentUser);
+                freshSingleArticle(article, currentCategory, categoryTreeInfo);
 
                 totalCount.incrementAndGet();
             });
