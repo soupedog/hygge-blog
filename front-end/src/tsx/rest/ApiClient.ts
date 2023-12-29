@@ -234,6 +234,7 @@ export interface ArticleDto {
     configuration: ArticleConfiguration,
     categoryTreeInfo: CategoryTreeInfo,
     cid: string,
+    uid: string,
     title: string,
     imageSrc: string,
     summary: string,
@@ -336,6 +337,7 @@ export interface TopicOverviewInfo {
 export interface AllOverviewInfo {
     topicOverviewInfoList: TopicOverviewInfo[];
     articleSummaryInfo: ArticleSummaryResponse;
+    quoteInfo: QuoteResponse;
     announcementInfoList: AnnouncementDto[];
 }
 
@@ -353,6 +355,7 @@ export interface ArticleSummaryInfo {
         categoryList: CategoryDto[]
     },
     cid: string,
+    uid: string,
     title: string,
     imageSrc: string,
     summary: string,

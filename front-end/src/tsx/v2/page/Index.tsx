@@ -4,7 +4,13 @@ import IndexLeft from "../component/index/IndexLeft";
 import IndexRight from "../component/index/IndexRight";
 
 import "../../../style/index.less"
-import {AnnouncementDto, ArticleSummaryResponse, HomePageService, TopicOverviewInfo} from "../../rest/ApiClient";
+import {
+    AnnouncementDto,
+    ArticleSummaryResponse,
+    HomePageService,
+    QuoteResponse,
+    TopicOverviewInfo
+} from "../../rest/ApiClient";
 import zhCN from "antd/lib/locale/zh_CN";
 
 export interface IndexState {
@@ -21,6 +27,8 @@ export interface IndexState {
     updateTopicOverviewInfos: Function;
     articleSummaryInfo: ArticleSummaryResponse;
     updateArticleSummaryInfo: Function;
+    quoteInfo: QuoteResponse;
+    updateQuoteInfo: Function;
     announcementInfos: AnnouncementDto[];
     updateAnnouncementInfos: Function;
 }
@@ -39,6 +47,12 @@ function Index() {
             totalCount: 0
         } as ArticleSummaryResponse
     );
+    const [quoteInfo, updateQuoteInfo] = useState(
+        {
+            quoteList: [],
+            totalCount: 0
+        } as QuoteResponse
+    );
     const [announcementInfos, updateAnnouncementInfos] = useState([]);
 
     const state = useMemo(() => ({
@@ -52,21 +66,21 @@ function Index() {
         updateTopicOverviewInfos: updateTopicOverviewInfos,
         articleSummaryInfo: articleSummaryInfo,
         updateArticleSummaryInfo: updateArticleSummaryInfo,
+        quoteInfo: quoteInfo,
+        updateQuoteInfo: updateQuoteInfo,
         announcementInfos: announcementInfos,
         updateAnnouncementInfos: updateAnnouncementInfos
-    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, announcementInfos]);
+    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, quoteInfo, announcementInfos]);
 
     useEffect(() => {
         HomePageService.fetch(data => {
             let response = data!.main!;
             let firstInitTopicOverviewInfo = response.topicOverviewInfoList;
 
-            // @ts-ignore
             updateTopicOverviewInfos(firstInitTopicOverviewInfo);
             updateCurrentTopicId(firstInitTopicOverviewInfo[0].topicInfo.tid);
-            // @ts-ignore
             updateArticleSummaryInfo(response.articleSummaryInfo);
-            // @ts-ignore
+            updateQuoteInfo(response.quoteInfo);
             updateAnnouncementInfos(response.announcementInfoList);
         });
         // 依赖静态值表示仅初始化时调用一次

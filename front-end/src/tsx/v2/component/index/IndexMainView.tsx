@@ -1,10 +1,17 @@
 import React from 'react';
 import {Badge, Tabs, TabsProps} from "antd";
 import {IndexContext} from '../../page/Index';
-import {AnnouncementDto, ArticleSummaryResponse, HomePageService, TopicOverviewInfo} from "../../../rest/ApiClient";
+import {
+    AnnouncementDto,
+    ArticleSummaryResponse,
+    HomePageService,
+    QuoteResponse,
+    TopicOverviewInfo
+} from "../../../rest/ApiClient";
 import AnnouncementTabPane from "./AnnouncementTabPane";
 import ArticleSummaryTabPane from "./ArticleSummaryTabPane";
 import {ArticleSummaryOrderType} from "./ArticleSummaryTabPaneItem";
+import QuoteTabPane from "./QuoteTabPane";
 
 function IndexMainView() {
     return (
@@ -12,9 +19,11 @@ function IndexMainView() {
             {({
                   updateCategoryFolded,
                   topicOverviewInfos,
+                  updateCurrentTopicId,
                   articleSummaryInfo,
                   updateArticleSummaryInfo,
-                  updateCurrentTopicId,
+                  quoteInfo,
+                  updateQuoteInfo,
                   announcementInfos
               }) => (
                 <Tabs type="card" size={"large"}
@@ -22,6 +31,7 @@ function IndexMainView() {
                       items={createTabs({
                           topicOverviewInfo: topicOverviewInfos,
                           articleSummaryInfo: articleSummaryInfo,
+                          quoteInfo: quoteInfo,
                           announcementInfos: announcementInfos
                       })}
                       onChange={(key) => {
@@ -46,9 +56,10 @@ function IndexMainView() {
     );
 }
 
-function createTabs({topicOverviewInfo, articleSummaryInfo, announcementInfos}: {
+function createTabs({topicOverviewInfo, articleSummaryInfo, quoteInfo, announcementInfos}: {
     topicOverviewInfo: TopicOverviewInfo[],
     articleSummaryInfo: ArticleSummaryResponse,
+    quoteInfo: QuoteResponse,
     announcementInfos: AnnouncementDto[]
 }): TabsProps[] {
     let result = new Array<TabsProps>();
@@ -80,13 +91,12 @@ function createTabs({topicOverviewInfo, articleSummaryInfo, announcementInfos}: 
             label: (
                 <>
                     句子收藏
-                    <Badge count={0} overflowCount={9999} offset={[10, -20]}/>
+                    <Badge count={quoteInfo.totalCount} overflowCount={9999} offset={[10, -20]}/>
                 </>
             ),
-            children: <div style={{height: "500px", backgroundColor: "red"}}></div>,
+            children: <QuoteTabPane quoteInfo={quoteInfo}/>,
         } as TabsProps
     );
-
 
     result.push(
         {

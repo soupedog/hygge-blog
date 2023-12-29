@@ -45,7 +45,6 @@ function ArticleSummaryTabPane({orderType, articleSummaryInfo}: {
                 />
             )}
         </IndexContext.Consumer>
-
     );
 }
 
