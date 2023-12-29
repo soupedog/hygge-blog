@@ -35,8 +35,7 @@ function ArticleSummaryTabPane({orderType, articleSummaryInfo}: {
                     dataSource={articleSummaryInfo.articleSummaryList}
                     renderItem={(item) => (
                         <ArticleSummaryTabPaneItem
-                            //TODO isAuthor 语义判断不准确，有待调整
-                            isAuthor={UserService.getCurrentUser() != null}
+                            isAuthor={item.uid == UserService.getCurrentUser()?.uid}
                             articleSummary={item}
                             orderType={orderType}
                             secretKey={UrlHelper.getQueryString("secretKey")}

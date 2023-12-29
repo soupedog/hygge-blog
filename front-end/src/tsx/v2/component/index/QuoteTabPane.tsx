@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {List} from "antd";
-import {HomePageService, QuoteResponse} from "../../../rest/ApiClient";
+import {HomePageService, QuoteResponse, UserService} from "../../../rest/ApiClient";
 import QuoteTabPaneItem from "./QuoteTabPaneItem";
 import {IndexContext} from '../../page/Index';
 
@@ -30,7 +30,7 @@ function QuoteTabPane({quoteInfo}: { quoteInfo: QuoteResponse }) {
                     }}
                     dataSource={quoteInfo.quoteList}
                     renderItem={(item) => (
-                        <QuoteTabPaneItem isAuthor={true} quote={item}/>
+                        <QuoteTabPaneItem isAuthor={item.uid == UserService.getCurrentUser()?.uid} quote={item}/>
                     )}
                 />
             )}
