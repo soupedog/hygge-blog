@@ -15,13 +15,13 @@ function ArticleSummaryTabPane({orderType, articleSummaryInfo, onPageChange}: {
 
     return (
         <IndexContext.Consumer>
-            {({currentTopicId, updateArticleSummaryInfo}) => (
+            {({currentTopicId,currentCategoryId, updateArticleSummaryInfo}) => (
                 <List
                     itemLayout="vertical"
                     size="large"
                     pagination={{
                         onChange: (page, pageSize) => {
-                            onPageChange(currentTopicId!, page, pageSize);
+                            onPageChange(currentTopicId!,currentCategoryId!, page, pageSize);
 
                             if (pageSize != currentPageSize) {
                                 updateCurrentPageSize(pageSize);

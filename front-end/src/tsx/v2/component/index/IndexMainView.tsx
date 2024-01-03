@@ -11,7 +11,8 @@ import {
 import AnnouncementTabPane from "./tabs/AnnouncementTabPane";
 import ArticleSummaryTabPane from "./tabs/ArticleSummaryTabPane";
 import QuoteTabPane from "./tabs/QuoteTabPane";
-import {ArticleSummaryOrderType} from "../properties/GlobalEnum";
+import {ArticleSummaryOrderType, IndexSearchType} from "../properties/GlobalEnum";
+import SearchResultTabPane from "./tabs/SearchResultTabPane";
 
 function IndexMainView() {
     return (
@@ -20,10 +21,12 @@ function IndexMainView() {
                   updateCategoryFolded,
                   topicOverviewInfos,
                   updateCurrentTopicId,
-                  articleSummaryInfo,
-                  updateArticleSummaryInfo,
-                  quoteInfo,
-                  updateQuoteInfo,
+                  articleSummaryInfo, updateArticleSummaryInfo,
+                  indexSearchType,
+                  quoteInfo, updateQuoteInfo,
+                  articleSummarySearchOrderType,
+                  articleSummarySearchInfo,
+                  quoteSearchInfo,
                   announcementInfos
               }) => (
                 <Tabs type="card" size={"large"}
@@ -32,6 +35,10 @@ function IndexMainView() {
                           topicOverviewInfo: topicOverviewInfos,
                           articleSummaryInfo: articleSummaryInfo,
                           quoteInfo: quoteInfo,
+                          indexSearchType: indexSearchType,
+                          articleSummarySearchOrderType: articleSummarySearchOrderType,
+                          articleSummarySearchInfo: articleSummarySearchInfo,
+                          quoteSearchInfo: quoteSearchInfo,
                           announcementInfos: announcementInfos,
                           updateArticleSummaryInfo: updateArticleSummaryInfo,
                           updateQuoteInfo: updateQuoteInfo
@@ -60,18 +67,22 @@ function IndexMainView() {
 
 function createTabs({
                         topicOverviewInfo,
-                        articleSummaryInfo,
-                        quoteInfo,
+                        articleSummaryInfo, updateArticleSummaryInfo,
+                        quoteInfo, updateQuoteInfo,
+                        indexSearchType,
+                        articleSummarySearchOrderType,
+                        articleSummarySearchInfo,
+                        quoteSearchInfo,
                         announcementInfos,
-                        updateArticleSummaryInfo,
-                        updateQuoteInfo
                     }: {
     topicOverviewInfo: TopicOverviewInfo[],
-    articleSummaryInfo: ArticleSummaryResponse,
-    quoteInfo: QuoteResponse,
-    announcementInfos: AnnouncementDto[],
-    updateArticleSummaryInfo: Function,
-    updateQuoteInfo: Function
+    articleSummaryInfo: ArticleSummaryResponse, updateArticleSummaryInfo: Function,
+    quoteInfo: QuoteResponse, updateQuoteInfo: Function,
+    indexSearchType: IndexSearchType,
+    articleSummarySearchOrderType: ArticleSummaryOrderType,
+    articleSummarySearchInfo: ArticleSummaryResponse,
+    quoteSearchInfo: QuoteResponse,
+    announcementInfos: AnnouncementDto[]
 }): TabsProps[] {
     let result = new Array<TabsProps>();
 
@@ -87,7 +98,7 @@ function createTabs({
                 ),
                 children: <ArticleSummaryTabPane orderType={ArticleSummaryOrderType.GLOBAL}
                                                  articleSummaryInfo={articleSummaryInfo}
-                                                 onPageChange={(currentTopicId: string, page: number, pageSize: number) => {
+                                                 onPageChange={(currentTopicId: string, currentCategoryId: string, page: number, pageSize: number) => {
                                                      HomePageService.fetchArticleSummaryByTid(currentTopicId, page, pageSize, (data) => {
                                                          updateArticleSummaryInfo(data?.main);
                                                      });
@@ -127,7 +138,10 @@ function createTabs({
                     <Badge count={0} overflowCount={9999} offset={[10, -20]}/>
                 </>
             ),
-            children: <div style={{height: "500px", backgroundColor: "red"}}></div>,
+            children: <SearchResultTabPane searchType={indexSearchType}
+                                           articleSummaryInfo={articleSummarySearchInfo}
+                                           orderType={articleSummarySearchOrderType}
+                                           quoteInfo={quoteSearchInfo}/>,
         } as TabsProps
     );
 

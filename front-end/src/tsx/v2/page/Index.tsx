@@ -12,6 +12,7 @@ import {
     TopicOverviewInfo
 } from "../../rest/ApiClient";
 import zhCN from "antd/lib/locale/zh_CN";
+import {ArticleSummaryOrderType, IndexSearchType} from "../component/properties/GlobalEnum";
 
 export interface IndexState {
     // 菜单是否折叠收起
@@ -23,12 +24,22 @@ export interface IndexState {
     // 当前选中查看的文章板块 tid
     currentTopicId?: string | null;
     updateCurrentTopicId: Function;
+    updateCurrentCategoryId: Function;
     topicOverviewInfos: TopicOverviewInfo[];
     updateTopicOverviewInfos: Function;
     articleSummaryInfo: ArticleSummaryResponse;
     updateArticleSummaryInfo: Function;
     quoteInfo: QuoteResponse;
     updateQuoteInfo: Function;
+    indexSearchType: IndexSearchType,
+    // 当前选中查看的文章类别 cid
+    currentCategoryId?: string | null;
+    searchKeyword: string;
+    articleSummarySearchOrderType: ArticleSummaryOrderType
+    articleSummarySearchInfo: ArticleSummaryResponse;
+    updateArticleSummarySearchInfo: Function;
+    quoteSearchInfo: QuoteResponse;
+    updateQuoteSearchInfo: Function;
     announcementInfos: AnnouncementDto[];
     updateAnnouncementInfos: Function;
 }
@@ -37,17 +48,33 @@ export interface IndexState {
 function Index() {
     const [menuFolded, updateMenuFolded] = useState(true);
     const [categoryFolded, updateCategoryFolded] = useState(false);
-    // 请求远端成功必然文章目录元素大于 0
     const [currentTopicId, updateCurrentTopicId] = useState("");
+    // 请求远端成功必然文章目录元素大于 0
     const [topicOverviewInfos, updateTopicOverviewInfos] = useState([]);
-
     const [articleSummaryInfo, updateArticleSummaryInfo] = useState(
         {
             articleSummaryList: [],
             totalCount: 0
         } as ArticleSummaryResponse
     );
+
     const [quoteInfo, updateQuoteInfo] = useState(
+        {
+            quoteList: [],
+            totalCount: 0
+        } as QuoteResponse
+    );
+    const [indexSearchType, updateIndexSearchType] = useState(IndexSearchType.ARTICLE);
+    const [currentCategoryId, updateCurrentCategoryId] = useState("");
+    const [searchKeyword, updateSearchKeyword] = useState("");
+    const [articleSummarySearchOrderType, updateArticleSummarySearchOrderType] = useState(ArticleSummaryOrderType.CATEGORY);
+    const [articleSummarySearchInfo, updateArticleSummarySearchInfo] = useState(
+        {
+            articleSummaryList: [],
+            totalCount: 0
+        } as ArticleSummaryResponse
+    );
+    const [quoteSearchInfo, updateQuoteSearchInfo] = useState(
         {
             quoteList: [],
             totalCount: 0
@@ -68,9 +95,21 @@ function Index() {
         updateArticleSummaryInfo: updateArticleSummaryInfo,
         quoteInfo: quoteInfo,
         updateQuoteInfo: updateQuoteInfo,
+        indexSearchType: indexSearchType,
+        updateIndexSearchType: updateIndexSearchType,
+        currentCategoryId: currentCategoryId,
+        updateCurrentCategoryId: updateCurrentCategoryId,
+        searchKeyword: searchKeyword,
+        updateSearchKeyword: updateSearchKeyword,
+        articleSummarySearchOrderType: articleSummarySearchOrderType,
+        updateArticleSummarySearchOrderType: updateArticleSummarySearchOrderType,
+        articleSummarySearchInfo: articleSummarySearchInfo,
+        updateArticleSummarySearchInfo: updateArticleSummarySearchInfo,
+        quoteSearchInfo: quoteSearchInfo,
+        updateQuoteSearchInfo: updateQuoteSearchInfo,
         announcementInfos: announcementInfos,
         updateAnnouncementInfos: updateAnnouncementInfos
-    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, quoteInfo, announcementInfos]);
+    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, quoteInfo, indexSearchType, currentCategoryId, searchKeyword, articleSummarySearchOrderType, articleSummarySearchInfo, quoteSearchInfo, announcementInfos]);
 
     useEffect(() => {
         HomePageService.fetch(data => {

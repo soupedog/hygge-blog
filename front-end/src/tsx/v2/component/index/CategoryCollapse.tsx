@@ -1,7 +1,7 @@
 import React from 'react';
 import {Badge, Card, Collapse} from "antd";
 import {IndexContext} from '../../page/Index';
-import {TopicOverviewInfo} from "../../../rest/ApiClient";
+import {HomePageService, TopicOverviewInfo} from "../../../rest/ApiClient";
 
 function CategoryCollapse() {
     return (
@@ -9,39 +9,40 @@ function CategoryCollapse() {
             {({
                   categoryFolded, updateCategoryFolded,
                   currentTopicId, updateCurrentTopicId,
-                  topicOverviewInfos, updateTopicOverviewInfos
+                  updateCurrentCategoryId,
+                  topicOverviewInfos, updateArticleSummarySearchInfo
               }) => (
                 // folded 是虚空组件，相当于收起所有面板
                 // 为 true 时，激活 key 为 default 的面板
                 <Collapse activeKey={[categoryFolded ? "folded" : "default"]}
                     // unknown 是一个不存在的文章板块
-                          items={renderCategoryPanel(topicOverviewInfos, currentTopicId == null ? "unknown" : currentTopicId)}>
+                          items={renderCategoryPanel(topicOverviewInfos, currentTopicId == null ? "unknown" : currentTopicId, updateCurrentCategoryId, updateArticleSummarySearchInfo)}>
                 </Collapse>
             )}
         </IndexContext.Consumer>
     );
 
-    function renderCategoryPanel(infos: TopicOverviewInfo[], selectedTid: string) {
+    function renderCategoryPanel(infos: TopicOverviewInfo[], selectedTid: string, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function) {
         // 只有单个子节点
         return [{
             // 默认展开 default 面板
             key: 'default',
             label: '文章类别目录',
-            children: renderCategoryCard(infos, selectedTid),
+            children: renderCategoryCard(infos, selectedTid, updateCurrentCategoryId, updateArticleSummarySearchInfo),
         }];
     }
 
-    function renderCategoryCard(infos: TopicOverviewInfo[], selectedTid: string) {
+    function renderCategoryCard(infos: TopicOverviewInfo[], selectedTid: string, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function) {
         return (
             <Card size={"small"}>
                 {
-                    renderCategoryCardGrid(infos, selectedTid)
+                    renderCategoryCardGrid(infos, selectedTid, updateCurrentCategoryId, updateArticleSummarySearchInfo)
                 }
             </Card>
         );
     }
 
-    function renderCategoryCardGrid(infos: TopicOverviewInfo[], selectedTid: string) {
+    function renderCategoryCardGrid(infos: TopicOverviewInfo[], selectedTid: string, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function) {
         let topicOverviewInfos: TopicOverviewInfo[] | undefined = infos;
 
         if (topicOverviewInfos == null || topicOverviewInfos.length < 1) {
@@ -59,8 +60,11 @@ function CategoryCollapse() {
                 }
                 return (
                     <Card.Grid className={"pointer"} style={gridStyle} onClick={() => {
-                        // state.fetchCategoryArticleSearchViewInfo!(1, 5, state, item.cid, null);
-                        document.getElementById("searchTap")?.click();
+                        updateCurrentCategoryId(item.cid);
+                        HomePageService.fetchArticleSummaryByCid(item.cid, 1, 5, (data) => {
+                            updateArticleSummarySearchInfo(data?.main);
+                        });
+                        document.getElementById("rc-tabs-0-tab-搜索结果")?.click();
                     }} key={"card_" + item.categoryName}>
                         <Badge.Ribbon style={{top: "-10px"}} text={item.articleCount == null ? "" : item.articleCount}
                                       color="red">
