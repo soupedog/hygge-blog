@@ -12,7 +12,8 @@ import rehypeRaw from "rehype-raw";
 import ReactMarkdown from "react-markdown";
 
 function QuoteTabPaneItem({isAuthor, quote}: { isAuthor: Boolean, quote: QuoteDto }) {
-    if (quote.orderVal > 0) {
+    let quoteOrder = quote.orderVal;
+    if (quoteOrder != null && quoteOrder > 0) {
         return (
             <Badge.Ribbon text="顶置" color="red">
                 {renderCore(isAuthor, quote)}

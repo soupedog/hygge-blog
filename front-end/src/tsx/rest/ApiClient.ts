@@ -376,6 +376,7 @@ export interface ArticleSummaryResponse {
 
 export interface QuoteDto {
     quoteId: number,
+    uid: string,
     imageSrc?: string,
     content: string,
     source?: string,
