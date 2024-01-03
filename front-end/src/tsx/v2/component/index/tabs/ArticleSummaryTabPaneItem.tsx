@@ -4,6 +4,7 @@ import clsx from "clsx";
 import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../../utils/UtilContainer";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
 import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
+import {ArticleSummaryOrderType} from "../../properties/GlobalEnum";
 
 function ArticleSummaryTabPaneItem({isAuthor, secretKey, orderType, articleSummary}: {
     isAuthor: Boolean,
@@ -161,10 +162,6 @@ const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
     </Space>
 );
 
-export enum ArticleSummaryOrderType {
-    DEFAULT,
-    CATEGORY,
-    GLOBAL
-}
+
 
 export default ArticleSummaryTabPaneItem;

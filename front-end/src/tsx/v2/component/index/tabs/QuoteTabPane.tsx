@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import {List} from "antd";
-import {HomePageService, QuoteResponse, UserService} from "../../../../rest/ApiClient";
+import {QuoteResponse, UserService} from "../../../../rest/ApiClient";
 import QuoteTabPaneItem from "./QuoteTabPaneItem";
 import {IndexContext} from "../../../page/Index";
 
-function QuoteTabPane({quoteInfo}: { quoteInfo: QuoteResponse }) {
+function QuoteTabPane({quoteInfo, onPageChange}: { quoteInfo: QuoteResponse, onPageChange: Function }) {
     const [currentPageSize, updateCurrentPageSize] = useState(5);
 
     return (
@@ -15,9 +15,7 @@ function QuoteTabPane({quoteInfo}: { quoteInfo: QuoteResponse }) {
                     size="large"
                     pagination={{
                         onChange: (page, pageSize) => {
-                            HomePageService.fetchQuote(page, pageSize, (data) => {
-                                updateQuoteInfo(data?.main);
-                            });
+                            onPageChange(page, pageSize);
 
                             if (pageSize != currentPageSize) {
                                 updateCurrentPageSize(pageSize);

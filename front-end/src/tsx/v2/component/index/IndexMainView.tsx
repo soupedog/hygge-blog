@@ -10,8 +10,8 @@ import {
 } from "../../../rest/ApiClient";
 import AnnouncementTabPane from "./tabs/AnnouncementTabPane";
 import ArticleSummaryTabPane from "./tabs/ArticleSummaryTabPane";
-import {ArticleSummaryOrderType} from "./tabs/ArticleSummaryTabPaneItem";
 import QuoteTabPane from "./tabs/QuoteTabPane";
+import {ArticleSummaryOrderType} from "../properties/GlobalEnum";
 
 function IndexMainView() {
     return (
@@ -32,7 +32,9 @@ function IndexMainView() {
                           topicOverviewInfo: topicOverviewInfos,
                           articleSummaryInfo: articleSummaryInfo,
                           quoteInfo: quoteInfo,
-                          announcementInfos: announcementInfos
+                          announcementInfos: announcementInfos,
+                          updateArticleSummaryInfo: updateArticleSummaryInfo,
+                          updateQuoteInfo: updateQuoteInfo
                       })}
                       onChange={(key) => {
                           switch (key) {
@@ -56,11 +58,20 @@ function IndexMainView() {
     );
 }
 
-function createTabs({topicOverviewInfo, articleSummaryInfo, quoteInfo, announcementInfos}: {
+function createTabs({
+                        topicOverviewInfo,
+                        articleSummaryInfo,
+                        quoteInfo,
+                        announcementInfos,
+                        updateArticleSummaryInfo,
+                        updateQuoteInfo
+                    }: {
     topicOverviewInfo: TopicOverviewInfo[],
     articleSummaryInfo: ArticleSummaryResponse,
     quoteInfo: QuoteResponse,
-    announcementInfos: AnnouncementDto[]
+    announcementInfos: AnnouncementDto[],
+    updateArticleSummaryInfo: Function,
+    updateQuoteInfo: Function
 }): TabsProps[] {
     let result = new Array<TabsProps>();
 
@@ -75,7 +86,12 @@ function createTabs({topicOverviewInfo, articleSummaryInfo, quoteInfo, announcem
                     </>
                 ),
                 children: <ArticleSummaryTabPane orderType={ArticleSummaryOrderType.GLOBAL}
-                                                 articleSummaryInfo={articleSummaryInfo}/>,
+                                                 articleSummaryInfo={articleSummaryInfo}
+                                                 onPageChange={(currentTopicId: string, page: number, pageSize: number) => {
+                                                     HomePageService.fetchArticleSummaryByTid(currentTopicId, page, pageSize, (data) => {
+                                                         updateArticleSummaryInfo(data?.main);
+                                                     });
+                                                 }}/>,
             } as TabsProps
         );
     });
@@ -94,7 +110,11 @@ function createTabs({topicOverviewInfo, articleSummaryInfo, quoteInfo, announcem
                     <Badge count={quoteInfo.totalCount} overflowCount={9999} offset={[10, -20]}/>
                 </>
             ),
-            children: <QuoteTabPane quoteInfo={quoteInfo}/>,
+            children: <QuoteTabPane quoteInfo={quoteInfo} onPageChange={(page: number, pageSize: number) => {
+                HomePageService.fetchQuote(page, pageSize, (data) => {
+                    updateQuoteInfo(data?.main);
+                });
+            }}/>,
         } as TabsProps
     );
 

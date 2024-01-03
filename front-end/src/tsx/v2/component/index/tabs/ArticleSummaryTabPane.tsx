@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
 import {List} from "antd";
-import ArticleSummaryTabPaneItem, {ArticleSummaryOrderType} from "./ArticleSummaryTabPaneItem";
-import {ArticleSummaryResponse, HomePageService, UserService} from "../../../../rest/ApiClient";
+import {ArticleSummaryResponse, UserService} from "../../../../rest/ApiClient";
 import {UrlHelper} from "../../../util/UtilContainer";
 import {IndexContext} from '../../../page/Index';
+import ArticleSummaryTabPaneItem from "./ArticleSummaryTabPaneItem";
+import {ArticleSummaryOrderType} from "../../properties/GlobalEnum";
 
-function ArticleSummaryTabPane({orderType, articleSummaryInfo}: {
+function ArticleSummaryTabPane({orderType, articleSummaryInfo, onPageChange}: {
     orderType: ArticleSummaryOrderType,
-    articleSummaryInfo: ArticleSummaryResponse
+    articleSummaryInfo: ArticleSummaryResponse,
+    onPageChange: Function
 }) {
     const [currentPageSize, updateCurrentPageSize] = useState(5);
 
@@ -19,9 +21,7 @@ function ArticleSummaryTabPane({orderType, articleSummaryInfo}: {
                     size="large"
                     pagination={{
                         onChange: (page, pageSize) => {
-                            HomePageService.fetchArticleSummaryByTid(currentTopicId!, page, pageSize, (data) => {
-                                updateArticleSummaryInfo(data?.main);
-                            });
+                            onPageChange(currentTopicId!, page, pageSize);
 
                             if (pageSize != currentPageSize) {
                                 updateCurrentPageSize(pageSize);

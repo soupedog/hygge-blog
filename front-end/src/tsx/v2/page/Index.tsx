@@ -77,10 +77,12 @@ function Index() {
             let response = data!.main!;
             let firstInitTopicOverviewInfo = response.topicOverviewInfoList;
 
+            // @ts-ignore
             updateTopicOverviewInfos(firstInitTopicOverviewInfo);
             updateCurrentTopicId(firstInitTopicOverviewInfo[0].topicInfo.tid);
             updateArticleSummaryInfo(response.articleSummaryInfo);
             updateQuoteInfo(response.quoteInfo);
+            // @ts-ignore
             updateAnnouncementInfos(response.announcementInfoList);
         });
         // 依赖静态值表示仅初始化时调用一次
