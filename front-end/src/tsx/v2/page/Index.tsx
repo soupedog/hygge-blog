@@ -32,10 +32,13 @@ export interface IndexState {
     quoteInfo: QuoteResponse;
     updateQuoteInfo: Function;
     indexSearchType: IndexSearchType,
+    updateIndexSearchType: Function,
     // 当前选中查看的文章类别 cid
     currentCategoryId?: string | null;
     searchKeyword: string;
+    updateSearchKeyword:Function,
     articleSummarySearchOrderType: ArticleSummaryOrderType
+    updateArticleSummarySearchOrderType: Function
     articleSummarySearchInfo: ArticleSummaryResponse;
     updateArticleSummarySearchInfo: Function;
     quoteSearchInfo: QuoteResponse;

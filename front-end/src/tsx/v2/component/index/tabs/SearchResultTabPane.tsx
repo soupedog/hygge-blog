@@ -16,13 +16,19 @@ function SearchResultTabPane({searchType, orderType, articleSummaryInfo, quoteIn
         case IndexSearchType.ARTICLE:
             return (
                 <IndexContext.Consumer>
-                    {({updateArticleSummarySearchInfo}) => (
+                    {({updateArticleSummarySearchInfo, searchKeyword, articleSummarySearchOrderType}) => (
                         <ArticleSummaryTabPane orderType={orderType}
                                                articleSummaryInfo={articleSummaryInfo}
                                                onPageChange={(currentTopicId: string, currentCategoryId: string, page: number, pageSize: number) => {
-                                                   HomePageService.fetchArticleSummaryByCid(currentCategoryId, page, pageSize, (data) => {
-                                                       updateArticleSummarySearchInfo(data?.main);
-                                                   });
+                                                   if (articleSummarySearchOrderType == ArticleSummaryOrderType.CATEGORY) {
+                                                       HomePageService.fetchArticleSummaryByCid(currentCategoryId, page, pageSize, (data) => {
+                                                           updateArticleSummarySearchInfo(data?.main);
+                                                       });
+                                                   } else {
+                                                       HomePageService.fetchArticleSummaryByKeyword(searchKeyword, page, pageSize, (data) => {
+                                                           updateArticleSummarySearchInfo(data?.main);
+                                                       });
+                                                   }
                                                }}/>
                     )}
                 </IndexContext.Consumer>
@@ -30,11 +36,11 @@ function SearchResultTabPane({searchType, orderType, articleSummaryInfo, quoteIn
         case IndexSearchType.QUOTE:
             return (
                 <IndexContext.Consumer>
-                    {({updateQuoteSearchInfo}) => (
+                    {({updateQuoteSearchInfo, searchKeyword}) => (
                         <QuoteTabPane quoteInfo={quoteInfo} onPageChange={(page: number, pageSize: number) => {
-                            // HomePageService.fetchQuote(page, pageSize, (data) => {
-                            //     updateQuoteSearchInfo(data?.main);
-                            // });
+                            HomePageService.fetchQuoteByKeyword(searchKeyword, page, pageSize, (data) => {
+                                updateQuoteSearchInfo(data?.main);
+                            });
                         }}/>
                     )}
                 </IndexContext.Consumer>

@@ -135,7 +135,10 @@ function createTabs({
             label: (
                 <>
                     搜索结果
-                    <Badge count={0} overflowCount={9999} offset={[10, -20]}/>
+                    <Badge
+                        count={indexSearchType == IndexSearchType.ARTICLE ? articleSummarySearchInfo.totalCount : quoteSearchInfo.totalCount}
+                        overflowCount={9999}
+                        offset={[10, -20]}/>
                 </>
             ),
             children: <SearchResultTabPane searchType={indexSearchType}

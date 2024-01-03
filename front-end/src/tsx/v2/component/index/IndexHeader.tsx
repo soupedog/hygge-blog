@@ -7,15 +7,24 @@ import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import {IndexContext} from '../../page/Index';
 import {PropertiesHelper} from "../../util/UtilContainer";
 import {useNavigate} from "react-router-dom";
-import {UserService} from "../../../rest/ApiClient";
+import {HomePageService, UserService} from "../../../rest/ApiClient";
 import HyggeUserMenu from "../HyggeUserMenu";
+import {ArticleSummaryOrderType, IndexSearchType} from "../properties/GlobalEnum";
 
 function IndexHeader() {
     const navigate = useNavigate();
 
     return (
         <IndexContext.Consumer>
-            {({menuFolded, updateMenuFolded}) => (
+            {({
+                  menuFolded,
+                  updateMenuFolded,
+                  updateArticleSummarySearchOrderType,
+                  updateSearchKeyword,
+                  updateIndexSearchType,
+                  updateArticleSummarySearchInfo,
+                  updateQuoteSearchInfo
+              }) => (
                 <Header className="site-layout-background"
                         style={{
                             padding: 0,
@@ -52,19 +61,35 @@ function IndexHeader() {
                                             size="middle"
                                             onSearch={(value) => {
                                                 console.log(value)
-                                                // console.log(!PropertiesHelper.isStringNotEmpty(value))
                                                 if (!PropertiesHelper.isStringNotEmpty(value)) {
                                                     message.warning("查询关键字不可为空", 3);
                                                     return;
                                                 }
-                                                //
-                                                // let searchType: SearchType;
-                                                // if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
-                                                //     searchType = SearchType.ARTICLE;
-                                                // } else {
-                                                //     searchType = SearchType.QUOTE;
-                                                // }
-                                                // state.fetchFuzzySearchViewInfo!(1, 5, value, searchType);
+
+                                                // 关键词搜索时，文章不排序
+                                                updateArticleSummarySearchOrderType(ArticleSummaryOrderType.DEFAULT);
+
+                                                let searchKey = value;
+                                                updateSearchKeyword(searchKey);
+
+                                                if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
+                                                    updateIndexSearchType(IndexSearchType.ARTICLE);
+                                                    HomePageService.fetchArticleSummaryByKeyword(searchKey, 1, 5, (data) => {
+                                                        updateArticleSummarySearchInfo(data?.main);
+
+                                                        // 切换到搜索展示页
+                                                        document.getElementById("rc-tabs-0-tab-搜索结果")?.click();
+                                                    });
+
+                                                } else {
+                                                    updateIndexSearchType(IndexSearchType.QUOTE);
+                                                    HomePageService.fetchQuoteByKeyword(searchKey, 1, 5, (data) => {
+                                                        updateQuoteSearchInfo(data?.main);
+
+                                                        // 切换到搜索展示页
+                                                        document.getElementById("rc-tabs-0-tab-搜索结果")?.click();
+                                                    });
+                                                }
                                             }}
                                     />
                                 </Col>
