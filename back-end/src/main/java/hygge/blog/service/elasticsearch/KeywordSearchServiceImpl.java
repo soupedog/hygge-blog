@@ -8,7 +8,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsSetQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -124,7 +123,7 @@ public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
 
         // 限定搜索关键字
         Query keywordRequirement = new MultiMatchQuery.Builder()
-                .fields("title", "summary", "content")
+                .fields("title", "summary", "content", "source")
                 // BestFields 指多重字段匹配得分最高的作为当前记录的最终得分，MostFields 代表多字段匹配得分求和作为最终得分，查询结果中，得分高的会排在前面
                 // 其他类型见 https://www.elastic.co/guide/cn/elasticsearch/guide/current/_cross_fields_queries.html
                 .type(TextQueryType.MostFields)

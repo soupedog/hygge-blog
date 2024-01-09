@@ -76,7 +76,7 @@ public class ArticleQuoteSearchCache {
     /**
      * 文章标题
      */
-    @Field(type = FieldType.Text, analyzer = "smartcn")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String title;
     /**
      * 配图链接(共享)
@@ -86,12 +86,12 @@ public class ArticleQuoteSearchCache {
     /**
      * 文章摘要
      */
-    @Field(type = FieldType.Text, analyzer = "smartcn")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String summary;
     /**
      * 内容(共享)
      */
-    @Field(type = FieldType.Text, analyzer = "smartcn")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String content;
     /**
      * 文章字数统计
@@ -129,7 +129,7 @@ public class ArticleQuoteSearchCache {
     /**
      * 句子可能出处
      */
-    @Field(type = FieldType.Text, analyzer = "smartcn")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String source;
     /**
      * 传送门
@@ -139,7 +139,7 @@ public class ArticleQuoteSearchCache {
     /**
      * 句子备注
      */
-    @Field(type = FieldType.Text, analyzer = "smartcn")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String remarks;
 
     public Integer initEsId(Integer idTemp, Type type) {
