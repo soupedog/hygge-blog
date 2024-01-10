@@ -30,7 +30,7 @@ class HyggeBrowserHeader extends React.Component<HyggeBrowserHeaderProps, HyggeB
 
     render() {
         return (
-            <Header style={{position: 'fixed', zIndex: 99999, width: '100%'}}
+            <Header style={{position: 'fixed', zIndex: 999, width: '100%'}}
                     className={clsx({
                         "backgroundTransparent": this.state.headerTransparent
                     })}>
