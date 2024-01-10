@@ -3,13 +3,14 @@ import zhCN from "antd/locale/zh_CN";
 import {ConfigProvider} from "antd";
 import EditorMenu from "../component/markdown/EditorMenu";
 import EditorView from "../component/markdown/EditorView";
+import {AntdTreeNodeInfo} from "../component/markdown/util/MdHelper";
 
 export interface EditorState {
     content: string;
     updateContent: Function;
     tocEnable: boolean;
     updateTocEnable: Function;
-    tocTree: any[];
+    tocTree: AntdTreeNodeInfo[];
     updateTocTree: Function;
 }
 

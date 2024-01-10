@@ -14,6 +14,7 @@ import Editor from "./v2/page/Editor";
 import Index from "./v2/page/Index";
 import NotFound from "./v2/page/NotFound";
 import SignIn from "./v2/page/SignIn";
+import Browser from "./v2/page/Browser";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -42,7 +43,7 @@ if (container != null) {
         <BrowserRouter>
             <Routes>
                 <Route path={"/"} element={<Index key={"index"}/>}/>
-                <Route path={"/browser/:aid"} element={<Editor key={"browser"}/>}/>
+                <Route path={"/browser/:aid"} element={<Browser key={"browser"}/>}/>
                 <Route path={"/signin"} element={<SignIn key={"signin"}/>}/>
                 <Route path={"/editor/article"} element={<Editor key={"editor-article"}/>}/>
                 <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>

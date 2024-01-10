@@ -86,7 +86,7 @@ function EditorView() {
                                 showLine
                                 switcherIcon={<DownOutlined/>}
                                 onSelect={onSelect}
-                                treeData={tocTree}
+                                treeData={tocTree as any}
                             />
                         </Col>
                         : null}
