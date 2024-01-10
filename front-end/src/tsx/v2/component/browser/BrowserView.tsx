@@ -2,10 +2,10 @@ import React from 'react';
 import {BrowserContext} from "../../page/Browser";
 import MusicPlayer from "../player/MusicPlayer";
 import {ArticleDto, UserService} from "../../../rest/ApiClient";
-import {Affix, Breadcrumb, Card, Layout, message, Space, Tree} from "antd";
+import {Affix, Breadcrumb, Card, FloatButton, Layout, message, Space, Tree} from "antd";
+import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
 import HyggeFooter from "../HyggeFooter";
 import HyggeBrowserHeader from "./HyggeBrowserHeader";
-import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from "@ant-design/icons";
 import {TimeHelper} from "../../../utils/UtilContainer";
 import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
@@ -36,12 +36,12 @@ import ReactMarkdown from "react-markdown";
 function BrowserView() {
     return (
         <BrowserContext.Consumer>
-            {({currentArticle, tocEnable, tocTree, updateTocTree}) => (
+            {({currentArticle, tocEnable, updateTocEnable, tocTree, updateTocTree}) => (
                 <Layout>
                     <HyggeBrowserHeader/>
                     {renderMainImage(currentArticle)}
                     {renderMusicPlayer(currentArticle)}
-                    {renderArticle(currentArticle, tocEnable, tocTree, updateTocTree)}
+                    {renderArticle(currentArticle, tocEnable, updateTocEnable, tocTree, updateTocTree)}
                     <HyggeFooter/>
                 </Layout>
             )}
@@ -70,26 +70,40 @@ function renderMusicPlayer(currentArticle: ArticleDto | null) {
     }
 }
 
-function renderArticle(currentArticle: ArticleDto | null, tocEnable: Boolean, tocTree: AntdTreeNodeInfo[], updateTocTree: Function) {
+function rrr(currentArticle: ArticleDto | null) {
+    let result = new Array();
+    if (currentArticle != null) {
+        // 主题名称
+        result.push(
+            {
+                title: currentArticle.categoryTreeInfo.topicInfo.topicName,
+            }
+        );
+
+        // 文章类别名称
+        currentArticle.categoryTreeInfo.categoryList.forEach((articleCategoryInfo, index) => {
+            result.push(
+                {
+                    title: articleCategoryInfo.categoryName,
+                }
+            );
+        })
+    }
+
+    return result;
+}
+
+function renderArticle(currentArticle: ArticleDto | null, tocEnable: Boolean, updateTocEnable: Function, tocTree: AntdTreeNodeInfo[], updateTocTree: Function) {
     if (currentArticle != null) {
         let isAuthor = currentArticle.uid == UserService.getCurrentUser()?.uid;
+        let actualTocEnable = tocEnable && tocTree.length > 0;
+
         return (
             <Layout>
                 <Content id="mainView">
                     <Card title={currentArticle.title} bordered={false}
                           style={{marginTop: '10px'}}>
-                        <Breadcrumb>
-                            <Breadcrumb.Item>{currentArticle.categoryTreeInfo.topicInfo.topicName}</Breadcrumb.Item>
-                            {
-                                currentArticle.categoryTreeInfo.categoryList?.map((articleCategoryInfo, index) => {
-                                    return (
-                                        <Breadcrumb.Item key={index}>
-                                            <span>{articleCategoryInfo.categoryName}</span>
-                                        </Breadcrumb.Item>
-                                    )
-                                })
-                            }
-                        </Breadcrumb>
+                        <Breadcrumb items={rrr(currentArticle)}/>
                         <div style={{
                             marginTop: "10px",
                             fontSize: "12px",
@@ -141,7 +155,7 @@ function renderArticle(currentArticle: ArticleDto | null, tocEnable: Boolean, to
                     </Card>
                 </Content>
                 <Sider trigger={null}
-                       collapsed={!tocEnable || tocTree.length < 1}
+                       collapsed={!actualTocEnable}
                        width={"20%"} collapsedWidth={0}
                        style={{backgroundColor: "#F0F2F5"}}>
                     <Affix style={{
@@ -151,24 +165,63 @@ function renderArticle(currentArticle: ArticleDto | null, tocEnable: Boolean, to
                         right: 0,
                         width: "100%"
                     }} offsetTop={164}>
-                        {(tocTree.length < 1) ? null :
-                            <div style={{paddingLeft: "20px"}}>
-                                <div className="tocTitle">目录</div>
-                                <Tree
-                                    showLine={true}
-                                    treeData={tocTree as any}
-                                    switcherIcon={<DownOutlined/>}
-                                    onSelect={onSelect}
-                                >
-                                </Tree>
-                            </div>
-                        }
+                        {(actualTocEnable ?
+                                <div style={{paddingLeft: "20px"}}>
+                                    <div className="tocTitle">目录</div>
+                                    <Tree
+                                        showLine={true}
+                                        treeData={tocTree as any}
+                                        switcherIcon={<DownOutlined/>}
+                                        onSelect={onSelect}
+                                    >
+                                    </Tree>
+                                </div>
+                                : <div/>
+                        )}
                     </Affix>
                 </Sider>
+                <FloatButton.Group shape="square" style={{right: 15, zIndex: 9999}}>
+                    <FloatButton onClick={() => {
+                        let antdTreeNodeInfos: Array<AntdTreeNodeInfo> = new Array<AntdTreeNodeInfo>();
+                        let map: Map<number, AntdTreeNodeInfo> = new Map<number, AntdTreeNodeInfo>();
+
+                        document.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach((item, index) => {
+                            let antdTreeNode = {
+                                index: index,
+                                key: "toc_" + index,
+                                nodeName: item.tagName,
+                                level: null,
+                                title: item.textContent as string,
+                                value: item.id,
+                                parentNodeIndex: null,
+                                children: new Array<AntdTreeNodeInfo>
+                            };
+
+                            antdTreeNodeInfos.push(antdTreeNode);
+                            map.set(index, antdTreeNode);
+                        });
+
+                        let currentTOC = MdHelper.initTitleTree({
+                            currentTOCArray: antdTreeNodeInfos,
+                            allTocNodeMap: map,
+                            errorCallback: null
+                        });
+
+                        if (currentTOC.length > 0) {
+                            updateTocTree(currentTOC);
+                            updateTocEnable(!tocEnable);
+                        } else {
+                            message.info("未找到目录结构");
+                        }
+                    }}/>
+                    <FloatButton.BackTop visibilityHeight={0}/>
+                </FloatButton.Group>
             </Layout>
+
         );
     }
 }
+
 
 // 目录选中自动跳转函数
 const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {

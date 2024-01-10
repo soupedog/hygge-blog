@@ -20,7 +20,7 @@ export interface BrowserState {
 
 function Browser() {
     const [currentArticle, updateCurrentArticle] = useState(null);
-    const [tocEnable, updateTocEnable] = useState(true);
+    const [tocEnable, updateTocEnable] = useState(false);
     const [tocTree, updateTocTree] = useState([]);
 
     let {aid} = useParams();
