@@ -230,7 +230,12 @@ const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
 
     if (element != null) {
         // 滚动到锚点元素的顶部
-        element.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+        window.scrollTo({
+            top: element.offsetTop + 520,
+            behavior: "smooth"
+        });
+
+        // element.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
     } else {
         message.warning("未找到对应跳转锚点")
     }
