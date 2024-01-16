@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Tooltip} from "antd";
+import {Button, Tooltip} from "antd";
 import {RollbackOutlined} from "@ant-design/icons";
-import {UserService} from "../../../rest/ApiClient";
 import {Header} from "antd/es/layout/layout";
 import HyggeUserMenu from "../HyggeUserMenu";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
 import {WindowsEventHelper} from "../../../utils/UtilContainer";
+import {UserService} from "../../../rest/ApiClient";
 
 export interface HyggeBrowserHeaderState {
     headerTransparent: Boolean;
@@ -48,7 +48,12 @@ function HyggeBrowserHeader() {
                 </Tooltip>
             </div>
             <div className={"floatToRight"}>
-                {UserService.getCurrentUser() != null ? <HyggeUserMenu/> : null}
+                {UserService.getCurrentUser() != null ? <HyggeUserMenu/> :
+                    <Button type="primary" onClick={() => {
+                        navigate("/signin");
+                    }}>
+                        登录
+                    </Button>}
             </div>
         </Header>
     );
