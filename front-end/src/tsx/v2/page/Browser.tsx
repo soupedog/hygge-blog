@@ -11,7 +11,7 @@ import BrowserView from "../component/browser/BrowserView";
 
 function Browser() {
     const [currentArticle, updateCurrentArticle] = useState(null);
-    let {aid} = useParams();
+    const {aid} = useParams();
 
     useEffect(() => {
         ArticleService.findArticleByAid(aid, (data) => {

@@ -4,6 +4,7 @@ import {ConfigProvider} from "antd";
 import EditorMenu from "../component/markdown/EditorMenu";
 import EditorView from "../component/markdown/EditorView";
 import {AntdTreeNodeInfo} from "../component/markdown/util/MdHelper";
+import ArticleEditorForm from "../component/editor/ArticleEditorForm";
 
 export interface EditorState {
     content: string;
@@ -25,7 +26,7 @@ function Editor() {
         tocEnable: tocEnable,
         updateTocEnable: updateTocEnable,
         tocTree: tocTree,
-        updateTocTree: updateTocTree
+        updateTocTree: updateTocTree,
     }), [content, tocEnable, tocTree]);
 
     return (
@@ -33,6 +34,7 @@ function Editor() {
             <EditorContext.Provider value={state}>
                 <EditorMenu/>
                 <EditorView/>
+                <ArticleEditorForm updateContent={updateContent}/>
             </EditorContext.Provider>
         </ConfigProvider>
     );
