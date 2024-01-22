@@ -14,9 +14,11 @@ import EditorImageModal from "./EditorImageModal";
 import {contentChangeUndoStackHandler} from "./EditorView";
 import EditorBilibiliShareModal from "./EditorBilibiliShareModal";
 import {UploadOutlined} from '@ant-design/icons';
-import { EditorContext } from '../../page/Editor';
+import {EditorContext} from '../../page/Editor';
 import {AntdTreeNodeInfo, MdHelper} from "./util/MdHelper";
 import InputElementHelper from "./util/InputElementHelper";
+import {FileInfo, UserService} from "../../../rest/ApiClient";
+import {UrlHelper} from "../../util/UtilContainer";
 
 const onChange = (key: string) => {
     console.log(key);
@@ -261,8 +263,36 @@ function EditorMenu() {
                         children:
                             <Row gutter={[8, 8]}>
                                 <Space size={"small"}>
-                                    <Upload showUploadList={true} multiple={true} onChange={(info) => {
-                                        console.log(info.file);
+                                    <Upload
+                                        name={"files"}
+                                        action={UrlHelper.getBaseApiUrl() + "/main/file?type=ARTICLE"}
+                                        headers={UserService.getHeader({})}
+                                        showUploadList={true} multiple={true} onChange={(info) => {
+                                        if (info.file.status == "done") {
+                                            let response = info.file.response;
+
+                                            if (response.code == 200) {
+                                                response.main.forEach((item: FileInfo) => {
+                                                    // @ts-ignore
+                                                    let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                                    InputElementHelper.appendTextToTextArea(element, "", ({
+                                                                                                              leftPart,
+                                                                                                              selectedPart,
+                                                                                                              rightPart
+                                                                                                          }) => {
+                                                        let nextContent = leftPart + "[" + item.name + "](" + UrlHelper.getBaseStaticSourceUrl() + item.src + ")\r\n\r\n" + rightPart;
+                                                        updateContent(nextContent);
+
+                                                        contentChangeUndoStackHandler(nextContent);
+                                                    });
+                                                });
+
+                                                message.success(`${info.file.name} 上传成功.`);
+                                            } else {
+                                                message.error(`${info.file.name} 上传失败.`);
+                                                console.log(info.file.response);
+                                            }
+                                        }
                                     }}>
                                         <Button type="link" icon={<UploadOutlined/>}>上传文件</Button>
                                     </Upload>

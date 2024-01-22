@@ -1,6 +1,6 @@
 import axios from "axios";
 import {message} from "antd";
-import {PropertiesHelper, UrlHelper} from "../utils/UtilContainer";
+import {PropertiesHelper, UrlHelper} from "../v2/util/UtilContainer";
 
 axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
 axios.interceptors.response.use(function (response) {

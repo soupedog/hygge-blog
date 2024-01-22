@@ -255,8 +255,8 @@ export class PropertiesHelper {
 }
 
 const baseUrl = "http://localhost:9000/";
-const baseApiUrl = "http://localhost:8080/blog-service/api";
-const baseStaticSourceUrl = "http://localhost:8080/static";
+const baseApiUrl = "https://www.xavierwang.cn/blog-service/api";
+const baseStaticSourceUrl = "https://www.xavierwang.cn/static";
 
 export interface OpenNewPageConfig {
     inNewTab: boolean;
