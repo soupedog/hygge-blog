@@ -21,6 +21,9 @@ function Browser() {
             } else {
                 // @ts-ignore
                 updateCurrentArticle(data.main);
+
+                // 改页面标题
+                document.title = data.main.title;
             }
         })
         // 依赖静态值表示仅初始化时调用一次
