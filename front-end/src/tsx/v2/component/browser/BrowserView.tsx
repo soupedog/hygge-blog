@@ -5,7 +5,6 @@ import {Affix, Breadcrumb, Card, FloatButton, Layout, message, Space, Tree} from
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
 import HyggeFooter from "../HyggeFooter";
 import HyggeBrowserHeader from "./HyggeBrowserHeader";
-import {TimeHelper} from "../../../utils/UtilContainer";
 import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import {TreeProps} from "antd/es/tree/Tree";
@@ -31,6 +30,7 @@ import json from 'highlight.js/lib/languages/json';
 import xml from 'highlight.js/lib/languages/xml';
 import yaml from 'highlight.js/lib/languages/yaml';
 import ReactMarkdown from "react-markdown";
+import {TimeHelper} from "../../util/UtilContainer";
 
 function BrowserView({article}: { article: ArticleDto | null }) {
     const [tocEnable, updateTocEnable] = useState(true);

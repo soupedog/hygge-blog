@@ -5,8 +5,8 @@ import 'APlayer/dist/APlayer.min.css';
 import "../../../style/browser.less"
 import {useParams} from "react-router-dom";
 import {ArticleService} from "../../rest/ApiClient";
-import {UrlHelper} from "../../utils/UtilContainer";
 import BrowserView from "../component/browser/BrowserView";
+import {UrlHelper} from "../util/UtilContainer";
 
 
 function Browser() {

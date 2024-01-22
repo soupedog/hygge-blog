@@ -1,6 +1,5 @@
 import React from 'react';
 import {Badge, List, Space, Tooltip} from "antd";
-import {PropertiesHelper, UrlHelper} from "../../../../utils/UtilContainer";
 import {QuoteDto} from "../../../../rest/ApiClient";
 import {FormOutlined} from "@ant-design/icons";
 import {class_md_preview} from "../../properties/ElementNameContainer";
@@ -10,6 +9,7 @@ import rehypeKatex from "rehype-katex";
 import rehypeSlug from "rehype-slug";
 import rehypeRaw from "rehype-raw";
 import ReactMarkdown from "react-markdown";
+import {PropertiesHelper, UrlHelper} from "../../../util/UtilContainer";
 
 function QuoteTabPaneItem({isAuthor, quote}: { isAuthor: Boolean, quote: QuoteDto }) {
     let quoteOrder = quote.orderVal;

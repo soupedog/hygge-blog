@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, Result} from "antd";
-import {UrlHelper} from "../../utils/UtilContainer";
+import {UrlHelper} from "../util/UtilContainer";
 
 function NotFound() {
     // 3 秒内自动跳转到主页

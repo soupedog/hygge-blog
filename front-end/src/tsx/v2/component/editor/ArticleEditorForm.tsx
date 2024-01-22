@@ -11,9 +11,8 @@ import {
     HomePageService,
     HyggeResponse
 } from "../../../rest/ApiClient";
-import {UrlHelper} from "../../../utils/UtilContainer";
 import {FormInstance} from "antd/es/form/hooks/useForm";
-import {PropertiesHelper} from "../../util/UtilContainer";
+import {PropertiesHelper, UrlHelper} from "../../util/UtilContainer";
 
 
 function ArticleEditorForm({updateContent}: { updateContent: Function }) {

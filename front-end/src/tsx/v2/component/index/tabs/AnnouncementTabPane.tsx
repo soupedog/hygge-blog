@@ -1,7 +1,7 @@
 import React from 'react';
 import {Timeline} from "antd";
-import {TimeHelper} from "../../../../utils/UtilContainer";
 import {AnnouncementDto} from "../../../../rest/ApiClient";
+import {TimeHelper} from "../../../util/UtilContainer";
 
 function AnnouncementTabPane({announcementDtoList}: { announcementDtoList: AnnouncementDto[] }) {
     return (

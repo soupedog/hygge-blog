@@ -1,9 +1,9 @@
 import React from 'react';
 import {Avatar, Dropdown, Menu, MenuProps, message} from "antd";
 import {CloseCircleOutlined, EditOutlined} from "@ant-design/icons";
-import {UrlHelper} from "../../utils/UtilContainer";
 import {UserService} from "../../rest/ApiClient";
 import {useParams} from "react-router-dom";
+import {UrlHelper} from "../util/UtilContainer";
 
 function HyggeUserMenu() {
     const user = UserService.getCurrentUser();

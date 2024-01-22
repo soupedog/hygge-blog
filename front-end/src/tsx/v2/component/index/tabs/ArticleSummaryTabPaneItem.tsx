@@ -1,10 +1,10 @@
 import React from 'react';
 import {Badge, List, Space} from "antd";
 import clsx from "clsx";
-import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../../utils/UtilContainer";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
 import {ArticleSummaryInfo} from "../../../../rest/ApiClient";
 import {ArticleSummaryOrderType} from "../../properties/GlobalEnum";
+import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../util/UtilContainer";
 
 function ArticleSummaryTabPaneItem({isAuthor, secretKey, orderType, articleSummary}: {
     isAuthor: Boolean,

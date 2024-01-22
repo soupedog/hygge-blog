@@ -4,7 +4,6 @@ import "../../../style/signin.less"
 
 import {Button, ConfigProvider, Form, Input, Layout, message} from "antd";
 import {UserService} from "../../rest/ApiClient";
-import {UrlHelper} from "../../utils/UtilContainer";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import HyggeFooter from "../component/HyggeFooter";
 import {Content, Header} from "antd/es/layout/layout";
@@ -14,6 +13,7 @@ import {
     class_signin_form_submit
 } from "../component/properties/ElementNameContainer";
 import zhCN from "antd/lib/locale/zh_CN";
+import {UrlHelper} from "../util/UtilContainer";
 
 function SignIn() {
     return (

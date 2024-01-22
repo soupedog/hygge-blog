@@ -254,7 +254,8 @@ export class PropertiesHelper {
     }
 }
 
-const baseUrl = "http://localhost:9000/";
+// const baseUrl = "http://localhost:9000/";
+const baseUrl = "https://www.xavierwang.cn/";
 const baseApiUrl = "https://www.xavierwang.cn/blog-service/api";
 const baseStaticSourceUrl = "https://www.xavierwang.cn/static";
 

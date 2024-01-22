@@ -5,8 +5,8 @@ import {Header} from "antd/es/layout/layout";
 import HyggeUserMenu from "../HyggeUserMenu";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
-import {WindowsEventHelper} from "../../../utils/UtilContainer";
 import {UserService} from "../../../rest/ApiClient";
+import {WindowsEventHelper} from "../../util/UtilContainer";
 
 export interface HyggeBrowserHeaderState {
     headerTransparent: Boolean;
