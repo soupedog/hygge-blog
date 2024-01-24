@@ -7,15 +7,15 @@ import "../style/markdownCustomStyle.less"
 import "highlight.js/styles/atom-one-dark-reasonable.css"
 import "katex/dist/katex.min.css"
 
-import {PropertiesHelper} from "./utils/UtilContainer";
 import {Modal} from "antd";
 import isMobile from "rc-util/es/isMobile"
-import ArticleEditor from "./v2/page/ArticleEditor";
-import Index from "./v2/page/Index";
-import NotFound from "./v2/page/NotFound";
-import SignIn from "./v2/page/SignIn";
-import Browser from "./v2/page/Browser";
-import QuoteEditor from "./v2/page/QuoteEditor";
+import ArticleEditor from "./page/ArticleEditor";
+import Index from "./page/Index";
+import NotFound from "./page/NotFound";
+import SignIn from "./page/SignIn";
+import Browser from "./page/Browser";
+import QuoteEditor from "./page/QuoteEditor";
+import {PropertiesHelper} from "./util/UtilContainer";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
