@@ -6,7 +6,7 @@ import HyggeUserMenu from "../HyggeUserMenu";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import clsx from "clsx";
 import {UserService} from "../../../rest/ApiClient";
-import {WindowsEventHelper} from "../../util/UtilContainer";
+import {OpenNewPageConfig, UrlHelper, WindowsEventHelper} from "../../util/UtilContainer";
 
 export interface HyggeBrowserHeaderState {
     headerTransparent: Boolean;
@@ -39,11 +39,11 @@ function HyggeBrowserHeader() {
             <div className={"floatToLeft"}>
                 <Tooltip placement="bottom" title={"返回首页"}>
                     <RollbackOutlined onClick={() => {
-                        let finalPath = "/";
+                        let finalPath = "";
                         if (searchParams.has("secretKey")) {
                             finalPath = finalPath + "?secretKey=" + searchParams.get("secretKey")
                         }
-                        navigate(finalPath);
+                        UrlHelper.openNewPage({path: finalPath,inNewTab:false} as OpenNewPageConfig);
                     }} style={{color: "#fff", fontWeight: "bold", fontSize: "24px", lineHeight: "64px"}}/>
                 </Tooltip>
             </div>
