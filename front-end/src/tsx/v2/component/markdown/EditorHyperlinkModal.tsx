@@ -3,7 +3,7 @@ import {Button, Input, message, Modal, Space} from "antd";
 import {editor_text_area} from "../properties/ElementNameContainer";
 import {contentChangeUndoStackHandler} from "./EditorView";
 import InputElementHelper from "./util/InputElementHelper";
-import { EditorContext } from '../../page/Editor';
+import { ArticleEditorContext } from '../../page/ArticleEditor';
 
 function EditorHyperlinkModal() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +21,7 @@ function EditorHyperlinkModal() {
     };
 
     return (
-        <EditorContext.Consumer>
+        <ArticleEditorContext.Consumer>
             {({updateContent}) => (
                 <>
                     {contextHolder}
@@ -65,7 +65,7 @@ function EditorHyperlinkModal() {
                     </Modal>
                 </>
             )}
-        </EditorContext.Consumer>
+        </ArticleEditorContext.Consumer>
     );
 }
 

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Button, Input, message, Modal, Radio, Space} from "antd";
 import {editor_text_area} from "../properties/ElementNameContainer";
 import {contentChangeUndoStackHandler} from "./EditorView";
-import { EditorContext } from '../../page/Editor';
+import { ArticleEditorContext } from '../../page/ArticleEditor';
 import InputElementHelper from "./util/InputElementHelper";
 
 function EditorImageModal() {
@@ -22,7 +22,7 @@ function EditorImageModal() {
     };
 
     return (
-        <EditorContext.Consumer>
+        <ArticleEditorContext.Consumer>
             {({updateContent}) => (
                 <>
                     {contextHolder}
@@ -78,7 +78,7 @@ function EditorImageModal() {
                     </Modal>
                 </>
             )}
-        </EditorContext.Consumer>
+        </ArticleEditorContext.Consumer>
     );
 }
 

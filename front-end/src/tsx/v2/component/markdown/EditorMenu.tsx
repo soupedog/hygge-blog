@@ -14,7 +14,7 @@ import EditorImageModal from "./EditorImageModal";
 import {contentChangeUndoStackHandler} from "./EditorView";
 import EditorBilibiliShareModal from "./EditorBilibiliShareModal";
 import {UploadOutlined} from '@ant-design/icons';
-import {EditorContext} from '../../page/Editor';
+import {ArticleEditorContext} from '../../page/ArticleEditor';
 import {AntdTreeNodeInfo, MdHelper} from "./util/MdHelper";
 import InputElementHelper from "./util/InputElementHelper";
 import {FileInfo, UserService} from "../../../rest/ApiClient";
@@ -27,7 +27,7 @@ const onChange = (key: string) => {
 function EditorMenu() {
 
     return (
-        <EditorContext.Consumer>
+        <ArticleEditorContext.Consumer>
             {({updateContent, tocEnable, updateTocEnable, updateTocTree}) => (
                 <Tabs defaultActiveKey="1" items={[
                     {
@@ -301,7 +301,7 @@ function EditorMenu() {
                     },
                 ]} onChange={onChange}/>
             )}
-        </EditorContext.Consumer>
+        </ArticleEditorContext.Consumer>
     )
 }
 

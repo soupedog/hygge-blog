@@ -6,7 +6,7 @@ import EditorView from "../component/markdown/EditorView";
 import {AntdTreeNodeInfo} from "../component/markdown/util/MdHelper";
 import ArticleEditorForm from "../component/editor/ArticleEditorForm";
 
-export interface EditorState {
+export interface ArticleEditorState {
     content: string;
     updateContent: Function;
     tocEnable: boolean;
@@ -15,7 +15,7 @@ export interface EditorState {
     updateTocTree: Function;
 }
 
-function Editor() {
+function ArticleEditor() {
     const [content, updateContent] = useState("");
     const [tocEnable, updateTocEnable] = useState(false);
     const [tocTree, updateTocTree] = useState([]);
@@ -31,14 +31,14 @@ function Editor() {
 
     return (
         <ConfigProvider locale={zhCN}>
-            <EditorContext.Provider value={state}>
+            <ArticleEditorContext.Provider value={state}>
                 <EditorMenu/>
                 <EditorView/>
                 <ArticleEditorForm updateContent={updateContent}/>
-            </EditorContext.Provider>
+            </ArticleEditorContext.Provider>
         </ConfigProvider>
     );
 }
 
-export const EditorContext = createContext<EditorState>({} as EditorState);
-export default Editor;
+export const ArticleEditorContext = createContext<ArticleEditorState>({} as ArticleEditorState);
+export default ArticleEditor;

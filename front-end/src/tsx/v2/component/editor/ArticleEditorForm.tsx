@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, Layout, message, Radio, Select, SelectProps, Space, TreeSelect} from "antd";
-import {EditorContext} from '../../page/Editor';
+import {ArticleEditorContext} from '../../page/ArticleEditor';
 import {Content} from "antd/es/layout/layout";
 import {useParams} from "react-router-dom";
 import {
@@ -42,7 +42,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
 
 
     return (
-        <EditorContext.Consumer>
+        <ArticleEditorContext.Consumer>
             {({content}) => (
                 <Layout>
                     <Content>
@@ -205,7 +205,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                     </Content>
                 </Layout>
             )}
-        </EditorContext.Consumer>
+        </ArticleEditorContext.Consumer>
     );
 
     function refreshCategoryInfoList(updateCategoryInfoList: Function) {

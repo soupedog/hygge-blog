@@ -26,7 +26,7 @@ import {key_draft} from "./properties/MarkDownStaticValue";
 import {DownOutlined} from '@ant-design/icons';
 import {TreeProps} from "antd/es/tree/Tree";
 import InputElementHelper from "./util/InputElementHelper";
-import { EditorContext } from "../../page/Editor";
+import { ArticleEditorContext } from "../../page/ArticleEditor";
 
 const stackMaxSize = 20;
 const undoStack: string[] = new Array<string>(); // 用于存储撤销历史记录
@@ -74,7 +74,7 @@ function EditorView() {
     };
 
     return (
-        <EditorContext.Consumer>
+        <ArticleEditorContext.Consumer>
             {({content, updateContent, tocEnable, tocTree}) => (
                 <Row gutter={[8, 8]} style={{
                     marginTop: "8px",
@@ -240,7 +240,7 @@ function EditorView() {
                     </Col>
                 </Row>
             )}
-        </EditorContext.Consumer>
+        </ArticleEditorContext.Consumer>
     );
 }
 

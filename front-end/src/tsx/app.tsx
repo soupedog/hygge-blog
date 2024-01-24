@@ -10,7 +10,7 @@ import "katex/dist/katex.min.css"
 import {PropertiesHelper} from "./utils/UtilContainer";
 import {Modal} from "antd";
 import isMobile from "rc-util/es/isMobile"
-import Editor from "./v2/page/Editor";
+import ArticleEditor from "./v2/page/ArticleEditor";
 import Index from "./v2/page/Index";
 import NotFound from "./v2/page/NotFound";
 import SignIn from "./v2/page/SignIn";
@@ -45,10 +45,10 @@ if (container != null) {
                 <Route path={"/"} element={<Index key={"index"}/>}/>
                 <Route path={"/browser/:aid"} element={<Browser key={"browser"}/>}/>
                 <Route path={"/signin"} element={<SignIn key={"signin"}/>}/>
-                <Route path={"/editor/article"} element={<Editor key={"editor-article"}/>}/>
-                <Route path={"/editor/article/:aid"} element={<Editor key={"editor-article"}/>}/>
-                <Route path={"/editor/quote/"} element={<Editor key={"editor-quote"}/>}/>
-                <Route path={"/editor/quote/:quoteId"} element={<Editor key={"editor-quote"}/>}/>
+                <Route path={"/editor/article"} element={<ArticleEditor key={"editor-article"}/>}/>
+                <Route path={"/editor/article/:aid"} element={<ArticleEditor key={"editor-article"}/>}/>
+                <Route path={"/editor/quote/"} element={<ArticleEditor key={"editor-quote"}/>}/>
+                <Route path={"/editor/quote/:quoteId"} element={<ArticleEditor key={"editor-quote"}/>}/>
                 <Route path={"*"} element={<NotFound key={"notFound"}/>}/>
             </Routes>
         </BrowserRouter>

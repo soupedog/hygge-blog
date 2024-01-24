@@ -3,7 +3,7 @@ import {Button, Input, message, Modal, Radio, Space} from "antd";
 import {editor_text_area} from "../properties/ElementNameContainer";
 import {contentChangeUndoStackHandler} from "./EditorView";
 import InputElementHelper from "./util/InputElementHelper";
-import { EditorContext } from '../../page/Editor';
+import { ArticleEditorContext } from '../../page/ArticleEditor';
 
 function EditorBilibiliShareModal() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,7 +21,7 @@ function EditorBilibiliShareModal() {
     };
 
     return (
-        <EditorContext.Consumer>
+        <ArticleEditorContext.Consumer>
             {({updateContent}) => (
                 <>
                     {contextHolder}
@@ -66,7 +66,7 @@ function EditorBilibiliShareModal() {
                     </Modal>
                 </>
             )}
-        </EditorContext.Consumer>
+        </ArticleEditorContext.Consumer>
     );
 }
 
