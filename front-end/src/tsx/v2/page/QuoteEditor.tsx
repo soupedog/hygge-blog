@@ -3,10 +3,10 @@ import zhCN from "antd/locale/zh_CN";
 import {ConfigProvider} from "antd";
 import EditorMenu from "../component/markdown/EditorMenu";
 import EditorView from "../component/markdown/EditorView";
+import QuoteEditorForm from "../component/editor/QuoteEditorForm";
 import {AntdTreeNodeInfo} from "../component/markdown/util/MdHelper";
-import ArticleEditorForm from "../component/editor/ArticleEditorForm";
 
-export interface ArticleEditorState {
+export interface QuoteEditorState {
     content: string;
     updateContent: Function;
     tocEnable: boolean;
@@ -15,7 +15,7 @@ export interface ArticleEditorState {
     updateTocTree: Function;
 }
 
-function ArticleEditor() {
+function QuoteEditor() {
     const [content, updateContent] = useState("");
     const [tocEnable, updateTocEnable] = useState(false);
     const [tocTree, updateTocTree] = useState([]);
@@ -31,16 +31,16 @@ function ArticleEditor() {
 
     return (
         <ConfigProvider locale={zhCN}>
-            <ArticleEditorContext.Provider value={state}>
+            <QuoteEditorContext.Provider value={state}>
                 <EditorMenu updateContent={updateContent} tocEnable={tocEnable}
                             updateTocEnable={updateTocEnable} updateTocTree={updateTocTree}/>
                 <EditorView content={content} updateContent={updateContent}
                             tocEnable={tocEnable} tocTree={tocTree}/>
-                <ArticleEditorForm updateContent={updateContent}/>
-            </ArticleEditorContext.Provider>
+                <QuoteEditorForm updateContent={updateContent}/>
+            </QuoteEditorContext.Provider>
         </ConfigProvider>
     );
 }
 
-export const ArticleEditorContext = createContext<ArticleEditorState>({} as ArticleEditorState);
-export default ArticleEditor;
+export const QuoteEditorContext = createContext<QuoteEditorState>({} as QuoteEditorState);
+export default QuoteEditor;

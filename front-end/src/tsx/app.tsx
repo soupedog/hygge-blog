@@ -15,6 +15,7 @@ import Index from "./v2/page/Index";
 import NotFound from "./v2/page/NotFound";
 import SignIn from "./v2/page/SignIn";
 import Browser from "./v2/page/Browser";
+import QuoteEditor from "./v2/page/QuoteEditor";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -47,8 +48,8 @@ if (container != null) {
                 <Route path={"/signin"} element={<SignIn key={"signin"}/>}/>
                 <Route path={"/editor/article"} element={<ArticleEditor key={"editor-article"}/>}/>
                 <Route path={"/editor/article/:aid"} element={<ArticleEditor key={"editor-article"}/>}/>
-                <Route path={"/editor/quote/"} element={<ArticleEditor key={"editor-quote"}/>}/>
-                <Route path={"/editor/quote/:quoteId"} element={<ArticleEditor key={"editor-quote"}/>}/>
+                <Route path={"/editor/quote/"} element={<QuoteEditor key={"editor-quote"}/>}/>
+                <Route path={"/editor/quote/:quoteId"} element={<QuoteEditor key={"editor-quote"}/>}/>
                 <Route path={"*"} element={<NotFound key={"notFound"}/>}/>
             </Routes>
         </BrowserRouter>

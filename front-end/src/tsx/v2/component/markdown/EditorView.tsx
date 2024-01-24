@@ -26,7 +26,7 @@ import {key_draft} from "./properties/MarkDownStaticValue";
 import {DownOutlined} from '@ant-design/icons';
 import {TreeProps} from "antd/es/tree/Tree";
 import InputElementHelper from "./util/InputElementHelper";
-import { ArticleEditorContext } from "../../page/ArticleEditor";
+import {AntdTreeNodeInfo} from "./util/MdHelper";
 
 const stackMaxSize = 20;
 const undoStack: string[] = new Array<string>(); // 用于存储撤销历史记录
@@ -57,7 +57,14 @@ export function contentChangeTextAreaPostHandler(element: HTMLTextAreaElement, c
     }, 50);
 }
 
-function EditorView() {
+export interface EditorViewProps {
+    content: string;
+    updateContent: Function;
+    tocEnable: boolean;
+    tocTree: AntdTreeNodeInfo[];
+}
+
+function EditorView({content, updateContent, tocEnable, tocTree}: EditorViewProps) {
     const [messageApi, contextHolder] = message.useMessage();
 
     // 目录选中自动跳转函数
@@ -74,26 +81,24 @@ function EditorView() {
     };
 
     return (
-        <ArticleEditorContext.Consumer>
-            {({content, updateContent, tocEnable, tocTree}) => (
-                <Row gutter={[8, 8]} style={{
-                    marginTop: "8px",
-                    paddingBottom: "8px"
-                }}>
-                    {tocEnable ?
-                        <Col span={4}>
-                            <Tree
-                                showLine
-                                switcherIcon={<DownOutlined/>}
-                                onSelect={onSelect}
-                                treeData={tocTree as any}
-                            />
-                        </Col>
-                        : null}
-                    <Col span={tocEnable ? 8 : 12} style={{maxHeight: "600px"}}>
-                        {contextHolder}
-                        <TextArea id={editor_text_area} rows={27}
-                                  placeholder="这里是 markdown 编辑器写作区，请开始您的创作吧！
+        <Row gutter={[8, 8]} style={{
+            marginTop: "8px",
+            paddingBottom: "8px"
+        }}>
+            {tocEnable ?
+                <Col span={4}>
+                    <Tree
+                        showLine
+                        switcherIcon={<DownOutlined/>}
+                        onSelect={onSelect}
+                        treeData={tocTree as any}
+                    />
+                </Col>
+                : null}
+            <Col span={tocEnable ? 8 : 12} style={{maxHeight: "600px"}}>
+                {contextHolder}
+                <TextArea id={editor_text_area} rows={27}
+                          placeholder="这里是 markdown 编辑器写作区，请开始您的创作吧！
                                         Ctrl + B 加粗
                                         Ctrl + D 删除当前行
                                         Ctrl + I 斜体
@@ -101,146 +106,144 @@ function EditorView() {
                                         Ctrl + Y 回退
                                         Ctrl + Z 撤销
                                         "
-                                  value={content}
-                                  onChange={event => {
-                                      contentChangeUndoStackHandler(event.target.value);
+                          value={content}
+                          onChange={event => {
+                              contentChangeUndoStackHandler(event.target.value);
 
-                                      updateContent(event.target.value);
-                                  }}
-                                  onKeyDown={(event) => {
-                                      // 如果是 ctrl 组合键
-                                      if (event.ctrlKey) {
-                                          // @ts-ignore
-                                          let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                              updateContent(event.target.value);
+                          }}
+                          onKeyDown={(event) => {
+                              // 如果是 ctrl 组合键
+                              if (event.ctrlKey) {
+                                  // @ts-ignore
+                                  let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
 
-                                          switch (event.key) {
-                                              case "s":
-                                                  // 保存
-                                                  stopEvent(event);
+                                  switch (event.key) {
+                                      case "s":
+                                          // 保存
+                                          stopEvent(event);
 
-                                                  localStorage.setItem(key_draft, element.textContent!);
+                                          localStorage.setItem(key_draft, element.textContent!);
 
-                                                  messageApi.success("保存草稿成功");
+                                          messageApi.success("保存草稿成功");
+                                          break;
+                                      case "d":
+                                          // 删除行
+                                          stopEvent(event);
+
+                                          InputElementHelper.removeSelectedLine(element, ({
+                                                                                              leftPart,
+                                                                                              rightPart
+                                                                                          }) => {
+                                              let nextContent = leftPart + rightPart;
+                                              updateContent(nextContent);
+
+                                              contentChangeUndoStackHandler(nextContent);
+                                              contentChangeTextAreaPostHandler(element, leftPart.length);
+                                          });
+                                          break;
+                                      case "b":
+                                          // 加粗
+                                          stopEvent(event);
+                                          InputElementHelper.appendTextToTextArea(element, "", ({
+                                                                                                    leftPart,
+                                                                                                    selectedPart,
+                                                                                                    rightPart
+                                                                                                }) => {
+                                              let nextContent = leftPart + "**" + selectedPart + "**" + rightPart;
+                                              updateContent(nextContent);
+
+                                              contentChangeUndoStackHandler(nextContent);
+                                          });
+                                          break;
+                                      case "i":
+                                          // 斜体
+                                          stopEvent(event);
+                                          InputElementHelper.appendTextToTextArea(element, "", ({
+                                                                                                    leftPart,
+                                                                                                    selectedPart,
+                                                                                                    rightPart
+                                                                                                }) => {
+                                              let nextContent = leftPart + "*" + selectedPart + "*" + rightPart;
+                                              updateContent(nextContent);
+
+                                              contentChangeUndoStackHandler(nextContent);
+                                          });
+                                          break;
+                                      case "z":
+                                          // 撤销
+                                          stopEvent(event);
+
+                                          if (undoStack.length > 0) {
+                                              let nextContent = undoStack.pop();
+
+                                              if (nextContent == null) {
                                                   break;
-                                              case "d":
-                                                  // 删除行
-                                                  stopEvent(event);
+                                              }
 
-                                                  InputElementHelper.removeSelectedLine(element, ({
-                                                                                                      leftPart,
-                                                                                                      rightPart
-                                                                                                  }) => {
-                                                      let nextContent = leftPart + rightPart;
-                                                      updateContent(nextContent);
+                                              redoStack.push(nextContent);
 
-                                                      contentChangeUndoStackHandler(nextContent);
-                                                      contentChangeTextAreaPostHandler(element, leftPart.length);
-                                                  });
-                                                  break;
-                                              case "b":
-                                                  // 加粗
-                                                  stopEvent(event);
-                                                  InputElementHelper.appendTextToTextArea(element, "", ({
-                                                                                                            leftPart,
-                                                                                                            selectedPart,
-                                                                                                            rightPart
-                                                                                                        }) => {
-                                                      let nextContent = leftPart + "**" + selectedPart + "**" + rightPart;
-                                                      updateContent(nextContent);
-
-                                                      contentChangeUndoStackHandler(nextContent);
-                                                  });
-                                                  break;
-                                              case "i":
-                                                  // 斜体
-                                                  stopEvent(event);
-                                                  InputElementHelper.appendTextToTextArea(element, "", ({
-                                                                                                            leftPart,
-                                                                                                            selectedPart,
-                                                                                                            rightPart
-                                                                                                        }) => {
-                                                      let nextContent = leftPart + "*" + selectedPart + "*" + rightPart;
-                                                      updateContent(nextContent);
-
-                                                      contentChangeUndoStackHandler(nextContent);
-                                                  });
-                                                  break;
-                                              case "z":
-                                                  // 撤销
-                                                  stopEvent(event);
-
-                                                  if (undoStack.length > 0) {
-                                                      let nextContent = undoStack.pop();
-
-                                                      if (nextContent == null) {
-                                                          break;
-                                                      }
-
-                                                      redoStack.push(nextContent);
-
-                                                      if (nextContent == element.textContent!) {
-                                                          nextContent = undoStack.pop();
-                                                          redoStack.push(nextContent!);
-                                                      }
-                                                      updateContent(nextContent);
-                                                  }
-
-                                                  break;
-                                              case "y":
-                                                  // 回退
-                                                  stopEvent(event);
-
-                                                  if (redoStack.length > 0) {
-                                                      let nextContent = redoStack.pop();
-                                                      if (nextContent == null) {
-                                                          break;
-                                                      }
-                                                      undoStack.push(nextContent);
-
-                                                      if (nextContent == element.textContent) {
-                                                          nextContent = redoStack.pop();
-                                                          undoStack.push(nextContent!);
-                                                      }
-                                                      updateContent(nextContent);
-                                                  }
-
-                                                  break;
-                                              default:
+                                              if (nextContent == element.textContent!) {
+                                                  nextContent = undoStack.pop();
+                                                  redoStack.push(nextContent!);
+                                              }
+                                              updateContent(nextContent);
                                           }
-                                      }
-                                  }}
-                            // 不允许文本域调整大小
-                                  style={{resize: "none"}}
-                        />
-                    </Col>
-                    <Col span={12} style={{maxHeight: "600px", overflowY: "scroll"}}>
-                        <ReactMarkdown className={class_md_preview}
-                                       children={content}
-                                       remarkPlugins={[remarkGfm, remarkMath]}
-                                       rehypePlugins={[rehypeKatex, rehypeSlug, rehypeRaw, [rehypeHighlight, {
-                                           detect: true,// 没有 language 属性的代码尝试自动解析语言类型
-                                           ignoreMissing: true, // 出现故障不抛出异常打断页面渲染
-                                           languages: {// 默认会装载部分语言，但手动更完整和准确
-                                               bash,
-                                               shell,
-                                               dockerfile,
-                                               nginx,
-                                               javascript,
-                                               typescript,
-                                               java,
-                                               python,
-                                               sql,
-                                               properties,
-                                               json,
-                                               xml,
-                                               yaml
-                                           }
-                                       }]]}
-                        />
-                    </Col>
-                </Row>
-            )}
-        </ArticleEditorContext.Consumer>
+
+                                          break;
+                                      case "y":
+                                          // 回退
+                                          stopEvent(event);
+
+                                          if (redoStack.length > 0) {
+                                              let nextContent = redoStack.pop();
+                                              if (nextContent == null) {
+                                                  break;
+                                              }
+                                              undoStack.push(nextContent);
+
+                                              if (nextContent == element.textContent) {
+                                                  nextContent = redoStack.pop();
+                                                  undoStack.push(nextContent!);
+                                              }
+                                              updateContent(nextContent);
+                                          }
+
+                                          break;
+                                      default:
+                                  }
+                              }
+                          }}
+                    // 不允许文本域调整大小
+                          style={{resize: "none"}}
+                />
+            </Col>
+            <Col span={12} style={{maxHeight: "600px", overflowY: "scroll"}}>
+                <ReactMarkdown className={class_md_preview}
+                               children={content}
+                               remarkPlugins={[remarkGfm, remarkMath]}
+                               rehypePlugins={[rehypeKatex, rehypeSlug, rehypeRaw, [rehypeHighlight, {
+                                   detect: true,// 没有 language 属性的代码尝试自动解析语言类型
+                                   ignoreMissing: true, // 出现故障不抛出异常打断页面渲染
+                                   languages: {// 默认会装载部分语言，但手动更完整和准确
+                                       bash,
+                                       shell,
+                                       dockerfile,
+                                       nginx,
+                                       javascript,
+                                       typescript,
+                                       java,
+                                       python,
+                                       sql,
+                                       properties,
+                                       json,
+                                       xml,
+                                       yaml
+                                   }
+                               }]]}
+                />
+            </Col>
+        </Row>
     );
 }
 
