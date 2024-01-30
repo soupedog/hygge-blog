@@ -18,6 +18,8 @@ import properties from 'highlight.js/lib/languages/properties';
 import json from 'highlight.js/lib/languages/json';
 import xml from 'highlight.js/lib/languages/xml';
 import yaml from 'highlight.js/lib/languages/yaml';
+// 指定代码高亮主题
+import  'highlight.js/styles/androidstudio.min.css';
 import {Col, message, Row, Tree} from "antd";
 import React from "react";
 import TextArea from "antd/es/input/TextArea";
