@@ -1,3 +1,8 @@
+import React from "react";
+
+// 指定代码高亮主题
+import 'highlight.js/styles/androidstudio.min.css';
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm' // 渲染表格、checkBox 等组件
 import rehypeRaw from 'rehype-raw' // 允许原生 html 渲染
@@ -18,10 +23,7 @@ import properties from 'highlight.js/lib/languages/properties';
 import json from 'highlight.js/lib/languages/json';
 import xml from 'highlight.js/lib/languages/xml';
 import yaml from 'highlight.js/lib/languages/yaml';
-// 指定代码高亮主题
-import  'highlight.js/styles/androidstudio.min.css';
 import {Col, message, Row, Tree} from "antd";
-import React from "react";
 import TextArea from "antd/es/input/TextArea";
 import {class_md_preview, editor_text_area} from "../properties/ElementNameContainer";
 import {key_draft} from "./properties/MarkDownStaticValue";

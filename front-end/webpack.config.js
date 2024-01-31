@@ -5,6 +5,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
@@ -104,10 +105,21 @@ module.exports = {
             }
         }),
         new CompressionPlugin({
-            algorithm: 'gzip', // 类型
-            test: /\.(js|css)$/, // 匹配规则
-            threshold: 10240, // 字节数 只处理比这个大的资源
-            minRatio: 0.8 // 压缩率 只有比这个小的才会处理
+            // 压缩类型
+            algorithm: "gzip",
+            // 被压缩目标的正则匹配规则
+            test: /\.(js|css)$/,
+            // 字节数 只处理比这个大的资源(100 kb)
+            threshold: 102400,
+            // 压缩率 只有比这个小的才会处理
+            minRatio: 0.8
+        }),
+        // 把前者拷贝到 to 指定的目录(to 中 ./ 代表相对于 module.exports.output 中配置的相对位置)
+        new CopyPlugin({
+            patterns: [
+                { from: './node_modules/katex/dist/fonts', to: './fonts' },
+                { from: './node_modules/katex/dist/katex.min.css', to: './' }
+            ],
         }),
         new BundleAnalyzerPlugin()
     ],
