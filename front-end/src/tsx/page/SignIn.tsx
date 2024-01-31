@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import "../../style/signin.less"
 
@@ -16,6 +16,13 @@ import zhCN from "antd/lib/locale/zh_CN";
 import {UrlHelper} from "../util/UtilContainer";
 
 function SignIn() {
+
+    useEffect(() => {
+        // 改页面标题
+        document.title = "登录页";
+        // 依赖静态值表示仅初始化时调用一次
+    }, []);
+
     return (
         <ConfigProvider locale={zhCN}>
             <Layout className="layout">

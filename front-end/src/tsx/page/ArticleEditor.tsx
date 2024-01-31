@@ -1,4 +1,4 @@
-import React, {createContext, useMemo, useState} from 'react';
+import React, {createContext, useEffect, useMemo, useState} from 'react';
 import zhCN from "antd/locale/zh_CN";
 import {ConfigProvider} from "antd";
 import EditorMenu from "../component/markdown/EditorMenu";
@@ -28,6 +28,12 @@ function ArticleEditor() {
         tocTree: tocTree,
         updateTocTree: updateTocTree,
     }), [content, tocEnable, tocTree]);
+
+    useEffect(() => {
+        // 改页面标题
+        document.title = "编辑文章";
+        // 依赖静态值表示仅初始化时调用一次
+    }, []);
 
     return (
         <ConfigProvider locale={zhCN}>
