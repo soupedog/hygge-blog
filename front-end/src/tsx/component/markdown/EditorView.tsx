@@ -1,36 +1,14 @@
 import React from "react";
 
-// 指定代码高亮主题
-import 'highlight.js/styles/androidstudio.min.css';
-
-import ReactMarkdown from "react-markdown";
-import remarkGfm from 'remark-gfm' // 渲染表格、checkBox 等组件
-import rehypeRaw from 'rehype-raw' // 允许原生 html 渲染
-import rehypeSlug from 'rehype-slug' // 标题标签标记描点
-import rehypeHighlight from 'rehype-highlight' // 代码高亮标记
-import remarkMath from 'remark-math' // 数学公式支持
-import rehypeKatex from 'rehype-katex' // 数学公式支持
-import bash from 'highlight.js/lib/languages/bash';
-import shell from 'highlight.js/lib/languages/shell'
-import dockerfile from 'highlight.js/lib/languages/dockerfile';
-import nginx from 'highlight.js/lib/languages/nginx';
-import javascript from 'highlight.js/lib/languages/javascript';
-import typescript from 'highlight.js/lib/languages/typescript';
-import java from 'highlight.js/lib/languages/java';
-import python from 'highlight.js/lib/languages/python';
-import sql from 'highlight.js/lib/languages/sql';
-import properties from 'highlight.js/lib/languages/properties';
-import json from 'highlight.js/lib/languages/json';
-import xml from 'highlight.js/lib/languages/xml';
-import yaml from 'highlight.js/lib/languages/yaml';
 import {Col, message, Row, Tree} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import {class_md_preview, editor_text_area} from "../properties/ElementNameContainer";
-import {key_draft} from "./properties/MarkDownStaticValue";
+import {allowAll, editor_id_for_browser, editor_id_for_editor, key_draft} from "./properties/MarkDownStaticValue";
 import {DownOutlined} from '@ant-design/icons';
 import {TreeProps} from "antd/es/tree/Tree";
 import InputElementHelper from "./util/InputElementHelper";
 import {AntdTreeNodeInfo} from "./util/MdHelper";
+import {MdPreview} from "md-editor-rt";
 
 const stackMaxSize = 20;
 const undoStack: string[] = new Array<string>(); // 用于存储撤销历史记录
@@ -223,29 +201,7 @@ function EditorView({content, updateContent, tocEnable, tocTree}: EditorViewProp
                 />
             </Col>
             <Col span={12} style={{maxHeight: "600px", overflowY: "scroll"}}>
-                <ReactMarkdown className={class_md_preview}
-                               children={content}
-                               remarkPlugins={[remarkGfm, remarkMath]}
-                               rehypePlugins={[rehypeKatex, rehypeSlug, rehypeRaw, [rehypeHighlight, {
-                                   detect: true,// 没有 language 属性的代码尝试自动解析语言类型
-                                   ignoreMissing: true, // 出现故障不抛出异常打断页面渲染
-                                   languages: {// 默认会装载部分语言，但手动更完整和准确
-                                       bash,
-                                       shell,
-                                       dockerfile,
-                                       nginx,
-                                       javascript,
-                                       typescript,
-                                       java,
-                                       python,
-                                       sql,
-                                       properties,
-                                       json,
-                                       xml,
-                                       yaml
-                                   }
-                               }]]}
-                />
+                <MdPreview editorId={editor_id_for_editor} modelValue={content} sanitize={allowAll}/>
             </Col>
         </Row>
     );

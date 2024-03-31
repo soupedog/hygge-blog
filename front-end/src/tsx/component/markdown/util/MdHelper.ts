@@ -1,46 +1,57 @@
 import {LogHelper, PropertiesHelper} from "../../../util/UtilContainer";
 
 export interface AntdTreeNodeInfo {
-    index: number | null;
+    // 不可重复的唯一标识
+    key?: string;
+    // 标题
     title: string;
-    value: string;
-    nodeName: string;
-    level: number | null;
-    parentNodeIndex: number | null;
     children: Array<AntdTreeNodeInfo>;
 }
 
+export interface TreeNodeInfo extends AntdTreeNodeInfo {
+    index: number;
+    id: string;
+    dataLine: string;
+    // html 标签名称
+    nodeName: string;
+    // 根据 nodeName 一对一唯一对应而来的级别(值越小位级越高)
+    level: number | undefined;
+    parentNodeIndex: number | undefined;
+}
+
 export interface ErrorCallbackFunction {
-    (msg: string | null): void;
+    (msg?: string): void;
 }
 
 export interface CreateTocTreeInputParam {
-    currentTOCArray: Array<AntdTreeNodeInfo>,
-    allTocNodeMap: Map<number, AntdTreeNodeInfo>,
-    errorCallback: ErrorCallbackFunction | null;
+    currentTOCArray: Array<TreeNodeInfo>,
+    allTocNodeMap: Map<number, TreeNodeInfo>,
+    errorCallback?: ErrorCallbackFunction;
 }
 
 export class MdHelper {
     // 根据目录数组生成目录树
     static initTitleTree(inputParam: CreateTocTreeInputParam) {
-        let tocTree: AntdTreeNodeInfo[] = [];
-        let rootNodeLevel: number | null = 1;
+        let tocTree = new Array<TreeNodeInfo>();
+        let rootNodeLevel: number = 1;
         // 初始化上一个节点对象
-        let prevNode: AntdTreeNodeInfo | null = null;
+        let prevNode: TreeNodeInfo | undefined = undefined;
 
         inputParam.currentTOCArray.forEach((item, index) => {
-            // 创建当前节点对象
+            // 完整初始化当前节点对象各个属性
             let currentNodeName = item.nodeName;
-            item.level = MdHelper.getTitleLevel(currentNodeName, inputParam.errorCallback);
-            item.children = [];
+            item.key = item.index + "_" + item.nodeName + "_" + item.dataLine;
+            item.level = MdHelper.getTitleLevel(currentNodeName, inputParam.errorCallback)!;
 
             // 首个节点
-            if (index == 0) {
+            if (item.index == 0) {
                 // 首个节点默认为根节点，初始其父节点为空
-                item.parentNodeIndex = null;
+                item.parentNodeIndex = undefined;
                 rootNodeLevel = item.level;
-                prevNode = item;
+
                 tocTree.push(item);
+                // 处理完毕，为下一轮初始化上一个节点
+                prevNode = item;
                 // means continue
                 return;
             }
@@ -48,38 +59,42 @@ export class MdHelper {
             // 非首个节点
             if (item.level == rootNodeLevel) {
                 // 当前节点为根节点，初始其父节点为空
-                item.parentNodeIndex = null;
-                prevNode = item;
+                item.parentNodeIndex = undefined;
+
                 tocTree.push(item);
-            } else if (item.level! > rootNodeLevel!) {
-                // @ts-ignore 当前节点是子节点
-                if (item.level == prevNode.level) {
-                    // @ts-ignore 当前节点是上一个节点的兄弟节点，分支同辈扩散
-                    let parentOfPrevNode = inputParam.allTocNodeMap.get(prevNode.parentNodeIndex);
-                    // @ts-ignore
+                // 处理完毕，为下一轮初始化上一个节点
+                prevNode = item;
+            } else if (item.level > rootNodeLevel) {
+                // 当前节点是子节点
+                if (item.level == prevNode!.level) {
+                    // 当前节点是上一个节点的兄弟节点，分支同辈扩散
+                    let parentOfPrevNode = inputParam.allTocNodeMap.get(prevNode!.parentNodeIndex!)!;
                     item.parentNodeIndex = parentOfPrevNode.index;
-                    // @ts-ignore
+
                     parentOfPrevNode.children.push(item);
+                    // 处理完毕，为下一轮初始化上一个节点
                     prevNode = item;
-                    // @ts-ignore
-                } else if (item.level > prevNode.level) {
-                    // @ts-ignore 当前节点是上一个节点的子节点，分支继续深入
-                    item.parentNodeIndex = prevNode.index;
-                    // @ts-ignore
-                    prevNode.children.push(item);
+                } else if (item.level > prevNode!.level!) {
+                    // 当前节点是上一个节点的子节点，分支继续深入
+                    item.parentNodeIndex = prevNode!.index;
+
+                    prevNode!.children.push(item);
+                    // 处理完毕，为下一轮初始化上一个节点
                     prevNode = item;
                 } else {
                     // 当前节点是上一个节点的长辈节点，分支按长辈扩散
                     let prevNodeSeniorNode = MdHelper.getNodeIndexByLevel({
                         startNode: prevNode!,
-                        targetLevel: item.level!,
+                        targetLevel: item.level,
                         allTocNodeMap: inputParam.allTocNodeMap
                     });
 
-                    if (prevNodeSeniorNode != null) {
+                    if (prevNodeSeniorNode != undefined) {
                         let parentOfPrevNodeSeniorNode = inputParam.allTocNodeMap.get(prevNodeSeniorNode.parentNodeIndex!)!;
                         item.parentNodeIndex = parentOfPrevNodeSeniorNode.index;
+
                         parentOfPrevNodeSeniorNode.children.push(item);
+                        // 处理完毕，为下一轮初始化上一个节点
                         prevNode = item;
                     } else {
                         MdHelper.defaultCallErrorCallback(inputParam.errorCallback, "非标准的目录关系，创建目录失败-2");
@@ -98,13 +113,17 @@ export class MdHelper {
                                    startNode,
                                    targetLevel,
                                    allTocNodeMap
-                               }: { startNode: AntdTreeNodeInfo, targetLevel: number, allTocNodeMap: Map<number, AntdTreeNodeInfo> }): AntdTreeNodeInfo | null {
+                               }: {
+        startNode: TreeNodeInfo,
+        targetLevel: number,
+        allTocNodeMap: Map<number, TreeNodeInfo>
+    }): TreeNodeInfo | undefined {
         let parentNodeId = startNode.parentNodeIndex;
-        if (parentNodeId == null) {
+        if (parentNodeId == undefined) {
             // 未找到结果
-            return null;
+            return undefined;
         } else {
-            let parentNodeIndex: AntdTreeNodeInfo = allTocNodeMap.get(parentNodeId)!;
+            let parentNodeIndex: TreeNodeInfo = allTocNodeMap.get(parentNodeId)!;
 
             if (parentNodeIndex.level == targetLevel) {
                 return parentNodeIndex;
@@ -118,7 +137,7 @@ export class MdHelper {
         }
     }
 
-    static getTitleLevel(nodeName: string, errorCallback: ErrorCallbackFunction | null) {
+    static getTitleLevel(nodeName: string, errorCallback?: ErrorCallbackFunction) {
         switch (nodeName) {
             case "H1":
                 return 1;
@@ -134,16 +153,16 @@ export class MdHelper {
                 return 6;
             default:
                 MdHelper.defaultCallErrorCallback(errorCallback, "仅支持六级目录");
-                return null;
+                return undefined;
         }
     }
 
-    static defaultCallErrorCallback(errorCallback: ErrorCallbackFunction | null, msg: string | null) {
-        if (errorCallback != null) {
+    static defaultCallErrorCallback(errorCallback?: ErrorCallbackFunction, msg?: string) {
+        if (errorCallback != undefined) {
             if (PropertiesHelper.isStringNotEmpty(msg)) {
                 errorCallback(msg);
             } else {
-                errorCallback(null);
+                errorCallback();
             }
         } else {
             LogHelper.error({className: "MdHelper", msg: "Fail to call errorCallback of getTOCTree(). " + msg});

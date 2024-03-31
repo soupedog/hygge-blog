@@ -4,6 +4,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 import "../style/default.css"
 import "../style/markdownCustomStyle.less"
+import 'md-editor-rt/lib/preview.css';
 
 import {Modal} from "antd";
 import isMobile from "rc-util/es/isMobile"

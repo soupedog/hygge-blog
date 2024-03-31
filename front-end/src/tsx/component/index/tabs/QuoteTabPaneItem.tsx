@@ -2,14 +2,10 @@ import React from 'react';
 import {Badge, List, Space, Tooltip} from "antd";
 import {QuoteDto} from "../../../rest/ApiClient";
 import {FormOutlined} from "@ant-design/icons";
-import {class_md_preview} from "../../properties/ElementNameContainer";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import rehypeSlug from "rehype-slug";
-import rehypeRaw from "rehype-raw";
-import ReactMarkdown from "react-markdown";
 import {PropertiesHelper, UrlHelper} from "../../../util/UtilContainer";
+import {MdPreview} from "md-editor-rt";
+import {allowAll, editor_id_for_browser} from "../../markdown/properties/MarkDownStaticValue";
+import {class_md_preview} from "../../properties/ElementNameContainer";
 
 function QuoteTabPaneItem({isAuthor, quote}: { isAuthor: Boolean, quote: QuoteDto }) {
     let quoteOrder = quote.orderVal;
@@ -62,14 +58,10 @@ function renderCore(isAuthor: Boolean, quote: QuoteDto) {
                         </>
                 }
             />
-            <div className={".md-preview"} style={{
-                color: "#9a0707",
-            }}>
-                <ReactMarkdown className={class_md_preview}
-                               children={quote.content}
-                               remarkPlugins={[remarkGfm, remarkMath]}
-                               rehypePlugins={[rehypeKatex, rehypeSlug, rehypeRaw]}
-                />
+            <div className={class_md_preview}>
+                <MdPreview
+                    editorId={editor_id_for_browser + "_" + quote.quoteId} modelValue={quote.content}
+                    sanitize={allowAll}/>
             </div>
         </List.Item>
     );

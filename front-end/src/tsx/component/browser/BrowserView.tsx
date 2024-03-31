@@ -8,29 +8,10 @@ import HyggeBrowserHeader from "./HyggeBrowserHeader";
 import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import {TreeProps} from "antd/es/tree/Tree";
-import {AntdTreeNodeInfo, MdHelper} from "../markdown/util/MdHelper";
-import {class_md_preview} from "../properties/ElementNameContainer";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import rehypeSlug from "rehype-slug";
-import rehypeRaw from "rehype-raw";
-import rehypeHighlight from "rehype-highlight";
-import bash from 'highlight.js/lib/languages/bash';
-import shell from 'highlight.js/lib/languages/shell'
-import dockerfile from 'highlight.js/lib/languages/dockerfile';
-import nginx from 'highlight.js/lib/languages/nginx';
-import javascript from 'highlight.js/lib/languages/javascript';
-import typescript from 'highlight.js/lib/languages/typescript';
-import java from 'highlight.js/lib/languages/java';
-import python from 'highlight.js/lib/languages/python';
-import sql from 'highlight.js/lib/languages/sql';
-import properties from 'highlight.js/lib/languages/properties';
-import json from 'highlight.js/lib/languages/json';
-import xml from 'highlight.js/lib/languages/xml';
-import yaml from 'highlight.js/lib/languages/yaml';
-import ReactMarkdown from "react-markdown";
+import {AntdTreeNodeInfo, CreateTocTreeInputParam, MdHelper, TreeNodeInfo} from "../markdown/util/MdHelper";
 import {TimeHelper} from "../../util/UtilContainer";
+import {MdPreview} from "md-editor-rt";
+import {allowAll, editor_id_for_browser} from "../markdown/properties/MarkDownStaticValue";
 
 function BrowserView({article}: { article: ArticleDto | null }) {
     const [tocEnable, updateTocEnable] = useState(true);
@@ -102,19 +83,18 @@ function renderBreadcrumbItems(article: ArticleDto | null) {
 }
 
 function initToc(updateTocTree: Function, updateTocEnable: Function, nextTocEnable: Boolean) {
-    let antdTreeNodeInfos: Array<AntdTreeNodeInfo> = new Array<AntdTreeNodeInfo>();
-    let map: Map<number, AntdTreeNodeInfo> = new Map<number, AntdTreeNodeInfo>();
+    let antdTreeNodeInfos = new Array<TreeNodeInfo>();
+    let map = new Map<number, TreeNodeInfo>();
 
-    document.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach((item, index) => {
-        let antdTreeNode = {
+    document.querySelectorAll('H1[data-line][id], H2[data-line][id], H3[data-line][id], H4[data-line][id], H5[data-line][id], H6[data-line][id]').forEach((item, index) => {
+        // @ts-ignore
+        let antdTreeNode: TreeNodeInfo = {
+            title: item.textContent!,
+            children: new Array<AntdTreeNodeInfo>(),
             index: index,
-            key: "toc_" + index,
+            id: item.id,
+            dataLine: item.getAttribute('data-line')!,
             nodeName: item.tagName,
-            level: null,
-            title: item.textContent as string,
-            value: item.id,
-            parentNodeIndex: null,
-            children: new Array<AntdTreeNodeInfo>
         };
 
         antdTreeNodeInfos.push(antdTreeNode);
@@ -123,9 +103,8 @@ function initToc(updateTocTree: Function, updateTocEnable: Function, nextTocEnab
 
     let currentTOC = MdHelper.initTitleTree({
         currentTOCArray: antdTreeNodeInfos,
-        allTocNodeMap: map,
-        errorCallback: null
-    });
+        allTocNodeMap: map
+    } as CreateTocTreeInputParam);
 
     if (currentTOC.length > 0) {
         updateTocTree(currentTOC);
@@ -170,30 +149,7 @@ function renderArticle(article: ArticleDto | null, tocEnable: Boolean, updateToc
                         </div>
                     </Card>
                     <Card style={{marginTop: "20px"}} bordered={false}>
-                        <div id={"preview"}/>
-                        <ReactMarkdown className={class_md_preview}
-                                       children={article.content}
-                                       remarkPlugins={[remarkGfm, remarkMath]}
-                                       rehypePlugins={[rehypeKatex, rehypeSlug, rehypeRaw, [rehypeHighlight, {
-                                           detect: true,// 没有 language 属性的代码尝试自动解析语言类型
-                                           ignoreMissing: true, // 出现故障不抛出异常打断页面渲染
-                                           languages: {// 默认会装载部分语言，但手动更完整和准确
-                                               bash,
-                                               shell,
-                                               dockerfile,
-                                               nginx,
-                                               javascript,
-                                               typescript,
-                                               java,
-                                               python,
-                                               sql,
-                                               properties,
-                                               json,
-                                               xml,
-                                               yaml
-                                           }
-                                       }]]}
-                        />
+                        <MdPreview editorId={editor_id_for_browser} modelValue={article.content} sanitize={allowAll}/>
                     </Card>
                 </Content>
                 <Sider trigger={null}
@@ -239,18 +195,24 @@ function renderArticle(article: ArticleDto | null, tocEnable: Boolean, updateToc
 // 目录选中自动跳转函数
 const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
     // @ts-ignore
-    let element = document.getElementById(info.node.value);
+    let item: TreeNodeInfo = info.node;
 
-    if (element != null) {
-        // 滚动到锚点元素的顶部
+    // 用标签类型 + data-line 属性做筛选
+    let element = document.querySelector(item.nodeName + '[data-line="' + item.dataLine + '"]');
+
+    if (element != undefined) {
+        // 滚动到锚点元素的顶部(offsetTop 是数字类型，你可以在此基础上追加偏移量)
+
         window.scrollTo({
+            // @ts-ignore
             top: element.offsetTop + 520,
             behavior: "smooth"
         });
 
+        // 拿到 dom 元素可以直接使用此方法滚动到目标位置(无法追加偏移量)
         // element.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
     } else {
-        message.warning("未找到对应跳转锚点")
+        message.warning("未找到对应跳转锚点");
     }
 };
 

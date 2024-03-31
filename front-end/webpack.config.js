@@ -114,13 +114,6 @@ module.exports = {
             // 压缩率 只有比这个小的才会处理
             minRatio: 0.8
         }),
-        // 把前者拷贝到 to 指定的目录(to 中 ./ 代表相对于 module.exports.output 中配置的相对位置)
-        new CopyPlugin({
-            patterns: [
-                { from: './node_modules/katex/dist/fonts', to: './fonts' },
-                { from: './node_modules/katex/dist/katex.min.css', to: './' }
-            ],
-        }),
         new BundleAnalyzerPlugin()
     ],
     optimization: {

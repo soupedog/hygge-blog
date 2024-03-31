@@ -36,7 +36,7 @@ export interface IndexState {
     // 当前选中查看的文章类别 cid
     currentCategoryId?: string | null;
     searchKeyword: string;
-    updateSearchKeyword:Function,
+    updateSearchKeyword: Function,
     articleSummarySearchOrderType: ArticleSummaryOrderType
     updateArticleSummarySearchOrderType: Function
     articleSummarySearchInfo: ArticleSummaryResponse;
