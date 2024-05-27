@@ -5,7 +5,7 @@ import hygge.blog.domain.baidu.dto.inner.BaiduIpInfoDto;
 import hygge.blog.domain.local.po.ArticleBrowseLog;
 import hygge.blog.repository.database.ArticleBrowseLogDao;
 import hygge.blog.service.client.IPQueryClient;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.util.http.bo.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.sql.Timestamp;
  */
 @Slf4j
 @Service
-public class ArticleBrowseLogServiceImpl extends HyggeWebUtilContainer {
+public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private ArticleBrowseLogDao articleBrowseLogDao;
     @Autowired

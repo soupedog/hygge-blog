@@ -5,7 +5,7 @@ import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.QuoteStateEnum;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 
 import java.sql.Timestamp;
 
@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  * @author Xavier
  * @date 2022/8/29
  */
-public class SimpleTypeConvert extends HyggeWebUtilContainer {
+public class SimpleTypeConvert extends HyggeJsonUtilContainer {
 
     public Long timestampAsLong(Timestamp target) {
         return target == null ? null : target.getTime();

@@ -11,7 +11,7 @@ import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import java.util.Objects;
  * @date 2022/8/1
  */
 @Service
-public class FileServiceImpl extends HyggeWebUtilContainer {
+public class FileServiceImpl extends HyggeJsonUtilContainer {
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     @Value("${file.upload.path}")
     private String filePath;

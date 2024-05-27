@@ -2,12 +2,12 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.UserTokenDao;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.UserToken;
+import hygge.blog.repository.database.UserTokenDao;
 import hygge.commons.exception.LightRuntimeException;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
  * @date 2022/7/20
  */
 @Service
-public class UserTokenServiceImpl extends HyggeWebUtilContainer {
+public class UserTokenServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private UserTokenDao userTokenDao;
     @Autowired

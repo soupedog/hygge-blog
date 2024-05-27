@@ -2,14 +2,14 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.BlogGroupDao;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.GroupBindInfo;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.BlogGroup;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.BlogGroupDao;
 import hygge.commons.exception.LightRuntimeException;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ import java.util.List;
  * @date 2022/7/22
  */
 @Service
-public class BlogGroupServiceImpl extends HyggeWebUtilContainer {
+public class BlogGroupServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private BlogGroupDao blogGroupDao;
     @Autowired

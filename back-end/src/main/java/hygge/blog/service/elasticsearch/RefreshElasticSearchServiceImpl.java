@@ -15,7 +15,7 @@ import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Service
-public class RefreshElasticSearchServiceImpl extends HyggeWebUtilContainer {
+public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private ArticleDao articleDao;
     @Autowired

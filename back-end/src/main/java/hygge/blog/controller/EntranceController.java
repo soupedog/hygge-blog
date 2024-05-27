@@ -11,7 +11,7 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.UserToken;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.blog.service.local.normal.UserTokenServiceImpl;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/blog-service/api")
-public class EntranceController extends HyggeWebUtilContainer implements EntranceControllerDoc {
+public class EntranceController extends HyggeJsonUtilContainer implements EntranceControllerDoc {
     @Autowired
     private UserServiceImpl userService;
     @Autowired

@@ -24,7 +24,7 @@ import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,7 +48,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Slf4j
 @Service
-public class ArticleServiceImpl extends HyggeWebUtilContainer {
+public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private ArticleDao articleDao;

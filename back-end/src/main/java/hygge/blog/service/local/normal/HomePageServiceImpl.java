@@ -15,7 +15,7 @@ import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +28,7 @@ import java.util.Optional;
  * @date 2022/7/25
  */
 @Service
-public class HomePageServiceImpl extends HyggeWebUtilContainer {
+public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private TopicServiceImpl topicService;
     @Autowired

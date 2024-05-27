@@ -10,7 +10,7 @@ import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
-import hygge.commons.annotation.HyggeExpressionInfo;
+import hygge.commons.annotation.HyggeExpressionForOutputFunction;
 import hygge.web.util.log.annotation.ControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +56,7 @@ public class ArticleController implements ArticleControllerDoc {
 
     @Override
     @GetMapping("/article/{aid}")
-    @ControllerLog(outputParamExpressions = {@HyggeExpressionInfo(rootObjectName = "#root", name = "title", value = "main == null ? null : main.title")})
+    @ControllerLog(outputParamExpressions = {@HyggeExpressionForOutputFunction(name = "title", value = "main == null ? null : main.title")})
     public ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(@PathVariable("aid") String aid) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
 

@@ -2,7 +2,7 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.domain.local.po.Announcement;
 import hygge.blog.repository.database.AnnouncementDao;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +17,7 @@ import java.util.List;
  * @date 2022/8/7
  */
 @Service
-public class AnnouncementServiceImpl extends HyggeWebUtilContainer {
+public class AnnouncementServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private AnnouncementDao announcementDao;
 

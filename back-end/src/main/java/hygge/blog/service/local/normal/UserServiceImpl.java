@@ -2,20 +2,20 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.UserDao;
+import hygge.blog.common.mapper.MapToAnyMapper;
+import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.enums.UserSexEnum;
 import hygge.blog.domain.local.enums.UserStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.common.mapper.MapToAnyMapper;
-import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.UserDao;
 import hygge.commons.constant.enums.StringFormatModeEnum;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 @Service
 @SuppressWarnings("java:S1192")
-public class UserServiceImpl extends HyggeWebUtilContainer {
+public class UserServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private UserDao userDao;

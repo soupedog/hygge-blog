@@ -2,19 +2,19 @@ package hygge.blog.service.local.normal;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.repository.database.TopicDao;
+import hygge.blog.common.mapper.MapToAnyMapper;
+import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.enums.TopicStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.common.mapper.MapToAnyMapper;
-import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.TopicDao;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @date 2022/7/23
  */
 @Service
-public class TopicServiceImpl extends HyggeWebUtilContainer {
+public class TopicServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     @Autowired
     private UserServiceImpl userService;

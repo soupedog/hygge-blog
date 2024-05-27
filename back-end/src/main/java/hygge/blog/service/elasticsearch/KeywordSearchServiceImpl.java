@@ -26,7 +26,7 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.constant.ConstantParameters;
 import hygge.commons.exception.ExternalRuntimeException;
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class KeywordSearchServiceImpl extends HyggeWebUtilContainer {
+public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private CategoryServiceImpl categoryService;
     @Autowired

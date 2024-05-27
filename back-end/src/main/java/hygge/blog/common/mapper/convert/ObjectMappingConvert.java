@@ -1,6 +1,6 @@
 package hygge.blog.common.mapper.convert;
 
-import hygge.web.template.HyggeWebUtilContainer;
+import hygge.util.template.HyggeJsonUtilContainer;
 
 import java.sql.Timestamp;
 
@@ -8,7 +8,7 @@ import java.sql.Timestamp;
  * @author Xavier
  * @date 2022/7/17
  */
-public class ObjectMappingConvert extends HyggeWebUtilContainer {
+public class ObjectMappingConvert extends HyggeJsonUtilContainer {
 
     public static Timestamp longToTimestamp(Long target) {
         if (target == null) {
