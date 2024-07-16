@@ -38,21 +38,21 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> homepageFetch(@RequestParam(required = false, defaultValue = "5") int pageSize) {
         return (ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>>) success(homePageService.fetch(pageSize));
     }
 
     @Override
     @GetMapping("/home/fetch/topic/overview")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> topicOverviewFetch() {
         return (ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>>) success(homePageService.fetch(null));
     }
 
     @Override
     @GetMapping("/home/fetch/topic/{tid}")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> topicInfoFetch(@PathVariable("tid") String tid,
                                                                                           @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                           @RequestParam(required = false, defaultValue = "5") int pageSize) {
@@ -61,7 +61,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch/category/{cid}")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> categoryInfoFetch(@PathVariable("cid") String cid,
                                                                                              @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                              @RequestParam(required = false, defaultValue = "5") int pageSize) {
@@ -70,7 +70,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch/quote")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> quoteInfoFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                  @RequestParam(required = false, defaultValue = "5") int pageSize) {
         return (ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>>) success(homePageService.findQuoteInfo(currentPage, pageSize));
@@ -86,7 +86,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/search/quote")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<QuoteInfo>> keywordSearch(@RequestParam(value = "keyword") String keyword,
                                                                                 @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                 @RequestParam(required = false, defaultValue = "5") int pageSize) {
@@ -95,7 +95,7 @@ public class HomePageController implements HomePageControllerDoc {
 
     @Override
     @GetMapping("/home/fetch/announcement")
-    @ControllerLog(enable = false)
+    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>> announcementFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                                 @RequestParam(required = false, defaultValue = "100") int pageSize) {
 

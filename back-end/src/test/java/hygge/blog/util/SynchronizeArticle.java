@@ -18,8 +18,8 @@ import hygge.commons.constant.ConstantParameters;
 import hygge.commons.constant.enums.DateTimeFormatModeEnum;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
+import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.config.HttpHelperAutoConfiguration;
-import hygge.web.template.HyggeWebUtilContainer;
 import hygge.web.util.http.configuration.HttpHelperConfiguration;
 import hygge.web.util.http.impl.DefaultHttpHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +71,7 @@ import java.util.List;
 )
 @SuppressWarnings({"java:S2699", "java:S3577"})
 @Slf4j
-class SynchronizeArticle extends HyggeWebUtilContainer {
+class SynchronizeArticle extends HyggeJsonUtilContainer {
     private static final String path = "H:\\Xavier\\Documents\\md文档\\";
     private static final String backup = "H:\\Xavier\\Documents\\md文档backup\\";
 

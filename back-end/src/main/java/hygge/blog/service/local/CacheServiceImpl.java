@@ -46,7 +46,6 @@ public class CacheServiceImpl {
 
         categoryList.add(PoDtoMapper.INSTANCE.poToDto(currentCategory));
 
-
         Category currentNode = currentCategory;
 
         // 已经是根节点类型的话直接结束，否则继续
@@ -54,8 +53,7 @@ public class CacheServiceImpl {
 
         while (continueFlag) {
             Category parentNode = categoryService.findCategoryByCategoryId(currentNode.getParentId(), false);
-
-            // 父节点是根节点了，可以停止
+            // 如果父节点是根节点了，应停止寻根
             if (parentNode.getRootId().equals(parentNode.getCategoryId())) {
                 continueFlag = false;
             }

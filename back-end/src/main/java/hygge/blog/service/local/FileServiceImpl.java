@@ -44,19 +44,26 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         for (MultipartFile temp : filesList) {
             String fileName = temp.getOriginalFilename();
-
             String path = filePath + fileType.getPath() + fileName;
             File file = new File(path);
             if (file.exists()) {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
+
             try {
                 fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileType.getPath());
-                file.createNewFile();
+                boolean createComplete = file.createNewFile();
+                if (!createComplete) {
+                    throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+                }
                 temp.transferTo(file);
+            } catch (LightRuntimeException le) {
+                // 主动抛出的已知异常已经标记了错误原因
+                throw le;
             } catch (Exception e) {
                 throw new LightRuntimeException("Fail to upload " + fileName + ".", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
             }
+
             FileInfo item = FileInfo.builder()
                     .src(fileType.getPath() + fileName)
                     .name(fileName)
@@ -79,7 +86,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         for (FileTypeEnum fileType : fileTypes) {
             String actualPath = filePath + fileType.getPath();
             File file = fileHelper.getOrCreateDirectoryIfNotExit(actualPath);
-            List<File> files = fileHelper.getFileFromDirectory(file, (pathname) -> true);
+            List<File> files = fileHelper.getFileFromDirectory(file, pathname -> true);
 
             files.forEach(item -> {
                 String absolutePath = item.getAbsolutePath();
@@ -89,7 +96,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                         .name(absolutePath.substring(absolutePath.lastIndexOf(File.separator) + 1, absolutePath.lastIndexOf(".")))
                         .build();
 
-                fileInfo.setSrc(fileInfo.getSrc().replace(File.separator,"/"));
+                fileInfo.setSrc(fileInfo.getSrc().replace(File.separator, "/"));
 
                 fileInfo.setFileSizeWithByte(new BigDecimal(item.length()));
                 result.add(fileInfo);

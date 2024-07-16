@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Xavier
@@ -37,6 +38,14 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
         articleBrowseLogDao.save(articleBrowseLog);
     }
 
+    public void insertArticleBrowseLogAsync(String aid, String title, String ip, Integer userId, String userAgent) {
+        CompletableFuture.runAsync(() -> insertArticleBrowseLog(aid, title, ip, userId, userAgent))
+                .exceptionally(e -> {
+                    log.error("Fail to insert articleBrowseLog(%s-%s-%s-%d-%s).".formatted(aid, title, ip, userId, userAgent), e);
+                    return null;
+                });
+    }
+
     /**
      * 扫描并解析 IP 信息，至多进行一次远端查询就终止(防止使用频率过高，被远端 API 拉进黑名单)
      */
@@ -54,7 +63,7 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
                 ArticleBrowseLog ipLocationInfoResult = articleBrowseLogDao.findIpLocationInfoFromLocal(targetIp);
 
                 // 本地不存在相关 IP 信息时，尝试从百度解析 IP location
-                if (parameterHelper.isEmpty(ipLocationInfoResult)) {
+                if (ipLocationInfoResult == null) {
                     HttpResponse<Void, BaiduGatewayDto<BaiduIpInfoDto>> resultTemp = ipQueryService.queryIpInfo(targetIp);
                     if (resultTemp.isSuccess() &&
                             resultTemp.getData() != null && "Success".equals(resultTemp.getData().getCode())) {
@@ -71,7 +80,7 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
                     continueFlag = false;
                 }
 
-                if (parameterHelper.isNotEmpty(ipLocationInfoResult)) {
+                if (ipLocationInfoResult != null) {
                     articleBrowseLogDao.updateIpLocationInfoForAll(targetIp, ipLocationInfoResult.getLatitude(), ipLocationInfoResult.getLongitude(), ipLocationInfoResult.getIpLocation(), currentTimeStamp);
                 } else {
                     log.error("解析 ipLocation({}) 失败.", targetIp);

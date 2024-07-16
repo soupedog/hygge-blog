@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Xavier
@@ -79,12 +78,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         Quote result = quoteDao.save(quote);
 
-        CompletableFuture.runAsync(() -> {
-            refreshElasticSearchService.freshSingleQuote(result.getQuoteId());
-        }).exceptionally(e -> {
-            log.error("刷新句子(" + result.getQuoteId() + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
+        refreshElasticSearchService.freshSingleQuoteAsync(result.getQuoteId());
 
         return result;
     }
@@ -102,12 +96,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         Quote result = quoteDao.save(old);
 
-        CompletableFuture.runAsync(() -> {
-            refreshElasticSearchService.freshSingleQuote(result.getQuoteId());
-        }).exceptionally(e -> {
-            log.error("刷新句子(" + result.getQuoteId() + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
+        refreshElasticSearchService.freshSingleQuoteAsync(result.getQuoteId());
 
         return result;
     }

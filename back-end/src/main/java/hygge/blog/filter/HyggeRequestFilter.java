@@ -20,22 +20,19 @@ import java.util.Optional;
  * @author Xavier
  * @date 2022/7/20
  */
+@SuppressWarnings("java:S1301")
 @Component
 public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         long serviceStartTs = System.currentTimeMillis();
-        HyggeRequestContext context = null;
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
         // 填充服务端信息，允许跨域访问
         enableCrossOrigin(response);
 
         try {
             switch (request.getMethod().toUpperCase()) {
-                case "GET":
-                case "POST":
-                case "PUT":
-                case "DELETE":
-                    context = HyggeRequestTracker.getContext();
+                case "GET", "POST", "PUT", "DELETE":
                     context.setServiceStartTs(serviceStartTs);
 
                     String uid = parameterHelper.string(request.getHeader("uid"));
@@ -58,16 +55,13 @@ public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
                     filterChain.doFilter(request, response);
                     break;
                 default:
+                    // 其他请求类型不会被主动暴露的端点使用，无需关注
             }
         } catch (HyggeRuntimeException e) {
             onError(response, e.getMessage(), e);
         } catch (Exception e) {
             onError(response, e);
         } finally {
-            if (context == null) {
-                context = HyggeRequestTracker.getContext();
-            }
-
             if (context.getServiceStartTs() != null) {
                 long costTime = System.currentTimeMillis() - context.getServiceStartTs();
                 if (costTime > requestTimeLimit.toMillis()) {
@@ -86,7 +80,7 @@ public class HyggeRequestFilter extends AbstractHyggeRequestFilter {
     private void enableCrossOrigin(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "OPTIONS,GET,POST,PUT,DELETE");
+        response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type,Access-Control-Allow-Headers,Authorization,X-Requested-With,http_user_agent,uid,token,refreshKey,secretKey,scope");
         response.setHeader("Access-Control-Max-Age", "2592000");
     }

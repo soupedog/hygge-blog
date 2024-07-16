@@ -44,7 +44,7 @@ public class BlogGroupController implements BlogGroupControllerDoc {
         if (blogGroupService.admission(groupBindInfo)) {
             return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success(GlobalHyggeCodeEnum.SUCCESS, "success", null);
         } else {
-            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) fail(HttpStatus.OK, null, BlogSystemCode.BLOG_GROUP_BIND_CHANGE_EXCEPTION, "no update", null, null, (HyggeControllerResponseWrapper<ResponseEntity<?>>) LIGHT_ERROR_WRAPPER);
+            return (ResponseEntity<HyggeBlogControllerResponse<Void>>) failWithWrapper(HttpStatus.OK, null, BlogSystemCode.BLOG_GROUP_BIND_CHANGE_EXCEPTION, "no update", null, null, (HyggeControllerResponseWrapper<ResponseEntity<?>>) LIGHT_ERROR_WRAPPER);
         }
     }
 

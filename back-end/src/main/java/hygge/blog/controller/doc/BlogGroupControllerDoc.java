@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "博客群组 Controller", description = "群组创建出入组操作")
 public interface BlogGroupControllerDoc extends HyggeBlogController<ResponseEntity<?>> {
     @Operation(summary = "创建群组", description = "使用当前登录用户创建一个新的群组")
-    ResponseEntity<HyggeBlogControllerResponse<BlogGroupDto>> createBlogGroup(BlogGroupDto blogGroupDto);
+    ResponseEntity<?> createBlogGroup(BlogGroupDto blogGroupDto);
 
     @Operation(summary = "用户入组", description = "群持有人令目标用户入组")
     ResponseEntity<HyggeBlogControllerResponse<Void>> groupAdmission(GroupBindInfo groupBindInfo);

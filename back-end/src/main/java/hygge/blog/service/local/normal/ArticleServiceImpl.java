@@ -247,29 +247,35 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
 
         // 如果允许更新浏览量
         if (pageViewsIncrease) {
-            // 文章作者自己
+            // 文章作者是自己
             if (article.getUserId()
                     .equals(Optional.ofNullable(currentUser)
                             .map(User::getUserId)
                             .orElse(null))) {
-                CompletableFuture.runAsync(() -> {
-                    articleDao.increaseSelfView(article.getArticleId());
-                }).exceptionally(e -> {
-                    log.error("更新文章(" + article.getArticleId() + ") 自浏览 失败.", e);
-                    return null;
-                });
+                increaseSelfViewAsync(article.getArticleId());
             } else {
-                // 不是文章作者自己
-                CompletableFuture.runAsync(() -> {
-                    articleDao.increasePageViews(article.getArticleId());
-                }).exceptionally(e -> {
-                    log.error("更新文章(" + article.getArticleId() + ") 浏览量 失败.", e);
-                    return null;
-                });
+                // 文章作者不是自己
+                increasePageViewsAsync(article.getArticleId());
             }
         }
 
         return result;
+    }
+
+    public void increaseSelfViewAsync(Integer articleId) {
+        CompletableFuture.runAsync(() -> articleDao.increaseSelfView(articleId))
+                .exceptionally(e -> {
+                    log.error("更新文章(" + articleId + ") 自浏览 失败.", e);
+                    return null;
+                });
+    }
+
+    public void increasePageViewsAsync(Integer articleId) {
+        CompletableFuture.runAsync(() -> articleDao.increasePageViews(articleId))
+                .exceptionally(e -> {
+                    log.error("更新文章(" + articleId + ") 浏览量 失败.", e);
+                    return null;
+                });
     }
 
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {

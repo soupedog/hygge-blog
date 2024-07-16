@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author Xavier
@@ -63,15 +62,11 @@ public class ArticleController implements ArticleControllerDoc {
         ArticleDto result = articleService.findArticleDetailByAid(true, aid);
 
         if (!context.isMaintainer()) {
-            CompletableFuture.runAsync(() -> articleBrowseLogService.insertArticleBrowseLog(result.getAid(),
-                            result.getTitle(),
-                            context.getObject(HyggeRequestContext.Key.IP_ADDRESS),
-                            Optional.ofNullable(context.getCurrentLoginUser()).map(User::getUserId).orElse(null),
-                            context.getObject(HyggeRequestContext.Key.USER_AGENT)))
-                    .exceptionally(e -> {
-                        log.error("Fail to insert articleBrowseLog.", e);
-                        return null;
-                    });
+            articleBrowseLogService.insertArticleBrowseLogAsync(result.getAid(),
+                    result.getTitle(),
+                    context.getObject(HyggeRequestContext.Key.IP_ADDRESS),
+                    Optional.ofNullable(context.getCurrentLoginUser()).map(User::getUserId).orElse(null),
+                    context.getObject(HyggeRequestContext.Key.USER_AGENT));
         }
         return (ResponseEntity<HyggeBlogControllerResponse<ArticleDto>>) success(result);
     }

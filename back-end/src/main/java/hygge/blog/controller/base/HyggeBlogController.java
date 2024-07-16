@@ -40,7 +40,7 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
      */
     @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
     default ResponseEntity<?> requestHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
-        return fail(HttpStatus.UNSUPPORTED_MEDIA_TYPE, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
+        return failWithWrapper(HttpStatus.UNSUPPORTED_MEDIA_TYPE, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
     }
 
     /**
@@ -48,7 +48,7 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
      */
     @ExceptionHandler({HttpMessageNotReadableException.class})
     default ResponseEntity<?> requestHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return fail(HttpStatus.BAD_REQUEST, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
+        return failWithWrapper(HttpStatus.BAD_REQUEST, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
     }
 
     /**
@@ -56,7 +56,7 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
      */
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     default ResponseEntity<?> requestHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        return fail(HttpStatus.METHOD_NOT_ALLOWED, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
+        return failWithWrapper(HttpStatus.METHOD_NOT_ALLOWED, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
     }
 
     /**
@@ -64,7 +64,7 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
      */
     @ExceptionHandler({TypeMismatchException.class})
     default ResponseEntity<?> requestTypeMismatch(TypeMismatchException e) {
-        return fail(HttpStatus.BAD_REQUEST, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
+        return failWithWrapper(HttpStatus.BAD_REQUEST, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
     }
 
     /**
@@ -72,7 +72,7 @@ public interface HyggeBlogController<R extends ResponseEntity<?>> extends HyggeC
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     default ResponseEntity<?> requestMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        return fail(HttpStatus.BAD_REQUEST, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
+        return failWithWrapper(HttpStatus.BAD_REQUEST, null, GlobalHyggeCodeEnum.CLIENT_END_EXCEPTION, e.getMessage(), null, e, (HyggeControllerResponseWrapper<R>) LIGHT_ERROR_WRAPPER);
     }
 
     /**

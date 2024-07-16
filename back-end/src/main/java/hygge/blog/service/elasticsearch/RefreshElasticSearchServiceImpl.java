@@ -65,21 +65,20 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void freshSingleArticleAsync(Integer articleId) {
-        CompletableFuture.runAsync(() -> {
-            freshSingleArticle(articleId);
-        }).exceptionally(e -> {
-            log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
-    }
-
     public void freshSingleArticle(Integer articleId) {
         Article article = articleDao.findById(articleId).orElse(null);
         Category currentCategory = categoryDao.findById(article.getCategoryId()).orElse(null);
         CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
 
         freshSingleArticle(article, currentCategory, categoryTreeInfo);
+    }
+
+    public void freshSingleArticleAsync(Integer articleId) {
+        CompletableFuture.runAsync(() -> freshSingleArticle(articleId))
+                .exceptionally(e -> {
+                    log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
+                    return null;
+                });
     }
 
     public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
@@ -109,6 +108,14 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         searchingCacheDao.save(articleQuoteSearchCache);
     }
 
+    public void freshSingleQuoteAsync(Integer quoteId) {
+        CompletableFuture.runAsync(() -> freshSingleQuote(quoteId))
+                .exceptionally(e -> {
+                    log.error("刷新句子(" + quoteId + ") 模糊搜索数据 失败.", e);
+                    return null;
+                });
+    }
+
     public void freshAllArticle() {
         long startTs = System.currentTimeMillis();
         AtomicInteger totalCount = new AtomicInteger(0);
@@ -127,6 +134,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
 
             articleList.forEach(article -> {
                 Category currentCategory = allCategoryList.stream().filter(category -> category.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
+                // 数据无误时，文章必属于全部文章类别中的一种，不可能空指针异常
                 CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
 
                 freshSingleArticle(article, currentCategory, categoryTreeInfo);

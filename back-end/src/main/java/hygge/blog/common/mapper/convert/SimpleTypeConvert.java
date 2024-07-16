@@ -1,10 +1,10 @@
 package hygge.blog.common.mapper.convert;
 
+import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.QuoteStateEnum;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
-import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.util.template.HyggeJsonUtilContainer;
 
 import java.sql.Timestamp;
