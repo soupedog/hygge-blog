@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Schema(title = "用户信息")
 public class UserDto {
-    @Schema(title = "用户编号", description = "系统自动生成用户编号", example = "U00000001")
+    @Schema(title = "用户编号")
     private String uid;
     @Schema(title = "密码", description = "用户密码", example = "xxxxxx")
     private String password;

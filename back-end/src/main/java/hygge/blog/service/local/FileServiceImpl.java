@@ -7,6 +7,7 @@ import hygge.blog.domain.local.dto.FileInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
@@ -34,6 +35,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private String filePath;
     @Autowired
     private UserServiceImpl userService;
+    @Autowired
+    private FileInfoDao fileInfoDao;
 
     public List<FileInfo> uploadFile(FileTypeEnum fileType, List<MultipartFile> filesList) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
