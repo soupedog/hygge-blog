@@ -35,6 +35,7 @@ function SignIn() {
                         className={class_signin_form}
                         onFinish={(val) => {
                             UserService.signIn(val.account, val.password, () => {
+                                // 登陆成功后需要重置自动重试开关
                                 localStorage.removeItem('autoRefreshDisableFlag');
                                 message.success("登录成功，1 秒内自动跳转回主页，请稍后", 1000);
                                 // this.props.router.navigate("/signin");

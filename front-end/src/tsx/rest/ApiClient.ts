@@ -28,6 +28,8 @@ axios.interceptors.response.use(function (response) {
             UserService.signIn(undefined, undefined, (data) => {
                 if (data?.code == 200) {
                     message.info("已为您成功自动登录，1 秒内为您跳转回主页", 1);
+                    // 重新登陆成功后需要重置自动重试开关
+                    localStorage.removeItem('autoRefreshDisableFlag');
                     UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
                 } else {
                     message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
