@@ -1,12 +1,8 @@
 package hygge.blog.service.local;
 
-import hygge.blog.common.HyggeRequestContext;
-import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
-import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
@@ -39,10 +35,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private FileInfoDao fileInfoDao;
 
     public List<FileInfo> uploadFile(FileTypeEnum fileType, List<MultipartFile> filesList) {
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
-        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
-
         List<FileInfo> result = new ArrayList<>();
 
         for (MultipartFile temp : filesList) {
@@ -80,10 +72,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public List<FileInfo> findFileInfo(List<FileTypeEnum> fileTypes) {
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
-        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
-
         List<FileInfo> result = new ArrayList<>();
 
         for (FileTypeEnum fileType : fileTypes) {
