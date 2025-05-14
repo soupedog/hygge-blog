@@ -68,5 +68,6 @@ public class FileInfo extends BasePo {
      */
     private Long fileSize;
     @Lob
+    @Column(columnDefinition = "longblob")
     private byte[] content;
 }

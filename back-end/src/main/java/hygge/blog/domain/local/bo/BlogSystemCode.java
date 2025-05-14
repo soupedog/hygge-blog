@@ -155,7 +155,7 @@ public enum BlogSystemCode implements HyggeCode {
     /**
      * 删除文件失败
      */
-    FAIL_TO_DELETE_FILE(true, null, 500004, null),
+    FAIL_TO_DELETE_FILE(true, null, 500005, null),
     ;
 
     private final boolean serious;

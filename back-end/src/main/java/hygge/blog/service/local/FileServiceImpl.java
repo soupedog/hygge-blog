@@ -1,8 +1,12 @@
 package hygge.blog.service.local;
 
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.bo.BlogSystemCode;
-import hygge.blog.domain.local.dto.FileInfo;
+import hygge.blog.domain.local.dto.FileInfoForFrontEnd;
 import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.domain.local.po.FileInfo;
+import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
@@ -11,14 +15,18 @@ import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Xavier
@@ -34,8 +42,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private FileInfoDao fileInfoDao;
 
-    public List<FileInfo> uploadFile(FileTypeEnum fileType, List<MultipartFile> filesList) {
-        List<FileInfo> result = new ArrayList<>();
+    public List<FileInfoForFrontEnd> uploadFile(FileTypeEnum fileType, List<MultipartFile> filesList) {
+        List<FileInfoForFrontEnd> result = new ArrayList<>();
 
         for (MultipartFile temp : filesList) {
             String fileName = temp.getOriginalFilename();
@@ -45,13 +53,38 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
+            String fileNo = randomHelper.getUniversallyUniqueIdentifier(true);
+
             try {
                 fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileType.getPath());
                 boolean createComplete = file.createNewFile();
                 if (!createComplete) {
                     throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
                 }
+
+                HyggeRequestContext context = HyggeRequestTracker.getContext();
+                User currentUser = context.getCurrentLoginUser();
+
+                FileInfo fileInfo = new FileInfo();
+                fileInfo.setFileNo(fileNo);
+                fileInfo.setUserId(currentUser.getUserId());
+                fileInfo.setName(fileName);
+
+                int indexOfLastPoint = fileName.lastIndexOf(".");
+                if (indexOfLastPoint > 0 && indexOfLastPoint < fileName.length() - 1) {
+                    String extension = fileName.substring(indexOfLastPoint + 1);
+                    fileInfo.setExtension(extension);
+                }
+                fileInfo.setFileSize(temp.getSize());
+                fileInfo.setContent(temp.getBytes());
                 temp.transferTo(file);
+
+                if (file.isAbsolute() && !file.exists()) {
+                    // 拷贝文件到磁盘
+                    FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
+                }
+                // 持久化文件到数据库
+                fileInfoDao.save(fileInfo);
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
                 throw le;
@@ -59,10 +92,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 throw new LightRuntimeException("Fail to upload " + fileName + ".", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
             }
 
-            FileInfo item = FileInfo.builder()
+            FileInfoForFrontEnd item = FileInfoForFrontEnd.builder()
                     .src(fileType.getPath() + fileName)
                     .name(fileName)
                     .extension(Objects.requireNonNull(fileName).substring(fileName.lastIndexOf(".")))
+                    .fileNo(fileNo)
                     .build();
             item.setFileSizeWithByte(new BigDecimal(file.length()));
 
@@ -71,8 +105,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public List<FileInfo> findFileInfo(List<FileTypeEnum> fileTypes) {
-        List<FileInfo> result = new ArrayList<>();
+    public List<FileInfoForFrontEnd> findFileInfo(List<FileTypeEnum> fileTypes) {
+        List<FileInfoForFrontEnd> result = new ArrayList<>();
 
         for (FileTypeEnum fileType : fileTypes) {
             String actualPath = filePath + fileType.getPath();
@@ -82,18 +116,23 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             files.forEach(item -> {
                 String absolutePath = item.getAbsolutePath();
 
-                FileInfo fileInfo = FileInfo.builder()
+                FileInfoForFrontEnd fileInfoForFrontEnd = FileInfoForFrontEnd.builder()
                         .src(absolutePath.substring(filePath.length()))
                         .name(absolutePath.substring(absolutePath.lastIndexOf(File.separator) + 1, absolutePath.lastIndexOf(".")))
                         .build();
 
-                fileInfo.setSrc(fileInfo.getSrc().replace(File.separator, "/"));
+                fileInfoForFrontEnd.setSrc(fileInfoForFrontEnd.getSrc().replace(File.separator, "/"));
 
-                fileInfo.setFileSizeWithByte(new BigDecimal(item.length()));
-                result.add(fileInfo);
+                fileInfoForFrontEnd.setFileSizeWithByte(new BigDecimal(item.length()));
+                result.add(fileInfoForFrontEnd);
             });
         }
         return result;
+    }
+
+    public Optional<FileInfo> findFileFromDB(String fileNo) {
+        return fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo)
+                .build()));
     }
 
 }

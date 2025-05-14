@@ -20,7 +20,7 @@ import java.math.RoundingMode;
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileInfo {
+public class FileInfoForFrontEnd {
     /**
      * byte → mb 进制
      */
@@ -30,6 +30,7 @@ public class FileInfo {
     private String name;
     private String extension;
     private BigDecimal fileSize;
+    private String fileNo;
 
     public void setFileSize(BigDecimal fileSize) {
         this.fileSize = fileSize.setScale(2, RoundingMode.FLOOR);
