@@ -8,6 +8,7 @@ import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.FileInfoDao;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
@@ -40,9 +41,16 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private UserServiceImpl userService;
     @Autowired
+    private CategoryServiceImpl categoryService;
+    @Autowired
     private FileInfoDao fileInfoDao;
 
-    public List<FileInfoForFrontEnd> uploadFile(FileTypeEnum fileType, List<MultipartFile> filesList) {
+    public List<FileInfoForFrontEnd> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
+        if (cid != null) {
+            // 目标类别必须存在
+            categoryService.findCategoryByCid(cid, false);
+        }
+
         List<FileInfoForFrontEnd> result = new ArrayList<>();
 
         for (MultipartFile temp : filesList) {
@@ -68,6 +76,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileNo(fileNo);
                 fileInfo.setUserId(currentUser.getUserId());
+                fileInfo.setCid(cid);
                 fileInfo.setName(fileName);
 
                 int indexOfLastPoint = fileName.lastIndexOf(".");
@@ -75,6 +84,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                     String extension = fileName.substring(indexOfLastPoint + 1);
                     fileInfo.setExtension(extension);
                 }
+                fileInfo.setFileType(fileType);
                 fileInfo.setFileSize(temp.getSize());
                 fileInfo.setContent(temp.getBytes());
                 temp.transferTo(file);

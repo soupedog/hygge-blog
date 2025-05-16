@@ -1,14 +1,19 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.controller.doc.FileControllerDoc;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.FileInfoForFrontEnd;
 import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
+import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.FileServiceImpl;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
-import hygge.commons.exception.main.HyggeRuntimeException;
+import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.util.log.annotation.ControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
@@ -34,15 +39,19 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
-public class FileController implements FileControllerDoc {
+public class FileController extends HyggeJsonUtilContainer implements FileControllerDoc {
     @Autowired
     private FileServiceImpl fileService;
+    @Autowired
+    private CategoryServiceImpl categoryService;
 
     @Override
     @PostMapping(value = "/file", consumes = "multipart/form-data")
     @ControllerLog(ignoreParamNames = "filesList")
-    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> upload(@RequestParam("type") FileTypeEnum fileType, @RequestParam("files") List<MultipartFile> filesList) {
-        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>>) success(fileService.uploadFile(fileType, filesList));
+    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> upload(@RequestParam("type") FileTypeEnum fileType,
+                                                                                         @RequestParam(value = "cid", required = false) String cid,
+                                                                                         @RequestParam("files") List<MultipartFile> filesList) {
+        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>>) success(fileService.uploadFile(cid, fileType, filesList));
     }
 
     @Override
@@ -56,8 +65,24 @@ public class FileController implements FileControllerDoc {
     public ResponseEntity<byte[]> getTimeEntity(@PathVariable("fileNo") String fileNo) {
         Optional<FileInfo> resultTemp = fileService.findFileFromDB(fileNo);
 
-        if (!resultTemp.isPresent()) {
-            return (ResponseEntity<byte[]>) fail(HttpStatus.NOT_FOUND, new HyggeRuntimeException(BlogSystemCode.FAIL_TO_QUERY_FILE));
+        if (resultTemp.isEmpty()) {
+            // 为找到 返回 404
+            return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
+        }
+
+        // 验证访问权限
+        String cid = resultTemp.get().getCid();
+        if (parameterHelper.isNotEmpty(cid)) {
+            HyggeRequestContext context = HyggeRequestTracker.getContext();
+            User currentUser = context.getCurrentLoginUser();
+            List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+
+            Optional<Category> accessibleCategoryTemp = categoryList.stream().filter(item -> cid.equals(item.getCid())).findAny();
+
+            // 无权访问返回 404
+            if (accessibleCategoryTemp.isEmpty()) {
+                return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
+            }
         }
 
         HttpHeaders headers = new HttpHeaders();

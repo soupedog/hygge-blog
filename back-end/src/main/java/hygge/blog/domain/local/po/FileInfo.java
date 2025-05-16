@@ -1,9 +1,12 @@
 package hygge.blog.domain.local.po;
 
+import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.base.BasePo;
 import hygge.blog.domain.local.po.inner.FileDescription;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,6 +56,10 @@ public class FileInfo extends BasePo {
     @Column(nullable = false)
     private Integer userId;
     /**
+     * 文章类别唯一标识展示用编号(与类别共享权限)
+     */
+    private String cid;
+    /**
      * 文件名称(不包含扩展名)
      */
     private String name;
@@ -60,6 +67,12 @@ public class FileInfo extends BasePo {
      * 文件扩展名(如 .png)
      */
     private String extension;
+    /**
+     * 文件类型
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum ('CORE', 'QUOTE', 'ARTICLE_COVER', 'ARTICLE', 'BGM', 'OTHERS') default 'OTHERS'")
+    private FileTypeEnum fileType;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private FileDescription description;

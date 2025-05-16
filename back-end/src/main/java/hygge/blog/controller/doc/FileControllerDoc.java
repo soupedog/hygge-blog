@@ -19,7 +19,7 @@ import java.util.List;
 @Tag(name = "文件 Controller", description = "文件的上传、查询操作")
 public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>> {
     @Operation(summary = "上传文件", description = "上传文件到特定目录")
-    ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> upload(@Parameter FileTypeEnum fileType, List<MultipartFile> filesList);
+    ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> upload(@Parameter FileTypeEnum fileType, @Parameter(description = "文章类别唯一标识展示用编号") String cid, List<MultipartFile> filesList);
 
     @Operation(summary = "查询文件信息", description = "根据文件类型查询文件信息")
     ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> findFileInfo(List<FileTypeEnum> fileTypes);
