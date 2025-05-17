@@ -56,8 +56,10 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
 
     @Override
     @GetMapping("/file")
-    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> findFileInfo(@RequestParam("type") List<FileTypeEnum> fileTypes) {
-        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>>) success(fileService.findFileInfo(fileTypes));
+    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> findFileInfo(@RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
+                                                                                               @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                               @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>>) success(fileService.findFileInfo(fileTypes, currentPage, pageSize));
     }
 
     @GetMapping(value = "/file/{fileNo}")

@@ -5,6 +5,7 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoForFrontEnd;
 import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.FileInfoDao;
@@ -17,6 +18,10 @@ import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +41,9 @@ import java.util.Optional;
 @Service
 public class FileServiceImpl extends HyggeJsonUtilContainer {
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
+
+    private static final List<FileTypeEnum> TYPE_FOR_ALL = collectionHelper.createCollection(FileTypeEnum.values());
+
     @Value("${file.upload.path}")
     private String filePath;
     @Autowired
@@ -77,12 +85,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfo.setFileNo(fileNo);
                 fileInfo.setUserId(currentUser.getUserId());
                 fileInfo.setCid(cid);
-                fileInfo.setName(fileName);
 
                 int indexOfLastPoint = fileName.lastIndexOf(".");
                 if (indexOfLastPoint > 0 && indexOfLastPoint < fileName.length() - 1) {
                     String extension = fileName.substring(indexOfLastPoint + 1);
                     fileInfo.setExtension(extension);
+                    fileInfo.setName(fileName.substring(0, indexOfLastPoint));
                 }
                 fileInfo.setFileType(fileType);
                 fileInfo.setFileSize(temp.getSize());
@@ -115,28 +123,34 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public List<FileInfoForFrontEnd> findFileInfo(List<FileTypeEnum> fileTypes) {
+    public List<FileInfoForFrontEnd> findFileInfo(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
+        List<FileTypeEnum> actualFileTypes = fileTypes == null ? TYPE_FOR_ALL : fileTypes;
+
         List<FileInfoForFrontEnd> result = new ArrayList<>();
 
-        for (FileTypeEnum fileType : fileTypes) {
-            String actualPath = filePath + fileType.getPath();
-            File file = fileHelper.getOrCreateDirectoryIfNotExit(actualPath);
-            List<File> files = fileHelper.getFileFromDirectory(file, pathname -> true);
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
 
-            files.forEach(item -> {
-                String absolutePath = item.getAbsolutePath();
+        List<String> cidList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCid);
 
-                FileInfoForFrontEnd fileInfoForFrontEnd = FileInfoForFrontEnd.builder()
-                        .src(absolutePath.substring(filePath.length()))
-                        .name(absolutePath.substring(absolutePath.lastIndexOf(File.separator) + 1, absolutePath.lastIndexOf(".")))
-                        .build();
+        Sort sort = Sort.by(Sort.Order.asc("createTs"));
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
+        Page<FileInfo> resultTemp = fileInfoDao.findFileInfoMultiple(actualFileTypes, cidList, pageable);
 
-                fileInfoForFrontEnd.setSrc(fileInfoForFrontEnd.getSrc().replace(File.separator, "/"));
+        resultTemp.stream().forEach(item -> {
+            FileInfoForFrontEnd fileInfoForFrontEnd = FileInfoForFrontEnd.builder()
+                    .fileNo(item.getFileNo())
+                    .name(item.getName())
+                    .extension(item.getExtension())
+                    .description(item.getDescription())
+                    .build();
 
-                fileInfoForFrontEnd.setFileSizeWithByte(new BigDecimal(item.length()));
-                result.add(fileInfoForFrontEnd);
-            });
-        }
+            fileInfoForFrontEnd.setSrc(getFileCacheSrc(item).replace(File.separator, "/"));
+
+            fileInfoForFrontEnd.setFileSizeWithByte(new BigDecimal(item.getFileSize()));
+            result.add(fileInfoForFrontEnd);
+        });
         return result;
     }
 
@@ -145,4 +159,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 .build()));
     }
 
+    public String getFileCacheSrc(FileInfo fileInfo) {
+        return fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
+    }
 }

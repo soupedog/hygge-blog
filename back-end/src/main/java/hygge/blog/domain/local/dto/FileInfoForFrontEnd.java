@@ -1,5 +1,6 @@
 package hygge.blog.domain.local.dto;
 
+import hygge.blog.domain.local.po.inner.FileDescription;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Generated;
@@ -26,11 +27,12 @@ public class FileInfoForFrontEnd {
      */
     public static final BigDecimal byteToMb = new BigDecimal(1048576);
 
-    private String src;
+    private String fileNo;
     private String name;
+    private String src;
     private String extension;
     private BigDecimal fileSize;
-    private String fileNo;
+    private FileDescription description;
 
     public void setFileSize(BigDecimal fileSize) {
         this.fileSize = fileSize.setScale(2, RoundingMode.FLOOR);
