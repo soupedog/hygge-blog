@@ -17,6 +17,14 @@ import java.util.Collection;
  */
 @Repository
 public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
+
+    /**
+     * 根据文件名称判断是否已存在
+     *
+     * @return Integer fileId
+     */
+    boolean existsByName(String name);
+
     @Query(value = "from FileInfo where fileType in :fileTypeCollection and (cid in :cidCollection or cid is null)")
     Page<FileInfo> findFileInfoMultiple(@Param("fileTypeCollection") Collection<FileTypeEnum> fileTypeCollection, @Param("cidCollection") Collection<String> cidCollection, Pageable pageable);
 

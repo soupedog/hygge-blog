@@ -31,7 +31,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -61,64 +60,56 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         List<FileInfoForFrontEnd> result = new ArrayList<>();
 
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
         for (MultipartFile temp : filesList) {
             String fileName = temp.getOriginalFilename();
-            String path = filePath + fileType.getPath() + fileName;
-            File file = new File(path);
-            if (file.exists()) {
+            String extension = null;
+            // 不带扩展名的文件名
+            String name = null;
+
+            int indexOfLastPoint = fileName.lastIndexOf(".");
+            if (indexOfLastPoint > 0 && indexOfLastPoint < fileName.length() - 1) {
+                extension = fileName.substring(indexOfLastPoint + 1);
+                name = fileName.substring(0, indexOfLastPoint);
+            }
+
+            if (fileInfoDao.existsByName(name)) {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
             String fileNo = randomHelper.getUniversallyUniqueIdentifier(true);
 
             try {
-                fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileType.getPath());
-                boolean createComplete = file.createNewFile();
-                if (!createComplete) {
-                    throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-                }
-
-                HyggeRequestContext context = HyggeRequestTracker.getContext();
-                User currentUser = context.getCurrentLoginUser();
-
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileNo(fileNo);
                 fileInfo.setUserId(currentUser.getUserId());
                 fileInfo.setCid(cid);
-
-                int indexOfLastPoint = fileName.lastIndexOf(".");
-                if (indexOfLastPoint > 0 && indexOfLastPoint < fileName.length() - 1) {
-                    String extension = fileName.substring(indexOfLastPoint + 1);
-                    fileInfo.setExtension(extension);
-                    fileInfo.setName(fileName.substring(0, indexOfLastPoint));
-                }
+                fileInfo.setExtension(extension);
+                fileInfo.setName(name);
                 fileInfo.setFileType(fileType);
                 fileInfo.setFileSize(temp.getSize());
                 fileInfo.setContent(temp.getBytes());
-                temp.transferTo(file);
 
-                if (file.isAbsolute() && !file.exists()) {
-                    // 拷贝文件到磁盘
-                    FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
-                }
                 // 持久化文件到数据库
                 fileInfoDao.save(fileInfo);
+
+                FileInfoForFrontEnd item = FileInfoForFrontEnd.builder()
+                        .src(fileType.getPath() + fileName)
+                        .name(fileName)
+                        .extension(fileInfo.getExtension())
+                        .fileNo(fileNo)
+                        .build();
+                item.setFileSizeWithByte(new BigDecimal(fileInfo.getFileSize()));
+
+                result.add(item);
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
                 throw le;
             } catch (Exception e) {
                 throw new LightRuntimeException("Fail to upload " + fileName + ".", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
             }
-
-            FileInfoForFrontEnd item = FileInfoForFrontEnd.builder()
-                    .src(fileType.getPath() + fileName)
-                    .name(fileName)
-                    .extension(Objects.requireNonNull(fileName).substring(fileName.lastIndexOf(".")))
-                    .fileNo(fileNo)
-                    .build();
-            item.setFileSizeWithByte(new BigDecimal(file.length()));
-
-            result.add(item);
         }
         return result;
     }
@@ -152,6 +143,28 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             result.add(fileInfoForFrontEnd);
         });
         return result;
+    }
+
+    public void copyFileToHardDisk(FileInfo fileInfo) {
+        String path = filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
+        try {
+            File file = new File(path);
+            fileHelper.getOrCreateDirectoryIfNotExit(filePath);
+            boolean createComplete = file.createNewFile();
+            if (!createComplete) {
+                throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            }
+
+            if (file.isAbsolute() && !file.exists()) {
+                // 拷贝文件到磁盘
+                FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
+            }
+        } catch (LightRuntimeException le) {
+            // 主动抛出的已知异常已经标记了错误原因
+            throw le;
+        } catch (Exception e) {
+            throw new LightRuntimeException("Fail to copy file:[" + path + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
+        }
     }
 
     public Optional<FileInfo> findFileFromDB(String fileNo) {
