@@ -21,7 +21,7 @@ function HyggeFooter() {
                 </Text>
                 <Text>
                     &nbsp;&amp;&nbsp;<a className="dependentLink" target="_blank"
-                                        href="https://ant-design.gitee.io">Ant Design</a>
+                                        href="https://ant-design.antgroup.com/index-cn">Ant Design</a>
                 </Text>
             </Paragraph>
             <Paragraph strong={true}>
