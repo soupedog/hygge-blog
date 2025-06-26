@@ -58,6 +58,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             categoryService.findCategoryByCid(cid, false);
         }
 
+        boolean needCopyToHardDisk = cid != null;
+
         List<FileInfoForFrontEnd> result = new ArrayList<>();
 
         HyggeRequestContext context = HyggeRequestTracker.getContext();
@@ -104,6 +106,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 item.setFileSizeWithByte(new BigDecimal(fileInfo.getFileSize()));
 
                 result.add(item);
+                // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
+                if (needCopyToHardDisk) {
+                    copyFileToHardDisk(fileInfo);
+                }
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
                 throw le;
