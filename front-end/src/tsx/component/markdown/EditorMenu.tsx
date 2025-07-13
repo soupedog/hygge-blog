@@ -111,7 +111,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                                                                           selectedPart,
                                                                                           rightPart
                                                                                       }) => {
-                                    let nextContent = leftPart + "~" + selectedPart + "~" + rightPart;
+                                    let nextContent = leftPart + "~~" + selectedPart + "~~" + rightPart;
                                     updateContent(nextContent);
 
                                     contentChangeUndoStackHandler(nextContent);
