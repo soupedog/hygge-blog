@@ -182,6 +182,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                 let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
                                 let currentContent: string | null = element.textContent;
                                 if (currentContent != null) {
+                                    //TODO 此处代码引发了 webpack --mode development 运行正常 而 production 运行报错
                                     prettier.format(currentContent, {
                                         parser: 'markdown',
                                         plugins: [parserMarkdown]
