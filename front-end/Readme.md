@@ -53,6 +53,9 @@ npm install babel-plugin-import --save-dev
 
 // 安装 jquery
 npm install jquery @types/jquery --save-dev
+
+// 安装文本格式化工具
+npm install prettier
 ```
 
 ## 安装完 webpack 后需要添加配置文件 ``webpack.config.js``

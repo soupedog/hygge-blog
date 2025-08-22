@@ -18,6 +18,8 @@ import {AntdTreeNodeInfo, MdHelper} from "./util/MdHelper";
 import InputElementHelper from "./util/InputElementHelper";
 import {FileInfo, UserService} from "../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
+import * as prettier from 'prettier';
+import parserMarkdown from 'prettier/plugins/markdown';
 
 export interface EditorMenuProps {
     updateContent: Function;
@@ -57,11 +59,13 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                     map.set(index, antdTreeNode);
                                 });
 
-                                let currentTOC = MdHelper.initTitleTree({
-                                    currentTOCArray: antdTreeNodeInfos,
-                                    allTocNodeMap: map,
-                                    errorCallback: null
-                                });
+                                let currentTOC = MdHelper.initTitleTree(
+                                    {
+                                        currentTOCArray: antdTreeNodeInfos,
+                                        allTocNodeMap: map,
+                                        errorCallback: null
+                                    }
+                                );
 
                                 updateTocTree(currentTOC);
 
@@ -173,6 +177,23 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                     message.warning("未找到可用草稿")
                                 }
                             }}>加载草稿</Button>
+                            <Button type="link" onClick={() => {
+                                // @ts-ignore
+                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let currentContent: string | null = element.textContent;
+                                if (currentContent != null) {
+                                    prettier.format(currentContent, {
+                                        parser: 'markdown',
+                                        plugins: [parserMarkdown]
+                                    }).then(nextContent => {
+                                        updateContent(nextContent);
+                                        contentChangeUndoStackHandler(nextContent);
+                                        message.info("已将文本格式化标准形式")
+                                    })
+                                } else {
+                                    message.warning("未发现待美化的文本内容")
+                                }
+                            }}>美化文本</Button>
                         </Space>
                     </Row>
             },
