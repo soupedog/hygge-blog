@@ -72,8 +72,8 @@ import java.util.List;
 @SuppressWarnings({"java:S2699", "java:S3577"})
 @Slf4j
 class SynchronizeArticle extends HyggeJsonUtilContainer {
-    private static final String path = "H:\\Xavier\\Documents\\md文档\\";
-    private static final String backup = "H:\\Xavier\\Documents\\md文档backup\\";
+    private static final String path = "G:\\Xavier\\Documents\\md文档\\";
+    private static final String backup = "G:\\Xavier\\Documents\\md文档backup\\";
 
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     @Autowired
