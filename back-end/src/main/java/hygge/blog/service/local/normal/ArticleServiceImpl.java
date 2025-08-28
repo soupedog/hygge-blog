@@ -145,22 +145,6 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public List<ArticleCountInfo> findArticleCountInfo(List<Integer> accessibleCategoryIdList, Integer currentUserId) {
-        return currentUserId == null ? articleDao.findArticleCountsOfCategory(accessibleCategoryIdList)
-                : articleDao.findArticleCountsOfCategory(accessibleCategoryIdList, currentUserId);
-    }
-
-    public ArticleCountInfo findArticleCountInfo(Integer categoryId, Integer currentUserId) {
-        parameterHelper.integerFormatNotEmpty("categoryId", categoryId);
-        List<Integer> accessibleCategoryIdList = collectionHelper.createCollection(categoryId);
-
-        List<ArticleCountInfo> articleCountInfoList = findArticleCountInfo(accessibleCategoryIdList, currentUserId);
-        if (parameterHelper.isEmpty(articleCountInfoList)) {
-            return null;
-        }
-        return articleCountInfoList.get(0);
-    }
-
     public ArticleSummaryInfo findArticleSummaryInfoByCategoryId(List<Integer> accessibleCategoryIdList, List<Category> accessibleCategoryList, Integer currentUserId, int currentPage, int pageSize) {
         ArticleSummaryInfo result = new ArticleSummaryInfo();
         if (accessibleCategoryIdList.isEmpty()) {

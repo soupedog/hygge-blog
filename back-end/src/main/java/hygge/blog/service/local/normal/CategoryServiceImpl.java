@@ -46,7 +46,7 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private UserServiceImpl userService;
     @Autowired
-    private ArticleServiceImpl articleService;
+    private ArticleCountServiceImpl articleCountService;
     @Autowired
     private TopicServiceImpl topicService;
     @Autowired
@@ -90,7 +90,7 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
 
         if (parameterHelper.isNotEmpty(categoryDto.getParentCid())) {
             Category parentCategory = findCategoryByCid(categoryDto.getParentCid(), false);
-            ArticleCountInfo parentCategoryCountInfo = articleService.findArticleCountInfo(parentCategory.getCategoryId(), currentUser.getUserId());
+            ArticleCountInfo parentCategoryCountInfo = articleCountService.findArticleCountInfoOfCategory(parentCategory.getCategoryId(), currentUser.getUserId());
             if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT) && parentCategoryCountInfo != null && parentCategoryCountInfo.getCount() > 0) {
                 throw new LightRuntimeException(String.format("Category(%s) can't contain article, but contains %d.", parentCategory.getCategoryName(), parentCategoryCountInfo.getCount()), BlogSystemCode.ARTICLE_CATEGORY_SUB_ARTICLE_NOT_EMPTY);
             }
@@ -147,7 +147,7 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         String parentCid = (String) finalData.get("parentCid");
         if (parentCid != null) {
             Category parentCategory = findCategoryByCid(parentCid, false);
-            ArticleCountInfo parentCategoryCountInfo = articleService.findArticleCountInfo(parentCategory.getCategoryId(), currentUser.getUserId());
+            ArticleCountInfo parentCategoryCountInfo = articleCountService.findArticleCountInfoOfCategory(parentCategory.getCategoryId(), currentUser.getUserId());
             if (parentCategory.getCategoryType().equals(CategoryTypeEnum.DEFAULT) && parentCategoryCountInfo.getCount() > 0) {
                 throw new LightRuntimeException(String.format("Category(%s) can't contain article, but contains %d.", parentCategory.getCategoryName(), parentCategoryCountInfo.getCount()), BlogSystemCode.ARTICLE_CATEGORY_SUB_ARTICLE_NOT_EMPTY);
             }

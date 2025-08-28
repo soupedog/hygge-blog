@@ -36,6 +36,8 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private ArticleServiceImpl articleService;
     @Autowired
+    private ArticleCountServiceImpl articleCountService;
+    @Autowired
     private QuoteServiceImpl quoteService;
     @Autowired
     private AnnouncementServiceImpl announcementService;
@@ -57,7 +59,7 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
 
-        List<ArticleCountInfo> articleCountInfoList = articleService.findArticleCountInfo(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
+        List<ArticleCountInfo> articleCountInfoList = articleCountService.findArticleCountInfoOfCategory(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
 
         HomepageFetchResult result = HomepageFetchResult.builder().topicOverviewInfoList(new ArrayList<>()).build();
 
