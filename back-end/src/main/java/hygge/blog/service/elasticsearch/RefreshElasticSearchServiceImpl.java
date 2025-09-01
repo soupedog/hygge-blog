@@ -97,15 +97,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
 
     public void freshSingleQuote(Integer quoteId) {
         Quote quote = quoteService.findQuoteByQuoteId(quoteId, false);
-        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
-        // userId → uid
-        String authorUid = cacheService.userIdToUid(quote.getUserId());
-        quoteDto.setUid(authorUid);
-
-        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-        articleQuoteSearchCache.initEsId(quoteId, ArticleQuoteSearchCache.Type.QUOTE);
-        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-        searchingCacheDao.save(articleQuoteSearchCache);
+        refreshQuote(quote);
     }
 
     public void freshSingleQuoteAsync(Integer quoteId) {
@@ -114,6 +106,18 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
                     log.error("刷新句子(" + quoteId + ") 模糊搜索数据 失败.", e);
                     return null;
                 });
+    }
+
+    private void refreshQuote(Quote quote) {
+        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(quote.getUserId());
+        quoteDto.setUid(authorUid);
+
+        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
+        articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
+        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
+        searchingCacheDao.save(articleQuoteSearchCache);
     }
 
     public void freshAllArticle() {
@@ -146,7 +150,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         log.info("已刷新文章数 {} 耗时 {} ms", totalCount.get(), System.currentTimeMillis() - startTs);
     }
 
-    public void freshQuote() {
+    public void freshAllQuote() {
         long startTs = System.currentTimeMillis();
         AtomicInteger totalCount = new AtomicInteger(0);
 
@@ -162,13 +166,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
             quoteList = quoteTemp.getContent();
 
             quoteList.forEach(quote -> {
-                QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
-
-                ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-                articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
-                articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-
-                searchingCacheDao.save(articleQuoteSearchCache);
+                refreshQuote(quote);
                 totalCount.incrementAndGet();
             });
         } while (!quoteTemp.isLast());

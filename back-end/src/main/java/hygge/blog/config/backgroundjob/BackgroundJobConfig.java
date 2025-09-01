@@ -26,7 +26,7 @@ public class BackgroundJobConfig {
 
     @Scheduled(fixedDelay = 1000 * 3600)
     public void toFreshQuoteSearchData() {
-        refreshElasticSearchService.freshQuote();
+        refreshElasticSearchService.freshAllQuote();
     }
 
     /**

@@ -13,8 +13,8 @@ import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Quote;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.QuoteDao;
-import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.EventServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -51,7 +51,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
     @Autowired
     private CacheServiceImpl cacheService;
     @Autowired
-    private RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private EventServiceImpl eventService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -78,7 +78,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         Quote result = quoteDao.save(quote);
 
-        refreshElasticSearchService.freshSingleQuoteAsync(result.getQuoteId());
+        eventService.refreshQuoteByQuoteIdAsync(result.getQuoteId());
 
         return result;
     }
@@ -96,7 +96,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         Quote result = quoteDao.save(old);
 
-        refreshElasticSearchService.freshSingleQuoteAsync(result.getQuoteId());
+        eventService.refreshQuoteByQuoteIdAsync(result.getQuoteId());
 
         return result;
     }
