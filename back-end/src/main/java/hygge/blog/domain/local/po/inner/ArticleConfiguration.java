@@ -22,8 +22,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文章配置项信息")
-// 主动标注作为数据库 json 字段时，null 属性不参与序列化
-@JsonInclude(JsonInclude.Include.NON_NULL)
+// 主动标注作为数据库 json 字段时，null/空字符串 属性不参与序列化
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ArticleConfiguration {
     @Schema(title = "背景音乐类型", description = "无背景音乐,默认类型(绝对路径),网易云外链")
     private BackgroundMusicTypeEnum backgroundMusicType;

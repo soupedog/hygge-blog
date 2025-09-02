@@ -20,10 +20,6 @@ import java.util.List;
  */
 @Repository
 public interface ArticleDao extends JpaRepository<Article, Integer> {
-
-    @Query(value = "select aid from article", nativeQuery = true)
-    Page<String> findAidByPageable(Pageable pageable);
-
     Article findArticleByTitle(String title);
 
     @Modifying

@@ -21,8 +21,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文章类别访问规则")
-// 主动标注作为数据库 json 字段时，null 属性不参与序列化
-@JsonInclude(JsonInclude.Include.NON_NULL)
+// 主动标注作为数据库 json 字段时，null/空字符串 属性不参与序列化
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CategoryAccessRule {
     @Schema(title = "文章类别访问类型")
     private AccessRuleTypeEnum accessRuleType;
