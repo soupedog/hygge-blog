@@ -1,6 +1,5 @@
 package hygge.blog.config.elasticsearch;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
@@ -19,7 +18,6 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 public class ElasticSearchConfig extends ElasticsearchConfiguration {
     private final ElasticSearchConfiguration elasticSearchConfiguration;
 
-    @Autowired
     public ElasticSearchConfig(ElasticSearchConfiguration elasticSearchConfiguration) {
         this.elasticSearchConfiguration = elasticSearchConfiguration;
     }

@@ -16,7 +16,6 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,7 +35,6 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     private final QuoteServiceImpl quoteService;
     private final AnnouncementServiceImpl announcementService;
 
-    @Autowired
     public HomePageServiceImpl(TopicServiceImpl topicService, CategoryServiceImpl categoryService, ArticleServiceImpl articleService, ArticleCountServiceImpl articleCountService, QuoteServiceImpl quoteService, AnnouncementServiceImpl announcementService) {
         this.topicService = topicService;
         this.categoryService = categoryService;

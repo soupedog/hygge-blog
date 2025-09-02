@@ -28,7 +28,6 @@ import hygge.web.util.http.impl.DefaultHttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -88,7 +87,6 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
     private final ArticleServiceImpl articleService;
     private final DefaultHttpHelper httpHelper;
 
-    @Autowired
     public SynchronizeArticle(ArticleDao articleDao, ArticleServiceImpl articleService, DefaultHttpHelper httpHelper) {
         this.articleDao = articleDao;
         this.articleService = articleService;

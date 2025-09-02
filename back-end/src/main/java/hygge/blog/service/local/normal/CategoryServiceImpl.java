@@ -22,7 +22,6 @@ import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -59,7 +58,6 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "categoryState", null).toStringColumn(0, 50));
     }
 
-    @Autowired
     public CategoryServiceImpl(UserServiceImpl userService, ArticleCountServiceImpl articleCountService, TopicServiceImpl topicService, CategoryDao categoryDao) {
         this.userService = userService;
         this.articleCountService = articleCountService;

@@ -21,7 +21,6 @@ import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,7 +60,6 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "quoteState", null).toStringColumn(0, 50));
     }
 
-    @Autowired
     public QuoteServiceImpl(QuoteDao quoteDao, UserServiceImpl userService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
         this.quoteDao = quoteDao;
         this.userService = userService;

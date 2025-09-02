@@ -3,7 +3,6 @@ package hygge.blog.service.local.normal;
 import hygge.blog.domain.local.po.Announcement;
 import hygge.blog.repository.database.AnnouncementDao;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,6 @@ import java.util.List;
 public class AnnouncementServiceImpl extends HyggeJsonUtilContainer {
     private final AnnouncementDao announcementDao;
 
-    @Autowired
     public AnnouncementServiceImpl(AnnouncementDao announcementDao) {
         this.announcementDao = announcementDao;
     }

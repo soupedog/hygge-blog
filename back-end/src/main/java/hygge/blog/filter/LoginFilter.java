@@ -11,7 +11,6 @@ import hygge.commons.exception.main.HyggeRuntimeException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +24,6 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
     private final UserTokenServiceImpl userTokenService;
     private final UserServiceImpl userService;
 
-    @Autowired
     public LoginFilter(UserTokenServiceImpl userTokenService, UserServiceImpl userService) {
         this.userTokenService = userTokenService;
         this.userService = userService;

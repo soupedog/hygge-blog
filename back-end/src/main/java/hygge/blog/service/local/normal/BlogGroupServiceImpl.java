@@ -10,7 +10,6 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.BlogGroupDao;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,6 @@ public class BlogGroupServiceImpl extends HyggeJsonUtilContainer {
     private final BlogGroupDao blogGroupDao;
     private final UserServiceImpl userService;
 
-    @Autowired
     public BlogGroupServiceImpl(BlogGroupDao blogGroupDao, UserServiceImpl userService) {
         this.blogGroupDao = blogGroupDao;
         this.userService = userService;

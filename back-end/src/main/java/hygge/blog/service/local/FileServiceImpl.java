@@ -14,7 +14,6 @@ import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -47,7 +46,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
 
-    @Autowired
     public FileServiceImpl(CategoryServiceImpl categoryService, FileInfoDao fileInfoDao) {
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;

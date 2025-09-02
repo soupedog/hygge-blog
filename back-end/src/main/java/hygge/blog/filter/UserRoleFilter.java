@@ -9,7 +9,6 @@ import hygge.commons.exception.main.HyggeRuntimeException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -30,7 +29,6 @@ public class UserRoleFilter extends AbstractHyggeRequestFilter {
         userRoleMapping.put("/blog-service/api/main/file", UserTypeEnum.ROOT);
     }
 
-    @Autowired
     public UserRoleFilter(UserServiceImpl userService) {
         this.userService = userService;
     }

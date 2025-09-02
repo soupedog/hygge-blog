@@ -19,7 +19,6 @@ import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +48,6 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     private final SearchingCacheDao searchingCacheDao;
     private final ElasticsearchOperations operations;
 
-    @Autowired
     public RefreshElasticSearchServiceImpl(ArticleDao articleDao, ArticleServiceImpl articleService, CategoryDao categoryDao, CategoryServiceImpl categoryService, QuoteDao quoteDao, QuoteServiceImpl quoteService, CacheServiceImpl cacheService, SearchingCacheDao searchingCacheDao, ElasticsearchOperations operations) {
         this.articleDao = articleDao;
         this.articleService = articleService;

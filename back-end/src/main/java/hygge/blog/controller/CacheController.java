@@ -3,7 +3,6 @@ package hygge.blog.controller;
 import hygge.blog.controller.doc.CacheControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.commons.exception.LightRuntimeException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CacheController implements CacheControllerDoc {
     private final CacheManager cacheManager;
 
-    @Autowired
     public CacheController(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }

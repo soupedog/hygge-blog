@@ -9,7 +9,6 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.TopicServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,6 @@ public class CacheServiceImpl {
     private final TopicServiceImpl topicService;
     private final UserServiceImpl userService;
 
-    @Autowired
     public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService) {
         this.categoryService = categoryService;
         this.topicService = topicService;

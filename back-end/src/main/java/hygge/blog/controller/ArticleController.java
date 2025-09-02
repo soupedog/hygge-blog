@@ -12,7 +12,6 @@ import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.commons.annotation.HyggeExpressionForOutputFunction;
 import hygge.web.util.log.annotation.ControllerLog;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +34,6 @@ public class ArticleController implements ArticleControllerDoc {
     private final ArticleServiceImpl articleService;
     private final ArticleBrowseLogServiceImpl articleBrowseLogService;
 
-    @Autowired
     public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
         this.articleService = articleService;
         this.articleBrowseLogService = articleBrowseLogService;

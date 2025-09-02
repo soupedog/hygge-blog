@@ -8,7 +8,6 @@ import hygge.blog.service.client.IPQueryClient;
 import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.util.http.bo.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -24,7 +23,6 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
     private final ArticleBrowseLogDao articleBrowseLogDao;
     private final IPQueryClient ipQueryService;
 
-    @Autowired
     public ArticleBrowseLogServiceImpl(ArticleBrowseLogDao articleBrowseLogDao, IPQueryClient ipQueryService) {
         this.articleBrowseLogDao = articleBrowseLogDao;
         this.ipQueryService = ipQueryService;

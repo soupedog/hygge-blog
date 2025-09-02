@@ -25,7 +25,6 @@ import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -69,7 +68,6 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
-    @Autowired
     public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, RefreshElasticSearchServiceImpl refreshElasticSearchService) {
         this.articleDao = articleDao;
         this.userService = userService;

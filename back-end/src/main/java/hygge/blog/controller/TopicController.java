@@ -6,7 +6,6 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.TopicDto;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.service.local.normal.TopicServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +25,6 @@ import java.util.Map;
 public class TopicController implements TopicControllerDoc {
     private final TopicServiceImpl topicService;
 
-    @Autowired
     public TopicController(TopicServiceImpl topicService) {
         this.topicService = topicService;
     }

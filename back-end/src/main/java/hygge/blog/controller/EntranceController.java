@@ -12,7 +12,6 @@ import hygge.blog.domain.local.po.UserToken;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.blog.service.local.normal.UserTokenServiceImpl;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +28,6 @@ public class EntranceController extends HyggeJsonUtilContainer implements Entran
     private final UserServiceImpl userService;
     private final UserTokenServiceImpl userTokenService;
 
-    @Autowired
     public EntranceController(UserServiceImpl userService, UserTokenServiceImpl userTokenService) {
         this.userService = userService;
         this.userTokenService = userTokenService;

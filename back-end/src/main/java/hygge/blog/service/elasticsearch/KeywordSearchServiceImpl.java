@@ -28,7 +28,6 @@ import hygge.commons.constant.ConstantParameters;
 import hygge.commons.exception.ExternalRuntimeException;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final ElasticsearchClient elasticsearchClient;
 
-    @Autowired
     public KeywordSearchServiceImpl(CategoryServiceImpl categoryService, ElasticsearchClient elasticsearchClient) {
         this.categoryService = categoryService;
         this.elasticsearchClient = elasticsearchClient;

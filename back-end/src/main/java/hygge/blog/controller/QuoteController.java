@@ -7,7 +7,6 @@ import hygge.blog.domain.local.dto.QuoteDto;
 import hygge.blog.domain.local.po.Quote;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,6 @@ public class QuoteController implements QuoteControllerDoc {
     private final QuoteServiceImpl quoteService;
     private final CacheServiceImpl cacheService;
 
-    @Autowired
     public QuoteController(QuoteServiceImpl quoteService, CacheServiceImpl cacheService) {
         this.quoteService = quoteService;
         this.cacheService = cacheService;

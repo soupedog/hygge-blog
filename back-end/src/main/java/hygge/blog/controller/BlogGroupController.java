@@ -9,7 +9,6 @@ import hygge.blog.domain.local.dto.GroupBindInfo;
 import hygge.blog.domain.local.po.BlogGroup;
 import hygge.blog.service.local.normal.BlogGroupServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class BlogGroupController implements BlogGroupControllerDoc {
     private final BlogGroupServiceImpl blogGroupService;
 
-    @Autowired
     public BlogGroupController(BlogGroupServiceImpl blogGroupService) {
         this.blogGroupService = blogGroupService;
     }

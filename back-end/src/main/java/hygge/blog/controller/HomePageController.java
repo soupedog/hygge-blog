@@ -12,7 +12,6 @@ import hygge.blog.service.elasticsearch.KeywordSearchServiceImpl;
 import hygge.blog.service.local.normal.AnnouncementServiceImpl;
 import hygge.blog.service.local.normal.HomePageServiceImpl;
 import hygge.web.util.log.annotation.ControllerLog;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +32,6 @@ public class HomePageController implements HomePageControllerDoc {
     private final AnnouncementServiceImpl announcementService;
     private final KeywordSearchServiceImpl fuzzySearchService;
 
-    @Autowired
     public HomePageController(HomePageServiceImpl homePageService, AnnouncementServiceImpl announcementService, KeywordSearchServiceImpl fuzzySearchService) {
         this.homePageService = homePageService;
         this.announcementService = announcementService;

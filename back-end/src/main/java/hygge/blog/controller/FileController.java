@@ -15,7 +15,6 @@ import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
 import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.util.log.annotation.ControllerLog;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,7 +42,6 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     private final FileServiceImpl fileService;
     private final CategoryServiceImpl categoryService;
 
-    @Autowired
     public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService) {
         this.fileService = fileService;
         this.categoryService = categoryService;

@@ -7,7 +7,6 @@ import hygge.blog.domain.baidu.dto.BaiduGatewayDto;
 import hygge.blog.domain.baidu.dto.inner.BaiduIpInfoDto;
 import hygge.web.util.http.bo.HttpResponse;
 import hygge.web.util.http.impl.DefaultHttpHelper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -23,7 +22,6 @@ public class IPQueryClient {
     };
     private final DefaultHttpHelper httpHelper;
 
-    @Autowired
     public IPQueryClient(DefaultHttpHelper httpHelper) {
         this.httpHelper = httpHelper;
     }

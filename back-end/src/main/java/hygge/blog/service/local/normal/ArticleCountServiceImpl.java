@@ -3,7 +3,6 @@ package hygge.blog.service.local.normal;
 import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.List;
 public class ArticleCountServiceImpl extends HyggeJsonUtilContainer {
     private final ArticleDao articleDao;
 
-    @Autowired
     public ArticleCountServiceImpl(ArticleDao articleDao) {
         this.articleDao = articleDao;
     }

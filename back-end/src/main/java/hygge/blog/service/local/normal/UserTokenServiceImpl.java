@@ -8,7 +8,6 @@ import hygge.blog.domain.local.po.UserToken;
 import hygge.blog.repository.database.UserTokenDao;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +19,6 @@ public class UserTokenServiceImpl extends HyggeJsonUtilContainer {
     private final UserTokenDao userTokenDao;
     private final UserServiceImpl userService;
 
-    @Autowired
     public UserTokenServiceImpl(UserTokenDao userTokenDao, UserServiceImpl userService) {
         this.userTokenDao = userTokenDao;
         this.userService = userService;

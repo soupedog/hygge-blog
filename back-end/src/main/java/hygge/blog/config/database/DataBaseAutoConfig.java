@@ -5,7 +5,6 @@ import hygge.commons.spring.config.configuration.definition.HyggeAutoConfigurati
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.MySQLDialect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +36,6 @@ import java.util.Map;
 public class DataBaseAutoConfig implements HyggeAutoConfiguration {
     private final DatabaseConfiguration databaseConfiguration;
 
-    @Autowired
     public DataBaseAutoConfig(DatabaseConfiguration databaseConfiguration) {
         this.databaseConfiguration = databaseConfiguration;
     }

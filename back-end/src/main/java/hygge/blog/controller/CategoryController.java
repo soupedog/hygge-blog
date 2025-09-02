@@ -6,7 +6,6 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +25,6 @@ import java.util.Map;
 public class CategoryController implements CategoryControllerDoc {
     private final CategoryServiceImpl categoryService;
 
-    @Autowired
     public CategoryController(CategoryServiceImpl categoryService) {
         this.categoryService = categoryService;
     }
