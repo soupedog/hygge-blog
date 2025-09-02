@@ -1,5 +1,6 @@
 package hygge.blog.domain.local.po.inner;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文章类别访问规则")
+// 主动标注作为数据库 json 字段时，null 属性不参与序列化
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CategoryAccessRule {
     @Schema(title = "文章类别访问类型")
     private AccessRuleTypeEnum accessRuleType;

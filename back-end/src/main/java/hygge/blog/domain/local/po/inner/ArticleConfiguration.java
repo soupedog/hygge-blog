@@ -1,5 +1,6 @@
 package hygge.blog.domain.local.po.inner;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import hygge.blog.domain.local.enums.BackgroundMusicTypeEnum;
 import hygge.blog.domain.local.enums.MediaPlayTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +22,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文章配置项信息")
+// 主动标注作为数据库 json 字段时，null 属性不参与序列化
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArticleConfiguration {
     @Schema(title = "背景音乐类型", description = "无背景音乐,默认类型(绝对路径),网易云外链")
     private BackgroundMusicTypeEnum backgroundMusicType;

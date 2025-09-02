@@ -1,5 +1,6 @@
 package hygge.blog.domain.local.po.inner;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,8 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "文件描述信息")
+// 主动标注作为数据库 json 字段时，null 属性不参与序列化
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FileDescription {
     @Schema(title = "文件描述文本信息")
     private String content;
