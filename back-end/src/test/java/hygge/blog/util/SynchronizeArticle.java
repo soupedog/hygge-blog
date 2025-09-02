@@ -10,8 +10,11 @@ import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.EventServiceImpl;
+import hygge.blog.service.local.normal.ArticleCountServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.QuoteServiceImpl;
 import hygge.blog.service.local.normal.TopicServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.constant.ConstantParameters;
@@ -63,9 +66,12 @@ import java.util.List;
                 HttpHelperAutoConfiguration.class,
                 DataBaseAutoConfig.class,
                 ArticleServiceImpl.class,
+                ArticleCountServiceImpl.class,
                 UserServiceImpl.class,
+                QuoteServiceImpl.class,
                 CategoryServiceImpl.class,
                 TopicServiceImpl.class,
+                EventServiceImpl.class,
                 CacheServiceImpl.class
         }
 )

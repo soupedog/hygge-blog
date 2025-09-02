@@ -2,7 +2,6 @@ package hygge.blog.config.event;
 
 import hygge.blog.event.listener.ESRefreshListener;
 import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class HyggeEventConfig {
 
     @Bean
-    public ESRefreshListener esRefreshListener(@Autowired RefreshElasticSearchServiceImpl refreshElasticSearchService) {
+    public ESRefreshListener esRefreshListener(RefreshElasticSearchServiceImpl refreshElasticSearchService) {
         return new ESRefreshListener(refreshElasticSearchService);
     }
 }
