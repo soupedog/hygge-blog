@@ -288,4 +288,16 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException(String.format("Article(%s) already exists.", title), BlogSystemCode.ARTICLE_ALREADY_EXISTS);
         }
     }
+
+    public Article findArticleByArticleId(Integer articleId, boolean nullable) {
+        Optional<Article> resultTemp = articleDao.findById(articleId);
+        return checkArticleResult(resultTemp, articleId, nullable);
+    }
+
+    private Article checkArticleResult(Optional<Article> articleTemp, Integer articleId, boolean nullable) {
+        if (!nullable && articleTemp.isEmpty()) {
+            throw new LightRuntimeException(String.format("Article(%d) was not found.", articleId), BlogSystemCode.ARTICLE_NOT_FOUND);
+        }
+        return articleTemp.orElse(null);
+    }
 }

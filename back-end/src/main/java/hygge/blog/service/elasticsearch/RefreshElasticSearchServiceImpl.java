@@ -14,6 +14,8 @@ import hygge.blog.repository.database.CategoryDao;
 import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.normal.ArticleServiceImpl;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +40,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     private final ArticleDao articleDao;
+    private final ArticleServiceImpl articleService;
     private final CategoryDao categoryDao;
+    private final CategoryServiceImpl categoryService;
     private final QuoteDao quoteDao;
     private final QuoteServiceImpl quoteService;
     private final CacheServiceImpl cacheService;
@@ -46,9 +50,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     private final ElasticsearchOperations operations;
 
     @Autowired
-    public RefreshElasticSearchServiceImpl(ArticleDao articleDao, CategoryDao categoryDao, QuoteDao quoteDao, QuoteServiceImpl quoteService, CacheServiceImpl cacheService, SearchingCacheDao searchingCacheDao, ElasticsearchOperations operations) {
+    public RefreshElasticSearchServiceImpl(ArticleDao articleDao, ArticleServiceImpl articleService, CategoryDao categoryDao, CategoryServiceImpl categoryService, QuoteDao quoteDao, QuoteServiceImpl quoteService, CacheServiceImpl cacheService, SearchingCacheDao searchingCacheDao, ElasticsearchOperations operations) {
         this.articleDao = articleDao;
+        this.articleService = articleService;
         this.categoryDao = categoryDao;
+        this.categoryService = categoryService;
         this.quoteDao = quoteDao;
         this.quoteService = quoteService;
         this.cacheService = cacheService;
@@ -70,8 +76,8 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void freshSingleArticle(Integer articleId) {
-        Article article = articleDao.findById(articleId).orElse(null);
-        Category currentCategory = categoryDao.findById(article.getCategoryId()).orElse(null);
+        Article article = articleService.findArticleByArticleId(articleId, false);
+        Category currentCategory = categoryService.findCategoryByCategoryId(article.getCategoryId(), false);
         CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
 
         freshSingleArticle(article, currentCategory, categoryTreeInfo);
