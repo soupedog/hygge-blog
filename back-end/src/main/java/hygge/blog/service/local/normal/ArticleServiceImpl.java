@@ -17,8 +17,8 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.repository.database.ArticleDao;
-import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.EventServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -52,7 +52,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private final UserServiceImpl userService;
     private final CategoryServiceImpl categoryService;
     private final CacheServiceImpl cacheService;
-    private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private final EventServiceImpl eventService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -68,12 +68,12 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
-    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, RefreshElasticSearchServiceImpl refreshElasticSearchService) {
+    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
         this.articleDao = articleDao;
         this.userService = userService;
         this.categoryService = categoryService;
         this.cacheService = cacheService;
-        this.refreshElasticSearchService = refreshElasticSearchService;
+        this.eventService = eventService;
     }
 
     @Transactional
@@ -104,7 +104,8 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         Article result = articleDao.save(article);
 
         Integer articleId = result.getArticleId();
-        refreshElasticSearchService.freshSingleArticleAsync(articleId);
+
+        eventService.refreshArticleByArticleIdAsync(articleId);
         return result;
     }
 
@@ -143,7 +144,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         Article result = articleDao.save(old);
 
         Integer articleId = result.getArticleId();
-        refreshElasticSearchService.freshSingleArticleAsync(articleId);
+        eventService.refreshArticleByArticleIdAsync(articleId);
         return result;
     }
 

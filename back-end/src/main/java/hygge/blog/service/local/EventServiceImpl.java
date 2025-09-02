@@ -23,17 +23,17 @@ public class EventServiceImpl {
         ESRefreshEvent event = new ESRefreshEvent(
                 new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.ARTICLE, false, articleId)
         );
-        publishEvent(event);
+        fireEvent(event);
     }
 
     public void refreshQuoteByQuoteIdAsync(Integer quoteId) {
         ESRefreshEvent event = new ESRefreshEvent(
                 new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.QUOTE, false, quoteId)
         );
-        publishEvent(event);
+        fireEvent(event);
     }
 
-    public void publishEvent(HyggeEvent<?> event) {
+    public void fireEvent(HyggeEvent<?> event) {
         applicationEventPublisher.publishEvent(event);
     }
 }
