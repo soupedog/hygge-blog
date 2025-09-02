@@ -4,9 +4,10 @@ import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.config.database.DataBaseAutoConfig;
 import hygge.blog.config.util.http.HttpHelperAutoConfigurationForSpringBoot3;
-import hygge.blog.domain.local.dto.ArticleDto;
 import hygge.blog.domain.local.dto.CategoryDto;
+import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.enums.UserTypeEnum;
+import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.service.local.CacheServiceImpl;
@@ -28,6 +29,7 @@ import hygge.web.util.http.impl.DefaultHttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -82,16 +84,14 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
 
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     private LinkedHashMap<String, String> resultMap = new LinkedHashMap<>();
-
-    private final ArticleDao articleDao;
-    private final ArticleServiceImpl articleService;
-    private final DefaultHttpHelper httpHelper;
-
-    public SynchronizeArticle(ArticleDao articleDao, ArticleServiceImpl articleService, DefaultHttpHelper httpHelper) {
-        this.articleDao = articleDao;
-        this.articleService = articleService;
-        this.httpHelper = httpHelper;
-    }
+    @Autowired
+    private ArticleDao articleDao;
+    @Autowired
+    private ArticleServiceImpl articleService;
+    @Autowired
+    private CacheServiceImpl cacheService;
+    @Autowired
+    private DefaultHttpHelper httpHelper;
 
     @Test
     void doHttpRequest() {
@@ -115,67 +115,70 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("articleId")));
 
-        Page<String> aidListTemp = articleDao.findAidByPageable(pageable);
-        List<String> aidList;
-
+        Page<Article> articleListTemp = articleDao.findAll(pageable);
+        log.info("共计 {} 篇文章待检测。", articleListTemp.getTotalElements());
         do {
             if (pageable.getPageNumber() != 0) {
                 // 不是第一页则进行查询
-                aidListTemp = articleDao.findAidByPageable(pageable);
+                articleListTemp = articleDao.findAll(pageable);
             }
 
-            aidList = aidListTemp.getContent();
+            List<Article> articleList = articleListTemp.getContent();
 
-            for (String aid : aidList) {
-                ArticleDto articleDto = articleService.findArticleDetailByAid(false, aid);
-                synchronizeForSingle(hyggeRequestContext, rootDirectory, backupDirectory, articleDto);
+            for (Article article : articleList) {
+                synchronizeForSingle(hyggeRequestContext, rootDirectory, backupDirectory, article);
             }
-            pageable = aidListTemp.nextPageable();
-        } while (!aidListTemp.isLast());
+
+            log.info("完成第 {} 页比对，准备进入下一页。", pageable.getPageNumber() + 1);
+            pageable = articleListTemp.nextPageable();
+        } while (!articleListTemp.isLast());
 
         log.info("info：" + ConstantParameters.LINE_SEPARATOR + jsonHelperIndent.formatAsString(resultMap));
         log.info("cost:" + (System.currentTimeMillis() - start) + " ms");
     }
 
-    private void synchronizeForSingle(HyggeRequestContext hyggeRequestContext, File saveDirectory, File backupDirectory, ArticleDto articleDto) {
-        String fileName = articleDto.getTitle() + ".md";
+    private void synchronizeForSingle(HyggeRequestContext hyggeRequestContext, File saveDirectory, File backupDirectory, Article article) {
+        String fileName = article.getTitle() + ".md";
+        long articleLastUpdateTs = article.getLastUpdateTs().getTime();
 
         List<File> searchTemp = fileHelper.getFileByFileNameFromDirectoryIgnoreDepth(saveDirectory, fileName);
-        if (searchTemp.size() > 0) {
+        if (!searchTemp.isEmpty()) {
             File localFile = searchTemp.get(0);
             String localContent = fileHelper.getTextFileContent(localFile).toString();
             // 本地远端数据不同
-            if (!articleDto.getContent().equals(localContent)) {
+            if (article.getContent().compareTo(localContent) != 0) {
                 // 本地数据同步到远端
-                if (localFile.lastModified() == articleDto.getLastUpdateTs()) {
-                    resultMap.put(articleDto.getTitle(), "idle");
-                } else if (localFile.lastModified() < articleDto.getLastUpdateTs()) {
+                if (localFile.lastModified() == articleLastUpdateTs) {
+                    resultMap.put(article.getTitle(), "idle");
+                } else if (localFile.lastModified() < articleLastUpdateTs) {
                     // 远端数据同步到本地
-                    fileHelper.saveTextFile(getFilePathByArticleCategory(backupDirectory, articleDto), articleDto.getTitle(), ".md", localContent);
-                    fileHelper.saveTextFile(getFilePathByArticleCategory(saveDirectory, articleDto), articleDto.getTitle(), ".md", articleDto.getContent());
-                    resultMap.put(articleDto.getTitle(), "download");
+                    fileHelper.saveTextFile(getFilePathByArticleCategory(backupDirectory, article), article.getTitle(), ".md", localContent);
+                    fileHelper.saveTextFile(getFilePathByArticleCategory(saveDirectory, article), article.getTitle(), ".md", article.getContent());
+                    resultMap.put(article.getTitle(), "download");
                 } else {
                     LinkedHashMap<String, Object> updateData = new LinkedHashMap<>();
                     updateData.put("content", localContent);
                     hyggeRequestContext.setServiceStartTs(localFile.lastModified());
-                    fileHelper.saveTextFile(getFilePathByArticleCategory(backupDirectory, articleDto), articleDto.getTitle(), ".md", articleDto.getContent());
-                    articleService.updateArticle(articleDto.getAid(), updateData);
-                    resultMap.put(articleDto.getTitle(), "upload");
+                    fileHelper.saveTextFile(getFilePathByArticleCategory(backupDirectory, article), article.getTitle(), ".md", article.getContent());
+                    articleService.updateArticle(article.getAid(), updateData);
+                    resultMap.put(article.getTitle(), "upload");
                 }
             }
         } else {
-            fileHelper.saveTextFile(getFilePathByArticleCategory(saveDirectory, articleDto), articleDto.getTitle(), ".md", articleDto.getContent());
-            resultMap.put(articleDto.getTitle(), "download");
+            fileHelper.saveTextFile(getFilePathByArticleCategory(saveDirectory, article), article.getTitle(), ".md", article.getContent());
+            resultMap.put(article.getTitle(), "download");
         }
     }
 
-    private String getFilePathByArticleCategory(File rootPath, ArticleDto articleDto) {
+    private String getFilePathByArticleCategory(File rootPath, Article article) {
+        CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(article.getCategoryId());
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(rootPath.getAbsolutePath());
         stringBuilder.append(File.separator);
-        stringBuilder.append(articleDto.getCategoryTreeInfo().getTopicInfo().getTopicName());
+        stringBuilder.append(categoryTreeInfo.getTopicInfo().getTopicName());
         stringBuilder.append(File.separator);
-        for (CategoryDto categoryDto : articleDto.getCategoryTreeInfo().getCategoryList()) {
+        for (CategoryDto categoryDto : categoryTreeInfo.getCategoryList()) {
             stringBuilder.append(categoryDto.getCategoryName());
             stringBuilder.append(File.separator);
         }
