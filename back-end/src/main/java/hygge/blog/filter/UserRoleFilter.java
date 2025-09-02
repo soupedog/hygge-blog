@@ -22,13 +22,17 @@ import java.util.HashMap;
  */
 @Component
 public class UserRoleFilter extends AbstractHyggeRequestFilter {
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserServiceImpl userService;
     public static final HashMap<String, UserTypeEnum> userRoleMapping = new HashMap<>();
 
     static {
         userRoleMapping.put("/blog-service/api/main/cache", UserTypeEnum.ROOT);
         userRoleMapping.put("/blog-service/api/main/file", UserTypeEnum.ROOT);
+    }
+
+    @Autowired
+    public UserRoleFilter(UserServiceImpl userService) {
+        this.userService = userService;
     }
 
     @Override

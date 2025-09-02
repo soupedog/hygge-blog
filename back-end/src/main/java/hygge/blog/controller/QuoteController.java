@@ -26,10 +26,14 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class QuoteController implements QuoteControllerDoc {
+    private final QuoteServiceImpl quoteService;
+    private final CacheServiceImpl cacheService;
+
     @Autowired
-    private QuoteServiceImpl quoteService;
-    @Autowired
-    private CacheServiceImpl cacheService;
+    public QuoteController(QuoteServiceImpl quoteService, CacheServiceImpl cacheService) {
+        this.quoteService = quoteService;
+        this.cacheService = cacheService;
+    }
 
     @Override
     @PostMapping("/quote")

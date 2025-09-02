@@ -35,8 +35,12 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties(DatabaseConfiguration.class)
 public class DataBaseAutoConfig implements HyggeAutoConfiguration {
+    private final DatabaseConfiguration databaseConfiguration;
+
     @Autowired
-    private DatabaseConfiguration databaseConfiguration;
+    public DataBaseAutoConfig(DatabaseConfiguration databaseConfiguration) {
+        this.databaseConfiguration = databaseConfiguration;
+    }
 
     @Bean("webAppDataSource")
     public HikariDataSource webAppDataSource() {

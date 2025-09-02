@@ -14,10 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Profile("!dev")
 @Configuration
 public class BackgroundJobConfig {
+    private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private final ArticleBrowseLogServiceImpl articleBrowseLogService;
+
     @Autowired
-    private RefreshElasticSearchServiceImpl refreshElasticSearchService;
-    @Autowired
-    private ArticleBrowseLogServiceImpl articleBrowseLogService;
+    public BackgroundJobConfig(RefreshElasticSearchServiceImpl refreshElasticSearchService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
+        this.refreshElasticSearchService = refreshElasticSearchService;
+        this.articleBrowseLogService = articleBrowseLogService;
+    }
 
     @Scheduled(fixedDelay = 1000 * 3600)
     public void toFreshArticleSearchData() {

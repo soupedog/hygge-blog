@@ -44,10 +44,14 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
+    private final CategoryServiceImpl categoryService;
+    private final ElasticsearchClient elasticsearchClient;
+
     @Autowired
-    private CategoryServiceImpl categoryService;
-    @Autowired
-    private ElasticsearchClient elasticsearchClient;
+    public KeywordSearchServiceImpl(CategoryServiceImpl categoryService, ElasticsearchClient elasticsearchClient) {
+        this.categoryService = categoryService;
+        this.elasticsearchClient = elasticsearchClient;
+    }
 
     public ArticleSummaryInfo articleKeyWordSearch(String keyword, Integer currentPage, Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();

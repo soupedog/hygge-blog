@@ -1,9 +1,9 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.TopicControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.TopicDto;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.service.local.normal.TopicServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,12 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class TopicController implements TopicControllerDoc {
+    private final TopicServiceImpl topicService;
+
     @Autowired
-    private TopicServiceImpl topicService;
+    public TopicController(TopicServiceImpl topicService) {
+        this.topicService = topicService;
+    }
 
     @Override
     @PostMapping("/topic")
@@ -38,8 +42,8 @@ public class TopicController implements TopicControllerDoc {
 
     @Override
     @PutMapping("/topic/{tid}")
-    public ResponseEntity<HyggeBlogControllerResponse<TopicDto>> updateTopic(@PathVariable("tid") String tid,@RequestBody Map<String, Object> data) {
-        Topic resultTemp = topicService.updateTopic(tid,data);
+    public ResponseEntity<HyggeBlogControllerResponse<TopicDto>> updateTopic(@PathVariable("tid") String tid, @RequestBody Map<String, Object> data) {
+        Topic resultTemp = topicService.updateTopic(tid, data);
         TopicDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
         return (ResponseEntity<HyggeBlogControllerResponse<TopicDto>>) success(result);
     }

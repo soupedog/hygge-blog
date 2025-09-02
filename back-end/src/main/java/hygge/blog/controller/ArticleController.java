@@ -32,10 +32,14 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class ArticleController implements ArticleControllerDoc {
+    private final ArticleServiceImpl articleService;
+    private final ArticleBrowseLogServiceImpl articleBrowseLogService;
+
     @Autowired
-    private ArticleServiceImpl articleService;
-    @Autowired
-    private ArticleBrowseLogServiceImpl articleBrowseLogService;
+    public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
+        this.articleService = articleService;
+        this.articleBrowseLogService = articleBrowseLogService;
+    }
 
     @Override
     @PostMapping("/article")

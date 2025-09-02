@@ -17,8 +17,12 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
         basePackages = "hygge.blog.repository.elasticsearch"
 )
 public class ElasticSearchConfig extends ElasticsearchConfiguration {
+    private final ElasticSearchConfiguration elasticSearchConfiguration;
+
     @Autowired
-    private ElasticSearchConfiguration elasticSearchConfiguration;
+    public ElasticSearchConfig(ElasticSearchConfiguration elasticSearchConfiguration) {
+        this.elasticSearchConfiguration = elasticSearchConfiguration;
+    }
 
     @Override
     public ClientConfiguration clientConfiguration() {

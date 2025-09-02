@@ -2,11 +2,11 @@ package hygge.blog.controller;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.EntranceControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.UserDto;
 import hygge.blog.domain.local.dto.UserTokenDto;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.UserToken;
 import hygge.blog.service.local.normal.UserServiceImpl;
@@ -26,10 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/blog-service/api")
 public class EntranceController extends HyggeJsonUtilContainer implements EntranceControllerDoc {
+    private final UserServiceImpl userService;
+    private final UserTokenServiceImpl userTokenService;
+
     @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private UserTokenServiceImpl userTokenService;
+    public EntranceController(UserServiceImpl userService, UserTokenServiceImpl userTokenService) {
+        this.userService = userService;
+        this.userTokenService = userTokenService;
+    }
 
     @Override
     @PostMapping("/sign/up")

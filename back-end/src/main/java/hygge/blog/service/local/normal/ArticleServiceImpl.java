@@ -13,7 +13,6 @@ import hygge.blog.domain.local.enums.BackgroundMusicTypeEnum;
 import hygge.blog.domain.local.enums.MediaPlayTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Article;
-import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
@@ -50,16 +49,12 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
-    @Autowired
-    private ArticleDao articleDao;
-    @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private CategoryServiceImpl categoryService;
-    @Autowired
-    private CacheServiceImpl cacheService;
-    @Autowired
-    private RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private final ArticleDao articleDao;
+    private final UserServiceImpl userService;
+    private final CategoryServiceImpl categoryService;
+    private final CacheServiceImpl cacheService;
+    private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
+
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
@@ -72,6 +67,15 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "orderGlobal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "orderCategory", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
+    }
+
+    @Autowired
+    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, RefreshElasticSearchServiceImpl refreshElasticSearchService) {
+        this.articleDao = articleDao;
+        this.userService = userService;
+        this.categoryService = categoryService;
+        this.cacheService = cacheService;
+        this.refreshElasticSearchService = refreshElasticSearchService;
     }
 
     @Transactional

@@ -22,10 +22,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LoginFilter extends AbstractHyggeRequestFilter {
+    private final UserTokenServiceImpl userTokenService;
+    private final UserServiceImpl userService;
+
     @Autowired
-    private UserTokenServiceImpl userTokenService;
-    @Autowired
-    private UserServiceImpl userService;
+    public LoginFilter(UserTokenServiceImpl userTokenService, UserServiceImpl userService) {
+        this.userTokenService = userTokenService;
+        this.userService = userService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {

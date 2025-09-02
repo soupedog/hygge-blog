@@ -43,14 +43,10 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     private static final CategoryAccessRule DEFAULT_CATEGORY_ACCESS_RULE = CategoryAccessRule.builder().accessRuleType(AccessRuleTypeEnum.PERSONAL).requirement(false).build();
 
-    @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private ArticleCountServiceImpl articleCountService;
-    @Autowired
-    private TopicServiceImpl topicService;
-    @Autowired
-    private CategoryDao categoryDao;
+    private final UserServiceImpl userService;
+    private final ArticleCountServiceImpl articleCountService;
+    private final TopicServiceImpl topicService;
+    private final CategoryDao categoryDao;
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
@@ -61,6 +57,14 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "parentCid", null).toStringColumn(0, 500));
         forUpdate.add(new ColumnInfo(true, false, "orderVal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "categoryState", null).toStringColumn(0, 50));
+    }
+
+    @Autowired
+    public CategoryServiceImpl(UserServiceImpl userService, ArticleCountServiceImpl articleCountService, TopicServiceImpl topicService, CategoryDao categoryDao) {
+        this.userService = userService;
+        this.articleCountService = articleCountService;
+        this.topicService = topicService;
+        this.categoryDao = categoryDao;
     }
 
     @Transactional

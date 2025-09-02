@@ -23,10 +23,14 @@ import java.util.List;
  */
 @Service
 public class BlogGroupServiceImpl extends HyggeJsonUtilContainer {
+    private final BlogGroupDao blogGroupDao;
+    private final UserServiceImpl userService;
+
     @Autowired
-    private BlogGroupDao blogGroupDao;
-    @Autowired
-    private UserServiceImpl userService;
+    public BlogGroupServiceImpl(BlogGroupDao blogGroupDao, UserServiceImpl userService) {
+        this.blogGroupDao = blogGroupDao;
+        this.userService = userService;
+    }
 
     @Transactional
     public BlogGroup createCreateBlogGroup(BlogGroup blogGroup) {

@@ -40,10 +40,14 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class FileController extends HyggeJsonUtilContainer implements FileControllerDoc {
+    private final FileServiceImpl fileService;
+    private final CategoryServiceImpl categoryService;
+
     @Autowired
-    private FileServiceImpl fileService;
-    @Autowired
-    private CategoryServiceImpl categoryService;
+    public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService) {
+        this.fileService = fileService;
+        this.categoryService = categoryService;
+    }
 
     @Override
     @PostMapping(value = "/file", consumes = "multipart/form-data")

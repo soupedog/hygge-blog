@@ -18,8 +18,12 @@ import java.util.List;
  */
 @Service
 public class AnnouncementServiceImpl extends HyggeJsonUtilContainer {
+    private final AnnouncementDao announcementDao;
+
     @Autowired
-    private AnnouncementDao announcementDao;
+    public AnnouncementServiceImpl(AnnouncementDao announcementDao) {
+        this.announcementDao = announcementDao;
+    }
 
     public List<Announcement> fetchAnnouncement(int currentPage, int pageSize) {
         Sort sort = Sort.by(Sort.Order.asc("createTs"));

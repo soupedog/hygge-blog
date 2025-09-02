@@ -82,13 +82,18 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
     private static final String backup = "G:\\Xavier\\Documents\\md文档backup\\";
 
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
-    @Autowired
-    private ArticleDao articleDao;
-    @Autowired
-    private ArticleServiceImpl articleService;
     private LinkedHashMap<String, String> resultMap = new LinkedHashMap<>();
+
+    private final ArticleDao articleDao;
+    private final ArticleServiceImpl articleService;
+    private final DefaultHttpHelper httpHelper;
+
     @Autowired
-    private DefaultHttpHelper httpHelper;
+    public SynchronizeArticle(ArticleDao articleDao, ArticleServiceImpl articleService, DefaultHttpHelper httpHelper) {
+        this.articleDao = articleDao;
+        this.articleService = articleService;
+        this.httpHelper = httpHelper;
+    }
 
     @Test
     void doHttpRequest() {

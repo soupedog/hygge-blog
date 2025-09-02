@@ -29,18 +29,22 @@ import java.util.Optional;
  */
 @Service
 public class HomePageServiceImpl extends HyggeJsonUtilContainer {
+    private final TopicServiceImpl topicService;
+    private final CategoryServiceImpl categoryService;
+    private final ArticleServiceImpl articleService;
+    private final ArticleCountServiceImpl articleCountService;
+    private final QuoteServiceImpl quoteService;
+    private final AnnouncementServiceImpl announcementService;
+
     @Autowired
-    private TopicServiceImpl topicService;
-    @Autowired
-    private CategoryServiceImpl categoryService;
-    @Autowired
-    private ArticleServiceImpl articleService;
-    @Autowired
-    private ArticleCountServiceImpl articleCountService;
-    @Autowired
-    private QuoteServiceImpl quoteService;
-    @Autowired
-    private AnnouncementServiceImpl announcementService;
+    public HomePageServiceImpl(TopicServiceImpl topicService, CategoryServiceImpl categoryService, ArticleServiceImpl articleService, ArticleCountServiceImpl articleCountService, QuoteServiceImpl quoteService, AnnouncementServiceImpl announcementService) {
+        this.topicService = topicService;
+        this.categoryService = categoryService;
+        this.articleService = articleService;
+        this.articleCountService = articleCountService;
+        this.quoteService = quoteService;
+        this.announcementService = announcementService;
+    }
 
     /**
      * 如果页容量不为空，将拉取首个主题下的文章摘要,以它为页容量进行分页查询第一页(如果主题存在的话)

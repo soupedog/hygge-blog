@@ -1,9 +1,9 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.UserControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.UserDto;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,12 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class UserController implements UserControllerDoc {
+    private final UserServiceImpl userService;
+
     @Autowired
-    private UserServiceImpl userService;
+    public UserController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     @Override
     @GetMapping("/user/{uid}")

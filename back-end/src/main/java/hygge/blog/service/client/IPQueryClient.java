@@ -21,8 +21,12 @@ import java.util.Optional;
 public class IPQueryClient {
     private static final TypeReference<BaiduGatewayDto<BaiduIpInfoDto>> typeReference = new TypeReference<>() {
     };
+    private final DefaultHttpHelper httpHelper;
+
     @Autowired
-    private DefaultHttpHelper httpHelper;
+    public IPQueryClient(DefaultHttpHelper httpHelper) {
+        this.httpHelper = httpHelper;
+    }
 
     /**
      * 功能相对较弱，使用优先级低

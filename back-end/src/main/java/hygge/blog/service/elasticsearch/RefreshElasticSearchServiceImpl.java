@@ -37,20 +37,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Service
 public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
+    private final ArticleDao articleDao;
+    private final CategoryDao categoryDao;
+    private final QuoteDao quoteDao;
+    private final QuoteServiceImpl quoteService;
+    private final CacheServiceImpl cacheService;
+    private final SearchingCacheDao searchingCacheDao;
+    private final ElasticsearchOperations operations;
+
     @Autowired
-    private ArticleDao articleDao;
-    @Autowired
-    private CategoryDao categoryDao;
-    @Autowired
-    private QuoteDao quoteDao;
-    @Autowired
-    private QuoteServiceImpl quoteService;
-    @Autowired
-    private CacheServiceImpl cacheService;
-    @Autowired
-    private SearchingCacheDao searchingCacheDao;
-    @Autowired
-    private ElasticsearchOperations operations;
+    public RefreshElasticSearchServiceImpl(ArticleDao articleDao, CategoryDao categoryDao, QuoteDao quoteDao, QuoteServiceImpl quoteService, CacheServiceImpl cacheService, SearchingCacheDao searchingCacheDao, ElasticsearchOperations operations) {
+        this.articleDao = articleDao;
+        this.categoryDao = categoryDao;
+        this.quoteDao = quoteDao;
+        this.quoteService = quoteService;
+        this.cacheService = cacheService;
+        this.searchingCacheDao = searchingCacheDao;
+        this.operations = operations;
+    }
 
     public void checkAndInitIndex() {
         // Spring 提供的注解生成索引方案
@@ -74,11 +78,10 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void freshSingleArticleAsync(Integer articleId) {
-        CompletableFuture.runAsync(() -> freshSingleArticle(articleId))
-                .exceptionally(e -> {
-                    log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
-                    return null;
-                });
+        CompletableFuture.runAsync(() -> freshSingleArticle(articleId)).exceptionally(e -> {
+            log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
     }
 
     public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
@@ -101,11 +104,10 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void freshSingleQuoteAsync(Integer quoteId) {
-        CompletableFuture.runAsync(() -> freshSingleQuote(quoteId))
-                .exceptionally(e -> {
-                    log.error("刷新句子(" + quoteId + ") 模糊搜索数据 失败.", e);
-                    return null;
-                });
+        CompletableFuture.runAsync(() -> freshSingleQuote(quoteId)).exceptionally(e -> {
+            log.error("刷新句子(" + quoteId + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
     }
 
     private void refreshQuote(Quote quote) {

@@ -44,14 +44,10 @@ import java.util.Optional;
 @Service
 public class QuoteServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
-    @Autowired
-    private QuoteDao quoteDao;
-    @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private CacheServiceImpl cacheService;
-    @Autowired
-    private EventServiceImpl eventService;
+    private final QuoteDao quoteDao;
+    private final UserServiceImpl userService;
+    private final CacheServiceImpl cacheService;
+    private final EventServiceImpl eventService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -63,6 +59,14 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, true, "remarks", null).toStringColumn(0, 5000));
         forUpdate.add(new ColumnInfo(true, true, "orderVal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "quoteState", null).toStringColumn(0, 50));
+    }
+
+    @Autowired
+    public QuoteServiceImpl(QuoteDao quoteDao, UserServiceImpl userService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
+        this.quoteDao = quoteDao;
+        this.userService = userService;
+        this.cacheService = cacheService;
+        this.eventService = eventService;
     }
 
     public Quote createQuote(Quote quote) {

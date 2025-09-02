@@ -1,9 +1,9 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.CategoryControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.CategoryDto;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,12 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class CategoryController implements CategoryControllerDoc {
+    private final CategoryServiceImpl categoryService;
+
     @Autowired
-    private CategoryServiceImpl categoryService;
+    public CategoryController(CategoryServiceImpl categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @Override
     @PostMapping("/category")

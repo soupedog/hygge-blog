@@ -33,10 +33,8 @@ import java.util.Map;
 @Service
 public class TopicServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
-    @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private TopicDao topicDao;
+    private final UserServiceImpl userService;
+    private final TopicDao topicDao;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -45,6 +43,12 @@ public class TopicServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "uid", null).toStringColumn(0, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "orderVal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "topicState", null).toStringColumn(0, 50));
+    }
+
+    @Autowired
+    public TopicServiceImpl(UserServiceImpl userService, TopicDao topicDao) {
+        this.userService = userService;
+        this.topicDao = topicDao;
     }
 
     public Topic createTopic(Topic topic) {

@@ -27,12 +27,16 @@ import java.util.List;
  */
 @Service
 public class CacheServiceImpl {
+    private final CategoryServiceImpl categoryService;
+    private final TopicServiceImpl topicService;
+    private final UserServiceImpl userService;
+
     @Autowired
-    private CategoryServiceImpl categoryService;
-    @Autowired
-    private TopicServiceImpl topicService;
-    @Autowired
-    private UserServiceImpl userService;
+    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService) {
+        this.categoryService = categoryService;
+        this.topicService = topicService;
+        this.userService = userService;
+    }
 
     /**
      * 从传入的文章类型构造类别树一直到根节点

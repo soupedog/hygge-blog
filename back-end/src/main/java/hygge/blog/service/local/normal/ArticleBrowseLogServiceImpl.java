@@ -21,10 +21,14 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Service
 public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
+    private final ArticleBrowseLogDao articleBrowseLogDao;
+    private final IPQueryClient ipQueryService;
+
     @Autowired
-    private ArticleBrowseLogDao articleBrowseLogDao;
-    @Autowired
-    private IPQueryClient ipQueryService;
+    public ArticleBrowseLogServiceImpl(ArticleBrowseLogDao articleBrowseLogDao, IPQueryClient ipQueryService) {
+        this.articleBrowseLogDao = articleBrowseLogDao;
+        this.ipQueryService = ipQueryService;
+    }
 
     public void insertArticleBrowseLog(String aid, String title, String ip, Integer userId, String userAgent) {
         ArticleBrowseLog articleBrowseLog = ArticleBrowseLog.builder()

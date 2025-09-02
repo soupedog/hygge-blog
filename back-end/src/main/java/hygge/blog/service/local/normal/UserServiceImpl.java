@@ -34,8 +34,7 @@ import java.util.Optional;
 @SuppressWarnings("java:S1192")
 public class UserServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
-    @Autowired
-    private UserDao userDao;
+    private final UserDao userDao;
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
@@ -48,6 +47,11 @@ public class UserServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "userAvatar", null).toStringColumn(1, 500));
         forUpdate.add(new ColumnInfo(true, false, "userName", null).toStringColumn(1, 100));
         forUpdate.add(new ColumnInfo(true, false, "userSex", null).toStringColumn(1, 100));
+    }
+
+    @Autowired
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
     }
 
     public User findUserByUserId(Integer userId, boolean nullable) {

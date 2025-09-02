@@ -29,12 +29,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class HomePageController implements HomePageControllerDoc {
+    private final HomePageServiceImpl homePageService;
+    private final AnnouncementServiceImpl announcementService;
+    private final KeywordSearchServiceImpl fuzzySearchService;
+
     @Autowired
-    private HomePageServiceImpl homePageService;
-    @Autowired
-    private AnnouncementServiceImpl announcementService;
-    @Autowired
-    private KeywordSearchServiceImpl fuzzySearchService;
+    public HomePageController(HomePageServiceImpl homePageService, AnnouncementServiceImpl announcementService, KeywordSearchServiceImpl fuzzySearchService) {
+        this.homePageService = homePageService;
+        this.announcementService = announcementService;
+        this.fuzzySearchService = fuzzySearchService;
+    }
 
     @Override
     @GetMapping("/home/fetch")

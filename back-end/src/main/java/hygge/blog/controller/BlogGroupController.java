@@ -1,11 +1,11 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.BlogGroupControllerDoc;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.BlogGroupDto;
 import hygge.blog.domain.local.dto.GroupBindInfo;
-import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.po.BlogGroup;
 import hygge.blog.service.local.normal.BlogGroupServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
@@ -24,8 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class BlogGroupController implements BlogGroupControllerDoc {
+    private final BlogGroupServiceImpl blogGroupService;
+
     @Autowired
-    private BlogGroupServiceImpl blogGroupService;
+    public BlogGroupController(BlogGroupServiceImpl blogGroupService) {
+        this.blogGroupService = blogGroupService;
+    }
 
     @Override
     @PostMapping("/blogGroup")

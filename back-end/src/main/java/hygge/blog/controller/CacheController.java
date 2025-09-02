@@ -2,7 +2,6 @@ package hygge.blog.controller;
 
 import hygge.blog.controller.doc.CacheControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
-import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -20,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class CacheController implements CacheControllerDoc {
+    private final CacheManager cacheManager;
+
     @Autowired
-    private CacheManager cacheManager;
-    @Autowired
-    private UserServiceImpl userService;
+    public CacheController(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
     @Override
     @DeleteMapping("/cache")

@@ -14,8 +14,12 @@ import java.util.List;
  */
 @Service
 public class ArticleCountServiceImpl extends HyggeJsonUtilContainer {
+    private final ArticleDao articleDao;
+
     @Autowired
-    private ArticleDao articleDao;
+    public ArticleCountServiceImpl(ArticleDao articleDao) {
+        this.articleDao = articleDao;
+    }
 
     public List<ArticleCountInfo> findArticleCountInfoOfCategory(List<Integer> accessibleCategoryIdList, Integer currentUserId) {
         return currentUserId == null ? articleDao.findArticleCountsOfCategory(accessibleCategoryIdList)

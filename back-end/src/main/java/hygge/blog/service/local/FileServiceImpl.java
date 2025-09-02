@@ -10,7 +10,6 @@ import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
-import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
@@ -45,12 +44,14 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
     @Value("${file.upload.path}")
     private String filePath;
+    private final CategoryServiceImpl categoryService;
+    private final FileInfoDao fileInfoDao;
+
     @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private CategoryServiceImpl categoryService;
-    @Autowired
-    private FileInfoDao fileInfoDao;
+    public FileServiceImpl(CategoryServiceImpl categoryService, FileInfoDao fileInfoDao) {
+        this.categoryService = categoryService;
+        this.fileInfoDao = fileInfoDao;
+    }
 
     public List<FileInfoForFrontEnd> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
         if (cid != null) {

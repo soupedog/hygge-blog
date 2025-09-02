@@ -17,10 +17,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserTokenServiceImpl extends HyggeJsonUtilContainer {
+    private final UserTokenDao userTokenDao;
+    private final UserServiceImpl userService;
+
     @Autowired
-    private UserTokenDao userTokenDao;
-    @Autowired
-    private UserServiceImpl userService;
+    public UserTokenServiceImpl(UserTokenDao userTokenDao, UserServiceImpl userService) {
+        this.userTokenDao = userTokenDao;
+        this.userService = userService;
+    }
 
     public UserToken signIn(String userName, String password) {
         parameterHelper.stringNotEmpty("userName", (Object) userName);
