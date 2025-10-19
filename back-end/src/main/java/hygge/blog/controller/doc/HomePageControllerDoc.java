@@ -21,9 +21,6 @@ public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntit
     @Operation(summary = "主页数据拉取", description = "在主页初次加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> homepageFetch(int pageSize);
 
-    @Operation(summary = "主题概览数据拉取", description = "展示全部主题概要信息时需要拉取的数据")
-    ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> topicOverviewFetch();
-
     @Operation(summary = "查询特定主题下的文章", description = "在主题加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> topicInfoFetch(String tid, int currentPage, int pageSize);
 

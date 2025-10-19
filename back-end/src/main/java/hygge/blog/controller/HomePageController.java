@@ -46,13 +46,6 @@ public class HomePageController implements HomePageControllerDoc {
     }
 
     @Override
-    @GetMapping("/home/fetch/topic/overview")
-    @ControllerLog(inputParamEnable = false, outputParamEnable = false)
-    public ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>> topicOverviewFetch() {
-        return (ResponseEntity<HyggeBlogControllerResponse<HomepageFetchResult>>) success(homePageService.fetch(null));
-    }
-
-    @Override
     @GetMapping("/home/fetch/topic/{tid}")
     @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<ArticleSummaryInfo>> topicInfoFetch(@PathVariable("tid") String tid,
