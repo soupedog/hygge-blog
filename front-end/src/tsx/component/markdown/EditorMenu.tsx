@@ -20,6 +20,7 @@ import {FileInfo, UserService} from "../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
 import * as prettier from 'prettier';
 import parserMarkdown from 'prettier/plugins/markdown';
+import {pangu} from 'pangu/browser';
 
 export interface EditorMenuProps {
     updateContent: Function;
@@ -187,6 +188,8 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                         parser: 'markdown',
                                         plugins: [parserMarkdown]
                                     }).then(nextContent => {
+                                        // 你好Tom → 你好 Tom
+                                        nextContent = pangu.spacingText(nextContent)
                                         updateContent(nextContent);
                                         contentChangeUndoStackHandler(nextContent);
                                         message.info("已将文本格式化标准形式")
