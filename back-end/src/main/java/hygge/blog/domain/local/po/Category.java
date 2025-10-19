@@ -26,7 +26,6 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
@@ -123,7 +122,6 @@ public class Category extends BasePo {
             return result || accessRuleList.stream().anyMatch(categoryAccessRule -> AccessRuleTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
         }
 
-
         for (CategoryAccessRule categoryAccessRule : accessRuleList) {
             boolean itemResult = false;
             switch (categoryAccessRule.getAccessRuleType()) {
@@ -161,7 +159,12 @@ public class Category extends BasePo {
             }
 
             if (categoryAccessRule.isRequirement()) {
-                result = result && itemResult;
+                // 是必要条件则有一票否决权,必要条件一但不满足则返回无权限
+                if (!itemResult) {
+                    return false;
+                } else {
+                    result = true;
+                }
             } else {
                 result = result || itemResult;
             }
