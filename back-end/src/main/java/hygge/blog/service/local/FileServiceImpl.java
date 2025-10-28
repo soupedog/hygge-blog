@@ -3,16 +3,21 @@ package hygge.blog.service.local;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.bo.BlogSystemCode;
-import hygge.blog.domain.local.dto.FileInfoForFrontEnd;
+import hygge.blog.domain.local.dto.FileInfoDto;
+import hygge.blog.domain.local.dto.FileInfoInfo;
+import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
+import hygge.blog.repository.database.FileInfoViewDao;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
+import hygge.util.definition.UnitConvertHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -25,7 +30,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +42,7 @@ import java.util.Optional;
 @Service
 public class FileServiceImpl extends HyggeJsonUtilContainer {
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
+    private static final UnitConvertHelper unitConvertHelper = UtilCreator.INSTANCE.getDefaultInstance(UnitConvertHelper.class);
 
     private static final List<FileTypeEnum> TYPE_FOR_ALL = collectionHelper.createCollection(FileTypeEnum.values());
 
@@ -45,21 +50,24 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private String filePath;
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
+    private final FileInfoViewDao fileInfoViewDao;
 
-    public FileServiceImpl(CategoryServiceImpl categoryService, FileInfoDao fileInfoDao) {
+    public FileServiceImpl(CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;
+        this.fileInfoViewDao = fileInfoViewDao;
     }
 
-    public List<FileInfoForFrontEnd> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
+    public List<FileInfoDto> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
+        boolean needCopyToHardDisk = true;
+
         if (cid != null) {
             // 目标类别必须存在
             categoryService.findCategoryByCid(cid, false);
+            needCopyToHardDisk = false;
         }
 
-        boolean needCopyToHardDisk = cid != null;
-
-        List<FileInfoForFrontEnd> result = new ArrayList<>();
+        List<FileInfoDto> result = new ArrayList<>();
 
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
@@ -76,7 +84,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 name = fileName.substring(0, indexOfLastPoint);
             }
 
-            if (fileInfoDao.existsByName(name)) {
+            if (fileInfoViewDao.existsByName(name)) {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
@@ -96,13 +104,23 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 // 持久化文件到数据库
                 fileInfoDao.save(fileInfo);
 
-                FileInfoForFrontEnd item = FileInfoForFrontEnd.builder()
+                FileInfoDto item = FileInfoDto.builder()
+                        .fileNo(fileInfo.getFileNo())
                         .src(fileType.getPath() + fileName)
                         .name(fileName)
                         .extension(fileInfo.getExtension())
-                        .fileNo(fileNo)
+                        .fileSize(unitConvertHelper.storageSmartFormatAsString(fileInfo.getFileSize()))
+                        .lastUpdateTs(fileInfo.getLastUpdateTs().getTime())
+                        .createTs(fileInfo.getCreateTs().getTime())
                         .build();
-                item.setFileSizeWithByte(new BigDecimal(fileInfo.getFileSize()));
+
+                // FileDescription 对象可空，非空时才初始化
+                Optional.ofNullable(fileInfo.getDescription()).ifPresent((info) -> item.setDescription(
+                        FileDescriptionDto.builder()
+                                .content(info.getContent())
+                                .timePointer(info.getTimePointer().getTime())
+                                .build()
+                ));
 
                 result.add(item);
                 // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
@@ -119,11 +137,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public List<FileInfoForFrontEnd> findFileInfo(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
+    public FileInfoInfo findFileInfo(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
         List<FileTypeEnum> actualFileTypes = fileTypes == null ? TYPE_FOR_ALL : fileTypes;
+        FileInfoInfo result = new FileInfoInfo();
 
-        List<FileInfoForFrontEnd> result = new ArrayList<>();
-
+        List<FileInfoDto> fileInfoDtoList = new ArrayList<>();
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
@@ -132,21 +150,17 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         Sort sort = Sort.by(Sort.Order.asc("createTs"));
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
-        Page<FileInfo> resultTemp = fileInfoDao.findFileInfoMultiple(actualFileTypes, cidList, pageable);
+        Page<FileInfoView> resultTemp = fileInfoViewDao.findFileInfoMultiple(actualFileTypes, cidList, pageable);
 
         resultTemp.stream().forEach(item -> {
-            FileInfoForFrontEnd fileInfoForFrontEnd = FileInfoForFrontEnd.builder()
-                    .fileNo(item.getFileNo())
-                    .name(item.getName())
-                    .extension(item.getExtension())
-                    .description(item.getDescription())
-                    .build();
-
-            fileInfoForFrontEnd.setSrc(getFileCacheSrc(item).replace(File.separator, "/"));
-
-            fileInfoForFrontEnd.setFileSizeWithByte(new BigDecimal(item.getFileSize()));
-            result.add(fileInfoForFrontEnd);
+            FileInfoDto resultTempItem = item.toDto();
+            // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
+            resultTempItem.setSrc(resultTempItem.getSrc().replace(File.separator, "/"));
+            fileInfoDtoList.add(resultTempItem);
         });
+
+        result.setFileInfoList(fileInfoDtoList);
+        result.setTotalCount(resultTemp.getTotalElements());
         return result;
     }
 
@@ -175,9 +189,5 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     public Optional<FileInfo> findFileFromDB(String fileNo) {
         return fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo)
                 .build()));
-    }
-
-    public String getFileCacheSrc(FileInfo fileInfo) {
-        return fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
     }
 }

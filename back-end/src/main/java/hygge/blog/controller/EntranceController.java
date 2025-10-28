@@ -35,8 +35,8 @@ public class EntranceController extends HyggeJsonUtilContainer implements Entran
 
     @Override
     @PostMapping("/sign/up")
-    public ResponseEntity<HyggeBlogControllerResponse<UserDto>> signUp(@RequestBody UserDto userDTO) {
-        User user = PoDtoMapper.INSTANCE.dtoToPo(userDTO);
+    public ResponseEntity<HyggeBlogControllerResponse<UserDto>> signUp(@RequestBody UserDto userDto) {
+        User user = PoDtoMapper.INSTANCE.dtoToPo(userDto);
         user = userService.saveUser(user);
         UserDto result = PoDtoMapper.INSTANCE.poToDto(user);
         return (ResponseEntity<HyggeBlogControllerResponse<UserDto>>) success(result);
@@ -44,7 +44,7 @@ public class EntranceController extends HyggeJsonUtilContainer implements Entran
 
     @Override
     @PostMapping("/sign/in")
-    public ResponseEntity<HyggeBlogControllerResponse<UserTokenDto>> signIn(@RequestBody UserDto userDTO) {
+    public ResponseEntity<HyggeBlogControllerResponse<UserTokenDto>> signIn(@RequestBody UserDto userDto) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
 
         UserToken userToken;
@@ -60,10 +60,10 @@ public class EntranceController extends HyggeJsonUtilContainer implements Entran
             context.setCurrentLoginUser(user);
         } else {
             // 登录
-            parameterHelper.stringNotEmpty("userName", (Object) userDTO.getUserName());
-            parameterHelper.stringNotEmpty("password", (Object) userDTO.getPassword());
+            parameterHelper.stringNotEmpty("userName", (Object) userDto.getUserName());
+            parameterHelper.stringNotEmpty("password", (Object) userDto.getPassword());
 
-            userToken = userTokenService.signIn(userDTO.getUserName(), userDTO.getPassword());
+            userToken = userTokenService.signIn(userDto.getUserName(), userDto.getPassword());
         }
 
         UserTokenDto result = PoDtoMapper.INSTANCE.poToDto(userToken);

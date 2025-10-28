@@ -1,11 +1,11 @@
-package hygge.blog.domain.local.po;
+package hygge.blog.domain.local.po.view;
 
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
 import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.base.BasePo;
 import hygge.blog.domain.local.po.inner.FileDescription;
-import hygge.blog.domain.local.po.view.FileInfoView;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,8 +13,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,19 +20,14 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.Optional;
 
 /**
- * 文件信息
- *
  * @author Xavier
- * @date 2024/9/12
- * @since 1.0
+ * @date 2025/10/28
  */
 @Getter
 @Setter
@@ -43,10 +36,8 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@DynamicInsert
-@DynamicUpdate
-@Table(name = "fileInfo", indexes = {@Index(name = "index_fileNo", columnList = "fileNo", unique = true)})
-public class FileInfo extends BasePo {
+@Table(name = "fileInfo_glance_view")
+public class FileInfoView extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -85,13 +76,9 @@ public class FileInfo extends BasePo {
      * 文件大小
      */
     private Long fileSize;
-    @Lob
-    @Column(columnDefinition = "longblob")
-    private byte[] content;
-
 
     /**
-     * 请确保与 {@link FileInfoView#toDto()} 逻辑一致
+     * 请确保与 {@link FileInfo#toDto()} 逻辑一致
      */
     public FileInfoDto toDto() {
         FileInfoDto result = FileInfoDto.builder()

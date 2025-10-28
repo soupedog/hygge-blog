@@ -2,6 +2,7 @@ package hygge.blog.domain.local.po.base;
 
 import hygge.util.UtilCreator;
 import hygge.util.definition.ParameterHelper;
+import hygge.util.definition.UnitConvertHelper;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Generated;
@@ -22,6 +23,7 @@ import java.sql.Timestamp;
 @MappedSuperclass
 public abstract class BasePo {
     protected static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
+    protected static final UnitConvertHelper unitConvertHelper = UtilCreator.INSTANCE.getDefaultInstance(UnitConvertHelper.class);
 
     protected BasePo() {
     }

@@ -5,7 +5,8 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.controller.doc.FileControllerDoc;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.local.dto.FileInfoForFrontEnd;
+import hygge.blog.domain.local.dto.FileInfoDto;
+import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
@@ -50,18 +51,18 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     @Override
     @PostMapping(value = "/file", consumes = "multipart/form-data")
     @ControllerLog(ignoreParamNames = "filesList")
-    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> upload(@RequestParam("type") FileTypeEnum fileType,
-                                                                                         @RequestParam(value = "cid", required = false) String cid,
-                                                                                         @RequestParam("files") List<MultipartFile> filesList) {
-        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>>) success(fileService.uploadFile(cid, fileType, filesList));
+    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>> upload(@RequestParam("type") FileTypeEnum fileType,
+                                                                                 @RequestParam(value = "cid", required = false) String cid,
+                                                                                 @RequestParam("files") List<MultipartFile> filesList) {
+        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>>) success(fileService.uploadFile(cid, fileType, filesList));
     }
 
     @Override
     @GetMapping("/file")
-    public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>> findFileInfo(@RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
-                                                                                               @RequestParam(required = false, defaultValue = "1") int currentPage,
-                                                                                               @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoForFrontEnd>>>) success(fileService.findFileInfo(fileTypes, currentPage, pageSize));
+    public ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfo(@RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
+                                                                                  @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                  @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>>) success(fileService.findFileInfo(fileTypes, currentPage, pageSize));
     }
 
     @GetMapping(value = "/file/{fileNo}")
