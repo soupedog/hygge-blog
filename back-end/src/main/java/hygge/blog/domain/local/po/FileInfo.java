@@ -100,6 +100,7 @@ public class FileInfo extends BasePo {
                 .extension(extension)
                 .src(fileType.getPath() + name + "." + extension)
                 .fileSize(unitConvertHelper.storageSmartFormatAsString(getFileSize()))
+                .fileType(fileType)
                 .lastUpdateTs(lastUpdateTs.getTime())
                 .createTs(createTs.getTime())
                 .build();

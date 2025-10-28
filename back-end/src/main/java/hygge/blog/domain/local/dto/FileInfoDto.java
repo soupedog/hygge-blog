@@ -1,6 +1,7 @@
 package hygge.blog.domain.local.dto;
 
 import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
+import hygge.blog.domain.local.enums.FileTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,8 @@ public class FileInfoDto {
     private String name;
     @Schema(title = "文件扩展名(如 .png)")
     private String extension;
+    @Schema(title = "文件归档类别")
+    private FileTypeEnum fileType;
     private FileDescriptionDto description;
     @Schema(title = "文件大小")
     private String fileSize;
