@@ -20,6 +20,7 @@ import {FileInfo, UserService} from "../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
 import * as prettier from 'prettier';
 import parserMarkdown from 'prettier/plugins/markdown';
+// @ts-ignore
 import {pangu} from 'pangu/browser';
 
 export interface EditorMenuProps {
@@ -62,8 +63,11 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
 
                                 let currentTOC = MdHelper.initTitleTree(
                                     {
+                                        // @ts-ignore
                                         currentTOCArray: antdTreeNodeInfos,
+                                        // @ts-ignore
                                         allTocNodeMap: map,
+                                        // @ts-ignore
                                         errorCallback: null
                                     }
                                 );
