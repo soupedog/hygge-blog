@@ -78,7 +78,9 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                             <Form.Item name={['cid']} label="文章类型" rules={[{required: true}]}>
                                 <TreeSelect
                                     style={{width: '100%'}}
-                                    dropdownStyle={{maxHeight: 400, overflow: 'auto'}}
+                                    styles={{
+                                        popup: {root: {maxHeight: 400, overflow: 'auto'}},
+                                    }}
                                     treeData={categoryInfoList}
                                     placeholder="请选择文章类型"
                                     treeDefaultExpandAll
