@@ -101,7 +101,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                                                                               selectedPart,
                                                                                               rightPart
                                                                                           }) => {
-                                        let nextContent = leftPart + "*" + selectedPart + "*" + rightPart;
+                                        let nextContent = leftPart + "_" + selectedPart + "_" + rightPart;
                                         updateContent(nextContent);
 
                                         contentChangeUndoStackHandler(nextContent);
@@ -181,6 +181,26 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             <Button type="link" onClick={() => {
                                 // @ts-ignore
                                 let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                InputElementHelper.appendTextToTextArea(element, "", ({
+                                                                                          leftPart,
+                                                                                          selectedPart,
+                                                                                          rightPart
+                                                                                      }) => {
+                                    if (selectedPart != null && selectedPart.length > 0) {
+                                        // 你好Tom → 你好 Tom
+                                        let nextContent = leftPart + pangu.spacingText(selectedPart) + rightPart;
+                                        updateContent(nextContent);
+
+                                        contentChangeUndoStackHandler(nextContent);
+                                        message.info("已将中外文本追加必要间隔")
+                                    } else {
+                                        message.warning("未发现待处理的文本内容")
+                                    }
+                                });
+                            }}>文本间隔</Button>
+                            <Button type="link" onClick={() => {
+                                // @ts-ignore
+                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
                                 let currentContent: string | null = element.textContent;
                                 if (currentContent != null) {
                                     //TODO 此处代码引发了 webpack --mode development 运行正常 而 production 运行报错
@@ -188,8 +208,6 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                         parser: 'markdown',
                                         plugins: [parserMarkdown]
                                     }).then(nextContent => {
-                                        // 你好Tom → 你好 Tom
-                                        nextContent = pangu.spacingText(nextContent)
                                         updateContent(nextContent);
                                         contentChangeUndoStackHandler(nextContent);
                                         message.info("已将文本格式化标准形式")
