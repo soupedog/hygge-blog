@@ -250,9 +250,9 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
         let container: SelectProps['options'] = [];
 
         FileService.findFileInfo(type, (data) => {
-            data?.main?.forEach((item) => {
+            data?.main?.fileInfoList.forEach((item) => {
                 container?.push({
-                    label: item.name + " --- " + item.fileSize + " mb",
+                    label: item.name + " --- " + item.fileSize,
                     value: UrlHelper.getBaseStaticSourceUrl() + item.src,
                 });
             });

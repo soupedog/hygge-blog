@@ -645,30 +645,41 @@ export class QuoteService {
 }
 
 export interface FileInfo {
-    src: string,
+    fileNo: string,
     name: string,
-    fileSize: number
+    src: string,
+    extension: string,
+    fileType: string,
+    fileSize: string,
+    description?: FileDescription
+}
+
+export interface FileInfoInfo {
+    fileInfoList: FileInfo[],
+    totalCount: number,
+}
+
+export interface FileDescription {
+    content: string,
+    timePointer: number
 }
 
 export class FileService {
-    static findFileInfo(type: string[],
-                        successHook?: (input?: HyggeResponse<FileInfo[]>) => void,
+    static findFileInfo(type?: string[],
+                        successHook?: (input?: HyggeResponse<FileInfoInfo>) => void,
                         beforeHook?: () => void,
                         finallyHook?: () => void): void {
         if (beforeHook != null) {
             beforeHook();
         }
 
-        let typeInfo: string = "";
-        type.forEach((item) => {
-            typeInfo = typeInfo + item;
-        });
+        let actualPath: string = type == undefined ? "" : "?type=" + type.join(",")
 
-        axios.get("/main/file?type=" + typeInfo, {
+        axios.get("/main/file" + actualPath, {
             headers: UserService.getHeader()
         }).then((response) => {
                 if (successHook != null && response != null) {
-                    let data: HyggeResponse<FileInfo[]> = response.data;
+                    let data: HyggeResponse<FileInfoInfo> = response.data;
                     successHook(data);
                 }
             }
