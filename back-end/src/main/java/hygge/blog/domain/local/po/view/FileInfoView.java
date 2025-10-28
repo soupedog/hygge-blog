@@ -23,6 +23,7 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 /**
@@ -96,7 +97,7 @@ public class FileInfoView extends BasePo {
         Optional.ofNullable(description).ifPresent((info) -> result.setDescription(
                 FileDescriptionDto.builder()
                         .content(info.getContent())
-                        .timePointer(info.getTimePointer().getTime())
+                        .timePointer(Optional.ofNullable(info.getTimePointer()).map(Timestamp::getTime).orElse(null))
                         .build()
         ));
         return result;
