@@ -5,7 +5,6 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
-import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
@@ -19,6 +18,8 @@ import hygge.util.UtilCreator;
 import hygge.util.definition.FileHelper;
 import hygge.util.definition.UnitConvertHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private static final UnitConvertHelper unitConvertHelper = UtilCreator.INSTANCE.getDefaultInstance(UnitConvertHelper.class);
 
     private static final List<FileTypeEnum> TYPE_FOR_ALL = collectionHelper.createCollection(FileTypeEnum.values());
+    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Value("${file.upload.path}")
     private String filePath;
@@ -105,24 +107,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 // 持久化文件到数据库
                 fileInfoDao.save(fileInfo);
 
-                FileInfoDto item = FileInfoDto.builder()
-                        .fileNo(fileInfo.getFileNo())
-                        .src(fileType.getPath() + fileName)
-                        .name(fileName)
-                        .extension(fileInfo.getExtension())
-                        .fileSize(unitConvertHelper.storageSmartFormatAsString(fileInfo.getFileSize()))
-                        .lastUpdateTs(fileInfo.getLastUpdateTs().getTime())
-                        .createTs(fileInfo.getCreateTs().getTime())
-                        .build();
-
-                // FileDescription 对象可空，非空时才初始化
-                Optional.ofNullable(fileInfo.getDescription()).ifPresent((info) -> item.setDescription(
-                        FileDescriptionDto.builder()
-                                .content(info.getContent())
-                                .timePointer(info.getTimePointer().getTime())
-                                .build()
-                ));
-
+                FileInfoDto item = fileInfo.toDto();
+                // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
+                if (isWindows) {
+                    item.setSrc(item.getSrc().replace(File.separator, "/"));
+                }
                 result.add(item);
                 // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
                 if (needCopyToHardDisk) {
@@ -179,15 +168,18 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         String path = filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
         try {
             File file = new File(path);
-            fileHelper.getOrCreateDirectoryIfNotExit(filePath);
-            boolean createComplete = file.createNewFile();
-            if (!createComplete) {
-                throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-            }
 
             if (file.isAbsolute() && !file.exists()) {
+                // 保障所需文件夹被创建
+                fileHelper.getOrCreateDirectoryIfNotExit(filePath);
+                boolean createComplete = file.createNewFile();
+                if (!createComplete) {
+                    throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+                }
+
                 // 拷贝文件到磁盘
                 FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
+                log.info("Copy file " + path + " to hard disk success.");
             }
         } catch (LightRuntimeException le) {
             // 主动抛出的已知异常已经标记了错误原因
@@ -195,6 +187,28 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         } catch (Exception e) {
             throw new LightRuntimeException("Fail to copy file:[" + path + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
         }
+    }
+
+    public void deleteFile(String fileNo) {
+        Optional<FileInfoView> fileInfoViewTemp = fileInfoViewDao.findOne(Example.of(FileInfoView.builder().fileNo(fileNo).build()));
+
+        fileInfoViewTemp.ifPresent((fileInfoView) -> {
+            // 检测是否存在硬盘副本
+            String cachePath = filePath + fileInfoView.toDto().getSrc();
+            File file = new File(cachePath);
+            if (file.exists()) {
+                boolean deleteSuccess = file.delete();
+                if (!deleteSuccess) {
+                    log.info("Delete file({}) in HardDisk failed.", cachePath);
+                } else {
+                    log.info("Delete file({}) in HardDisk success.", cachePath);
+                }
+            }
+            long affectedRows = fileInfoDao.deleteByFileNo(fileNo);
+            if (affectedRows > 0) {
+                log.info("delete file({}) success, affected rows:{}.", fileInfoView.getName(), affectedRows);
+            }
+        });
     }
 
     public Optional<FileInfo> findFileFromDB(String fileNo) {

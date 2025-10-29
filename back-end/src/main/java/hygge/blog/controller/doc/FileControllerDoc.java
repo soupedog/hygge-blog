@@ -24,4 +24,10 @@ public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>
 
     @Operation(summary = "查询文件信息", description = "根据文件类型查询文件信息")
     ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfo(List<FileTypeEnum> fileTypes, int currentPage, int pageSize);
+
+    @Operation(summary = "对外暴露文件", description = "对外提供文件下载功能")
+    ResponseEntity<byte[]> exposeFile(String fileNo);
+
+    @Operation(summary = "删除文件", description = "删除数据库中文件及磁盘副本")
+    ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(String fileNo);
 }

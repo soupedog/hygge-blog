@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +69,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
 
     @GetMapping(value = "/file/static/{fileNo}")
     @ControllerLog(outputParamEnable = false)
-    public ResponseEntity<byte[]> getTimeEntity(@PathVariable("fileNo") String fileNo) {
+    public ResponseEntity<byte[]> exposeFile(@PathVariable("fileNo") String fileNo) {
         Optional<FileInfo> resultTemp = fileService.findFileFromDB(fileNo);
 
         if (resultTemp.isEmpty()) {
@@ -132,5 +133,12 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
         }
 
         return (ResponseEntity<byte[]>) successWithWrapper(HttpStatus.OK, headers, GlobalHyggeCodeEnum.SUCCESS, null, resultTemp.get().getContent(), emptyResponseWrapper);
+    }
+
+    @Override
+    @DeleteMapping("/file/{fileNo}")
+    public ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(@PathVariable("fileNo") String fileNo) {
+        fileService.deleteFile(fileNo);
+        return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
     }
 }
