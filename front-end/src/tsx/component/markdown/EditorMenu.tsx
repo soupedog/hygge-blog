@@ -18,8 +18,6 @@ import {AntdTreeNodeInfo, MdHelper} from "./util/MdHelper";
 import InputElementHelper from "./util/InputElementHelper";
 import {FileInfo, UserService} from "../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
-import * as prettier from 'prettier';
-import parserMarkdown from 'prettier/plugins/markdown';
 // @ts-ignore
 import {pangu} from 'pangu/browser';
 
@@ -202,24 +200,6 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                     }
                                 });
                             }}>文本间隔</Button>
-                            <Button type="link" onClick={() => {
-                                // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
-                                let currentContent: string | null = element.textContent;
-                                if (currentContent != null) {
-                                    //TODO 此处代码引发了 webpack --mode development 运行正常 而 production 运行报错
-                                    prettier.format(currentContent, {
-                                        parser: 'markdown',
-                                        plugins: [parserMarkdown]
-                                    }).then(nextContent => {
-                                        updateContent(nextContent);
-                                        contentChangeUndoStackHandler(nextContent);
-                                        message.info("已将文本格式化标准形式")
-                                    })
-                                } else {
-                                    message.warning("未发现待美化的文本内容")
-                                }
-                            }}>美化文本</Button>
                         </Space>
                     </Row>
             },

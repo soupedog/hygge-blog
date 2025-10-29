@@ -1,36 +1,35 @@
 import React, {createContext, useEffect, useState} from 'react';
-import {Button, Card, ConfigProvider, GetProp, Layout, Modal, Space, Table, TableProps} from 'antd';
+import {Button, Card, ConfigProvider, GetProp, Layout, message, Modal, Space, Switch, Table, TableProps} from 'antd';
 
 import zhCN from "antd/lib/locale/zh_CN";
 import {Content, Header} from "antd/es/layout/layout";
 import {class_index_title,} from "../component/properties/ElementNameContainer";
 import HyggeFooter from "../component/HyggeFooter";
 import type {SorterResult} from 'antd/es/table/interface';
-import {LogHelper} from "../util/UtilContainer";
+import {LogHelper, UrlHelper} from "../util/UtilContainer";
 import {FileInfo, FileService} from "../rest/ApiClient";
 import Column from "antd/es/table/Column";
-import { createStyles } from 'antd-style';
+import {createStyles} from 'antd-style';
 
-const useStyle = createStyles(({ css, token }) => {
+const useStyle = createStyles(({css, token}) => {
     // @ts-ignore
-    const { antCls } = token;
+    const {antCls} = token;
     return {
         customTable: css`
-      ${antCls}-table {
-        ${antCls}-table-container {
-          ${antCls}-table-body,
-          ${antCls}-table-content {
-            scrollbar-width: thin;
-            scrollbar-color: #eaeaea transparent;
-            scrollbar-gutter: stable;
-          }
-        }
-      }
-    `,
+            ${antCls}-table {
+                ${antCls}-table-container {
+                    ${antCls}-table-body,
+                    ${antCls}-table-content {
+                        scrollbar-width: thin;
+                        scrollbar-color: #eaeaea transparent;
+                        scrollbar-gutter: stable;
+                    }
+                }
+            }
+        `,
     };
 });
 
-type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
 
 interface TableParams {
@@ -39,41 +38,6 @@ interface TableParams {
     sortOrder?: SorterResult<any>['order'];
     filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
 }
-
-const columns: ColumnsType<FileInfo> = [
-    {
-        title: '文件名',
-        dataIndex: 'name',
-    },
-    {
-        title: '归档类型',
-        dataIndex: 'fileType',
-        filters: [
-            {text: '系统核心图', value: 'CORE'},
-            {text: '句子收藏图', value: 'QUOTE'},
-            {text: '文章封面', value: 'ARTICLE_COVER'},
-            {text: '文章所属', value: 'ARTICLE'},
-            {text: '背景音乐', value: 'BGM'},
-            {text: '杂项', value: 'OTHERS'},
-        ],
-    },
-    {
-        title: '扩展名',
-        dataIndex: 'extension',
-    },
-    {
-        title: '文件大小',
-        dataIndex: 'fileSize',
-    },
-    {
-        title: '相对路径',
-        dataIndex: 'src',
-    },
-    {
-        title: '编号',
-        dataIndex: 'fileNo',
-    },
-];
 
 const ReachableContext = createContext<string | null>(null);
 
@@ -97,7 +61,7 @@ function FileManage() {
         },
     });
 
-    const { styles } = useStyle();
+    const {styles} = useStyle();
 
     const [modal, contextHolder] = Modal.useModal();
 
@@ -116,6 +80,7 @@ function FileManage() {
                 ...tableParams,
                 pagination: {
                     ...tableParams.pagination,
+                    showSizeChanger: true,
                     total: data == null ? 0 : data.main?.totalCount,
                 },
             });
@@ -164,7 +129,7 @@ function FileManage() {
                                         style={{margin: 0}}>{record.description?.content}</p>,
                                     rowExpandable: (record) => record.description?.content != undefined,
                                 }}
-                                scroll={{ x: 'max-content' }}
+                                scroll={{x: 'max-content'}}
                                 pagination={tableParams.pagination}
                                 loading={loading}
                                 onChange={handleTableChange}
@@ -181,7 +146,32 @@ function FileManage() {
                                         ]}/>
                                 <Column title="扩展名" dataIndex="extension" fixed={"left"}/>
                                 <Column title="大小" dataIndex="fileSize"/>
-                                <Column title="相对路径" dataIndex="src"/>
+                                <Column title="磁盘副本" dataIndex="isInHardDisk"
+                                        render={(_: any, record: FileInfo) => (
+                                            record.isInHardDisk == undefined ? <Switch disabled/> :
+                                                <Switch disabled defaultChecked/>
+                                        )}
+                                />
+                                <Column title="路径" dataIndex="src"
+                                        render={(_: any, record: FileInfo) => (
+                                            record.isInHardDisk == undefined ?
+                                                <Button color="default" variant="link" onClick={() => {
+                                                    navigator.clipboard.writeText(record.src).then(() => {
+                                                        message.info("已成功复制 " + record.name + " 相对路径到剪切板！")
+                                                    }).catch(e => console.error(e))
+                                                }}>
+                                                    {record.src}
+                                                </Button> :
+                                                <Button color="primary" variant="link" onClick={() => {
+                                                    let link: string = UrlHelper.getBaseStaticSourceUrl() + record.src;
+                                                    navigator.clipboard.writeText(link).then(() => {
+                                                        message.info("已成功复制 " + record.name + " 静态链接到剪切板！")
+                                                    }).catch(e => console.error(e))
+                                                }}>
+                                                    {record.src}
+                                                </Button>
+                                        )}
+                                />
                                 <Column title="编号" dataIndex="fileNo"/>
                                 <Column
                                     title="操作"
@@ -189,14 +179,26 @@ function FileManage() {
                                     fixed={"right"}
                                     render={(_: any, record: FileInfo) => (
                                         <Space size="small">
-                                            <Button color="default" variant="outlined" onClick={() => {
-                                                alert(record.fileNo)
-
+                                            <Button color="cyan" variant="filled" onClick={() => {
+                                                let link: string = UrlHelper.getBaseApiUrl() + "/main/file/static/" + record.fileNo;
+                                                navigator.clipboard.writeText(link).then(() => {
+                                                    message.info("已成功复制 " + record.name + " 动态链接到剪切板！")
+                                                }).catch(e => console.error(e))
+                                            }}>
+                                                复制链接
+                                            </Button>
+                                            <Button
+                                                disabled={record.extension != "png" && record.extension != "jpg" && record.extension != "jpeg" && record.extension != "gif"}
+                                                color="default" variant="outlined" onClick={() => {
+                                                let link: string = UrlHelper.getBaseApiUrl() + "/main/file/static/" + record.fileNo;
+                                                UrlHelper.openNewPage({finalUrl: link, inNewTab: true})
                                             }}>
                                                 查看
                                             </Button>
                                             <Button color="cyan" variant="solid" onClick={() => {
-                                                alert(record.fileNo)
+                                                let filePromise = FileService.downloadFilePromise(record.fileNo)
+                                                let fileName = record.name + "." + record.extension;
+                                                FileService.saveFile(filePromise, fileName);
                                             }}>
                                                 下载
                                             </Button>
@@ -208,8 +210,13 @@ function FileManage() {
                                             <Button color="danger" variant="solid" onClick={async () => {
                                                 setCurrentFileName(record.name);
                                                 const confirmed = await modal.confirm(config);
-                                                console.log('Confirmed: ', confirmed);
-                                                alert(record.fileNo)
+                                                if (confirmed) {
+                                                    FileService.deleteFile(record.fileNo, (data) => {
+                                                        message.info("删除 " + record.name + " 成功！");
+                                                        // 主动触发数据重新加载
+                                                        fetchData();
+                                                    });
+                                                }
                                             }}>
                                                 删除
                                             </Button>

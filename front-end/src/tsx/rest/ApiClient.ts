@@ -1,6 +1,7 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import {message} from "antd";
 import {PropertiesHelper, UrlHelper} from "../util/UtilContainer";
+import {saveAs} from 'file-saver';
 
 axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
 axios.interceptors.response.use(function (response) {
@@ -651,6 +652,7 @@ export interface FileInfo {
     extension: string,
     fileType: string,
     fileSize: string,
+    isInHardDisk?: Boolean,
     description?: FileDescription
 }
 
@@ -675,11 +677,47 @@ export class FileService {
 
         let actualPath: string = type == undefined ? "" : "?type=" + type.join(",")
 
+
         axios.get("/main/file" + actualPath, {
-            headers: UserService.getHeader()
+            headers: UserService.getHeader({})
         }).then((response) => {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<FileInfoInfo> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static downloadFilePromise(fileNo: string): Promise<AxiosResponse> {
+        // 全局被加了特殊拦截器，不适用于下载文件，此处为新创建实例
+        return axios.create().get("/main/file/static/" + fileNo, {
+            headers: UserService.getHeader({}),
+            responseType: 'arraybuffer'
+        })
+    }
+
+    static saveFile(responsePromise: Promise<AxiosResponse>, fileName: string) {
+        responsePromise.then((response) => {
+            let type: string = response.headers['content-type'];
+            let blob = new Blob([response.data], {type: type});
+            saveAs(blob, fileName);
+        })
+    }
+
+    static deleteFile(fileNo: string,
+                      successHook?: (input?: HyggeResponse<string>) => void,
+                      beforeHook?: () => void,
+                      finallyHook?: () => void): void {
+        axios.delete("/main/file/" + fileNo, {
+            headers: UserService.getHeader()
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<string> = response.data;
                     successHook(data);
                 }
             }
