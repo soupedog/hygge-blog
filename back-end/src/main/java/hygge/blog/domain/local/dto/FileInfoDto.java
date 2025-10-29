@@ -39,6 +39,8 @@ public class FileInfoDto {
     private FileDescriptionDto description;
     @Schema(title = "文件大小")
     private String fileSize;
+    @Schema(title = "是否已存在硬盘副本")
+    private Boolean isInHardDisk;
     @Schema(title = "创建时间", description = "UTC 毫秒级时间戳")
     protected Long createTs;
     @Schema(title = "最后修改时间", description = "UTC 毫秒级时间戳")
