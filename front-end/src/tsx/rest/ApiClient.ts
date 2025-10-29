@@ -709,6 +709,26 @@ export class FileService {
         })
     }
 
+    static assignBlobImageToElement( responsePromise: Promise<AxiosResponse>, ...elements: HTMLImageElement[]) {
+        if (elements.length < 1) {
+            message.warning("未找到对应图片展示标签！");
+            return;
+        }
+        responsePromise.then((response) => {
+            let type: string = response.headers['content-type'];
+            let blob = new Blob([response.data], {type: type});
+            let url = URL.createObjectURL(blob);
+
+            elements.forEach((element) => {
+                element.src = url;
+                element.onload = function () {
+                    URL.revokeObjectURL(url);
+                };
+            });
+            message.info("图片加载成功")
+        })
+    }
+
     static deleteFile(fileNo: string,
                       successHook?: (input?: HyggeResponse<string>) => void,
                       beforeHook?: () => void,

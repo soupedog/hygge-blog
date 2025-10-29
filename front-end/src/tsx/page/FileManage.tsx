@@ -1,12 +1,25 @@
 import React, {createContext, useEffect, useState} from 'react';
-import {Button, Card, ConfigProvider, GetProp, Layout, message, Modal, Space, Switch, Table, TableProps} from 'antd';
+import {
+    Button,
+    Card,
+    ConfigProvider,
+    GetProp,
+    Image,
+    Layout,
+    message,
+    Modal,
+    Space,
+    Switch,
+    Table,
+    TableProps
+} from 'antd';
 
 import zhCN from "antd/lib/locale/zh_CN";
 import {Content, Header} from "antd/es/layout/layout";
 import {class_index_title,} from "../component/properties/ElementNameContainer";
 import HyggeFooter from "../component/HyggeFooter";
 import type {SorterResult} from 'antd/es/table/interface';
-import {LogHelper, UrlHelper} from "../util/UtilContainer";
+import {UrlHelper} from "../util/UtilContainer";
 import {FileInfo, FileService} from "../rest/ApiClient";
 import Column from "antd/es/table/Column";
 import {createStyles} from 'antd-style';
@@ -64,8 +77,6 @@ function FileManage() {
     const {styles} = useStyle();
 
     const [modal, contextHolder] = Modal.useModal();
-
-    LogHelper.warn({className: "FileManage", msg: tableParams, isJson: true})
 
     const fetchData = () => {
         // 改页面标题
@@ -134,6 +145,24 @@ function FileManage() {
                                 loading={loading}
                                 onChange={handleTableChange}
                             >
+                                <Column title="缩略图" dataIndex="fileNo" fixed={"left"}
+                                        render={(_: any, record: FileInfo) => (
+                                            record.extension != "png" && record.extension != "jpg" && record.extension != "jpeg" && record.extension != "gif" ?
+                                                <Image id={"img_" + record.fileNo}
+                                                       width={40}
+                                                       preview={false}
+                                                       fallback={UrlHelper.getBaseStaticSourceUrl() + "/core/imageNotFound.png"}
+                                                /> :
+                                                <Image id={"img_" + record.fileNo}
+                                                       width={40}
+                                                       fallback={UrlHelper.getBaseStaticSourceUrl() + "/core/imageDefault.png"}
+                                                       preview={{
+                                                           forceRender: true,
+                                                           rootClassName: "img_p_" + record.fileNo
+                                                       }}
+                                                />
+                                        )}
+                                />
                                 <Column title="文件名" dataIndex="name" fixed={"left"}/>
                                 <Column title="归档类型" dataIndex="fileType" fixed={"left"}
                                         filters={[
@@ -190,8 +219,12 @@ function FileManage() {
                                             <Button
                                                 disabled={record.extension != "png" && record.extension != "jpg" && record.extension != "jpeg" && record.extension != "gif"}
                                                 color="default" variant="outlined" onClick={() => {
-                                                let link: string = UrlHelper.getBaseApiUrl() + "/main/file/static/" + record.fileNo;
-                                                UrlHelper.openNewPage({finalUrl: link, inNewTab: true})
+                                                let firstImg: HTMLImageElement | null = document.querySelector('#img_' + record.fileNo + ' img:first-child');
+                                                const parentElement = document.getElementsByClassName('img_p_' + record.fileNo)[0];
+                                                let secondImg: HTMLImageElement | null = parentElement?.querySelector('img');
+                                                let filePromise = FileService.downloadFilePromise(record.fileNo)
+                                                // @ts-ignore
+                                                FileService.assignBlobImageToElement(filePromise, firstImg, secondImg);
                                             }}>
                                                 查看
                                             </Button>
