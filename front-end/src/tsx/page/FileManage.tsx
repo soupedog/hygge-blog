@@ -104,6 +104,8 @@ function FileManage() {
     LogHelper.warn({className: "FileManage", msg: tableParams, isJson: true})
 
     const fetchData = () => {
+        // 改页面标题
+        document.title = "管理文件";
         setLoading(true);
         // @ts-ignore
         let types: [] = tableParams?.filters?.fileType;
@@ -186,7 +188,7 @@ function FileManage() {
                                     key="action"
                                     fixed={"right"}
                                     render={(_: any, record: FileInfo) => (
-                                        <Space size="middle">
+                                        <Space size="small">
                                             <Button color="default" variant="outlined" onClick={() => {
                                                 alert(record.fileNo)
 

@@ -50,6 +50,19 @@ const onClick: MenuProps['onClick'] = ({key}) => {
     let aid = null;
     let finalUrl = UrlHelper.getBaseUrl();
     switch (key) {
+        case "editArticle":
+            if (aid != null) {
+                UrlHelper.openNewPage({path: "editor/article/" + aid, inNewTab: true})
+            } else {
+                UrlHelper.openNewPage({path: "editor/article", inNewTab: true})
+            }
+            break;
+        case "editQuote":
+            UrlHelper.openNewPage({path: "editor/quote", inNewTab: true})
+            break;
+        case "fileManage":
+            UrlHelper.openNewPage({path: "file/manage", inNewTab: true})
+            break;
         case "signOut":
             UserService.removeCurrentUser();
             message.success("登出成功，1 s 后将跳转回首页。");
@@ -60,19 +73,6 @@ const onClick: MenuProps['onClick'] = ({key}) => {
                 UrlHelper.openNewPage({inNewTab: false})
             }
             UrlHelper.openNewPage({finalUrl: finalUrl, inNewTab: false})
-            break;
-        case "editArticle":
-            if (aid != null) {
-                UrlHelper.openNewPage({path: "editor/article/" + aid, inNewTab: false})
-            } else {
-                UrlHelper.openNewPage({path: "editor/article", inNewTab: false})
-            }
-            break;
-        case "fileManage":
-            UrlHelper.openNewPage({path: "file/manage", inNewTab: false})
-            break;
-        case "editQuote":
-            UrlHelper.openNewPage({path: "editor/quote", inNewTab: false})
             break;
     }
 };

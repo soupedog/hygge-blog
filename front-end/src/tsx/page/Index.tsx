@@ -1,9 +1,10 @@
+import "../../style/index.less"
+
 import React, {createContext, useEffect, useMemo, useState} from 'react';
 import {ConfigProvider, Layout} from "antd";
 import IndexLeft from "../component/index/IndexLeft";
 import IndexRight from "../component/index/IndexRight";
 
-import "../../style/index.less"
 import {
     AnnouncementDto,
     ArticleSummaryResponse,

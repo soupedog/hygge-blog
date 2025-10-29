@@ -8,7 +8,7 @@ import {DownOutlined} from '@ant-design/icons';
 import {TreeProps} from "antd/es/tree/Tree";
 import InputElementHelper from "./util/InputElementHelper";
 import {AntdTreeNodeInfo} from "./util/MdHelper";
-import {MdPreview} from "md-editor-rt";
+import {MdEditor, MdPreview} from "md-editor-rt";
 
 const stackMaxSize = 20;
 const undoStack: string[] = new Array<string>(); // 用于存储撤销历史记录
@@ -202,6 +202,14 @@ function EditorView({content, updateContent, tocEnable, tocTree}: EditorViewProp
             </Col>
             <Col span={12} style={{maxHeight: "600px", overflowY: "scroll"}}>
                 <MdPreview editorId={editor_id_for_editor} modelValue={content} sanitize={allowAll}/>
+            </Col>
+            <Col span={24}>
+                <MdEditor
+                    modelValue={content}
+                    onChange={(modelValue) => {
+                        updateContent(modelValue);
+                    }}
+                />
             </Col>
         </Row>
     );

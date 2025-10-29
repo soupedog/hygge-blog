@@ -1,13 +1,13 @@
+import 'APlayer/dist/APlayer.min.css';
+import "../../style/browser.less"
+
 import React, {useEffect, useState} from 'react';
 import {ConfigProvider, message} from "antd";
 import zhCN from "antd/locale/zh_CN";
-import 'APlayer/dist/APlayer.min.css';
-import "../../style/browser.less"
 import {useParams} from "react-router-dom";
 import {ArticleService} from "../rest/ApiClient";
 import BrowserView from "../component/browser/BrowserView";
 import {UrlHelper} from "../util/UtilContainer";
-
 
 function Browser() {
     const [currentArticle, updateCurrentArticle] = useState(null);

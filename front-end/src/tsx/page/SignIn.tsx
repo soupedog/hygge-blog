@@ -1,7 +1,6 @@
-import React, {useEffect} from 'react';
-
 import "../../style/signin.less"
 
+import React, {useEffect} from 'react';
 import {Button, ConfigProvider, Form, Input, Layout, message} from "antd";
 import {UserService} from "../rest/ApiClient";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
