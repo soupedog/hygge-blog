@@ -77,8 +77,10 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
             return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
         }
 
+        FileInfo fileInfo = resultTemp.get();
+
         // 验证访问权限
-        String cid = resultTemp.get().getCid();
+        String cid = fileInfo.getCid();
         if (parameterHelper.isNotEmpty(cid)) {
             HyggeRequestContext context = HyggeRequestTracker.getContext();
             User currentUser = context.getCurrentLoginUser();
@@ -96,7 +98,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
 
         boolean displayDirectly = true;
 
-        switch (resultTemp.get().getExtension()) {
+        switch (fileInfo.getExtension()) {
             case "png":
                 headers.setContentType(MediaType.IMAGE_PNG);
                 break;
@@ -117,22 +119,24 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         }
 
+        String nameWithExtension = fileInfo.getName() + "." + fileInfo.getExtension();
+
         // 影响鼠标右键图片另存为默认文件名称
         if (displayDirectly) {
             // inline() 是在浏览器直接展示
             headers.setContentDisposition(ContentDisposition.inline()
-                    .filename(resultTemp.get().getName(), StandardCharsets.UTF_8)
+                    .filename(nameWithExtension, StandardCharsets.UTF_8)
                     .build()
             );
         } else {
             // attachment() 模式则是浏览器直接调用下载
             headers.setContentDisposition(ContentDisposition.attachment()
-                    .filename(resultTemp.get().getName(), StandardCharsets.UTF_8)
+                    .filename(nameWithExtension, StandardCharsets.UTF_8)
                     .build()
             );
         }
 
-        return (ResponseEntity<byte[]>) successWithWrapper(HttpStatus.OK, headers, GlobalHyggeCodeEnum.SUCCESS, null, resultTemp.get().getContent(), emptyResponseWrapper);
+        return (ResponseEntity<byte[]>) successWithWrapper(HttpStatus.OK, headers, GlobalHyggeCodeEnum.SUCCESS, null, fileInfo.getContent(), emptyResponseWrapper);
     }
 
     @Override
