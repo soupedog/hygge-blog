@@ -14,8 +14,18 @@ function HyggeUserMenu() {
 
     const {aid} = useParams();
 
+    items?.forEach(item => {
+        let keyOfItem = item!.key as string;
+        let index = keyOfItem.indexOf(",");
+
+        if (index == -1 && aid != undefined) {
+            // 找不到则添加
+            item!.key = keyOfItem + "," + aid;
+        }
+    })
+
     return (
-        // useParams 要求是 hook 组件，而新版本 menu 方式不是
+        // useParams 要在 hook 组件内用，而新版本 menu 数据定义在 hook 组件外
         <Dropdown menu={{items, onClick}}>
             <Avatar className={"pointer"} size={48} src={user.userAvatar}/>
         </Dropdown>
@@ -46,12 +56,15 @@ const items: MenuProps['items'] = [
 ];
 
 // 新版本 menu 模式(无法正确获取 aid)
+// workaround，把 aid 赋进 key，后续再截取 key
 const onClick: MenuProps['onClick'] = ({key}) => {
-    let aid = null;
+    let keyInfo = key.split(",");
+    let actualKay = keyInfo[0];
+    let aid = keyInfo[1];
     let finalUrl = UrlHelper.getBaseUrl();
-    switch (key) {
+    switch (actualKay) {
         case "editArticle":
-            if (aid != null) {
+            if (keyInfo.length > 1) {
                 UrlHelper.openNewPage({path: "editor/article/" + aid, inNewTab: true})
             } else {
                 UrlHelper.openNewPage({path: "editor/article", inNewTab: true})
