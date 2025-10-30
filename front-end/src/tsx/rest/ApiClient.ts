@@ -7,13 +7,14 @@ axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
 axios.interceptors.response.use(function (axiosResponse) {
     if (axiosResponse == null || axiosResponse.status != 200) {
         message.error("网络请求异常！！！")
+        // 相当于控制台抛出异常
         return Promise.reject(axiosResponse);
     }
 
     let response: HyggeResponse<any> = axiosResponse.data;
     let code = response.code;
 
-    // 正确请求前置，优先返回
+    // 正确请求尽可能地前置处理，优先返回
     if (code == 200) {
         return axiosResponse;
     }
@@ -59,8 +60,8 @@ axios.interceptors.response.use(function (axiosResponse) {
 
     return axiosResponse;
 }, function (error) {
-    // 对响应错误做点什么
-    console.log(error.message);
+    message.error("未知请求异常！！！")
+    // 相当于控制台抛出异常
     return Promise.reject(error);
 });
 
