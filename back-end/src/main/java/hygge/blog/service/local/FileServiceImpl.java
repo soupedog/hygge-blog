@@ -109,7 +109,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 name = fileName.substring(0, indexOfLastPoint);
             }
 
-            if (fileInfoViewDao.existsByFileTypeAndNameAndExtension(fileType, name, extension)) {
+            if (fileInfoViewDao.existsByName(name)) {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
@@ -193,7 +193,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
 
-        if (fileInfoViewDao.existsByFileTypeAndNameAndExtension(oldAndBeenOverwrite.getFileType(), oldAndBeenOverwrite.getName(), oldAndBeenOverwrite.getExtension())) {
+        if (fileInfoViewDao.existsByName(oldAndBeenOverwrite.getName())) {
             throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate in new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE);
         }
 
