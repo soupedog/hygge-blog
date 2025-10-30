@@ -49,6 +49,11 @@ const items: MenuProps['items'] = [
         icon: <PaperClipOutlined/>,
     },
     {
+        label: '文件操作',
+        key: 'fileOperation',
+        icon: <PaperClipOutlined/>,
+    },
+    {
         label: '登出',
         key: 'signOut',
         icon: <CloseCircleOutlined/>,
@@ -75,6 +80,9 @@ const onClick: MenuProps['onClick'] = ({key}) => {
             break;
         case "fileManage":
             UrlHelper.openNewPage({path: "file/manage", inNewTab: true})
+            break;
+        case "fileOperation":
+            UrlHelper.openNewPage({path: "file/operation", inNewTab: true})
             break;
         case "signOut":
             UserService.removeCurrentUser();

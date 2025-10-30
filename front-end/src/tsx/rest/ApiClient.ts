@@ -667,16 +667,38 @@ export interface FileDescription {
 }
 
 export class FileService {
-    static findFileInfo(type?: string[],
-                        successHook?: (input?: HyggeResponse<FileInfoInfo>) => void,
+    static findFileInfo(fileNo: string,
+                        successHook?: (input?: HyggeResponse<FileInfo>) => void,
                         beforeHook?: () => void,
                         finallyHook?: () => void): void {
         if (beforeHook != null) {
             beforeHook();
         }
 
-        let actualPath: string = type == undefined ? "" : "?type=" + type.join(",")
+        axios.get("/main/file/" + fileNo, {
+            headers: UserService.getHeader({})
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    let data: HyggeResponse<FileInfo> = response.data;
+                    successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
 
+    static findFileInfoMulti(type?: string[],
+                             successHook?: (input?: HyggeResponse<FileInfoInfo>) => void,
+                             beforeHook?: () => void,
+                             finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        let actualPath: string = type == undefined ? "" : "?type=" + type.join(",")
 
         axios.get("/main/file" + actualPath, {
             headers: UserService.getHeader({})
@@ -684,6 +706,27 @@ export class FileService {
                 if (successHook != null && response != null) {
                     let data: HyggeResponse<FileInfoInfo> = response.data;
                     successHook(data);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static updateFileInfo(fileInfo: FileInfo,
+                          successHook?: (input?: any) => void,
+                          beforeHook?: () => void,
+                          finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+        axios.put("/main/file/" + fileInfo.fileNo, fileInfo, {
+            headers: UserService.getHeader({})
+        }).then((response) => {
+                if (successHook != null && response != null) {
+                    successHook();
                 }
             }
         ).finally(() => {
@@ -709,7 +752,7 @@ export class FileService {
         })
     }
 
-    static assignBlobImageToElement( responsePromise: Promise<AxiosResponse>, ...elements: HTMLImageElement[]) {
+    static assignBlobImageToElement(responsePromise: Promise<AxiosResponse>, ...elements: HTMLImageElement[]) {
         if (elements.length < 1) {
             message.warning("未找到对应图片展示标签！");
             return;

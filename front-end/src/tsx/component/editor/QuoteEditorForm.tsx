@@ -164,7 +164,7 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
 
         let container: SelectProps['options'] = [];
 
-        FileService.findFileInfo(type, (data) => {
+        FileService.findFileInfoMulti(type, (data) => {
             data?.main?.fileInfoList.forEach((item) => {
                 container?.push({
                     label: item.name + " --- " + item.fileSize,

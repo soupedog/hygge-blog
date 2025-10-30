@@ -84,7 +84,7 @@ function FileManage() {
         setLoading(true);
         // @ts-ignore
         let types: [] = tableParams?.filters?.fileType;
-        FileService.findFileInfo(types, (data) => {
+        FileService.findFileInfoMulti(types, (data) => {
             setData(data == null ? [] : data.main?.fileInfoList);
             setLoading(false);
             setTableParams({
@@ -236,7 +236,10 @@ function FileManage() {
                                                 下载
                                             </Button>
                                             <Button color="primary" variant="solid" onClick={() => {
-                                                alert(record.fileNo)
+                                                UrlHelper.openNewPage({
+                                                    path: "file/operation/" + record.fileNo,
+                                                    inNewTab: true
+                                                })
                                             }}>
                                                 编辑
                                             </Button>

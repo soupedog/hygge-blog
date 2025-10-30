@@ -15,6 +15,7 @@ import Browser from "./page/Browser";
 import QuoteEditor from "./page/QuoteEditor";
 import FileManage from "./page/FileManage";
 import {PropertiesHelper} from "./util/UtilContainer";
+import FileOperation from "./page/FileOperation";
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -50,6 +51,8 @@ if (container != null) {
                 <Route path={"/editor/quote/"} element={<QuoteEditor key={"editor-quote"}/>}/>
                 <Route path={"/editor/quote/:quoteId"} element={<QuoteEditor key={"editor-quote"}/>}/>
                 <Route path={"/file/manage"} element={<FileManage key={"file-manage"}/>}/>
+                <Route path={"/file/operation"} element={<FileOperation key={"file-operation"}/>}/>
+                <Route path={"/file/operation/:fileNo"} element={<FileOperation key={"file-operation"}/>}/>
                 <Route path={"*"} element={<NotFound key={"notFound"}/>}/>
             </Routes>
         </BrowserRouter>
