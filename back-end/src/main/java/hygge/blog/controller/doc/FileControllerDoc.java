@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Xavier
@@ -22,12 +23,15 @@ public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>
     @Operation(summary = "上传文件", description = "上传文件到特定目录")
     ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>> upload(@Parameter FileTypeEnum fileType, @Parameter(description = "文章类别唯一标识展示用编号") String cid, List<MultipartFile> filesList);
 
+    @Operation(summary = "删除文件", description = "删除数据库中文件及磁盘副本")
+    ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(String fileNo);
+
+    @Operation(summary = "修改部分文件信息", description = "修改文件名称，描述")
+    ResponseEntity<HyggeBlogControllerResponse<Void>> updateFileInfo(String fileNo, Map<String, Object> data);
+
     @Operation(summary = "查询文件信息", description = "根据文件类型查询文件信息")
     ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfo(List<FileTypeEnum> fileTypes, int currentPage, int pageSize);
 
     @Operation(summary = "对外暴露文件", description = "对外提供文件下载功能")
     ResponseEntity<byte[]> exposeFile(String fileNo);
-
-    @Operation(summary = "删除文件", description = "删除数据库中文件及磁盘副本")
-    ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(String fileNo);
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
+import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.QuoteStateEnum;
 import hygge.blog.domain.local.enums.TopicStateEnum;
 import hygge.blog.domain.local.enums.UserSexEnum;
@@ -11,6 +12,7 @@ import hygge.blog.domain.local.enums.UserStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.domain.local.po.inner.CategoryAccessRule;
+import hygge.blog.domain.local.po.inner.FileDescription;
 import hygge.util.UtilCreator;
 import hygge.util.definition.JsonHelper;
 import hygge.util.definition.ParameterHelper;
@@ -40,6 +42,13 @@ public class MapObjectConvert {
 
     public Long asLong(Object target) {
         return parameterHelper.longFormat("target", target);
+    }
+
+    public byte[] asByteArray(Object target) {
+        if (target instanceof byte[]) {
+            return (byte[]) target;
+        }
+        return null;
     }
 
     public Timestamp asTimestamp(Object target) {
@@ -78,7 +87,6 @@ public class MapObjectConvert {
         return CategoryStateEnum.parse(parameterHelper.string(target));
     }
 
-
     public ArticleConfiguration asArticleConfiguration(Object target) {
         if (target == null) {
             return null;
@@ -92,5 +100,16 @@ public class MapObjectConvert {
 
     public QuoteStateEnum asQuoteStateEnum(Object target) {
         return QuoteStateEnum.parse(parameterHelper.string(target));
+    }
+
+    public FileTypeEnum asFileTypeEnum(Object target) {
+        return FileTypeEnum.valueOf(parameterHelper.string(target));
+    }
+
+    public FileDescription asFileDescription(Object target) {
+        if (target == null) {
+            return null;
+        }
+        return jsonHelper.readAsObject(jsonHelper.formatAsString(target), FileDescription.class);
     }
 }

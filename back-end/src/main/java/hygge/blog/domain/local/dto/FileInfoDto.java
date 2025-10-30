@@ -32,7 +32,7 @@ public class FileInfoDto {
     private String uid;
     @Schema(title = "文件名称(不包含扩展名)")
     private String name;
-    @Schema(title = "文件扩展名(如 .png)")
+    @Schema(title = "文件扩展名(如 png)")
     private String extension;
     @Schema(title = "文件归档类别")
     private FileTypeEnum fileType;

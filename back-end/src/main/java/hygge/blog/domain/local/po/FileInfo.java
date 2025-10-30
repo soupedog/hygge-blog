@@ -2,30 +2,21 @@ package hygge.blog.domain.local.po;
 
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
-import hygge.blog.domain.local.enums.FileTypeEnum;
-import hygge.blog.domain.local.po.base.BasePo;
-import hygge.blog.domain.local.po.inner.FileDescription;
+import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.sql.Timestamp;
 import java.util.Optional;
@@ -39,57 +30,18 @@ import java.util.Optional;
  */
 @Getter
 @Setter
-@Builder
 @Generated
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "fileInfo", indexes = {@Index(name = "index_fileNo", columnList = "fileNo", unique = true)})
-public class FileInfo extends BasePo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Integer fileId;
-    /**
-     * 文件展示用唯一标识
-     */
-    private String fileNo;
-    /**
-     * 上传者唯一标识
-     */
-    @Column(nullable = false)
-    private Integer userId;
-    /**
-     * 文章类别唯一标识展示用编号(与类别共享权限)
-     */
-    private String cid;
-    /**
-     * 文件名称(不包含扩展名)
-     */
-    private String name;
-    /**
-     * 文件扩展名(如 .png)
-     */
-    private String extension;
-    /**
-     * 文件类型
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum ('CORE', 'QUOTE', 'ARTICLE_COVER', 'ARTICLE', 'BGM', 'OTHERS') default 'OTHERS'")
-    private FileTypeEnum fileType;
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private FileDescription description;
-    /**
-     * 文件大小
-     */
-    private Long fileSize;
+public class FileInfo extends FileInfoBase {
     @Lob
-    @Column(columnDefinition = "longblob")
+    @Column(columnDefinition = "longblob", updatable = false)
     private byte[] content;
-
 
     /**
      * 请确保与 {@link FileInfoView#toDto()} 逻辑一致
@@ -100,7 +52,7 @@ public class FileInfo extends BasePo {
                 .name(name)
                 .extension(extension)
                 .src(fileType.getPath() + name + "." + extension)
-                .fileSize(unitConvertHelper.storageSmartFormatAsString(getFileSize()))
+                .fileSize(unitConvertHelper.storageSmartFormatAsString(fileSize))
                 .fileType(fileType)
                 .lastUpdateTs(lastUpdateTs.getTime())
                 .createTs(createTs.getTime())

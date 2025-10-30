@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -59,6 +62,20 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
                                                                                  @RequestParam(value = "cid", required = false) String cid,
                                                                                  @RequestParam("files") List<MultipartFile> filesList) {
         return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>>) success(fileService.uploadFile(cid, fileType, filesList));
+    }
+
+    @Override
+    @DeleteMapping("/file/{fileNo}")
+    public ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(@PathVariable("fileNo") String fileNo) {
+        fileService.deleteFile(fileNo);
+        return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
+    }
+
+    @Override
+    @PutMapping("/file/{fileNo}")
+    public ResponseEntity<HyggeBlogControllerResponse<Void>> updateFileInfo(@PathVariable("fileNo") String fileNo, @RequestBody Map<String, Object> data) {
+        fileService.updateFileInfo(fileNo, data);
+        return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
     }
 
     @Override
@@ -149,12 +166,5 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
         }
 
         return (ResponseEntity<byte[]>) successWithWrapper(HttpStatus.OK, headers, GlobalHyggeCodeEnum.SUCCESS, null, result, emptyResponseWrapper);
-    }
-
-    @Override
-    @DeleteMapping("/file/{fileNo}")
-    public ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(@PathVariable("fileNo") String fileNo) {
-        fileService.deleteFile(fileNo);
-        return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
     }
 }

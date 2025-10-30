@@ -2,10 +2,13 @@ package hygge.blog.service.local;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.common.mapper.MapToAnyMapper;
+import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
@@ -13,10 +16,12 @@ import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
+import hygge.util.bo.ColumnInfo;
+import hygge.util.definition.DaoHelper;
 import hygge.util.definition.FileHelper;
-import hygge.util.definition.UnitConvertHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +38,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -43,19 +51,29 @@ import java.util.Optional;
 @Service
 public class FileServiceImpl extends HyggeJsonUtilContainer {
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
-    private static final UnitConvertHelper unitConvertHelper = UtilCreator.INSTANCE.getDefaultInstance(UnitConvertHelper.class);
+    private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
 
     private static final List<FileTypeEnum> TYPE_FOR_ALL = collectionHelper.createCollection(FileTypeEnum.values());
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Value("${file.upload.path}")
     private String filePath;
+    private final UserServiceImpl userService;
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
     private final FileInfoViewDao fileInfoViewDao;
     private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
 
-    public FileServiceImpl(CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
+    private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
+
+    static {
+        forUpdate.add(new ColumnInfo(true, true, "description", null));
+        forUpdate.add(new ColumnInfo(true, true, "cid", null).toStringColumn(1, 255));
+        forUpdate.add(new ColumnInfo(true, false, "name", null).toStringColumn(1, 255));
+    }
+
+    public FileServiceImpl(UserServiceImpl userService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
+        this.userService = userService;
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;
         this.fileInfoViewDao = fileInfoViewDao;
@@ -108,14 +126,15 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfoDao.save(fileInfo);
 
                 FileInfoDto item = fileInfo.toDto();
-                // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
-                if (isWindows) {
-                    item.setSrc(item.getSrc().replace(File.separator, "/"));
-                }
                 result.add(item);
                 // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
                 if (needCopyToHardDisk) {
                     copyFileToHardDisk(fileInfo);
+                }
+
+                // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
+                if (isWindows) {
+                    item.setSrc(item.getSrc().replace(File.separator, "/"));
                 }
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
@@ -125,6 +144,42 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             }
         }
         return result;
+    }
+
+    public void updateFileInfo(String fileNo, Map<String, Object> data) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+        // 是否有文件查询权限
+        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
+
+        Optional<FileInfoView> targetFileInfoTemp = fileInfoViewDao.findOne(Example.of(FileInfoView.builder()
+                .fileNo(fileNo)
+                .build()));
+
+        if (targetFileInfoTemp.isEmpty()) {
+            throw new LightRuntimeException("File(" + fileNo + ") was not found.", BlogSystemCode.FAIL_TO_QUERY_FILE);
+        }
+        FileInfoView fileInfoView = targetFileInfoTemp.get();
+        User owner = userService.findUserByUserId(fileInfoView.getUserId(), false);
+
+        // 是否有修改权限
+        userService.checkUserRightOrHimself(owner, UserTypeEnum.ROOT);
+
+        Integer currentUserId = currentUser.getUserId();
+        HashMap<String, Object> finalData = daoHelper.filterOutTheFinalColumns(data, forUpdate, finalDataTemp -> {
+            // 过滤成功回调，写回当前操作用户
+            finalDataTemp.put("userId", currentUserId);
+            return finalDataTemp;
+        });
+
+        FileInfo old = new FileInfo();
+        OverrideMapper.INSTANCE.viewOverrideToPo(fileInfoView, old);
+
+        FileInfo newOne = MapToAnyMapper.INSTANCE.mapToFileInfo(finalData);
+
+        OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
+
+        fileInfoDao.save(old);
     }
 
     public FileInfoInfo findFileInfo(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
@@ -171,7 +226,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
             if (file.isAbsolute() && !file.exists()) {
                 // 保障所需文件夹被创建
-                fileHelper.getOrCreateDirectoryIfNotExit(filePath);
+                fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileInfo.getFileType().getPath());
                 boolean createComplete = file.createNewFile();
                 if (!createComplete) {
                     throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
