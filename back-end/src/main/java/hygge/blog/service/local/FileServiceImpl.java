@@ -215,4 +215,9 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo)
                 .build()));
     }
+
+    public Optional<FileInfoView> findFileViewFromDB(String fileNo) {
+        return fileInfoViewDao.findOne(Example.of(FileInfoView.builder().fileNo(fileNo)
+                .build()));
+    }
 }

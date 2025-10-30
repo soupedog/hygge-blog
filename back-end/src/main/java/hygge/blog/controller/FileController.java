@@ -11,6 +11,7 @@ import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
@@ -44,6 +45,8 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     private final FileServiceImpl fileService;
     private final CategoryServiceImpl categoryService;
 
+    private static final byte[] emptyBytes = new byte[0];
+
     public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService) {
         this.fileService = fileService;
         this.categoryService = categoryService;
@@ -70,17 +73,17 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     @GetMapping(value = "/file/static/{fileNo}")
     @ControllerLog(outputParamEnable = false)
     public ResponseEntity<byte[]> exposeFile(@PathVariable("fileNo") String fileNo) {
-        Optional<FileInfo> resultTemp = fileService.findFileFromDB(fileNo);
+        Optional<FileInfoView> resultTempView = fileService.findFileViewFromDB(fileNo);
 
-        if (resultTemp.isEmpty()) {
+        if (resultTempView.isEmpty()) {
             // 为找到 返回 404
             return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
         }
 
-        FileInfo fileInfo = resultTemp.get();
+        FileInfoView fileInfoView = resultTempView.get();
 
         // 验证访问权限
-        String cid = fileInfo.getCid();
+        String cid = fileInfoView.getCid();
         if (parameterHelper.isNotEmpty(cid)) {
             HyggeRequestContext context = HyggeRequestTracker.getContext();
             User currentUser = context.getCurrentLoginUser();
@@ -93,12 +96,21 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
                 return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
             }
         }
+        // 文件下载动作后置，轻量查询鉴权，权限无误再进行笨重操作
+        Optional<FileInfo> resultTemp = fileService.findFileFromDB(fileNo);
+        // 二次验空，防止上一刻文件还在，下一刻立马被删除
+        if (resultTemp.isEmpty()) {
+            // 为找到 返回 404
+            return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
+        }
+
+        byte[] result = resultTemp.get().getContent();
 
         HttpHeaders headers = new HttpHeaders();
 
         boolean displayDirectly = true;
 
-        switch (fileInfo.getExtension()) {
+        switch (fileInfoView.getExtension()) {
             case "png":
                 headers.setContentType(MediaType.IMAGE_PNG);
                 break;
@@ -119,7 +131,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
                 headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         }
 
-        String nameWithExtension = fileInfo.getName() + "." + fileInfo.getExtension();
+        String nameWithExtension = fileInfoView.getName() + "." + fileInfoView.getExtension();
 
         // 影响鼠标右键图片另存为默认文件名称
         if (displayDirectly) {
@@ -136,7 +148,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
             );
         }
 
-        return (ResponseEntity<byte[]>) successWithWrapper(HttpStatus.OK, headers, GlobalHyggeCodeEnum.SUCCESS, null, fileInfo.getContent(), emptyResponseWrapper);
+        return (ResponseEntity<byte[]>) successWithWrapper(HttpStatus.OK, headers, GlobalHyggeCodeEnum.SUCCESS, null, result, emptyResponseWrapper);
     }
 
     @Override
