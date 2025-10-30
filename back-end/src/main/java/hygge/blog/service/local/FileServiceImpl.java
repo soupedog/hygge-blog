@@ -17,6 +17,7 @@ import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
+import hygge.commons.exception.InternalRuntimeException;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -36,6 +37,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +72,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, true, "description", null));
         forUpdate.add(new ColumnInfo(true, true, "cid", null).toStringColumn(1, 255));
         forUpdate.add(new ColumnInfo(true, false, "name", null).toStringColumn(1, 255));
+        forUpdate.add(new ColumnInfo(true, false, "fileType", null).toStringColumn(1, 30));
     }
 
     public FileServiceImpl(UserServiceImpl userService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
@@ -105,7 +108,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 name = fileName.substring(0, indexOfLastPoint);
             }
 
-            if (fileInfoViewDao.existsByName(name)) {
+            if (fileInfoViewDao.existsByFileTypeAndNameAndExtension(fileType, name, extension)) {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
@@ -172,14 +175,61 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             return finalDataTemp;
         });
 
-        FileInfo old = new FileInfo();
-        OverrideMapper.INSTANCE.viewOverrideToPo(fileInfoView, old);
+        // 存在 cid 修改时，需要验证新 cid 存在性
+        String cid = (String) finalData.get("cid");
+        if (cid != null) {
+            if (!cid.equals(fileInfoView.getCid())) {
+                categoryService.findCategoryByCid(cid, false);
+            } else {
+                finalData.remove("cid");
+            }
+        }
+
+        FileInfo oldAndBeenOverwrite = new FileInfo();
+        OverrideMapper.INSTANCE.viewOverrideToPo(fileInfoView, oldAndBeenOverwrite);
 
         FileInfo newOne = MapToAnyMapper.INSTANCE.mapToFileInfo(finalData);
 
-        OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
+        OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
 
-        fileInfoDao.save(old);
+        if (fileInfoViewDao.existsByFileTypeAndNameAndExtension(oldAndBeenOverwrite.getFileType(), oldAndBeenOverwrite.getName(), oldAndBeenOverwrite.getExtension())) {
+            throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate in new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE);
+        }
+
+        fileInfoDao.save(oldAndBeenOverwrite);
+
+        // 相对路径发生变化则需要处理硬盘副本
+        if (!fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath())) {
+            // 检测是否存在硬盘副本
+            String newCachePath = filePath + oldAndBeenOverwrite.returnRelativePath();
+            String oldCachePath = filePath + fileInfoView.returnRelativePath();
+
+            File oldFile = new File(oldCachePath);
+
+            boolean needDeleteOldFile = false;
+            if (oldFile.exists()) {
+                needDeleteOldFile = true;
+
+                File newFile = new File(newCachePath);
+                // 保障所需文件夹被创建
+                fileHelper.getOrCreateDirectoryIfNotExit(filePath + oldAndBeenOverwrite.getFileType().getPath());
+                try {
+                    FileCopyUtils.copy(oldFile, newFile);
+                    log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
+                } catch (IOException e) {
+                    throw new InternalRuntimeException("Fail to copy old file to new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE, e);
+                }
+            }
+
+            if (needDeleteOldFile) {
+                boolean deleteSuccess = oldFile.delete();
+                if (!deleteSuccess) {
+                    log.info("Delete file({}) in HardDisk failed.", oldCachePath);
+                } else {
+                    log.info("Delete file({}) in HardDisk success.", oldCachePath);
+                }
+            }
+        }
     }
 
     public FileInfoInfo findFileInfo(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {

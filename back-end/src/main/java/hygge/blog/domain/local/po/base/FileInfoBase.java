@@ -1,5 +1,7 @@
 package hygge.blog.domain.local.po.base;
 
+import hygge.blog.domain.local.dto.FileInfoDto;
+import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.inner.FileDescription;
 import jakarta.persistence.Column;
@@ -10,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,9 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import java.sql.Timestamp;
+import java.util.Optional;
 
 /**
  * @author Xavier
@@ -68,4 +72,35 @@ public abstract class FileInfoBase extends BasePo {
      * 文件大小
      */
     protected Long fileSize;
+
+    public FileInfoDto toDto() {
+        FileInfoDto result = FileInfoDto.builder()
+                .fileNo(fileNo)
+                .name(name)
+                .extension(extension)
+                .src(returnRelativePath())
+                .fileSize(unitConvertHelper.storageSmartFormatAsString(fileSize))
+                .fileType(fileType)
+                .lastUpdateTs(lastUpdateTs.getTime())
+                .createTs(createTs.getTime())
+                .build();
+
+        // FileDescription 对象可空，非空时才尝试初始化
+        Optional.ofNullable(description).ifPresent((info) -> {
+            if (parameterHelper.atLeastOneNotEmpty(info.getContent(), info.getTimePointer())) {
+                // 至少有一个非空字段才初始化
+                result.setDescription(
+                        FileDescriptionDto.builder()
+                                .content(info.getContent())
+                                .timePointer(Optional.ofNullable(info.getTimePointer()).map(Timestamp::getTime).orElse(null))
+                                .build()
+                );
+            }
+        });
+        return result;
+    }
+
+    public String returnRelativePath() {
+        return fileType.getPath() + name + "." + extension;
+    }
 }
