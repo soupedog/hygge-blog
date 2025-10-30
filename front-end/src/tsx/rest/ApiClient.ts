@@ -4,22 +4,26 @@ import {PropertiesHelper, UrlHelper} from "../util/UtilContainer";
 import {saveAs} from 'file-saver';
 
 axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
-axios.interceptors.response.use(function (response) {
-    let data = response.data;
-    if (data == null) {
-        return Promise.reject(response);
+axios.interceptors.response.use(function (axiosResponse) {
+    if (axiosResponse == null || axiosResponse.status != 200) {
+        message.error("网络请求异常！！！")
+        return Promise.reject(axiosResponse);
     }
-    let code = data.code;
 
-    // 对响应数据做点什么
+    let response: HyggeResponse<any> = axiosResponse.data;
+    let code = response.code;
+
+    // 正确请求前置，优先返回
     if (code == 200) {
-        return response;
-    } else if (code == 403002) {
+        return axiosResponse;
+    }
+
+    // 处理自动登录相关状态码
+    if (code == 403002) {
         UserService.removeCurrentUser();
         // 令牌刷新失败，无法自动登录
         message.warning("自动刷新令牌失败，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
-        return Promise.reject(response);
     } else if (code == 403003) {
         let flag = localStorage.getItem('autoRefreshDisableFlag');
 
@@ -27,7 +31,7 @@ axios.interceptors.response.use(function (response) {
             localStorage.setItem('autoRefreshDisableFlag', "已禁止再次触发自动登陆");
 
             UserService.signIn(undefined, undefined, (data) => {
-                if (data?.code == 200) {
+                if (data!.code == 200) {
                     message.info("已为您成功自动登录，1 秒内为您跳转回主页", 1);
                     // 重新登陆成功后需要重置自动重试开关
                     localStorage.removeItem('autoRefreshDisableFlag');
@@ -44,23 +48,19 @@ axios.interceptors.response.use(function (response) {
             message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
             UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 2000});
         }
-        return Promise.reject(response);
     } else if (code == 403000) {
         // 账号、密码、令牌错误
         UserService.removeCurrentUser();
         message.warning("已清空错误登陆信息，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
-        return response;
-    } else if (code == 400 || code < 500000) {
-        message.warning(data.msg, 5);
-        return Promise.reject(response);
     } else {
-        message.error(data.msg, 5);
-        return Promise.reject(response);
+        message.error(response.msg, 5);
     }
+
+    return axiosResponse;
 }, function (error) {
     // 对响应错误做点什么
-    message.error(error.message, 5);
+    console.log(error.message);
     return Promise.reject(error);
 });
 
@@ -179,19 +179,18 @@ export class UserService {
             request = axios.post("/sign/in", requestData, {headers: UserService.getHeader()});
         }
 
-        request.then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<SignInResponse> = response.data;
-                    if (data.main?.user != null) {
-                        let user = data.main.user;
-                        localStorage.setItem('uid', user.uid);
-                        localStorage.setItem('token', data.main.token);
-                        localStorage.setItem('refreshKey', data.main.refreshKey);
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        message.info("用户信息已更新")
-                    }
+        request.then((axiosResponse) => {
+                let response: HyggeResponse<SignInResponse> = axiosResponse.data;
 
-                    successHook(data);
+                if (successHook != null && response.code == 200) {
+                    let user = response.main!.user!;
+                    localStorage.setItem('uid', user.uid);
+                    localStorage.setItem('token', response.main!.token);
+                    localStorage.setItem('refreshKey', response.main!.refreshKey);
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    message.info("用户信息已更新")
+
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -270,10 +269,10 @@ export class ArticleService {
 
         axios.get("/main/article/" + aid, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<ArticleDto> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<ArticleDto> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -293,10 +292,10 @@ export class ArticleService {
 
         axios.post("/main/article", article, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<ArticleDto> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<ArticleDto> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -317,10 +316,10 @@ export class ArticleService {
 
         axios.put("/main/article/" + aid, article, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<ArticleDto> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<ArticleDto> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -404,10 +403,10 @@ export class HomePageService {
 
         axios.get("main/home/fetch", {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<AllOverviewInfo> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<AllOverviewInfo> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -426,10 +425,10 @@ export class HomePageService {
 
         axios.get("main/home/fetch/announcement", {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<AnnouncementDto[]> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<AnnouncementDto[]> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -450,10 +449,10 @@ export class HomePageService {
 
         axios.get("main/home/fetch/quote" + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<QuoteResponse> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<QuoteResponse> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -476,10 +475,10 @@ export class HomePageService {
 
         axios.get("main/home/fetch/topic/" + tid + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<ArticleSummaryResponse> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<ArticleSummaryResponse> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -502,10 +501,10 @@ export class HomePageService {
 
         axios.get("main/home/fetch/category/" + cid + "?currentPage=" + currentPage + "&pageSize=" + pageSize, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<ArticleSummaryResponse> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<ArticleSummaryResponse> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -527,10 +526,10 @@ export class HomePageService {
 
         axios.get("main/home/search/article?keyword=" + keyword + "&currentPage=" + currentPage + "&pageSize=" + pageSize, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<ArticleSummaryResponse> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<ArticleSummaryResponse> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -552,10 +551,10 @@ export class HomePageService {
 
         axios.get("main/home/search/quote?keyword=" + keyword + "&currentPage=" + currentPage + "&pageSize=" + pageSize, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<QuoteResponse> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<QuoteResponse> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -575,6 +574,7 @@ export class QuoteService {
             beforeHook();
         }
 
+        // TODO 没看懂
         if (!PropertiesHelper.isStringNotEmpty(quoteId)) {
             if (successHook != null) {
                 successHook();
@@ -584,10 +584,10 @@ export class QuoteService {
 
         axios.get("/main/quote/" + quoteId, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<QuoteDto> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<QuoteDto> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -607,10 +607,10 @@ export class QuoteService {
 
         axios.post("/main/quote", quote, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<QuoteDto> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<QuoteDto> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -631,10 +631,10 @@ export class QuoteService {
 
         axios.put("/main/quote/" + quoteId, quote, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<QuoteDto> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<QuoteDto> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -677,10 +677,10 @@ export class FileService {
 
         axios.get("/main/file/" + fileNo, {
             headers: UserService.getHeader({})
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<FileInfo> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<FileInfo> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -702,10 +702,10 @@ export class FileService {
 
         axios.get("/main/file" + actualPath, {
             headers: UserService.getHeader({})
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<FileInfoInfo> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<FileInfoInfo> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -716,7 +716,7 @@ export class FileService {
     }
 
     static updateFileInfo(fileInfo: FileInfo,
-                          successHook?: (input?: any) => void,
+                          successHook?: (input?: HyggeResponse<FileInfo>) => void,
                           beforeHook?: () => void,
                           finallyHook?: () => void): void {
         if (beforeHook != null) {
@@ -724,9 +724,10 @@ export class FileService {
         }
         axios.put("/main/file/" + fileInfo.fileNo, fileInfo, {
             headers: UserService.getHeader({})
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    successHook();
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<FileInfo> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {
@@ -745,9 +746,9 @@ export class FileService {
     }
 
     static saveFile(responsePromise: Promise<AxiosResponse>, fileName: string) {
-        responsePromise.then((response) => {
-            let type: string = response.headers['content-type'];
-            let blob = new Blob([response.data], {type: type});
+        responsePromise.then((axiosResponse) => {
+            let type: string = axiosResponse.headers['content-type'];
+            let blob = new Blob([axiosResponse.data], {type: type});
             saveAs(blob, fileName);
         })
     }
@@ -757,9 +758,9 @@ export class FileService {
             message.warning("未找到对应图片展示标签！");
             return;
         }
-        responsePromise.then((response) => {
-            let type: string = response.headers['content-type'];
-            let blob = new Blob([response.data], {type: type});
+        responsePromise.then((axiosResponse) => {
+            let type: string = axiosResponse.headers['content-type'];
+            let blob = new Blob([axiosResponse.data], {type: type});
             let url = URL.createObjectURL(blob);
 
             elements.forEach((element) => {
@@ -773,15 +774,15 @@ export class FileService {
     }
 
     static deleteFile(fileNo: string,
-                      successHook?: (input?: HyggeResponse<string>) => void,
+                      successHook?: (input?: HyggeResponse<any>) => void,
                       beforeHook?: () => void,
                       finallyHook?: () => void): void {
         axios.delete("/main/file/" + fileNo, {
             headers: UserService.getHeader()
-        }).then((response) => {
-                if (successHook != null && response != null) {
-                    let data: HyggeResponse<string> = response.data;
-                    successHook(data);
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<any> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
                 }
             }
         ).finally(() => {

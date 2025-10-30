@@ -19,7 +19,7 @@ import {
 import zhCN from "antd/lib/locale/zh_CN";
 import {Content, Header} from "antd/es/layout/layout";
 import {class_file_operation_form, class_index_title} from "../component/properties/ElementNameContainer";
-import {LogHelper, PropertiesHelper, TimeHelper, TimeType, UrlHelper} from "../util/UtilContainer";
+import {LogHelper, PropertiesHelper, UrlHelper} from "../util/UtilContainer";
 import HyggeFooter from "../component/HyggeFooter";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {UploadOutlined} from "@ant-design/icons";
@@ -59,13 +59,16 @@ function FileOperation() {
                         onFinish={(value) => {
                             if (value.action == "query") {
                                 FileService.findFileInfo(value.fileNo, (data) => {
-                                    if (data?.main != null) {
-                                        refreshFormData(data.main)
+                                    let fileInfo = data!.main;
+                                    if (fileInfo != null) {
+                                        refreshFormData(fileInfo);
+                                        message.info("查询文件信息完毕。");
+                                    } else {
+                                        message.info("文件信息(" + value.fileNo + ")未查询到相关信息。");
                                     }
-                                    message.info("查询文件信息完毕。")
                                 })
                             } else if (value.action == "update") {
-                                FileService.updateFileInfo(value,()=>{
+                                FileService.updateFileInfo(value, (da) => {
                                     message.success("文件信息更新成功。")
                                 });
                             }
@@ -73,7 +76,7 @@ function FileOperation() {
                     >
                         <Form.Item name={['fileNo']} label="文件编号"
                                    rules={[{required: fileNoRequired}]}
-                        initialValue={fileNo}>
+                                   initialValue={fileNo}>
                             <Input/>
                         </Form.Item>
                         <Row justify="center" gutter={[24, 16]}>
