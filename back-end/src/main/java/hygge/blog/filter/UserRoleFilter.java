@@ -26,6 +26,7 @@ public class UserRoleFilter extends AbstractHyggeRequestFilter {
 
     static {
         userRoleMapping.put("/blog-service/api/main/cache", UserTypeEnum.ROOT);
+        // 看起来这里实现很蠢，但实际上是为了在笨重操作前中断请求，防止上传文件占用资源
         userRoleMapping.put("/blog-service/api/main/file", UserTypeEnum.ROOT);
     }
 

@@ -29,8 +29,11 @@ public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>
     @Operation(summary = "修改部分文件信息", description = "修改文件名称，描述")
     ResponseEntity<HyggeBlogControllerResponse<Void>> updateFileInfo(String fileNo, Map<String, Object> data);
 
-    @Operation(summary = "查询文件信息", description = "根据文件类型查询文件信息")
-    ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfo(List<FileTypeEnum> fileTypes, int currentPage, int pageSize);
+    @Operation(summary = "查询文件特定信息", description = "根据文件唯一标识查询文件信息")
+    ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>> findFileInfo(String fileNo);
+
+    @Operation(summary = "查询文件信息列表", description = "根据文件类型查询文件信息")
+    ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfoList(List<FileTypeEnum> fileTypes, int currentPage, int pageSize);
 
     @Operation(summary = "对外暴露文件", description = "对外提供文件下载功能")
     ResponseEntity<byte[]> exposeFile(String fileNo);

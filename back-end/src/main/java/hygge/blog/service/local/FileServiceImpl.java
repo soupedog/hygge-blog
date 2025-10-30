@@ -12,6 +12,7 @@ import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
@@ -83,6 +84,9 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public List<FileInfoDto> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
         boolean needCopyToHardDisk = true;
 
         if (cid != null) {
@@ -92,9 +96,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
 
         List<FileInfoDto> result = new ArrayList<>();
-
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
 
         for (MultipartFile temp : filesList) {
             String fileName = temp.getOriginalFilename();
@@ -232,13 +233,23 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public FileInfoInfo findFileInfo(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
+    public FileInfoDto findFileInfo(String fileNo) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+        // 是否有文件查询权限
+        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
+
+        return findFileViewFromDB(fileNo).map(FileInfoBase::toDto).orElse(null);
+    }
+
+    public FileInfoInfo findFileInfoPageQuery(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
         List<FileTypeEnum> actualFileTypes = fileTypes == null ? TYPE_FOR_ALL : fileTypes;
         FileInfoInfo result = new FileInfoInfo();
 
         List<FileInfoDto> fileInfoDtoList = new ArrayList<>();
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
         List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
 
         List<String> cidList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCid);
@@ -295,6 +306,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void deleteFile(String fileNo) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+        // 是否有文件删除权限
+        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
+
         Optional<FileInfoView> fileInfoViewTemp = fileInfoViewDao.findOne(Example.of(FileInfoView.builder().fileNo(fileNo).build()));
 
         fileInfoViewTemp.ifPresent((fileInfoView) -> {

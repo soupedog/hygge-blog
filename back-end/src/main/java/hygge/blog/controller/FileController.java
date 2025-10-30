@@ -48,8 +48,6 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     private final FileServiceImpl fileService;
     private final CategoryServiceImpl categoryService;
 
-    private static final byte[] emptyBytes = new byte[0];
-
     public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService) {
         this.fileService = fileService;
         this.categoryService = categoryService;
@@ -79,12 +77,19 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     }
 
     @Override
+    @GetMapping("/file/{fileNo}")
+    public ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>> findFileInfo(@PathVariable("fileNo") String fileNo) {
+        FileInfoDto result = fileService.findFileInfo(fileNo);
+        return (ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>>) success(result);
+    }
+
+    @Override
     @GetMapping("/file")
     @ControllerLog(inputParamEnable = false, outputParamEnable = false)
-    public ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfo(@RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
-                                                                                  @RequestParam(required = false, defaultValue = "1") int currentPage,
-                                                                                  @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        return (ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>>) success(fileService.findFileInfo(fileTypes, currentPage, pageSize));
+    public ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfoList(@RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
+                                                                                      @RequestParam(required = false, defaultValue = "1") int currentPage,
+                                                                                      @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        return (ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>>) success(fileService.findFileInfoPageQuery(fileTypes, currentPage, pageSize));
     }
 
     @GetMapping(value = "/file/static/{fileNo}")
