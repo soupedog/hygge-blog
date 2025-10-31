@@ -1,41 +1,48 @@
 import axios, {AxiosResponse} from "axios";
 import {message} from "antd";
 import {PropertiesHelper, UrlHelper} from "../util/UtilContainer";
-import {saveAs} from 'file-saver';
+import {saveAs} from "file-saver";
 
 axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
 axios.interceptors.response.use(function (axiosResponse) {
-    if (axiosResponse == null || axiosResponse.status != 200) {
-        message.error("网络请求异常！！！")
+    // http 状态码非 200
+    if (axiosResponse.status != 200) {
+        message.error("网络请求异常！！！");
         // 相当于控制台抛出异常
         return Promise.reject(axiosResponse);
     }
 
+    // 服务端返回 http 状态码 200
     let response: HyggeResponse<any> = axiosResponse.data;
     let code = response.code;
 
-    // 正确请求尽可能地前置处理，优先返回
-    if (code == 200) {
+    // 没有 code 可能不是 application/json 类型 response，既然 http 状态码是 200 ，那也无需拒绝
+    if (code == null || code == 200) {
         return axiosResponse;
     }
 
-    // 处理自动登录相关状态码
+    // code 不为 200 是后端有特殊规则
+    // 处理自动登录相关 code
     if (code == 403002) {
         UserService.removeCurrentUser();
         // 令牌刷新失败，无法自动登录
         message.warning("自动刷新令牌失败，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
     } else if (code == 403003) {
-        let flag = localStorage.getItem('autoRefreshDisableFlag');
+        let flag = localStorage.getItem("autoRefreshDisableFlag");
 
-        if (flag == null) {
-            localStorage.setItem('autoRefreshDisableFlag', "已禁止再次触发自动登陆");
+        if (flag) {
+            UserService.removeCurrentUser();
+            message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
+            UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 2000});
+        } else {
+            localStorage.setItem("autoRefreshDisableFlag", "已禁止再次触发自动登陆");
 
             UserService.signIn(undefined, undefined, (data) => {
                 if (data!.code == 200) {
                     message.info("已为您成功自动登录，1 秒内为您跳转回主页", 1);
                     // 重新登陆成功后需要重置自动重试开关
-                    localStorage.removeItem('autoRefreshDisableFlag');
+                    localStorage.removeItem("autoRefreshDisableFlag");
                     UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
                 } else {
                     message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
@@ -44,18 +51,12 @@ axios.interceptors.response.use(function (axiosResponse) {
                     UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
                 }
             });
-        } else {
-            UserService.removeCurrentUser();
-            message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
-            UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 2000});
         }
     } else if (code == 403000) {
         // 账号、密码、令牌错误
         UserService.removeCurrentUser();
         message.warning("已清空错误登陆信息，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
-    } else {
-        message.error(response.msg, 5);
     }
 
     return axiosResponse;
@@ -96,19 +97,19 @@ export enum ClientScope {
 }
 
 export class UserService {
-    static getCurrentUser(): UserDto | null | undefined {
-        let currentUserStringValue = localStorage.getItem('currentUser');
+    static getCurrentUser(): UserDto | undefined {
+        let currentUserStringValue = localStorage.getItem("currentUser");
         if (PropertiesHelper.isStringNotEmpty()) {
-            return null;
+            return undefined;
         }
         return JSON.parse(currentUserStringValue!) as UserDto;
     }
 
     static removeCurrentUser() {
-        localStorage.removeItem('uid');
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshKey');
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem("uid");
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshKey");
+        localStorage.removeItem("currentUser");
     }
 
     static getCurrentScope(): ClientScope {
@@ -185,10 +186,10 @@ export class UserService {
 
                 if (successHook != null && response.code == 200) {
                     let user = response.main!.user!;
-                    localStorage.setItem('uid', user.uid);
-                    localStorage.setItem('token', response.main!.token);
-                    localStorage.setItem('refreshKey', response.main!.refreshKey);
-                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    localStorage.setItem("uid", user.uid);
+                    localStorage.setItem("token", response.main!.token);
+                    localStorage.setItem("refreshKey", response.main!.refreshKey);
+                    localStorage.setItem("currentUser", JSON.stringify(user));
                     message.info("用户信息已更新")
 
                     successHook(response);
@@ -575,14 +576,6 @@ export class QuoteService {
             beforeHook();
         }
 
-        // TODO 没看懂
-        if (!PropertiesHelper.isStringNotEmpty(quoteId)) {
-            if (successHook != null) {
-                successHook();
-            }
-            return;
-        }
-
         axios.get("/main/quote/" + quoteId, {
             headers: UserService.getHeader()
         }).then((axiosResponse) => {
@@ -723,6 +716,7 @@ export class FileService {
         if (beforeHook != null) {
             beforeHook();
         }
+
         axios.put("/main/file/" + fileInfo.fileNo, fileInfo, {
             headers: UserService.getHeader({})
         }).then((axiosResponse) => {
@@ -740,15 +734,15 @@ export class FileService {
 
     static downloadFilePromise(fileNo: string): Promise<AxiosResponse> {
         // 全局被加了特殊拦截器，不适用于下载文件，此处为新创建实例
-        return axios.create().get("/main/file/static/" + fileNo, {
+        return axios.get("/main/file/static/" + fileNo, {
             headers: UserService.getHeader({}),
-            responseType: 'arraybuffer'
+            responseType: "arraybuffer"
         })
     }
 
     static saveFile(responsePromise: Promise<AxiosResponse>, fileName: string) {
         responsePromise.then((axiosResponse) => {
-            let type: string = axiosResponse.headers['content-type'];
+            let type: string = axiosResponse.headers["content-type"];
             let blob = new Blob([axiosResponse.data], {type: type});
             saveAs(blob, fileName);
         })
@@ -760,7 +754,7 @@ export class FileService {
             return;
         }
         responsePromise.then((axiosResponse) => {
-            let type: string = axiosResponse.headers['content-type'];
+            let type: string = axiosResponse.headers["content-type"];
             let blob = new Blob([axiosResponse.data], {type: type});
             let url = URL.createObjectURL(blob);
 
@@ -770,7 +764,7 @@ export class FileService {
                     URL.revokeObjectURL(url);
                 };
             });
-            message.info("图片加载成功")
+            message.info("图片加载成功。")
         })
     }
 
@@ -778,6 +772,10 @@ export class FileService {
                       successHook?: (input?: HyggeResponse<any>) => void,
                       beforeHook?: () => void,
                       finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
         axios.delete("/main/file/" + fileNo, {
             headers: UserService.getHeader()
         }).then((axiosResponse) => {
