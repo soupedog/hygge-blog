@@ -8,7 +8,7 @@ const CompressionPlugin = require("compression-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = {
+var config = {
     // 指定下列依赖从远端获取，不打包进 .js 文件
     externals: {
         // "react": "React",
@@ -20,7 +20,6 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js', '.json']
     },
     mode: 'development', // development,production
-    devtool: 'eval-source-map',
     //入口文件的路径(可配多个，此处只配置了 "index" 实体)
     entry: {
         index: "./src/tsx/app.tsx"
@@ -123,4 +122,12 @@ module.exports = {
             // name: "commons"
         }
     }
-}
+};
+
+module.exports = (env, argv) => {
+    if (argv.mode === 'development') {
+        config.devtool = 'source-map';
+    }
+
+    return config;
+};
