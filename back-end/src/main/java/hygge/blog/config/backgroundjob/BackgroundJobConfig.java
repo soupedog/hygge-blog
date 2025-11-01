@@ -31,11 +31,11 @@ public class BackgroundJobConfig {
         refreshElasticSearchService.freshAllQuote();
     }
 
-    /**
-     * ip 查询接口是第三方提供的公共服务，频率限制比想象中更严格，每 8 小时调用一次
-     */
-    @Scheduled(fixedDelay = 1000 * 3600 * 8, initialDelay = 1000 * 300)
-    public void toFreshIpLocationData() {
-        articleBrowseLogService.freshIpLocationBackgroundJob();
-    }
+//    /**
+//     * ip 查询接口是第三方提供的公共服务，频率限制比想象中更严格，每 8 小时调用一次
+//     */
+//    @Scheduled(fixedDelay = 1000 * 3600 * 8, initialDelay = 1000 * 300)
+//    public void toFreshIpLocationData() {
+//        articleBrowseLogService.freshIpLocationBackgroundJob();
+//    }
 }
