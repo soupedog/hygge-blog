@@ -109,7 +109,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 name = fileName.substring(0, indexOfLastPoint);
             }
 
-            if (fileInfoViewDao.existsByName(name)) {
+            if (fileInfoViewDao.existsByFileTypeAndNameAndExtension(fileType, name, extension)) {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
@@ -193,14 +193,30 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
 
-        if (fileInfoViewDao.existsByName(oldAndBeenOverwrite.getName())) {
-            throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate in new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE);
-        }
 
-        fileInfoDao.save(oldAndBeenOverwrite);
+        boolean isPathChanged = !fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
 
         // 相对路径发生变化则需要处理硬盘副本
-        if (!fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath())) {
+        if (isPathChanged) {
+            Sort sort = Sort.by(Sort.Order.asc("createTs"));
+            Pageable pageable = PageRequest.of(0, 1, sort);
+
+            Page<FileInfoView> conflictResultTemp = fileInfoViewDao.findAll(Example.of(FileInfoView.builder()
+                    .fileType(oldAndBeenOverwrite.getFileType())
+                    .name(oldAndBeenOverwrite.getName())
+                    .extension(oldAndBeenOverwrite.getExtension())
+                    .build()), pageable);
+
+            long conflictCount = conflictResultTemp.getTotalElements();
+
+            if (conflictCount > 1L) {
+                // 超过 1 个已存在的冲突必然冲突
+                throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            } else if (conflictCount == 1L && conflictResultTemp.get().noneMatch(item -> item.getFileNo().equals(oldAndBeenOverwrite.getFileNo()))) {
+                // 存在 1 个已存在的冲突且不是自己
+                throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            }
+
             // 检测是否存在硬盘副本
             String newCachePath = filePath + oldAndBeenOverwrite.returnRelativePath();
             String oldCachePath = filePath + fileInfoView.returnRelativePath();
@@ -231,6 +247,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 }
             }
         }
+
+        fileInfoDao.save(oldAndBeenOverwrite);
     }
 
     public FileInfoDto findFileInfo(String fileNo) {
