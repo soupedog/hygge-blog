@@ -122,7 +122,7 @@ function renderArticle(article: ArticleDto | null, tocEnable: Boolean, updateToc
         return (
             <Layout>
                 <Content id="mainView">
-                    <Card title={article.title} bordered={false}
+                    <Card title={article.title} variant={"borderless"}
                           style={{marginTop: '10px'}}>
                         <Breadcrumb items={renderBreadcrumbItems(article)}/>
                         <div style={{
@@ -148,8 +148,8 @@ function renderArticle(article: ArticleDto | null, tocEnable: Boolean, updateToc
                             </Space>
                         </div>
                     </Card>
-                    <Card style={{marginTop: "20px"}} bordered={false}>
-                        <MdPreview editorId={editor_id_for_browser} modelValue={article.content} sanitize={allowAll}/>
+                    <Card style={{marginTop: "20px"}} variant={"borderless"}>
+                        <MdPreview id={editor_id_for_browser} value={article.content} sanitize={allowAll}/>
                     </Card>
                 </Content>
                 <Sider trigger={null}

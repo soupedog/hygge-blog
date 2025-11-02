@@ -2,13 +2,13 @@ import React from "react";
 
 import {Col, message, Row, Tree} from "antd";
 import TextArea from "antd/es/input/TextArea";
-import {class_md_preview, editor_text_area} from "../properties/ElementNameContainer";
-import {allowAll, editor_id_for_browser, editor_id_for_editor, key_draft} from "./properties/MarkDownStaticValue";
+import {editor_text_area} from "../properties/ElementNameContainer";
+import {allowAll, editor_id_for_editor, key_draft} from "./properties/MarkDownStaticValue";
 import {DownOutlined} from '@ant-design/icons';
 import {TreeProps} from "antd/es/tree/Tree";
 import InputElementHelper from "./util/InputElementHelper";
 import {AntdTreeNodeInfo} from "./util/MdHelper";
-import {MdEditor, MdPreview} from "md-editor-rt";
+import {MdPreview} from "md-editor-rt";
 
 const stackMaxSize = 20;
 const undoStack: string[] = new Array<string>(); // 用于存储撤销历史记录
@@ -204,12 +204,6 @@ function EditorView({content, updateContent, tocEnable, tocTree}: EditorViewProp
                 <MdPreview editorId={editor_id_for_editor} modelValue={content} sanitize={allowAll}/>
             </Col>
             <Col span={24}>
-                <MdEditor
-                    modelValue={content}
-                    onChange={(modelValue) => {
-                        updateContent(modelValue);
-                    }}
-                />
             </Col>
         </Row>
     );

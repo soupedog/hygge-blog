@@ -6,6 +6,7 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {Modal} from "antd";
+import '@ant-design/v5-patch-for-react-19';
 import isMobile from "rc-util/es/isMobile"
 import ArticleEditor from "./page/ArticleEditor";
 import Index from "./page/Index";
@@ -41,7 +42,12 @@ if (container != null) {
 
     root.render(
         // <React.StrictMode>
-        <BrowserRouter>
+        <BrowserRouter
+            future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true
+            }}
+        >
             <Routes>
                 <Route path={"/"} element={<Index key={"index"}/>}/>
                 <Route path={"/browser/:aid"} element={<Browser key={"browser"}/>}/>

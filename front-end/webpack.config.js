@@ -11,6 +11,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 var config = {
     // 指定下列依赖从远端获取，不打包进 .js 文件
     externals: {
+        // "prettier": "prettier"
         // "react": "React",
         // "react-dom": "ReactDOM"
         // "vditor": "Vditor"
@@ -19,7 +20,7 @@ var config = {
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json']
     },
-    mode: 'development', // development,production
+    // mode: 'development', // development,production
     //入口文件的路径(可配多个，此处只配置了 "index" 实体)
     entry: {
         index: "./src/tsx/app.tsx"

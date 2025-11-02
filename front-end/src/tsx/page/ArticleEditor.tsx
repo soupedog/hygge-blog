@@ -1,10 +1,9 @@
 import React, {createContext, useEffect, useMemo, useState} from 'react';
 import zhCN from "antd/locale/zh_CN";
 import {ConfigProvider} from "antd";
-import EditorMenu from "../component/markdown/EditorMenu";
-import EditorView from "../component/markdown/EditorView";
 import {AntdTreeNodeInfo} from "../component/markdown/util/MdHelper";
 import ArticleEditorForm from "../component/editor/ArticleEditorForm";
+import DefaultMarkdownEditor from "../component/markdown/DefaultMarkdownEditor";
 
 export interface ArticleEditorState {
     content: string;
@@ -38,10 +37,11 @@ function ArticleEditor() {
     return (
         <ConfigProvider locale={zhCN}>
             <ArticleEditorContext.Provider value={state}>
-                <EditorMenu updateContent={updateContent} tocEnable={tocEnable}
-                            updateTocEnable={updateTocEnable} updateTocTree={updateTocTree}/>
-                <EditorView content={content} updateContent={updateContent}
-                            tocEnable={tocEnable} tocTree={tocTree}/>
+                <DefaultMarkdownEditor content={content} updateContent={updateContent}/>
+                {/*<EditorMenu updateContent={updateContent} tocEnable={tocEnable}*/}
+                {/*            updateTocEnable={updateTocEnable} updateTocTree={updateTocTree}/>*/}
+                {/*<EditorView content={content} updateContent={updateContent}*/}
+                {/*            tocEnable={tocEnable} tocTree={tocTree}/>*/}
                 <ArticleEditorForm updateContent={updateContent}/>
             </ArticleEditorContext.Provider>
         </ConfigProvider>
