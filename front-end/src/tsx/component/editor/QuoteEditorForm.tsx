@@ -31,7 +31,6 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
         // 依赖静态值表示仅初始化时调用一次
     }, []);
 
-
     return (
         <QuoteEditorContext.Consumer>
             {({content}) => (
@@ -43,8 +42,10 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
                              style={{padding: '0 50px', minHeight: window.innerHeight - 182}}>
                         <div id="preview" style={{marginTop: "10px", marginBottom: "20px"}}/>
                         <Form
+                            // 不再记录历史信息
+                            autoComplete={"off"}
                             form={quoteForm}
-                            name="hygge_login"
+                            name="hygge_quote"
                             style={{
                                 maxWidth: "80%",
                                 margin: "40px auto 0 auto"

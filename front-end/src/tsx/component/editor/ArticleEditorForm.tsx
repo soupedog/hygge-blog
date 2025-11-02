@@ -37,13 +37,14 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
         // 依赖静态值表示仅初始化时调用一次
     }, []);
 
-
     return (
         <ArticleEditorContext.Consumer>
             {({content}) => (
                 <Layout>
                     <Content>
                         <Form
+                            // 不再记录历史信息
+                            autoComplete={"off"}
                             form={articleForm}
                             style={{
                                 maxWidth: "80%",

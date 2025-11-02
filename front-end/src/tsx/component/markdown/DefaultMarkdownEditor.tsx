@@ -90,20 +90,19 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
             placeholder="开始记录奇思妙想..."
             toolbars={[
                 // 第一组图标
-                1, "bold", "underline", "italic", "strikeThrough", "-",
+                0, "bold", "underline", "italic", "strikeThrough", "-",
                 // 第二组图标 "-" 是分隔符
                 "title", "sup", "sub", "quote", "unorderedList", "orderedList", "-",
                 // 第三组图标 "-" 是分隔符
                 "task", "codeRow", "code", "link", "image", "table", "mermaid", "katex", "-",
                 // 第四组图标
-                // "revoke", "next", "save",
-                "save",
+                "revoke", "next", "save",
                 // 第三组图标 "=" 是右对齐  "-" 是分隔符
-                "=", "-", 0, "prettier", "pageFullscreen", "previewOnly", "catalog"
+                "=", "-", "prettier", "previewOnly", 1, "pageFullscreen", "catalog",
             ]}
             defToolbars={[
+                <Mark title={"高亮"} key="Mark" trigger={<MarkIcon/>}/>,
                 <ExportPDF key="ExportPDF" value={content}/>,
-                <Mark title={"高亮"} key="Mark" trigger={<MarkIcon/>}/>
             ]}
             value={content}
             onChange={(nextContent) => updateContent(nextContent)}
