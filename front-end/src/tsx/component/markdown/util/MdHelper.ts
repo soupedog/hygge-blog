@@ -15,8 +15,8 @@ export interface TreeNodeInfo extends AntdTreeNodeInfo {
     // html 标签名称
     nodeName: string;
     // 根据 nodeName 一对一唯一对应而来的级别(值越小位级越高)
-    level: number | undefined;
-    parentNodeIndex: number | undefined;
+    level?: number;
+    parentNodeIndex?: number;
 }
 
 export interface ErrorCallbackFunction {
@@ -44,7 +44,7 @@ export class MdHelper {
             item.level = MdHelper.getTitleLevel(currentNodeName, inputParam.errorCallback)!;
 
             // 首个节点
-            if (item.index == 0) {
+            if (item.index === 0) {
                 // 首个节点默认为根节点，初始其父节点为空
                 item.parentNodeIndex = undefined;
                 rootNodeLevel = item.level;
@@ -57,7 +57,7 @@ export class MdHelper {
             }
 
             // 非首个节点
-            if (item.level == rootNodeLevel) {
+            if (item.level === rootNodeLevel) {
                 // 当前节点为根节点，初始其父节点为空
                 item.parentNodeIndex = undefined;
 
@@ -66,7 +66,7 @@ export class MdHelper {
                 prevNode = item;
             } else if (item.level > rootNodeLevel) {
                 // 当前节点是子节点
-                if (item.level == prevNode!.level) {
+                if (item.level === prevNode!.level) {
                     // 当前节点是上一个节点的兄弟节点，分支同辈扩散
                     let parentOfPrevNode = inputParam.allTocNodeMap.get(prevNode!.parentNodeIndex!)!;
                     item.parentNodeIndex = parentOfPrevNode.index;
@@ -89,7 +89,7 @@ export class MdHelper {
                         allTocNodeMap: inputParam.allTocNodeMap
                     });
 
-                    if (prevNodeSeniorNode != undefined) {
+                    if (prevNodeSeniorNode != null) {
                         let parentOfPrevNodeSeniorNode = inputParam.allTocNodeMap.get(prevNodeSeniorNode.parentNodeIndex!)!;
                         item.parentNodeIndex = parentOfPrevNodeSeniorNode.index;
 

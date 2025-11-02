@@ -87,9 +87,8 @@ function initToc(updateTocTree: Function, updateTocEnable: Function, nextTocEnab
     let map = new Map<number, TreeNodeInfo>();
 
     document.querySelectorAll('H1[data-line][id], H2[data-line][id], H3[data-line][id], H4[data-line][id], H5[data-line][id], H6[data-line][id]').forEach((item, index) => {
-        // @ts-ignore
         let antdTreeNode: TreeNodeInfo = {
-            title: item.textContent!,
+            title: item.textContent,
             children: new Array<AntdTreeNodeInfo>(),
             index: index,
             id: item.id,
