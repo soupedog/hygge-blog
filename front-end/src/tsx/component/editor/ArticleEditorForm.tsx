@@ -34,9 +34,9 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                 } else {
                     if (localDraft) {
                         data.main.content = localDraft;
+                        message.success("已从本地草稿加载文本。");
                     }
                     refreshFormInfo(updateContent, data, articleForm);
-                    message.success("已从本地草稿加载文本。");
                 }
             })
         } else if (localDraft) {

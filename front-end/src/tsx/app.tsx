@@ -1,6 +1,9 @@
 import "../style/default.css"
 import "../style/markdownCustomStyle.less"
 import "md-editor-rt/lib/style.css";
+import "@vavt/rt-extension/lib/asset/ExportPDF.css";
+import "@vavt/rt-extension/lib/asset/Mark.css";
+import 'highlight.js/styles/atom-one-dark.css';
 
 import React from 'react';
 import {createRoot} from 'react-dom/client';
@@ -17,6 +20,14 @@ import QuoteEditor from "./page/QuoteEditor";
 import FileManage from "./page/FileManage";
 import {PropertiesHelper} from "./util/UtilContainer";
 import FileOperation from "./page/FileOperation";
+import {config} from "md-editor-rt";
+// @ts-ignore
+import MarkExtension from "markdown-it-mark";
+import * as prettier from 'prettier';
+import parserMarkdown from 'prettier/plugins/markdown';
+import {keymap} from "@codemirror/view";
+import highlight from 'highlight.js';
+import mermaid from 'mermaid';
 
 let enableClientDeviceWarning: string | null = localStorage.getItem('enableClientDeviceWarning');
 
@@ -34,6 +45,53 @@ if (PropertiesHelper.booleanOfNullable({target: enableClientDeviceWarning, defau
         });
     }
 }
+
+// Markdown 工具全局配置
+config({
+    markdownItConfig(md) {
+        md.use(MarkExtension);
+    },
+    editorExtensions: {
+        prettier: {
+            prettierInstance: prettier,
+            parserMarkdownInstance: parserMarkdown
+        },
+        highlight: {
+            instance: highlight
+        },
+        mermaid: {
+            instance: mermaid
+        }
+    },
+    codeMirrorExtensions(extensions, {keyBindings}) {
+        // 1. 先把旧的快捷键映射移除
+        const newExtensions = [...extensions].filter((item) => {
+            return item.type !== 'keymap';
+        });
+
+        // 2. 参考快捷键配置的源码，找到 CtrlF 的配置项在 keyBindings 中的位置
+        const CtrlF = keyBindings.find((i) => i.key === 'Ctrl-f');
+
+        // 3. 复制 CtrlF 的功能到我自定义的 CtrlL
+        // https://codemirror.net/docs/ref/#commands
+        const MyCtrlL = {
+            ...CtrlF,
+            key: 'Ctrl-l',
+            mac: 'Cmd-l',
+        };
+
+        // 4. 把修改后的快捷键放到待构建扩展的数组中
+        const newKeyBindings = [MyCtrlL, ...keyBindings.filter((i) => i.key !== 'Ctrl-l')];
+
+        newExtensions.push({
+            type: 'newKeymap',
+            extension: keymap.of(newKeyBindings)
+        });
+
+        return newExtensions;
+    }
+});
+
 
 const container: Element | null = document.getElementById('root');
 

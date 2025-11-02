@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@vavt/rt-extension": "^4.0.0",
     "antd": "^5.27.6",
     "antd-style": "^3.7.1",
     "aplayer": "^1.10.1",
@@ -55,9 +56,10 @@
     "clsx": "^2.0.0",
     "dayjs": "^1.11.18",
     "file-saver": "^2.0.5",
-    "md-editor-rt": "^6.1.0",
-    "@vavt/rt-extension": "^4.0.0",
+    "highlight.js": "^11.11.1",
     "markdown-it-mark": "^4.0.0",
+    "md-editor-rt": "^6.1.0",
+    "mermaid": "^11.12.1",
     "pangu": "^7.2.0",
     "prettier": "^3.6.2"
   }
