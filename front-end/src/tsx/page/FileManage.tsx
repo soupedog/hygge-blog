@@ -23,6 +23,7 @@ import {UrlHelper} from "../util/UtilContainer";
 import {FileInfo, FileService} from "../rest/ApiClient";
 import Column from "antd/es/table/Column";
 import {createStyles} from 'antd-style';
+import {useNavigate} from "react-router-dom";
 
 const useStyle = createStyles(({css, token}) => {
     // @ts-ignore
@@ -64,6 +65,7 @@ const config = {
 };
 
 function FileManage() {
+    const navigate = useNavigate();
     const [data, setData] = useState<FileInfo[]>();
     const [currentFileName, setCurrentFileName] = useState<string>("未选择");
     const [loading, setLoading] = useState(false);
@@ -236,10 +238,7 @@ function FileManage() {
                                                 下载
                                             </Button>
                                             <Button color="primary" variant="solid" onClick={() => {
-                                                UrlHelper.openNewPage({
-                                                    path: "file/operation/" + record.fileNo,
-                                                    inNewTab: true
-                                                })
+                                                navigate("/file/operation/" + record.fileNo);
                                             }}>
                                                 编辑
                                             </Button>
