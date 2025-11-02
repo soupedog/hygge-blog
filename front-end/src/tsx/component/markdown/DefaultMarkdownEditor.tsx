@@ -65,8 +65,6 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
             }}
             autoFocus={true}
             showToolbarName={true}
-            // // onDrop={(e) => handleDrop(e)}
-            // // onUploadImg={handleUploadImage}
             toolbars={[
                 // 第一组图标
                 1, "bold", "underline", "italic", "strikeThrough", "-",
@@ -84,8 +82,6 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
                 <ExportPDF key="ExportPDF" value={content}/>,
                 <Mark title={"高亮"} key="Mark" trigger={<MarkIcon/>}/>
             ]}
-            // footers={["markdownTotal", "=", "scrollSwitch"]}
-            // defFooters={[<span>{currentTime}</span>]}
         />
     );
 }

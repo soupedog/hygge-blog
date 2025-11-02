@@ -41,7 +41,8 @@ if (container != null) {
     let root = createRoot(container);
 
     root.render(
-        // <React.StrictMode>
+        // <React.StrictMode>  (仅本地调试用一用)
+        // 会使得每个组件在开发模式下被额外渲染两次，通过多次渲染，React 能够确保副作用代码是幂等的，即无论组件渲染多少次，副作用的结果都是一致的。
         <BrowserRouter
             future={{
                 v7_startTransition: true,

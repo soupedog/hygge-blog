@@ -14,11 +14,9 @@ import {
 import {FormInstance} from "antd/es/form/hooks/useForm";
 import {PropertiesHelper, UrlHelper} from "../../util/UtilContainer";
 
-
 function ArticleEditorForm({updateContent}: { updateContent: Function }) {
     const [articleForm] = Form.useForm();
     const {aid} = useParams();
-
     const [backgroundMusicType, updateBackgroundMusicType] = useState(undefined);
     const [categoryInfoList, updateCategoryInfoList] = useState([]);
     const [backgroundImageInfoList, updateBackgroundImageInfoList] = useState([]);
