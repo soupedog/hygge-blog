@@ -113,7 +113,7 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
             onSave={(content) => {
                 if (content == null || content.length < 1) {
                     localStorage.removeItem("local-draft");
-                    message.info("已将本地草稿清空！");
+                    message.warning("已将本地草稿清空！");
                 } else {
                     localStorage.setItem("local-draft", content);
                     message.info("已将草稿保存到本地。");

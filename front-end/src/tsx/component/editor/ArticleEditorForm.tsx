@@ -36,7 +36,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                         data.main.content = localDraft;
                     }
                     refreshFormInfo(updateContent, data, articleForm);
-                    message.info("已从本地草稿加载文本。");
+                    message.success("已从本地草稿加载文本。");
                 }
             })
         } else if (localDraft) {
@@ -44,7 +44,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
             data.main = {} as ArticleDto;
             data.main.content = localDraft;
             refreshFormInfo(updateContent, data, articleForm);
-            message.info("已从本地草稿加载文本。");
+            message.success("已从本地草稿加载文本。");
         }
 
         // 依赖静态值表示仅初始化时调用一次

@@ -9,7 +9,7 @@ import {
     md_template_table
 } from "./properties/MarkDownStaticValue";
 import EditorHyperlinkModal from "./EditorHyperlinkModal";
-import {editor_text_area} from "../properties/ElementNameContainer";
+import {id_editor_text_area} from "../properties/ElementNameContainer";
 import EditorImageModal from "./EditorImageModal";
 import {contentChangeUndoStackHandler} from "./EditorView";
 import EditorBilibiliShareModal from "./EditorBilibiliShareModal";
@@ -81,7 +81,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             <Tooltip placement="top" title={"Ctrl + B"}>
                                 <Button type="link" onClick={(event) => {
                                     // @ts-ignore
-                                    let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                    let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                     InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                               leftPart,
                                                                                               selectedPart,
@@ -97,7 +97,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             <Tooltip placement="top" title={"Ctrl + I"}>
                                 <Button type="link" onClick={(event) => {
                                     // @ts-ignore
-                                    let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                    let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                     InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                               leftPart,
                                                                                               selectedPart,
@@ -112,7 +112,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             </Tooltip>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -126,7 +126,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>删除线</Button>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, md_template_table, ({
                                                                                                          appendTarget,
                                                                                                          leftPart,
@@ -140,7 +140,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>表格</Button>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, md_template_code, ({
                                                                                                         appendTarget,
                                                                                                         leftPart,
@@ -157,7 +157,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             <EditorBilibiliShareModal/>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, md_template_scheduled_tasks, ({
                                                                                                                    appendTarget,
                                                                                                                    leftPart,
@@ -182,7 +182,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>加载草稿</Button>
                             <Button type="link" onClick={() => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -211,7 +211,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                         <Space size={"small"}>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -225,7 +225,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>下划线</Button>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -239,7 +239,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>上标</Button>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -253,7 +253,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>下标</Button>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -267,7 +267,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                             }}>摘要</Button>
                             <Button type="link" onClick={(event) => {
                                 // @ts-ignore
-                                let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                 InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                           leftPart,
                                                                                           selectedPart,
@@ -299,7 +299,7 @@ function EditorMenu({updateContent, tocEnable, updateTocEnable, updateTocTree}: 
                                     if (response.code == 200) {
                                         response.main.forEach((item: FileInfo) => {
                                             // @ts-ignore
-                                            let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                            let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                                             InputElementHelper.appendTextToTextArea(element, "", ({
                                                                                                       leftPart,
                                                                                                       selectedPart,

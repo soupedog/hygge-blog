@@ -42,7 +42,7 @@ function BrowserView({article}: { article: ArticleDto | null }) {
 function renderMainImage(article: ArticleDto | null) {
     if (article != null) {
         return (
-            <div style={{
+           <div style={{
                 width: "100%",
                 height: "400px",
                 backgroundSize: "cover",

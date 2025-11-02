@@ -2,7 +2,7 @@ import React from "react";
 
 import {Col, message, Row, Tree} from "antd";
 import TextArea from "antd/es/input/TextArea";
-import {editor_text_area} from "../properties/ElementNameContainer";
+import {id_editor_text_area} from "../properties/ElementNameContainer";
 import {allowAll, editor_id_for_editor, key_draft} from "./properties/MarkDownStaticValue";
 import {DownOutlined} from '@ant-design/icons';
 import {TreeProps} from "antd/es/tree/Tree";
@@ -79,7 +79,7 @@ function EditorView({content, updateContent, tocEnable, tocTree}: EditorViewProp
                 : null}
             <Col span={tocEnable ? 8 : 12} style={{maxHeight: "600px"}}>
                 {contextHolder}
-                <TextArea id={editor_text_area} rows={27}
+                <TextArea id={id_editor_text_area} rows={27}
                           placeholder="这里是 markdown 编辑器写作区，请开始您的创作吧！
                                         Ctrl + B 加粗
                                         Ctrl + D 删除当前行
@@ -98,7 +98,7 @@ function EditorView({content, updateContent, tocEnable, tocTree}: EditorViewProp
                               // 如果是 ctrl 组合键
                               if (event.ctrlKey) {
                                   // @ts-ignore
-                                  let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                                  let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
 
                                   switch (event.key) {
                                       case "s":

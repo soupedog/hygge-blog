@@ -13,6 +13,7 @@ import ArticleSummaryTabPane from "./tabs/ArticleSummaryTabPane";
 import QuoteTabPane from "./tabs/QuoteTabPane";
 import {ArticleSummaryOrderType, IndexSearchType} from "../properties/GlobalEnum";
 import SearchResultTabPane from "./tabs/SearchResultTabPane";
+import {id_search_result_tap_pane_text} from "../properties/ElementNameContainer";
 
 function IndexMainView() {
     return (
@@ -136,6 +137,7 @@ function createTabs({
                 <>
                     搜索结果
                     <Badge
+                        id={id_search_result_tap_pane_text}
                         count={indexSearchType == IndexSearchType.ARTICLE ? articleSummarySearchInfo.totalCount : quoteSearchInfo.totalCount}
                         overflowCount={9999}
                         offset={[10, -20]}/>

@@ -3,6 +3,8 @@ import {Badge, Card, Collapse} from "antd";
 import {IndexContext} from '../../page/Index';
 import {HomePageService, TopicOverviewInfo} from "../../rest/ApiClient";
 import {ArticleSummaryOrderType, IndexSearchType} from "../properties/GlobalEnum";
+import {id_search_result_tap_pane_text} from "../properties/ElementNameContainer";
+import {LogHelper} from "../../util/UtilContainer";
 
 function CategoryCollapse() {
     return (
@@ -71,7 +73,15 @@ function CategoryCollapse() {
                         HomePageService.fetchArticleSummaryByCid(item.cid, 1, 5, (data) => {
                             updateArticleSummarySearchInfo(data?.main);
                             // 切换到搜索展示页
-                            document.getElementById("rc-tabs-0-tab-搜索结果")?.click();
+                            let search_result_tap_pane_text_Element: HTMLElement | null = document.getElementById(id_search_result_tap_pane_text);
+                            if (search_result_tap_pane_text_Element) {
+                                search_result_tap_pane_text_Element.click()
+                            } else {
+                                LogHelper.error({
+                                    className: "CategoryCollapse",
+                                    msg: "search_result_tap_pane_text_Element 未找到。"
+                                })
+                            }
                         });
                     }} key={"card_" + item.categoryName}>
                         <Badge.Ribbon style={{top: "-10px"}} text={item.articleCount == null ? "" : item.articleCount}

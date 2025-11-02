@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Input, message, Modal, Space} from "antd";
-import {editor_text_area} from "../properties/ElementNameContainer";
+import {id_editor_text_area} from "../properties/ElementNameContainer";
 import {contentChangeUndoStackHandler} from "./EditorView";
 import InputElementHelper from "./util/InputElementHelper";
 import { ArticleEditorContext } from '../../page/ArticleEditor';
@@ -37,7 +37,7 @@ function EditorHyperlinkModal() {
                         let content = "[" + hyperlinkText + "](" + hyperlinkValue + ")";
 
                         // @ts-ignore
-                        let element: HTMLTextAreaElement = document.getElementById(editor_text_area);
+                        let element: HTMLTextAreaElement = document.getElementById(id_editor_text_area);
                         InputElementHelper.appendTextToTextArea(element, content, ({
                                                                                        appendTarget,
                                                                                        leftPart,
