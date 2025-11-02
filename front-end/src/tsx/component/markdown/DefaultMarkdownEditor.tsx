@@ -5,10 +5,14 @@ import "@vavt/rt-extension/lib/asset/Mark.css";
 import React, {useEffect} from "react";
 import {config, MdEditor} from "md-editor-rt";
 import {ExportPDF, Mark} from "@vavt/rt-extension";
+import {keymap} from '@codemirror/view';
 // @ts-ignore
 import MarkExtension from 'markdown-it-mark';
 import MarkIcon from "./MarkIcon";
-import {keymap} from '@codemirror/view';
+import {UploadImgCallBack} from "md-editor-rt/lib/types/MdEditor/type";
+import {FileInfo, FileService, HyggeResponse} from "../../rest/ApiClient";
+import {UrlHelper} from "../../util/UtilContainer";
+import {AxiosResponse} from "axios";
 
 export interface DefaultMarkdownEditorProps {
     content: string,
@@ -20,15 +24,15 @@ config({
         md.use(MarkExtension);
     },
     codeMirrorExtensions(extensions, {keyBindings}) {
-        // 1. 先把默认的快捷键扩展移除
+        // 1. 先把旧的快捷键映射移除
         const newExtensions = [...extensions].filter((item) => {
             return item.type !== 'keymap';
         });
 
-        // 2. 参考快捷键配置的源码，找到CtrlB的配置项在keyBindings中的位置
+        // 2. 参考快捷键配置的源码，找到 CtrlF 的配置项在 keyBindings 中的位置
         const CtrlF = keyBindings.find((i) => i.key === 'Ctrl-f');
 
-        // 3. 配置codemirror快捷键的文档
+        // 3. 复制 CtrlF 的功能到我自定义的 CtrlL
         // https://codemirror.net/docs/ref/#commands
         const MyCtrlL = {
             ...CtrlF,
@@ -50,21 +54,40 @@ config({
 
 function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorProps) {
 
+    const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
+        const responseTemp: AxiosResponse<HyggeResponse<FileInfo[]>>[] = await Promise.all(
+            files.map((file) => {
+                return new Promise<AxiosResponse<HyggeResponse<FileInfo[]>>>((rev, rej) => {
+                    const formData = new FormData();
+                    formData.append('files', file);
+                    let type = "ARTICLE";
+                    FileService.uploadFilesPromise(type, formData)
+                        .then((response) => rev(response));
+                });
+            })
+        );
+
+        responseTemp.map(axiosResponse => {
+            let fileInfoList = axiosResponse.data.main;
+            if (fileInfoList) {
+                callBack(
+                    fileInfoList.map(fileInfo => ({
+                        url: UrlHelper.getBaseStaticSourceUrl() + fileInfo.src,
+                        alt: fileInfo.name,
+                        title: fileInfo.name,
+                    }))
+                );
+            }
+        });
+    };
+
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
     }, []);
 
     return (
         <MdEditor
-            noPrettier={false}
-            value={content}
-            onChange={(nextContent) => updateContent(nextContent)}
             placeholder="开始记录奇思妙想..."
-            onSave={(da) => {
-                alert(da)
-            }}
-            autoFocus={true}
-            showToolbarName={true}
             toolbars={[
                 // 第一组图标
                 1, "bold", "underline", "italic", "strikeThrough", "-",
@@ -82,6 +105,15 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
                 <ExportPDF key="ExportPDF" value={content}/>,
                 <Mark title={"高亮"} key="Mark" trigger={<MarkIcon/>}/>
             ]}
+            value={content}
+            onChange={(nextContent) => updateContent(nextContent)}
+            autoFocus={true}
+            noPrettier={false}
+            showToolbarName={true}
+            onSave={(content) => {
+                alert(content)
+            }}
+            onUploadImg={onUploadImg}
         />
     );
 }

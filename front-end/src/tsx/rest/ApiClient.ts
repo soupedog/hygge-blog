@@ -732,6 +732,18 @@ export class FileService {
         });
     }
 
+    static uploadFilesPromise(type: string,
+                              formData: FormData,
+                              successHook?: (input?: HyggeResponse<FileInfo[]>) => void,
+                              beforeHook?: () => void,
+                              finallyHook?: () => void):Promise<AxiosResponse<HyggeResponse<FileInfo[]>>> {
+
+        let headers = UserService.getHeader({"Content-Type": "multipart/form-data"});
+        return axios.post(UrlHelper.getBaseApiUrl() + "/main/file?type=" + type, formData, {
+            headers: headers
+        });
+    }
+
     static downloadFilePromise(fileNo: string): Promise<AxiosResponse> {
         // 全局被加了特殊拦截器，不适用于下载文件，此处为新创建实例
         return axios.get("/main/file/static/" + fileNo, {

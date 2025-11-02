@@ -34,7 +34,6 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                 }
             })
         }
-
         // 依赖静态值表示仅初始化时调用一次
     }, []);
 
