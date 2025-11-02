@@ -26,7 +26,7 @@ function ArticleEditor() {
         updateTocEnable: updateTocEnable,
         tocTree: tocTree,
         updateTocTree: updateTocTree,
-    }), [content, tocEnable, JSON.stringify(tocTree)]);
+    }), [content, tocEnable, tocTree]);
 
     useEffect(() => {
         // 改页面标题

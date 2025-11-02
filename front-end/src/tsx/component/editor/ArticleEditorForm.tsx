@@ -25,15 +25,28 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
         refreshCategoryInfoList(updateCategoryInfoList);
         refreshImageInfoList(updateBackgroundImageInfoList);
 
+        let localDraft = localStorage.getItem("local-draft");
+
         if (aid) {
             ArticleService.findArticleByAid(aid, (data) => {
                 if (data?.main == null) {
                     message.warning("目标文章不存在", 2000);
                 } else {
+                    if (localDraft) {
+                        data.main.content = localDraft;
+                    }
                     refreshFormInfo(updateContent, data, articleForm);
+                    message.info("已从本地草稿加载文本。");
                 }
             })
+        } else if (localDraft) {
+            let data = {} as HyggeResponse<ArticleDto>;
+            data.main = {} as ArticleDto;
+            data.main.content = localDraft;
+            refreshFormInfo(updateContent, data, articleForm);
+            message.info("已从本地草稿加载文本。");
         }
+
         // 依赖静态值表示仅初始化时调用一次
     }, []);
 

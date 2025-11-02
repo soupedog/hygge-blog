@@ -36,20 +36,22 @@ axios.interceptors.response.use(function (axiosResponse) {
             message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
             UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 2000});
         } else {
+            // 自动刷新默认至多刷新一次
             localStorage.setItem("autoRefreshDisableFlag", "已禁止再次触发自动登陆");
 
-            UserService.signIn(undefined, undefined, (data) => {
-                if (data!.code == 200) {
+            UserService.signIn(undefined, undefined, (response) => {
+                if (response?.code === 200) {
                     message.info("已为您成功自动登录，1 秒内为您跳转回主页", 1);
-                    // 重新登陆成功后需要重置自动重试开关
+                    // 重新登陆成功后需要重置已自动刷新次数为 0
                     localStorage.removeItem("autoRefreshDisableFlag");
                     UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
-                } else {
-                    message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
-                    // 刷新秘钥自动登录失败，需要清空本地身份信息
-                    UserService.removeCurrentUser();
-                    UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
                 }
+
+                // 没 code、code 非 200，都是登录失败，要求重新登录
+                message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
+                // 刷新秘钥自动登录失败，需要清空本地身份信息
+                UserService.removeCurrentUser();
+                UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
             });
         }
     } else if (code == 403000) {
@@ -116,7 +118,7 @@ export class UserService {
         return ClientScope.WEB;
     }
 
-    static getContentType(): string {
+    static getDefaultContentType(): string {
         return "application/json";
     }
 
@@ -126,7 +128,7 @@ export class UserService {
         if (currentHeader == null) {
             result = {};
             // @ts-ignore
-            result["Content-Type"] = this.getContentType();
+            result["Content-Type"] = this.getDefaultContentType();
         } else {
             result = currentHeader;
         }
@@ -736,7 +738,7 @@ export class FileService {
                               formData: FormData,
                               successHook?: (input?: HyggeResponse<FileInfo[]>) => void,
                               beforeHook?: () => void,
-                              finallyHook?: () => void):Promise<AxiosResponse<HyggeResponse<FileInfo[]>>> {
+                              finallyHook?: () => void): Promise<AxiosResponse<HyggeResponse<FileInfo[]>>> {
 
         let headers = UserService.getHeader({"Content-Type": "multipart/form-data"});
         return axios.post(UrlHelper.getBaseApiUrl() + "/main/file?type=" + type, formData, {

@@ -13,6 +13,7 @@ import {UploadImgCallBack} from "md-editor-rt/lib/types/MdEditor/type";
 import {FileInfo, FileService, HyggeResponse} from "../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
 import {AxiosResponse} from "axios";
+import {message} from "antd";
 
 export interface DefaultMarkdownEditorProps {
     content: string,
@@ -110,7 +111,13 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
             noPrettier={false}
             showToolbarName={true}
             onSave={(content) => {
-                alert(content)
+                if (content == null || content.length < 1) {
+                    localStorage.removeItem("local-draft");
+                    message.info("已将本地草稿清空！");
+                } else {
+                    localStorage.setItem("local-draft", content);
+                    message.info("已将草稿保存到本地。");
+                }
             }}
             onUploadImg={onUploadImg}
         />
