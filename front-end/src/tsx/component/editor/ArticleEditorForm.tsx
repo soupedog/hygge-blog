@@ -69,6 +69,8 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                                     if (PropertiesHelper.isStringNotEmpty(value.aid)) {
                                         ArticleService.updateArticle(value.aid, value, () => {
                                                 message.success("修改文章成功");
+                                                localStorage.removeItem("local-draft");
+                                                message.warning("已将本地草稿清空！");
                                             }
                                         );
                                     } else {
@@ -78,6 +80,8 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                                     ArticleService.createArticle(value, (data) => {
                                             refreshFormInfo(updateContent, data!, articleForm);
                                             message.success("添加文章成功");
+                                            localStorage.removeItem("local-draft");
+                                            message.warning("已将本地草稿清空！");
                                         }
                                     );
                                 }
