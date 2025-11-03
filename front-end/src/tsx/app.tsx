@@ -8,7 +8,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {Modal} from "antd";
+import {message, Modal} from "antd";
 import '@ant-design/v5-patch-for-react-19';
 import isMobile from "rc-util/es/isMobile"
 import ArticleEditor from "./page/ArticleEditor";
@@ -72,12 +72,21 @@ config({
         // 2. 参考快捷键配置的源码，找到 CtrlF 的配置项在 keyBindings 中的位置
         const CtrlF = keyBindings.find((i) => i.key === 'Ctrl-f');
 
-        // 3. 复制 CtrlF 的功能到我自定义的 CtrlL
+        const prettierAction = CtrlF!.shift
+
+        // 3. 把美化操作绑定到 ctrl + alt + L 上
         // https://codemirror.net/docs/ref/#commands
         const MyCtrlL = {
-            ...CtrlF,
             key: 'Ctrl-l',
             mac: 'Cmd-l',
+            // @ts-ignore
+            any(_view, e) {
+                if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyL') {
+                    // @ts-ignore
+                    prettierAction();
+                    message.success("已将文本进行美化排版。")
+                }
+            }
         };
 
         // 4. 把修改后的快捷键放到待构建扩展的数组中
@@ -85,6 +94,7 @@ config({
 
         newExtensions.push({
             type: 'newKeymap',
+            // @ts-ignore
             extension: keymap.of(newKeyBindings)
         });
 
