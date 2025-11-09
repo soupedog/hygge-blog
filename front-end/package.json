@@ -58,7 +58,7 @@
     "file-saver": "^2.0.5",
     "highlight.js": "^11.11.1",
     "markdown-it-mark": "^4.0.0",
-    "md-editor-rt": "^6.1.0",
+    "md-editor-rt": "^6.1.1",
     "mermaid": "^11.12.1",
     "pangu": "^7.2.0",
     "prettier": "^3.6.2"

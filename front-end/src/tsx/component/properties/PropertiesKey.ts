@@ -1,0 +1,1 @@
+export const key_editor_draft: string = "local-draft";

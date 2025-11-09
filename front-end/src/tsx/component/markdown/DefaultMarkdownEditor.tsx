@@ -2,11 +2,12 @@ import React, {useEffect} from "react";
 import {MdEditor} from "md-editor-rt";
 import {ExportPDF, Mark} from "@vavt/rt-extension";
 import MarkIcon from "./MarkIcon";
-import {UploadImgCallBack} from "md-editor-rt/lib/types/MdEditor/type";
+import {ChangeEvent, UploadImgCallBack} from "md-editor-rt/lib/types/MdEditor/type";
 import {FileInfo, FileService, HyggeResponse} from "../../rest/ApiClient";
 import {UrlHelper} from "../../util/UtilContainer";
 import {AxiosResponse} from "axios";
 import {message} from "antd";
+import {key_editor_draft} from "../properties/PropertiesKey";
 
 export interface DefaultMarkdownEditorProps {
     content: string,
@@ -66,16 +67,16 @@ function DefaultMarkdownEditor({content, updateContent}: DefaultMarkdownEditorPr
                 <ExportPDF key="ExportPDF" value={content}/>,
             ]}
             value={content}
-            onChange={(nextContent) => updateContent(nextContent)}
+            onChange={updateContent as ChangeEvent}
             autoFocus={true}
             noPrettier={false}
             showToolbarName={true}
             onSave={(content) => {
                 if (content == null || content.length < 1) {
-                    localStorage.removeItem("local-draft");
+                    localStorage.removeItem(key_editor_draft);
                     message.warning("已将本地草稿清空！");
                 } else {
-                    localStorage.setItem("local-draft", content);
+                    localStorage.setItem(key_editor_draft, content);
                     message.info("已将草稿保存到本地。");
                 }
             }}

@@ -13,6 +13,7 @@ import {
 } from "../../rest/ApiClient";
 import {FormInstance} from "antd/es/form/hooks/useForm";
 import {PropertiesHelper, UrlHelper} from "../../util/UtilContainer";
+import {key_editor_draft} from "../properties/PropertiesKey";
 
 function ArticleEditorForm({updateContent}: { updateContent: Function }) {
     const [articleForm] = Form.useForm();
@@ -25,7 +26,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
         refreshCategoryInfoList(updateCategoryInfoList);
         refreshImageInfoList(updateBackgroundImageInfoList);
 
-        let localDraft = localStorage.getItem("local-draft");
+        let localDraft = localStorage.getItem(key_editor_draft);
 
         if (aid) {
             ArticleService.findArticleByAid(aid, (data) => {
@@ -69,7 +70,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                                     if (PropertiesHelper.isStringNotEmpty(value.aid)) {
                                         ArticleService.updateArticle(value.aid, value, () => {
                                                 message.success("修改文章成功");
-                                                localStorage.removeItem("local-draft");
+                                                localStorage.removeItem(key_editor_draft);
                                                 message.warning("已将本地草稿清空！");
                                             }
                                         );
@@ -80,7 +81,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
                                     ArticleService.createArticle(value, (data) => {
                                             refreshFormInfo(updateContent, data!, articleForm);
                                             message.success("添加文章成功");
-                                            localStorage.removeItem("local-draft");
+                                            localStorage.removeItem(key_editor_draft);
                                             message.warning("已将本地草稿清空！");
                                         }
                                     );
