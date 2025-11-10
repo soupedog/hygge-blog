@@ -35,8 +35,9 @@ public class ImageResourceReplayVisitor implements Visitor<Image> {
         if (fileNo != null) {
             // 是需要被保护的文件资源
             String fileKey = fileKeyKeeper.createFileKey(fileNo);
-//            String newUrl = linkPrefix + fileNo + "?fileKey=" + fileKey;
-            String newUrl = "http://localhost:8080/blog-service/api/main/file/static/" + fileNo + "?fileKey=" + fileKey;
+            String newUrl = linkPrefix + fileNo + "?fileKey=" + fileKey;
+            // 本地调试可用
+            // String newUrl = "http://localhost:8080/blog-service/api/main/file/static/" + fileNo + "?fileKey=" + fileKey;
             BasedSequence basedSequence = BasedSequence.of(newUrl);
             image.setUrl(basedSequence);
             image.setPageRef(basedSequence);

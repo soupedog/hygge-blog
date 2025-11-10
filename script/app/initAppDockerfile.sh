@@ -4,6 +4,7 @@ DB_URL=$1
 DB_USER=$2
 DB_PW=$3
 ES_URIS=$4
+FILE_PREFIX=$5
 
 cat > Dockerfile <<END_TEXT
 FROM amazoncorretto:17-alpine3.18-jdk
@@ -14,6 +15,7 @@ ENV database.url="${DB_URL}"
 ENV database.userName="${DB_USER}"
 ENV database.password="${DB_PW}"
 ENV esUris="${ES_URIS}"
+ENV file.link.prefix="${FILE_PREFIX}"
 
 ENV JVM_OPTS="-Xmx256M -Xms256M -Dspring.profiles.active=prod -Duser.language=zh -Duser.timezone=GMT+8"
 

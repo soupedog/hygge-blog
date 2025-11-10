@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class MyFileLinkPicker {
     private final Pattern pattern;
 
-    public MyFileLinkPicker(@Value("^${hyyge.blog.file.link.prefix}/([0-9a-fA-F]{32})(?:[?#].*)?") String regex) {
+    public MyFileLinkPicker(@Value("^${hyyge.blog.file.link.prefix}([0-9a-fA-F]{32})(?:[?#].*)?") String regex) {
         this.pattern = Pattern.compile(regex);
         log.info("pattern init with 【{}】 success.", regex);
     }

@@ -98,7 +98,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
 
     @GetMapping(value = "/file/static/{fileNo}")
     @ControllerLog(outputParamEnable = false)
-    public ResponseEntity<byte[]> exposeFile(@PathVariable("fileNo") String fileNo, @RequestParam(required = false) String fileKey) {
+    public ResponseEntity<byte[]> exposeFile(@PathVariable("fileNo") String fileNo, @RequestParam(value = "fileKey", required = false) String fileKey) {
         Optional<FileInfoView> resultTempView = fileService.findFileViewFromDB(fileNo);
 
         if (resultTempView.isEmpty()) {
