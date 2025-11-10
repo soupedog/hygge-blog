@@ -2,6 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import {message} from "antd";
 import {PropertiesHelper, UrlHelper} from "../util/UtilContainer";
 import {saveAs} from "file-saver";
+import {key_auto_login_disabled} from "../component/properties/PropertiesKey";
 
 axios.defaults.baseURL = UrlHelper.getBaseApiUrl();
 axios.interceptors.response.use(function (axiosResponse) {
@@ -29,29 +30,29 @@ axios.interceptors.response.use(function (axiosResponse) {
         message.warning("自动刷新令牌失败，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
     } else if (code == 403003) {
-        let flag = localStorage.getItem("autoRefreshDisableFlag");
+        let autoLoginDisabledFlag = localStorage.getItem(key_auto_login_disabled);
 
-        if (flag) {
+        if (autoLoginDisabledFlag) {
             UserService.removeCurrentUser();
             message.warning("该账号需要重新登陆，2 秒内为您跳转回登陆页", 2);
             UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 2000});
         } else {
             // 自动刷新默认至多刷新一次
-            localStorage.setItem("autoRefreshDisableFlag", "已禁止再次触发自动登陆");
+            localStorage.setItem(key_auto_login_disabled, "已禁止再次触发自动登陆");
 
             UserService.signIn(undefined, undefined, (response) => {
                 if (response?.code === 200) {
                     message.info("已为您成功自动登录，1 秒内为您跳转回主页", 1);
                     // 重新登陆成功后需要重置已自动刷新次数为 0
-                    localStorage.removeItem("autoRefreshDisableFlag");
+                    localStorage.removeItem(key_auto_login_disabled);
                     UrlHelper.openNewPage({inNewTab: false, delayTime: 1000});
+                } else {
+                    // 没 code、code 非 200，都是登录失败，要求重新登录
+                    message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
+                    // 刷新秘钥自动登录失败，需要清空本地身份信息
+                    UserService.removeCurrentUser();
+                    UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
                 }
-
-                // 没 code、code 非 200，都是登录失败，要求重新登录
-                message.info("自动登录失败，1 秒内为您跳转回登录页", 1);
-                // 刷新秘钥自动登录失败，需要清空本地身份信息
-                UserService.removeCurrentUser();
-                UrlHelper.openNewPage({inNewTab: false, path: "signin", delayTime: 1000});
             });
         }
     } else if (code == 403000) {
