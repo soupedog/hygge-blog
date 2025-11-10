@@ -9,8 +9,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2025/11/10
  */
 @Getter
-public record FileKeyLocalCounter(String fileNo) {
+public class FileKeyLocalCounter {
     private static final AtomicInteger counter = new AtomicInteger(1);
+    private final String fileNo;
+
+    public FileKeyLocalCounter(String fileNo) {
+        this.fileNo = fileNo;
+    }
 
     public boolean writeOff() {
         return counter.decrementAndGet() > -1;
