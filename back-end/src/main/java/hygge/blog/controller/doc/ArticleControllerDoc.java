@@ -4,6 +4,7 @@ import hygge.blog.controller.base.HyggeBlogController;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.ArticleDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -30,5 +31,5 @@ public interface ArticleControllerDoc extends HyggeBlogController<ResponseEntity
     ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> updateArticle(String aid, Map<String, Object> data);
 
     @Operation(summary = "查询文章", description = "查询文章详情")
-    ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(String aid);
+    ResponseEntity<HyggeBlogControllerResponse<ArticleDto>> findArticle(String aid, @Parameter(description = "是否展示未加工的原始文本") boolean raw);
 }

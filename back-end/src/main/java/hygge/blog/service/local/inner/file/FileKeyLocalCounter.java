@@ -1,4 +1,4 @@
-package hygge.blog.service.local;
+package hygge.blog.service.local.inner.file;
 
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Getter
 public class FileKeyLocalCounter {
-    private static final AtomicInteger counter = new AtomicInteger(1);
+    private final AtomicInteger counter = new AtomicInteger(1);
     private final String fileNo;
 
     public FileKeyLocalCounter(String fileNo) {

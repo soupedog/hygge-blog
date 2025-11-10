@@ -13,8 +13,8 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.view.FileInfoView;
-import hygge.blog.service.local.CacheFileKeyKeeper;
 import hygge.blog.service.local.FileServiceImpl;
+import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
 import hygge.util.template.HyggeJsonUtilContainer;
@@ -119,7 +119,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
         User currentUser = context.getCurrentLoginUser();
 
         // 如果为非公开文件，尝试用管理员权限授权
-        if (!shouldExpose && UserTypeEnum.ROOT.equals(currentUser.getUserType())) {
+        if (!shouldExpose && currentUser != null && UserTypeEnum.ROOT.equals(currentUser.getUserType())) {
             shouldExpose = true;
         }
 

@@ -1,4 +1,4 @@
-package hygge.blog.service.local;
+package hygge.blog.service.local.inner.file;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -54,6 +54,4 @@ public class CacheFileKeyKeeper extends HyggeJsonUtilContainer implements FileKe
 
         return counter.writeOff();
     }
-
-
 }
