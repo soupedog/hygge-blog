@@ -36,5 +36,5 @@ public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>
     ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfoList(List<FileTypeEnum> fileTypes, int currentPage, int pageSize);
 
     @Operation(summary = "对外暴露文件", description = "对外提供文件下载功能")
-    ResponseEntity<byte[]> exposeFile(String fileNo);
+    ResponseEntity<byte[]> exposeFile(String fileNo, @Parameter(description = "一次性图片许可秘钥") String fileKey);
 }

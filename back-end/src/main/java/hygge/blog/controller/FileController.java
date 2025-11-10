@@ -8,10 +8,12 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
+import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.view.FileInfoView;
+import hygge.blog.service.local.CacheFileKeyKeeper;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
@@ -47,10 +49,12 @@ import java.util.Optional;
 public class FileController extends HyggeJsonUtilContainer implements FileControllerDoc {
     private final FileServiceImpl fileService;
     private final CategoryServiceImpl categoryService;
+    private final CacheFileKeyKeeper cacheFileKeyKeeper;
 
-    public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService) {
+    public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService, CacheFileKeyKeeper cacheFileKeyKeeper) {
         this.fileService = fileService;
         this.categoryService = categoryService;
+        this.cacheFileKeyKeeper = cacheFileKeyKeeper;
     }
 
     @Override
@@ -94,35 +98,52 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
 
     @GetMapping(value = "/file/static/{fileNo}")
     @ControllerLog(outputParamEnable = false)
-    public ResponseEntity<byte[]> exposeFile(@PathVariable("fileNo") String fileNo) {
+    public ResponseEntity<byte[]> exposeFile(@PathVariable("fileNo") String fileNo, @RequestParam(required = false) String fileKey) {
         Optional<FileInfoView> resultTempView = fileService.findFileViewFromDB(fileNo);
 
         if (resultTempView.isEmpty()) {
             // 为找到 返回 404
             return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
         }
-
         FileInfoView fileInfoView = resultTempView.get();
 
-        // 验证访问权限
-        String cid = fileInfoView.getCid();
-        if (parameterHelper.isNotEmpty(cid)) {
-            HyggeRequestContext context = HyggeRequestTracker.getContext();
-            User currentUser = context.getCurrentLoginUser();
-            List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+        // 文件 cid 不为 null 则认为是非公开文件
+        boolean shouldExpose = fileInfoView.getCid() == null;
 
-            Optional<Category> accessibleCategoryTemp = categoryList.stream().filter(item -> cid.equals(item.getCid())).findAny();
+        // 如果为非公开文件，尝试用 fileKey 授权
+        if (!shouldExpose && fileKey != null && !fileKey.isEmpty()) {
+            shouldExpose = cacheFileKeyKeeper.writeOffFileKey(fileNo, fileKey);
+        }
 
-            // 无权访问返回 404
-            if (accessibleCategoryTemp.isEmpty()) {
-                return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
+        // 如果为非公开文件，尝试用管理员权限授权
+        if (!shouldExpose && UserTypeEnum.ROOT.equals(currentUser.getUserType())) {
+            shouldExpose = true;
+        }
+
+        // 如果为非公开文件，尝试用用户权限授权
+        if (!shouldExpose) {
+            // 验证访问权限
+            String cid = fileInfoView.getCid();
+            if (parameterHelper.isNotEmpty(cid)) {
+                List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+
+                Optional<Category> accessibleCategoryTemp = categoryList.stream().filter(item -> cid.equals(item.getCid())).findAny();
+                shouldExpose = accessibleCategoryTemp.isPresent();
             }
         }
-        // 文件下载动作后置，轻量查询鉴权，权限无误再进行笨重操作
+
+        // 无权访问返回 404
+        if (!shouldExpose) {
+            return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
+        }
+
+        // View 中不包含文件内容本身，需要二次查询文件本体
         Optional<FileInfo> resultTemp = fileService.findFileFromDB(fileNo);
-        // 二次验空，防止上一刻文件还在，下一刻立马被删除
         if (resultTemp.isEmpty()) {
-            // 为找到 返回 404
+            // 二次验空，防止上一刻文件还在，下一刻立马被删除，未找到 返回 404
             return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
         }
 
