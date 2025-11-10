@@ -1,6 +1,7 @@
 package hygge.blog.domain.local.dto;
 
 import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
+import hygge.blog.domain.local.enums.FileCopyTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -30,10 +31,14 @@ public class FileInfoDto {
     private String src;
     @Schema(title = "用户编号")
     private String uid;
+    @Schema(title = "文件所属文章类别")
+    protected String cid;
     @Schema(title = "文件名称(不包含扩展名)")
     private String name;
     @Schema(title = "文件扩展名(如 png)")
     private String extension;
+    @Schema(title = "副本类型")
+    protected FileCopyTypeEnum fileCopyType;
     @Schema(title = "文件归档类别")
     private FileTypeEnum fileType;
     private FileDescriptionDto description;

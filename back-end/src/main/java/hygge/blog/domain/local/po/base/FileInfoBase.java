@@ -2,6 +2,7 @@ package hygge.blog.domain.local.po.base;
 
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
+import hygge.blog.domain.local.enums.FileCopyTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.inner.FileDescription;
 import jakarta.persistence.Column;
@@ -65,6 +66,12 @@ public abstract class FileInfoBase extends BasePo {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum ('CORE', 'QUOTE', 'ARTICLE_COVER', 'ARTICLE', 'BGM', 'OTHERS') default 'OTHERS'")
     protected FileTypeEnum fileType;
+    /**
+     * 文件副本类型
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum ('DEFAULT', 'NGINX') default 'DEFAULT'")
+    protected FileCopyTypeEnum fileCopyType;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     protected FileDescription description;
@@ -76,11 +83,13 @@ public abstract class FileInfoBase extends BasePo {
     public FileInfoDto toDto() {
         FileInfoDto result = FileInfoDto.builder()
                 .fileNo(fileNo)
+                .cid(cid)
                 .name(name)
                 .extension(extension)
                 .src(returnRelativePath())
                 .fileSize(unitConvertHelper.storageSmartFormatAsString(fileSize))
                 .fileType(fileType)
+                .fileCopyType(fileCopyType)
                 .lastUpdateTs(lastUpdateTs.getTime())
                 .createTs(createTs.getTime())
                 .build();

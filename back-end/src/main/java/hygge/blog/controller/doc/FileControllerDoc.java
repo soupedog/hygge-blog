@@ -4,6 +4,7 @@ import hygge.blog.controller.base.HyggeBlogController;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
+import hygge.blog.domain.local.enums.FileCopyTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +22,7 @@ import java.util.Map;
 @Tag(name = "文件 Controller", description = "文件的上传、查询操作")
 public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>> {
     @Operation(summary = "上传文件", description = "上传文件到特定目录")
-    ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>> upload(@Parameter FileTypeEnum fileType, @Parameter(description = "文章类别唯一标识展示用编号") String cid, List<MultipartFile> filesList);
+    ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>> upload(@Parameter FileTypeEnum fileType, @Parameter FileCopyTypeEnum fileCopyType, @Parameter(description = "文章类别唯一标识展示用编号") String cid, List<MultipartFile> filesList);
 
     @Operation(summary = "删除文件", description = "删除数据库中文件及磁盘副本")
     ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(String fileNo);

@@ -7,6 +7,8 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
+import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.FileCopyTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Category;
@@ -74,6 +76,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, true, "cid", null).toStringColumn(1, 255));
         forUpdate.add(new ColumnInfo(true, false, "name", null).toStringColumn(1, 255));
         forUpdate.add(new ColumnInfo(true, false, "fileType", null).toStringColumn(1, 30));
+        forUpdate.add(new ColumnInfo(true, false, "fileCopyType", null).toStringColumn(1, 30));
     }
 
     public FileServiceImpl(UserServiceImpl userService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
@@ -91,8 +94,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         if (cid != null) {
             // 目标类别必须存在
-            categoryService.findCategoryByCid(cid, false);
-            needCopyToHardDisk = false;
+            Category category = categoryService.findCategoryByCid(cid, false);
+            // 有且全都是 AccessRuleTypeEnum.PUBLIC 的就说明可以公开拷贝
+            needCopyToHardDisk = category.getAccessRuleList().stream()
+                    .allMatch(accessRule -> AccessRuleTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
         }
 
         List<FileInfoDto> result = new ArrayList<>();
@@ -123,6 +128,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfo.setExtension(extension);
                 fileInfo.setName(name);
                 fileInfo.setFileType(fileType);
+                if (needCopyToHardDisk) {
+                    // 文件所属于公开类别则使用 Nginx 创建副本
+                    fileInfo.setFileCopyType(FileCopyTypeEnum.NGINX);
+                }
                 fileInfo.setFileSize(temp.getSize());
                 fileInfo.setContent(temp.getBytes());
 
@@ -133,7 +142,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 result.add(item);
                 // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
                 if (needCopyToHardDisk) {
-                    copyFileToHardDisk(fileInfo);
+                    createFileToHardDisk(fileInfo);
                 }
 
                 // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
@@ -176,14 +185,15 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             return finalDataTemp;
         });
 
+        boolean canUpdateToNginxCopyType = false;
+        String articleCategoryName = null;
+
         // 存在 cid 修改时，需要验证新 cid 存在性
         String cid = (String) finalData.get("cid");
         if (cid != null) {
-            if (!cid.equals(fileInfoView.getCid())) {
-                categoryService.findCategoryByCid(cid, false);
-            } else {
-                finalData.remove("cid");
-            }
+            Category category = categoryService.findCategoryByCid(cid, false);
+            canUpdateToNginxCopyType = category.getAccessRuleList().stream().allMatch(accessRule -> AccessRuleTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
+            articleCategoryName = category.getCategoryName();
         }
 
         FileInfo oldAndBeenOverwrite = new FileInfo();
@@ -193,57 +203,57 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
 
+        // 非公开的文章类别不允许创建 Nginx 文件副本
+        if (newOne.getFileCopyType() != null && newOne.getFileCopyType().equals(FileCopyTypeEnum.NGINX) && !canUpdateToNginxCopyType) {
+            throw new LightRuntimeException("File(" + articleCategoryName + ") can't be updated to ArticleCategory(" + articleCategoryName + ") with FileCopyType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+        }
 
         boolean isPathChanged = !fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
 
-        // 相对路径发生变化则需要处理硬盘副本
         if (isPathChanged) {
-            Sort sort = Sort.by(Sort.Order.asc("createTs"));
-            Pageable pageable = PageRequest.of(0, 1, sort);
+            pathConflictCheck(oldAndBeenOverwrite);
+        }
 
-            Page<FileInfoView> conflictResultTemp = fileInfoViewDao.findAll(Example.of(FileInfoView.builder()
-                    .fileType(oldAndBeenOverwrite.getFileType())
-                    .name(oldAndBeenOverwrite.getName())
-                    .extension(oldAndBeenOverwrite.getExtension())
-                    .build()), pageable);
+        boolean copyTypeChanged = newOne.getFileCopyType() != null && !fileInfoView.getFileCopyType().equals(newOne.getFileCopyType());
 
-            long conflictCount = conflictResultTemp.getTotalElements();
-
-            if (conflictCount > 1L) {
-                // 超过 1 个已存在的冲突必然冲突
-                throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-            } else if (conflictCount == 1L && conflictResultTemp.get().noneMatch(item -> item.getFileNo().equals(oldAndBeenOverwrite.getFileNo()))) {
-                // 存在 1 个已存在的冲突且不是自己
-                throw new LightRuntimeException("File(" + oldAndBeenOverwrite.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-            }
-
-            // 检测是否存在硬盘副本
-            String newCachePath = filePath + oldAndBeenOverwrite.returnRelativePath();
-            String oldCachePath = filePath + fileInfoView.returnRelativePath();
-
-            File oldFile = new File(oldCachePath);
-
-            boolean needDeleteOldFile = false;
-            if (oldFile.exists()) {
-                needDeleteOldFile = true;
-
-                File newFile = new File(newCachePath);
-                // 保障所需文件夹被创建
-                fileHelper.getOrCreateDirectoryIfNotExit(filePath + oldAndBeenOverwrite.getFileType().getPath());
-                try {
-                    FileCopyUtils.copy(oldFile, newFile);
-                    log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
-                } catch (IOException e) {
-                    throw new InternalRuntimeException("Fail to copy old file to new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE, e);
+        if (copyTypeChanged) {
+            if (fileInfoView.getFileCopyType().equals(FileCopyTypeEnum.DEFAULT)) {
+                // 无副本切换到有副本，仅新增副本
+                Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
+                if (fileInfoTemp.isEmpty()) {
+                    throw new InternalRuntimeException("FileInfo(" + fileNo + ") was not found.");
                 }
-            }
 
-            if (needDeleteOldFile) {
-                boolean deleteSuccess = oldFile.delete();
-                if (!deleteSuccess) {
-                    log.info("Delete file({}) in HardDisk failed.", oldCachePath);
+                oldAndBeenOverwrite.setContent(fileInfoTemp.get().getContent());
+
+                createFileToHardDisk(oldAndBeenOverwrite);
+            } else {
+                // 有副本切换到无副本，仅删除旧副本
+                String oldCachePath = filePath + fileInfoView.returnRelativePath();
+                File oldFile = new File(oldCachePath);
+                deleteFileInHardDisk(true, oldFile, oldCachePath);
+            }
+        } else {
+            if (fileInfoView.getFileCopyType().equals(FileCopyTypeEnum.NGINX)) {
+                // 未切换副本类型，属于 Nginx，可能存在路径变更
+                // 检测是否存在硬盘副本
+                String newCachePath = filePath + oldAndBeenOverwrite.returnRelativePath();
+                String oldCachePath = filePath + fileInfoView.returnRelativePath();
+
+                File oldFile = new File(oldCachePath);
+                if (oldFile.exists()) {
+                    File newFile = new File(newCachePath);
+                    // 保障所需文件夹被创建
+                    fileHelper.getOrCreateDirectoryIfNotExit(filePath + oldAndBeenOverwrite.getFileType().getPath());
+                    try {
+                        FileCopyUtils.copy(oldFile, newFile);
+                        log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
+                        deleteFileInHardDisk(true, oldFile, oldCachePath);
+                    } catch (IOException e) {
+                        throw new InternalRuntimeException("Fail to copy old file to new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE, e);
+                    }
                 } else {
-                    log.info("Delete file({}) in HardDisk success.", oldCachePath);
+                    throw new InternalRuntimeException("Fail to copy old file to new space, oldFile not exist.", BlogSystemCode.FAIL_TO_UPDATE_FILE);
                 }
             }
         }
@@ -263,6 +273,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     public FileInfoInfo findFileInfoPageQuery(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
+        // 是否有文件查询权限
+        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
 
         List<FileTypeEnum> actualFileTypes = fileTypes == null ? TYPE_FOR_ALL : fileTypes;
         FileInfoInfo result = new FileInfoInfo();
@@ -298,29 +310,14 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public void copyFileToHardDisk(FileInfo fileInfo) {
-        String path = filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
-        try {
-            File file = new File(path);
+    public void createFileCopyFromDBToHardDisk(String fileNo) {
+        Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
 
-            if (file.isAbsolute() && !file.exists()) {
-                // 保障所需文件夹被创建
-                fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileInfo.getFileType().getPath());
-                boolean createComplete = file.createNewFile();
-                if (!createComplete) {
-                    throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-                }
-
-                // 拷贝文件到磁盘
-                FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
-                log.info("Copy file " + path + " to hard disk success.");
-            }
-        } catch (LightRuntimeException le) {
-            // 主动抛出的已知异常已经标记了错误原因
-            throw le;
-        } catch (Exception e) {
-            throw new LightRuntimeException("Fail to copy file:[" + path + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
+        if (fileInfoTemp.isEmpty()) {
+            throw new InternalRuntimeException("FileInfo(" + fileNo + ") was not found.");
         }
+
+        createFileToHardDisk(fileInfoTemp.get());
     }
 
     public void deleteFile(String fileNo) {
@@ -335,14 +332,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             // 检测是否存在硬盘副本
             String cachePath = filePath + fileInfoView.toDto().getSrc();
             File file = new File(cachePath);
-            if (file.exists()) {
-                boolean deleteSuccess = file.delete();
-                if (!deleteSuccess) {
-                    log.info("Delete file({}) in HardDisk failed.", cachePath);
-                } else {
-                    log.info("Delete file({}) in HardDisk success.", cachePath);
-                }
-            }
+            deleteFileInHardDisk(file.exists(), file, cachePath);
             long affectedRows = fileInfoDao.deleteByFileNo(fileNo);
             if (affectedRows > 0) {
                 log.info("delete file({}) success, affected rows:{}.", fileInfoView.getName(), affectedRows);
@@ -358,5 +348,68 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     public Optional<FileInfoView> findFileViewFromDB(String fileNo) {
         return fileInfoViewDao.findOne(Example.of(FileInfoView.builder().fileNo(fileNo)
                 .build()));
+    }
+
+    public void pathConflictCheck(FileInfoBase newFile) {
+        Sort sort = Sort.by(Sort.Order.asc("createTs"));
+        Pageable pageable = PageRequest.of(0, 1, sort);
+
+        Page<FileInfoView> conflictResultTemp = fileInfoViewDao.findAll(Example.of(FileInfoView.builder()
+                .fileType(newFile.getFileType())
+                .name(newFile.getName())
+                .extension(newFile.getExtension())
+                .build()), pageable);
+
+        long conflictCount = conflictResultTemp.getTotalElements();
+
+        if (conflictCount > 1L) {
+            // 超过 1 个已存在的冲突必然冲突
+            throw new LightRuntimeException("File(" + newFile.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+        } else if (conflictCount == 1L && conflictResultTemp.get().noneMatch(item -> item.getFileNo().equals(newFile.getFileNo()))) {
+            // 存在 1 个已存在的冲突且不是自己
+            throw new LightRuntimeException("File(" + newFile.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+        }
+    }
+
+    public void createFileToHardDisk(FileInfo fileInfo) {
+        String path = filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
+        try {
+            File file = new File(path);
+
+            if (!file.isAbsolute()) {
+                throw new LightRuntimeException("Ptah(" + path + ") of File(" + fileInfo.getName() + ") was unexpected.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            }
+
+            if (file.exists()) {
+                throw new LightRuntimeException("File(" + fileInfo.getName() + ") already exist in HardDisk.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            }
+
+            // 保障所需文件夹被创建
+            fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileInfo.getFileType().getPath());
+            boolean createNoConflict = file.createNewFile();
+            if (!createNoConflict) {
+                throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            }
+
+            // 拷贝文件到磁盘
+            FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
+            log.info("Copy file " + path + " to hard disk success.");
+        } catch (LightRuntimeException le) {
+            // 主动抛出的已知异常已经标记了错误原因
+            throw le;
+        } catch (Exception e) {
+            throw new LightRuntimeException("Fail to copy file:[" + path + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
+        }
+    }
+
+    public void deleteFileInHardDisk(boolean needDelete, File file, String filePath) {
+        if (needDelete) {
+            boolean deleteSuccess = file.delete();
+            if (!deleteSuccess) {
+                log.info("Delete file({}) in HardDisk failed.", filePath);
+            } else {
+                log.info("Delete file({}) in HardDisk success.", filePath);
+            }
+        }
     }
 }

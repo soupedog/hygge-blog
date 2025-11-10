@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
+import hygge.blog.domain.local.enums.FileCopyTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.QuoteStateEnum;
 import hygge.blog.domain.local.enums.TopicStateEnum;
@@ -104,6 +105,10 @@ public class MapObjectConvert {
 
     public FileTypeEnum asFileTypeEnum(Object target) {
         return FileTypeEnum.valueOf(parameterHelper.string(target));
+    }
+
+    public FileCopyTypeEnum asFileCopyTypeEnum(Object target) {
+        return FileCopyTypeEnum.valueOf(parameterHelper.string(target));
     }
 
     public FileDescription asFileDescription(Object target) {
