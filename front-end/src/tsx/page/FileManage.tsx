@@ -211,7 +211,8 @@ function FileManage() {
                                     render={(_: any, record: FileInfo) => (
                                         <Space size="small">
                                             <Button color="cyan" variant="filled" onClick={() => {
-                                                let link: string = UrlHelper.getBaseApiUrl() + "/main/file/static/" + record.fileNo;
+                                                //TODO 需要进行网络请求生成一个一次性 fileKey
+                                                let link: string = UrlHelper.getBaseUrl() + "file/" + record.fileNo;
                                                 navigator.clipboard.writeText(link).then(() => {
                                                     message.info("已成功复制 " + record.name + " 动态链接到剪切板！")
                                                 }).catch(e => console.error(e))

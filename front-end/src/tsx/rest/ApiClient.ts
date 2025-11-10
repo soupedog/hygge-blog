@@ -60,6 +60,8 @@ axios.interceptors.response.use(function (axiosResponse) {
         UserService.removeCurrentUser();
         message.warning("已清空错误登陆信息，2 秒内为您跳转回主页", 2);
         UrlHelper.openNewPage({inNewTab: false, delayTime: 2000});
+    } else {
+        message.warning(response.msg, 2);
     }
 
     return axiosResponse;
@@ -644,10 +646,12 @@ export class QuoteService {
 
 export interface FileInfo {
     fileNo: string,
+    cid: string,
     name: string,
     src: string,
     extension: string,
     fileType: string,
+    fileCopyType: string,
     fileSize: string,
     isInHardDisk?: Boolean,
     description?: FileDescription
@@ -737,12 +741,18 @@ export class FileService {
 
     static uploadFilesPromise(type: string,
                               formData: FormData,
+                              cid?: string,
                               successHook?: (input?: HyggeResponse<FileInfo[]>) => void,
                               beforeHook?: () => void,
                               finallyHook?: () => void): Promise<AxiosResponse<HyggeResponse<FileInfo[]>>> {
 
+        let url = UrlHelper.getBaseApiUrl() + "/main/file?type=" + type;
+        if (cid && cid.length > 0) {
+            url = url + "&cid=" + cid;
+        }
+
         let headers = UserService.getHeader({"Content-Type": "multipart/form-data"});
-        return axios.post(UrlHelper.getBaseApiUrl() + "/main/file?type=" + type, formData, {
+        return axios.post(url, formData, {
             headers: headers
         });
     }

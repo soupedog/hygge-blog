@@ -92,7 +92,7 @@ function FileOperation() {
                             </Col>
                         </Row>
                         <Row justify="center" gutter={[24, 16]}>
-                            <Col span={8}>
+                            <Col span={6}>
                                 <Form.Item name={['fileType']} label="文件类型" rules={[{required: true}]}
                                            initialValue="OTHERS">
                                     <Select
@@ -102,7 +102,8 @@ function FileOperation() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={4}></Col>
+                            <Col span={6}>
+                            </Col>
                             <Col span={12}>
                                 <Form.Item name={['cid']} label="所属文章类型" rules={[{required: false}]}>
                                     <TreeSelect
@@ -119,6 +120,14 @@ function FileOperation() {
                                 </Form.Item>
                             </Col>
                         </Row>
+                        <Form.Item name={['fileCopyType']} label="副本备份类型"
+                                   rules={[{required: true}]}
+                                   initialValue={"DEFAULT"}>
+                            <Radio.Group>
+                                <Radio value={"DEFAULT"}>无副本</Radio>
+                                <Radio value={"NGINX"}>Nginx 备份</Radio>
+                            </Radio.Group>
+                        </Form.Item>
                         <Form.Item name={['description', 'timePointer']} label="图片发生时间"
                                    rules={[{required: false}]}>
                             <DatePicker showTime format={"YYYY-MM-DD HH:mm:ss"}/>
@@ -209,6 +218,8 @@ function FileOperation() {
         fileOperationForm.setFieldValue("name", fileInfo.name);
         fileOperationForm.setFieldValue("extension", fileInfo.extension);
         fileOperationForm.setFieldValue("fileType", fileInfo.fileType);
+        fileOperationForm.setFieldValue("cid", fileInfo.cid);
+        fileOperationForm.setFieldValue("fileCopyType", fileInfo.fileCopyType);
 
         if (fileInfo.description != null) {
             fileOperationForm.setFieldsValue({"description": {"content": fileInfo.description.content}});

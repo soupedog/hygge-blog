@@ -16,10 +16,13 @@ export interface ArticleEditorState {
 
 function ArticleEditor() {
     const [content, updateContent] = useState("");
+    const [cid, updateCid] = useState("");
     const [tocEnable, updateTocEnable] = useState(false);
     const [tocTree, updateTocTree] = useState([]);
 
     const state = useMemo(() => ({
+        cid: cid,
+        updateCid: updateCid,
         content: content,
         updateContent: updateContent,
         tocEnable: tocEnable,
@@ -37,12 +40,12 @@ function ArticleEditor() {
     return (
         <ConfigProvider locale={zhCN}>
             <ArticleEditorContext.Provider value={state}>
-                <DefaultMarkdownEditor content={content} updateContent={updateContent}/>
+                <DefaultMarkdownEditor cid={cid} content={content} updateContent={updateContent}/>
                 {/*<EditorMenu updateContent={updateContent} tocEnable={tocEnable}*/}
                 {/*            updateTocEnable={updateTocEnable} updateTocTree={updateTocTree}/>*/}
                 {/*<EditorView content={content} updateContent={updateContent}*/}
                 {/*            tocEnable={tocEnable} tocTree={tocTree}/>*/}
-                <ArticleEditorForm updateContent={updateContent}/>
+                <ArticleEditorForm updateCid={updateCid} updateContent={updateContent}/>
             </ArticleEditorContext.Provider>
         </ConfigProvider>
     );

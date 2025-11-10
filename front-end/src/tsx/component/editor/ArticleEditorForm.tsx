@@ -15,7 +15,12 @@ import {FormInstance} from "antd/es/form/hooks/useForm";
 import {PropertiesHelper, UrlHelper} from "../../util/UtilContainer";
 import {key_editor_draft} from "../properties/PropertiesKey";
 
-function ArticleEditorForm({updateContent}: { updateContent: Function }) {
+export interface ArticleEditorFormProps {
+    updateCid: Function,
+    updateContent: Function;
+}
+
+function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
     const [articleForm] = Form.useForm();
     const {aid} = useParams();
     const [backgroundMusicType, updateBackgroundMusicType] = useState(undefined);
@@ -280,6 +285,7 @@ function ArticleEditorForm({updateContent}: { updateContent: Function }) {
     function refreshFormInfo(updateContent: Function, data: HyggeResponse<ArticleDto>, form: FormInstance<any>) {
         let article: ArticleDto = data.main!;
 
+        updateCid(article.cid);
         updateContent(article.content);
 
         form.setFieldsValue({
