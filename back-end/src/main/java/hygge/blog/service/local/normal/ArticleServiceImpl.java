@@ -173,6 +173,9 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
 
         long totalCount = articleListTemp.getTotalElements();
 
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
         List<ArticleDto> articleSummaryList = collectionHelper.filterNonemptyItemAsArrayList(false, articleListTemp.getContent(), (item -> {
             ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(item);
             if (accessibleCategoryList != null) {
@@ -180,6 +183,10 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                         .filter(category -> category.getCategoryId().equals(item.getCategoryId()))
                         .findFirst()
                         .ifPresent(category -> articleDto.setCid(category.getCid()));
+            }
+            // 鉴别并赋值当前用户是否有编辑权限
+            if (item.getUserId().equals(currentUserId)) {
+                articleDto.setEditable(true);
             }
 
             // userId → uid
@@ -198,6 +205,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                 CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(category.getCategoryId());
                 articleDto.setCategoryTreeInfo(categoryTreeInfo);
             }
+
         }
         result.setArticleSummaryList(articleSummaryList);
         result.setTotalCount(totalCount);
