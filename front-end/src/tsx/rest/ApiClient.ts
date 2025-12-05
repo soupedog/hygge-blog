@@ -255,7 +255,8 @@ export interface ArticleDto {
     orderCategory: number,
     articleState: string,
     createTs: number,
-    lastUpdateTs: number
+    lastUpdateTs: number,
+    editable: boolean
 }
 
 export class ArticleService {
@@ -357,29 +358,8 @@ export interface AnnouncementDto {
     createTs: number
 }
 
-export interface ArticleSummaryInfo {
-    aid: string,
-    categoryTreeInfo: {
-        topicInfo: TopicDto,
-        categoryList: CategoryDto[]
-    },
-    cid: string,
-    uid: string,
-    title: string,
-    imageSrc: string,
-    summary: string,
-    wordCount: number,
-    orderGlobal: number,
-    orderCategory: number,
-    pageViews: number,
-    selfPageViews: number,
-    articleState: string,
-    createTs: number,
-    lastUpdateTs: number
-}
-
 export interface ArticleSummaryResponse {
-    articleSummaryList: ArticleSummaryInfo[],
+    articleSummaryList: ArticleDto[],
     totalCount: number
 }
 
@@ -393,6 +373,7 @@ export interface QuoteDto {
     remarks?: string,
     orderVal?: number,
     quoteState?: string,
+    editable: boolean
 }
 
 export interface QuoteResponse {

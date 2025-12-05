@@ -53,7 +53,7 @@ function ArticleSummaryTabPane({orderType, articleSummaryInfo, onPageChange}: Ar
                     dataSource={articleSummaryInfo.articleSummaryList}
                     renderItem={(item) => (
                         <ArticleSummaryTabPaneItem
-                            isAuthor={item.uid == UserService.getCurrentUser()?.uid}
+                            isAuthor={item.editable}
                             articleSummary={item}
                             orderType={orderType}
                             secretKey={UrlHelper.getQueryString("secretKey")}

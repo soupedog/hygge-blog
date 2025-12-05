@@ -28,7 +28,7 @@ function QuoteTabPane({quoteInfo, onPageChange}: { quoteInfo: QuoteResponse, onP
                     }}
                     dataSource={quoteInfo.quoteList}
                     renderItem={(item) => (
-                        <QuoteTabPaneItem isAuthor={item.uid == UserService.getCurrentUser()?.uid} quote={item}/>
+                        <QuoteTabPaneItem isAuthor={item.editable} quote={item}/>
                     )}
                 />
             )}

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import MusicPlayer from "../player/MusicPlayer";
-import {ArticleDto, UserService} from "../../rest/ApiClient";
+import {ArticleConfiguration, ArticleDto, UserService} from "../../rest/ApiClient";
 import {Affix, Breadcrumb, Card, FloatButton, Layout, message, Space, Tree} from "antd";
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
 import HyggeFooter from "../HyggeFooter";
@@ -13,7 +13,7 @@ import {TimeHelper} from "../../util/UtilContainer";
 import {MdPreview} from "md-editor-rt";
 import {allowAll, editor_id_for_browser} from "../markdown/properties/MarkDownStaticValue";
 
-function BrowserView({article}: { article: ArticleDto | null }) {
+function BrowserView({article}: { article: ArticleDto | undefined }) {
     const [tocEnable, updateTocEnable] = useState(true);
     const [tocTree, updateTocTree] = useState([]);
 
@@ -31,36 +31,36 @@ function BrowserView({article}: { article: ArticleDto | null }) {
     return (
         <Layout>
             <HyggeBrowserHeader/>
-            {renderMainImage(article)}
-            {renderMusicPlayer(article)}
+            {renderMainImage(article?.imageSrc)}
+            {renderMusicPlayer(article?.configuration)}
             {renderArticle(article, tocEnable, updateTocEnable, tocTree, updateTocTree)}
             <HyggeFooter/>
         </Layout>
     );
 }
 
-function renderMainImage(article: ArticleDto | null) {
-    if (article != null) {
+function renderMainImage(imageSrc: string | undefined) {
+    if (imageSrc != null) {
         return (
-           <div style={{
+            <div style={{
                 width: "100%",
                 height: "400px",
                 backgroundSize: "cover",
-                background: "url(" + article.imageSrc + ") no-repeat center"
+                background: "url(" + imageSrc + ") no-repeat center"
             }}/>
         );
     }
 }
 
-function renderMusicPlayer(article: ArticleDto | null) {
-    if (article != null) {
+function renderMusicPlayer(configuration: ArticleConfiguration | undefined) {
+    if (configuration != null) {
         return (
-            <MusicPlayer configuration={article.configuration}/>
+            <MusicPlayer configuration={configuration}/>
         );
     }
 }
 
-function renderBreadcrumbItems(article: ArticleDto | null) {
+function renderBreadcrumbItems(article: ArticleDto | undefined) {
     let result = new Array();
     if (article != null) {
         // 主题名称
@@ -113,9 +113,9 @@ function initToc(updateTocTree: Function, updateTocEnable: Function, nextTocEnab
     }
 }
 
-function renderArticle(article: ArticleDto | null, tocEnable: Boolean, updateTocEnable: Function, tocTree: AntdTreeNodeInfo[], updateTocTree: Function) {
+function renderArticle(article: ArticleDto | undefined, tocEnable: Boolean, updateTocEnable: Function, tocTree: AntdTreeNodeInfo[], updateTocTree: Function) {
     if (article != null) {
-        let isAuthor = article.uid == UserService.getCurrentUser()?.uid;
+        let isAuthor = article.editable;
         let actualTocEnable = tocEnable && tocTree.length > 0;
 
         return (
