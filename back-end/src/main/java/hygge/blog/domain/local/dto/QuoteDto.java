@@ -41,7 +41,9 @@ public class QuoteDto {
     @Schema(title = "句子状态", description = "启用,禁用")
     private QuoteStateEnum quoteState;
     @Schema(title = "创建时间", description = "UTC 毫秒级时间戳")
-    protected Long createTs;
+    private Long createTs;
     @Schema(title = "最后修改时间", description = "UTC 毫秒级时间戳")
-    protected Long lastUpdateTs;
+    private Long lastUpdateTs;
+    @Schema(title = "当前用户是否可编辑", description = "可空, 仅当 True 时当前用户允许编辑")
+    private Boolean editable;
 }

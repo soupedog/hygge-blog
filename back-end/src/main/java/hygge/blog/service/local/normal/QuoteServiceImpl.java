@@ -112,8 +112,16 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         QuoteInfo result = QuoteInfo.builder().build();
 
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
         List<QuoteDto> list = collectionHelper.filterNonemptyItemAsArrayList(false, resultTemp.getContent(), (item -> {
             QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(item);
+
+            // 鉴别并赋值当前用户是否有编辑权限
+            if (item.getUserId().equals(Optional.ofNullable(currentUser).map(User::getUserId).orElse(null))) {
+                quoteDto.setEditable(true);
+            }
             // userId → uid
             String authorUid = cacheService.userIdToUid(item.getUserId());
             quoteDto.setUid(authorUid);
