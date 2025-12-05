@@ -5,12 +5,14 @@ import ArticleSummaryTabPane from "./ArticleSummaryTabPane";
 import {IndexContext} from '../../../page/Index';
 import QuoteTabPane from "./QuoteTabPane";
 
-function SearchResultTabPane({searchType, orderType, articleSummaryInfo, quoteInfo}: {
+export interface SearchResultTabPaneProps {
     searchType: IndexSearchType,
     orderType: ArticleSummaryOrderType,
     articleSummaryInfo: ArticleSummaryResponse,
     quoteInfo: QuoteResponse
-}) {
+}
+
+function SearchResultTabPane({searchType, orderType, articleSummaryInfo, quoteInfo}: SearchResultTabPaneProps) {
 
     switch (searchType) {
         case IndexSearchType.ARTICLE:

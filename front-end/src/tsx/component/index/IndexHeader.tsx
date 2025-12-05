@@ -22,6 +22,8 @@ function IndexHeader() {
                   updateArticleSummarySearchOrderType,
                   updateSearchKeyword,
                   updateIndexSearchType,
+                  updatePageForSearch,
+                  updatePageSizeForSearch,
                   updateArticleSummarySearchInfo,
                   updateQuoteSearchInfo
               }) => (
@@ -60,7 +62,6 @@ function IndexHeader() {
                                             enterButton
                                             size="middle"
                                             onSearch={(value) => {
-                                                console.log(value)
                                                 if (!PropertiesHelper.isStringNotEmpty(value)) {
                                                     message.warning("查询关键字不可为空", 3);
                                                     return;
@@ -71,6 +72,9 @@ function IndexHeader() {
 
                                                 let searchKey = value;
                                                 updateSearchKeyword(searchKey);
+                                                // 因为和文章类别展示共用一个展示模块，需要重置页码
+                                                updatePageForSearch(1);
+                                                updatePageSizeForSearch(5);
 
                                                 if (document.querySelector("#searchModeSwitch")!.querySelector("button")!.ariaChecked == "true") {
                                                     updateIndexSearchType(IndexSearchType.ARTICLE);

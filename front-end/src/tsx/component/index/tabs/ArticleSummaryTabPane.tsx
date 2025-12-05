@@ -6,31 +6,49 @@ import {IndexContext} from '../../../page/Index';
 import ArticleSummaryTabPaneItem from "./ArticleSummaryTabPaneItem";
 import {ArticleSummaryOrderType} from "../../properties/GlobalEnum";
 
-function ArticleSummaryTabPane({orderType, articleSummaryInfo, onPageChange}: {
+export interface ArticleSummaryTabPaneProps {
     orderType: ArticleSummaryOrderType,
     articleSummaryInfo: ArticleSummaryResponse,
     onPageChange: Function
-}) {
-    const [currentPageSize, updateCurrentPageSize] = useState(5);
+}
+
+function ArticleSummaryTabPane({orderType, articleSummaryInfo, onPageChange}: ArticleSummaryTabPaneProps) {
+    const [loading, setLoading] = useState(false);
 
     return (
         <IndexContext.Consumer>
-            {({currentTopicId,currentCategoryId, updateArticleSummaryInfo}) => (
+            {({
+                  currentTopicId,
+                  currentCategoryId,
+                  pageForSearch,
+                  updatePageForSearch,
+                  pageSizeForSearch,
+                  updatePageSizeForSearch
+              }) => (
                 <List
                     itemLayout="vertical"
                     size="large"
+                    loading={loading}
                     pagination={{
                         onChange: (page, pageSize) => {
-                            onPageChange(currentTopicId!,currentCategoryId!, page, pageSize);
+                            let needRefresh = false;
 
-                            if (pageSize != currentPageSize) {
-                                updateCurrentPageSize(pageSize);
+                            if (page != pageForSearch) {
+                                updatePageForSearch(page);
+                                needRefresh = true;
+                            } else if (pageSize != pageSizeForSearch) {
+                                updatePageSizeForSearch(pageSize);
+                                needRefresh = true;
+                            }
+
+                            if (needRefresh) {
+                                onPageChange(currentTopicId, currentCategoryId, page, pageSize);
                             }
                         },
                         showSizeChanger: true,
                         total: articleSummaryInfo.totalCount,
-                        pageSize: currentPageSize,
-
+                        current: pageForSearch,
+                        pageSize: pageSizeForSearch,
                     }}
                     dataSource={articleSummaryInfo.articleSummaryList}
                     renderItem={(item) => (

@@ -23,7 +23,7 @@ export interface IndexState {
     categoryFolded: boolean;
     updateCategoryFolded: Function;
     // 当前选中查看的文章板块 tid
-    currentTopicId?: string | null;
+    currentTopicId?: string;
     updateCurrentTopicId: Function;
     updateCurrentCategoryId: Function;
     topicOverviewInfos: TopicOverviewInfo[];
@@ -35,7 +35,12 @@ export interface IndexState {
     indexSearchType: IndexSearchType,
     updateIndexSearchType: Function,
     // 当前选中查看的文章类别 cid
-    currentCategoryId?: string | null;
+    currentCategoryId?: string;
+    // 搜索功能被多个 Category 共享，所以每次切换需要重置页码，需要放到全局管理
+    pageForSearch: number,
+    updatePageForSearch: Function,
+    pageSizeForSearch: number,
+    updatePageSizeForSearch: Function,
     searchKeyword: string;
     updateSearchKeyword: Function,
     articleSummarySearchOrderType: ArticleSummaryOrderType
@@ -47,7 +52,6 @@ export interface IndexState {
     announcementInfos: AnnouncementDto[];
     updateAnnouncementInfos: Function;
 }
-
 
 function Index() {
     const [menuFolded, updateMenuFolded] = useState(true);
@@ -71,6 +75,8 @@ function Index() {
     const [indexSearchType, updateIndexSearchType] = useState(IndexSearchType.ARTICLE);
     const [currentCategoryId, updateCurrentCategoryId] = useState("");
     const [searchKeyword, updateSearchKeyword] = useState("");
+    const [pageForSearch, updatePageForSearch] = useState(1);
+    const [pageSizeForSearch, updatePageSizeForSearch] = useState(5);
     const [articleSummarySearchOrderType, updateArticleSummarySearchOrderType] = useState(ArticleSummaryOrderType.CATEGORY);
     const [articleSummarySearchInfo, updateArticleSummarySearchInfo] = useState(
         {
@@ -105,6 +111,10 @@ function Index() {
         updateCurrentCategoryId: updateCurrentCategoryId,
         searchKeyword: searchKeyword,
         updateSearchKeyword: updateSearchKeyword,
+        pageForSearch: pageForSearch,
+        updatePageForSearch: updatePageForSearch,
+        pageSizeForSearch: pageSizeForSearch,
+        updatePageSizeForSearch: updatePageSizeForSearch,
         articleSummarySearchOrderType: articleSummarySearchOrderType,
         updateArticleSummarySearchOrderType: updateArticleSummarySearchOrderType,
         articleSummarySearchInfo: articleSummarySearchInfo,
@@ -113,7 +123,7 @@ function Index() {
         updateQuoteSearchInfo: updateQuoteSearchInfo,
         announcementInfos: announcementInfos,
         updateAnnouncementInfos: updateAnnouncementInfos
-    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, quoteInfo, indexSearchType, currentCategoryId, searchKeyword, articleSummarySearchOrderType, articleSummarySearchInfo, quoteSearchInfo, announcementInfos]);
+    }), [menuFolded, categoryFolded, currentTopicId, topicOverviewInfos, articleSummaryInfo, quoteInfo, indexSearchType, currentCategoryId, searchKeyword, pageForSearch, pageSizeForSearch, articleSummarySearchOrderType, articleSummarySearchInfo, quoteSearchInfo, announcementInfos]);
 
     useEffect(() => {
         HomePageService.fetch(data => {

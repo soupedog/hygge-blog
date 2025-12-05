@@ -162,6 +162,4 @@ const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
     </Space>
 );
 
-
-
 export default ArticleSummaryTabPaneItem;

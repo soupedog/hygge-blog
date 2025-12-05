@@ -16,39 +16,41 @@ function CategoryCollapse() {
                   topicOverviewInfos,
                   updateIndexSearchType,
                   updateArticleSummarySearchInfo,
-                  updateArticleSummarySearchOrderType
+                  updateArticleSummarySearchOrderType,
+                  updatePageForSearch,
+                  updatePageSizeForSearch,
               }) => (
                 // folded 是虚空组件，相当于收起所有面板
                 // 为 true 时，激活 key 为 default 的面板
                 <Collapse activeKey={[categoryFolded ? "folded" : "default"]}
                     // unknown 是一个不存在的文章板块
-                          items={renderCategoryPanel(topicOverviewInfos, currentTopicId == null ? "unknown" : currentTopicId, updateIndexSearchType, updateArticleSummarySearchOrderType, updateCurrentCategoryId, updateArticleSummarySearchInfo)}>
+                          items={renderCategoryPanel(topicOverviewInfos, currentTopicId == null ? "unknown" : currentTopicId, updateIndexSearchType, updateArticleSummarySearchOrderType, updateCurrentCategoryId, updateArticleSummarySearchInfo, updatePageForSearch, updatePageSizeForSearch)}>
                 </Collapse>
             )}
         </IndexContext.Consumer>
     );
 
-    function renderCategoryPanel(infos: TopicOverviewInfo[], selectedTid: string, updateIndexSearchType: Function, updateArticleSummarySearchOrderType: Function, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function) {
+    function renderCategoryPanel(infos: TopicOverviewInfo[], selectedTid: string, updateIndexSearchType: Function, updateArticleSummarySearchOrderType: Function, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function, updatePageForSearch: Function, updatePageSizeForSearch: Function) {
         // 只有单个子节点
         return [{
             // 默认展开 default 面板
             key: 'default',
             label: '文章类别目录',
-            children: renderCategoryCard(infos, selectedTid, updateIndexSearchType, updateArticleSummarySearchOrderType, updateCurrentCategoryId, updateArticleSummarySearchInfo),
+            children: renderCategoryCard(infos, selectedTid, updateIndexSearchType, updateArticleSummarySearchOrderType, updateCurrentCategoryId, updateArticleSummarySearchInfo, updatePageForSearch, updatePageSizeForSearch),
         }];
     }
 
-    function renderCategoryCard(infos: TopicOverviewInfo[], selectedTid: string, updateIndexSearchType: Function, updateArticleSummarySearchOrderType: Function, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function) {
+    function renderCategoryCard(infos: TopicOverviewInfo[], selectedTid: string, updateIndexSearchType: Function, updateArticleSummarySearchOrderType: Function, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function, updatePageForSearch: Function, updatePageSizeForSearch: Function) {
         return (
             <Card size={"small"}>
                 {
-                    renderCategoryCardGrid(infos, selectedTid, updateIndexSearchType, updateArticleSummarySearchOrderType, updateCurrentCategoryId, updateArticleSummarySearchInfo)
+                    renderCategoryCardGrid(infos, selectedTid, updateIndexSearchType, updateArticleSummarySearchOrderType, updateCurrentCategoryId, updateArticleSummarySearchInfo, updatePageForSearch, updatePageSizeForSearch)
                 }
             </Card>
         );
     }
 
-    function renderCategoryCardGrid(infos: TopicOverviewInfo[], selectedTid: string, updateIndexSearchType: Function, updateArticleSummarySearchOrderType: Function, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function) {
+    function renderCategoryCardGrid(infos: TopicOverviewInfo[], selectedTid: string, updateIndexSearchType: Function, updateArticleSummarySearchOrderType: Function, updateCurrentCategoryId: Function, updateArticleSummarySearchInfo: Function, updatePageForSearch: Function, updatePageSizeForSearch: Function) {
         let topicOverviewInfos: TopicOverviewInfo[] | undefined = infos;
 
         if (topicOverviewInfos == null || topicOverviewInfos.length < 1) {
@@ -69,6 +71,9 @@ function CategoryCollapse() {
                         updateIndexSearchType(IndexSearchType.ARTICLE);
                         updateArticleSummarySearchOrderType(ArticleSummaryOrderType.CATEGORY);
                         updateCurrentCategoryId(item.cid);
+                        // 点击后会切换搜索结果，需要重置页码
+                        updatePageForSearch(1);
+                        updatePageSizeForSearch(5);
 
                         HomePageService.fetchArticleSummaryByCid(item.cid, 1, 5, (data) => {
                             updateArticleSummarySearchInfo(data?.main);
