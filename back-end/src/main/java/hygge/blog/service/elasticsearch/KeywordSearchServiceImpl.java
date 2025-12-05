@@ -63,11 +63,23 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
 
         resultTemp.hits().hits().forEach(itemTemp -> {
             ArticleQuoteSearchCache item = itemTemp.source();
-            ArticleDto articleDto = ElasticToDtoMapper.INSTANCE.esToArticleDto(item);
-            // 模糊查询配合前端不显示顶置
-            articleDto.setOrderGlobal(null);
-            articleDto.setOrderCategory(null);
-            articleSummaryList.add(articleDto);
+
+            if (item != null) {
+                ArticleDto articleDto = ElasticToDtoMapper.INSTANCE.esToArticleDto(item);
+
+                // 缓存里是 DTO 转存的，没有 userid，故此处使用 uid
+                // 鉴别并赋值当前用户是否有编辑权限
+                Optional.ofNullable(item.getUid()).ifPresent(uid -> {
+                    if (uid.equals(Optional.ofNullable(currentUser).map(User::getUid).orElse(null))) {
+                        articleDto.setEditable(true);
+                    }
+                });
+
+                // 模糊查询配合前端不显示顶置
+                articleDto.setOrderGlobal(null);
+                articleDto.setOrderCategory(null);
+                articleSummaryList.add(articleDto);
+            }
         });
 
         return ArticleSummaryInfo.builder()
@@ -77,14 +89,29 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public QuoteInfo quoteKeyWordSearch(String keyword, Integer currentPage, Integer pageSize) {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+
         SearchResponse<ArticleQuoteSearchCache> resultTemp = keywordSearch(keyword, ArticleQuoteSearchCache.Type.QUOTE, null, currentPage, pageSize);
 
         List<QuoteDto> quoteList = new ArrayList<>(pageSize);
 
         resultTemp.hits().hits().forEach(itemTemp -> {
             ArticleQuoteSearchCache item = itemTemp.source();
-            QuoteDto quoteDto = ElasticToDtoMapper.INSTANCE.esToQuoteDto(item);
-            quoteList.add(quoteDto);
+
+            if (item != null) {
+                QuoteDto quoteDto = ElasticToDtoMapper.INSTANCE.esToQuoteDto(item);
+
+                // 缓存里是 DTO 转存的，没有 userid，故此处使用 uid
+                // 鉴别并赋值当前用户是否有编辑权限
+                Optional.ofNullable(item.getUid()).ifPresent(uid -> {
+                    if (uid.equals(Optional.ofNullable(currentUser).map(User::getUid).orElse(null))) {
+                        quoteDto.setEditable(true);
+                    }
+                });
+
+                quoteList.add(quoteDto);
+            }
         });
 
         return QuoteInfo.builder()

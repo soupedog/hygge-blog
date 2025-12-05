@@ -38,7 +38,7 @@ public class HyggeRequestContext extends AbstractHyggeContext<HyggeRequestContex
      */
     private TokenScopeEnum tokenScope;
     /**
-     * 当前登录用户信息
+     * 当前登录用户信息(未登录用户则为 null)
      */
     private User currentLoginUser;
 
