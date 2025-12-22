@@ -1,4 +1,4 @@
-package hygge.blog.domain.baidu.dto.inner;
+package hygge.blog.domain.baidu.inner;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

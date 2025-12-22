@@ -1,4 +1,4 @@
-package hygge.blog.domain.baidu;
+package hygge.blog.domain.ipdatacloud.inner;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.Setter;
 
 /**
  * @author Xavier
- * @date 2022/11/19
+ * @date 2025/12/22
  */
 @Getter
 @Setter
@@ -17,6 +17,6 @@ import lombok.Setter;
 @Generated
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaiDuIpQueryResponseItem {
-    private String location;
+public class DataCloudIpInfoDTO {
+    private DataCloudLocation dataCloudLocation;
 }

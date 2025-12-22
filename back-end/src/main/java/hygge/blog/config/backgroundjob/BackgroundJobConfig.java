@@ -33,15 +33,15 @@ public class BackgroundJobConfig {
 
     // 每 5 分钟一次，初始静默 5 分钟
     @Scheduled(fixedDelay = 1000 * 300, initialDelay = 1000 * 300)
-    public void toFreshIpLocationData() {
+    public void toFreshBrowseLogType() {
         articleBrowseLogService.freshBrowseLogTypeBackgroundJob();
     }
 
-//    /**
-//     * ip 查询接口是第三方提供的公共服务，频率限制比想象中更严格，每 8 小时调用一次
-//     */
-//    @Scheduled(fixedDelay = 1000 * 3600 * 8, initialDelay = 1000 * 300)
-//    public void toFreshIpLocationData() {
-//        articleBrowseLogService.freshIpLocationBackgroundJob();
-//    }
+    /**
+     * ip 查询接口是第三方提供的公共服务
+     */
+    @Scheduled(fixedDelay = 1000 * 3600 * 8, initialDelay = 1000 * 300)
+    public void toFreshIpLocationData() {
+        articleBrowseLogService.freshIpLocationBackgroundJob();
+    }
 }

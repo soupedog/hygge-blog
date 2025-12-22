@@ -1,16 +1,14 @@
 package hygge.blog.service.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import hygge.blog.domain.baidu.BaiDuIpQueryResponseDto;
-import hygge.blog.domain.baidu.BaiDuIpQueryResponseItem;
-import hygge.blog.domain.baidu.dto.BaiduGatewayDto;
-import hygge.blog.domain.baidu.dto.inner.BaiduIpInfoDto;
+import hygge.blog.domain.baidu.BaiduGatewayDto;
+import hygge.blog.domain.baidu.inner.BaiduIpInfoDto;
+import hygge.blog.domain.ipdatacloud.DataCloudGatewayDTO;
 import hygge.web.util.http.bo.HttpResponse;
 import hygge.web.util.http.impl.DefaultHttpHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Optional;
 
 /**
  * @author Xavier
@@ -21,31 +19,45 @@ public class IPQueryClient {
     private static final TypeReference<BaiduGatewayDto<BaiduIpInfoDto>> typeReference = new TypeReference<>() {
     };
     private final DefaultHttpHelper httpHelper;
+    @Value("${third-party.ipdatacloud.ipquery.key}")
+    private String key;
 
     public IPQueryClient(DefaultHttpHelper httpHelper) {
         this.httpHelper = httpHelper;
     }
 
     /**
-     * 功能相对较弱，使用优先级低
+     * IP 数据云 "https://api.ipdatacloud.com/v2/query?ip=需要查询的ip&key=您申请的key" 的 IP 查询<br/>
+     *
+     * <pre>
+     * {
+     *      "code": 200,
+     *      "data": {
+     *          "location": {
+     *              "city": "xx市",
+     *              "country": "中国",
+     *              "country_english": "China",
+     *              "ip": " xx.xxx.xxx.xx ",
+     *              "isp": "移动",
+     *              "latitude": "xx.xxx",
+     *              "longitude": "xxx.xxx",
+     *              "province": "湖南"
+     *           }
+     *      },
+     *      "msg": "success"
+     * }
+     * </pre>
      */
-    public String queryIpLocation(String ip) {
+    public HttpResponse<Void, DataCloudGatewayDTO> queryIpLocation(String ip) {
         String url = UriComponentsBuilder
-                .fromUriString("https://sp1.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?query={ip}&resource_id=5809")
+                .fromUriString("https://api.ipdatacloud.com/v2/query")
+                .queryParam("ip", ip)
+                .queryParam("key", key)
                 .encode()
                 .build()
-                .expand(ip)
                 .toUriString();
 
-        HttpResponse<Void, BaiDuIpQueryResponseDto> resultTemp = httpHelper.get(url, BaiDuIpQueryResponseDto.class);
-        if (resultTemp.isSuccess()) {
-            return Optional.ofNullable(resultTemp.getData())
-                    .map(BaiDuIpQueryResponseDto::getData)
-                    .map(list -> list.isEmpty() ? null : list.get(0))
-                    .map(BaiDuIpQueryResponseItem::getLocation)
-                    .orElse(null);
-        }
-        return null;
+        return httpHelper.get(url, DataCloudGatewayDTO.class);
     }
 
     /**

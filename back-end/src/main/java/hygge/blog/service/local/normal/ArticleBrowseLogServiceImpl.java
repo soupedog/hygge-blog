@@ -1,7 +1,7 @@
 package hygge.blog.service.local.normal;
 
-import hygge.blog.domain.baidu.dto.BaiduGatewayDto;
-import hygge.blog.domain.baidu.dto.inner.BaiduIpInfoDto;
+import hygge.blog.domain.ipdatacloud.DataCloudGatewayDTO;
+import hygge.blog.domain.ipdatacloud.inner.DataCloudIpInfoDTO;
 import hygge.blog.domain.local.enums.BrowseLogTypeEnum;
 import hygge.blog.domain.local.po.ArticleBrowseLog;
 import hygge.blog.repository.database.ArticleBrowseLogDao;
@@ -130,18 +130,18 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
                 // 尝试从本地解析 IP location
                 ArticleBrowseLog ipLocationInfoResult = articleBrowseLogDao.findIpLocationInfoFromLocal(targetIp);
 
-                // 本地不存在相关 IP 信息时，尝试从百度解析 IP location
+                // 本地不存在相关 IP 信息时，尝试从第三方平台解析 IP location
                 if (ipLocationInfoResult == null) {
-                    HttpResponse<Void, BaiduGatewayDto<BaiduIpInfoDto>> resultTemp = ipQueryService.queryIpInfo(targetIp);
+                    HttpResponse<Void, DataCloudGatewayDTO> resultTemp = ipQueryService.queryIpLocation(targetIp);
                     if (resultTemp.isSuccess() &&
-                            resultTemp.getData() != null && "Success".equals(resultTemp.getData().getCode())) {
-                        BaiduIpInfoDto baiduIpInfoDto = resultTemp.getData().getData();
+                            resultTemp.getData() != null && "success".equals(resultTemp.getData().getMsg())) {
+                        DataCloudIpInfoDTO ipInfoDTO = resultTemp.getData().getData();
 
                         ipLocationInfoResult = ArticleBrowseLog.builder()
                                 .ip(targetIp)
-                                .ipLocation(baiduIpInfoDto.toLocationInfo())
-                                .latitude(baiduIpInfoDto.getLat())
-                                .longitude(baiduIpInfoDto.getLng())
+                                .ipLocation(ipInfoDTO.getDataCloudLocation().toLocationInfo())
+                                .latitude(ipInfoDTO.getDataCloudLocation().getLatitude())
+                                .longitude(ipInfoDTO.getDataCloudLocation().getLongitude())
                                 .build();
                     }
                     // 至少进行过一次远端查询了，终止查询

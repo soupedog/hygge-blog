@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 @Repository
 public interface ArticleBrowseLogDao extends JpaRepository<ArticleBrowseLog, Integer> {
-    @Query(value = "SELECT ip FROM article_browse_log WHERE ipLocation IS NULL GROUP BY ip limit 1", nativeQuery = true)
+    @Query(value = "SELECT ip FROM article_browse_log WHERE browseLogType='DEFAULT' and ipLocation IS NULL GROUP BY ip limit 1", nativeQuery = true)
     String findAnIpWithoutLocation();
 
     @Query(value = "SELECT * FROM article_browse_log WHERE ip=:ip AND ipLocation IS NOT NULL AND latitude IS NOT NULL AND longitude IS NOT NULL limit 1", nativeQuery = true)
