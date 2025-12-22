@@ -139,9 +139,9 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
 
                         ipLocationInfoResult = ArticleBrowseLog.builder()
                                 .ip(targetIp)
-                                .ipLocation(ipInfoDTO.getDataCloudLocation().toLocationInfo())
-                                .latitude(ipInfoDTO.getDataCloudLocation().getLatitude())
-                                .longitude(ipInfoDTO.getDataCloudLocation().getLongitude())
+                                .ipLocation(ipInfoDTO.getLocation().toLocationInfo())
+                                .latitude(ipInfoDTO.getLocation().getLatitude())
+                                .longitude(ipInfoDTO.getLocation().getLongitude())
                                 .build();
                     }
                     // 至少进行过一次远端查询了，终止查询

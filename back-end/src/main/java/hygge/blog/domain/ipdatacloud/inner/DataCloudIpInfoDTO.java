@@ -18,5 +18,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DataCloudIpInfoDTO {
-    private DataCloudLocation dataCloudLocation;
+    private DataCloudLocation location;
 }
