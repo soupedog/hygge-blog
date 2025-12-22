@@ -1,7 +1,11 @@
 package hygge.blog.domain.local.po;
 
+import hygge.blog.domain.local.enums.BrowseLogTypeEnum;
 import hygge.blog.domain.local.po.base.BasePo;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,4 +51,10 @@ public class ArticleBrowseLog extends BasePo {
     private String longitude;
     private Integer userId;
     private String userAgent;
+    /**
+     * 是否为人机
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "enum ('UNCHECKED', 'DEFAULT', 'BOT_BAIDU', 'BOT_GOOGLE', 'BOT_360', 'BOT_Byte', 'BOT_UNKNOWN') default 'UNCHECKED'")
+    private BrowseLogTypeEnum browseLogType;
 }
