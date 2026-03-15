@@ -10,7 +10,7 @@ import BrowserView from "../component/browser/BrowserView";
 import {UrlHelper} from "../util/UtilContainer";
 
 function Browser() {
-    const [currentArticle, updateCurrentArticle] = useState(null);
+    const [currentArticle, updateCurrentArticle] = useState(undefined);
     const {aid} = useParams();
 
     useEffect(() => {
