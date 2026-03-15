@@ -131,7 +131,8 @@ public class Category extends BasePo {
                     }
                     break;
                 case PERSONAL:
-                    if (context.getCurrentLoginUser().getUserId().equals(targetUser.getUserId())) {
+                    // 当前类别创建人与当前登录用户相符时放行
+                    if (getUserId().equals(targetUser.getUserId())) {
                         itemResult = true;
                     }
                     break;
