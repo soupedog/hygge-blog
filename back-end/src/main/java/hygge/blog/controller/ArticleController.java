@@ -74,7 +74,7 @@ public class ArticleController implements ArticleControllerDoc {
                 String newContent = markdownContentService.replaceMarkdownImageResource(result.getContent());
                 result.setContent(newContent);
             }
-            // 浏览量自增
+            // 非管理员则记录访问日志
             if (!context.isMaintainer()) {
                 articleBrowseLogService.insertArticleBrowseLogAsync(result.getAid(),
                         result.getTitle(),
