@@ -100,12 +100,11 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         article.setOrderGlobal(parameterHelper.parseObjectOfNullable("orderGlobal", article.getOrderGlobal(), 0));
         article.setOrderCategory(parameterHelper.parseObjectOfNullable("orderCategory", article.getOrderCategory(), 0));
 
-
         Article result = articleDao.save(article);
 
         Integer articleId = result.getArticleId();
 
-        eventService.refreshArticleByArticleIdAsync(articleId);
+        eventService.refreshArticleByArticleId(articleId);
         return result;
     }
 
@@ -144,7 +143,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         Article result = articleDao.save(old);
 
         Integer articleId = result.getArticleId();
-        eventService.refreshArticleByArticleIdAsync(articleId);
+        eventService.refreshArticleByArticleId(articleId);
         return result;
     }
 
@@ -172,9 +171,6 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         }
 
         long totalCount = articleListTemp.getTotalElements();
-
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
 
         List<ArticleDto> articleSummaryList = collectionHelper.filterNonemptyItemAsArrayList(false, articleListTemp.getContent(), (item -> {
             ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(item);
