@@ -23,4 +23,8 @@ public class ElasticSearchConfiguration implements HyggeSpringConfigurationPrope
      * e.g:"localhost:9200"
      */
     private String hostAndPort;
+    /**
+     * 固定账号为： "elastic"
+     */
+    private String password;
 }

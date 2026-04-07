@@ -30,6 +30,7 @@ public class ElasticSearchConfig extends ElasticsearchConfiguration {
                 .connectedTo(elasticSearchConfiguration.getHostAndPort())
                 .withConnectTimeout(Duration.ofSeconds(10))
                 .withSocketTimeout(Duration.ofSeconds(30))
+                .withBasicAuth("elastic", elasticSearchConfiguration.getPassword())
                 .build();
     }
 
