@@ -4,8 +4,9 @@ DB_URL=$1
 DB_USER=$2
 DB_PW=$3
 ES_URIS=$4
-FILE_PREFIX=$5
-IP_QUERY_KEY=$6
+ES_PW=$5
+FILE_PREFIX=$6
+IP_QUERY_KEY=$7
 
 cat > Dockerfile <<END_TEXT
 FROM amazoncorretto:17-alpine3.18-jdk
@@ -16,6 +17,7 @@ ENV database.url="${DB_URL}"
 ENV database.userName="${DB_USER}"
 ENV database.password="${DB_PW}"
 ENV esUris="${ES_URIS}"
+ENV esPassword="${ES_PW}"
 ENV file.link.prefix="${FILE_PREFIX}"
 ENV ipquery.key="${IP_QUERY_KEY}"
 
