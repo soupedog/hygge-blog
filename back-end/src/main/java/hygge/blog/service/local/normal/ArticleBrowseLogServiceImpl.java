@@ -49,6 +49,7 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
                 .aid(aid)
                 .userId(userId)
                 .userAgent(userAgent)
+                .browseLogType(BrowseLogTypeEnum.UNCHECKED)
                 .build();
 
         articleBrowseLogDao.save(articleBrowseLog);
