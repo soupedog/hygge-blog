@@ -1,5 +1,6 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.CacheControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.commons.exception.LightRuntimeException;
@@ -25,6 +26,7 @@ public class CacheController implements CacheControllerDoc {
     }
 
     @Override
+    @RequireAuth
     @DeleteMapping("/cache")
     public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheName", defaultValue = "categoryTreeInfoCache") String cacheName) {
         Cache cache = cacheManager.getCache(cacheName);

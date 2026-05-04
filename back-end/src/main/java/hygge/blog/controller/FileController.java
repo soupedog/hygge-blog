@@ -2,6 +2,7 @@ package hygge.blog.controller;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
+import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.FileControllerDoc;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
@@ -59,6 +60,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     }
 
     @Override
+    @RequireAuth
     @PostMapping(value = "/file", consumes = "multipart/form-data")
     @ControllerLog(ignoreParamNames = "filesList")
     public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>> upload(@RequestParam(value = "type") FileTypeEnum fileType,

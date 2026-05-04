@@ -1,8 +1,10 @@
 package hygge.blog.filter.base;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hygge.commons.constant.ConstantParameters;
 import hygge.commons.template.definition.HyggeInfo;
 import hygge.util.UtilCreator;
+import hygge.util.definition.JsonHelper;
 import hygge.util.definition.ParameterHelper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import java.time.temporal.ChronoUnit;
 public abstract class AbstractHyggeRequestFilter extends OncePerRequestFilter {
     protected static final Logger log = LoggerFactory.getLogger(AbstractHyggeRequestFilter.class);
     protected static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
+    protected static final JsonHelper<ObjectMapper> jsonHelper = UtilCreator.INSTANCE.getDefaultJsonHelperInstance(false);
 
     /**
      * 慢请求耗时门槛(毫秒)
