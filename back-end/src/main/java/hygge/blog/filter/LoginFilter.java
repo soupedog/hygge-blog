@@ -116,12 +116,11 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
 
             if (needPreCheckRole) {
                 // 需要权限预检查
-                for (UserTypeEnum userTypeEnum : roleRequireSet) {
-                    if (UserTypeEnum.ROOT.equals(userTypeEnum)) {
-                        userService.checkUserRight(context.getCurrentLoginUser(), UserTypeEnum.ROOT);
-                    }
-                    // TODO 目前没有 ROOT 以外的类型，有需要时再加
+                if (!roleRequireSet.isEmpty()) {
+                    UserTypeEnum[] typeEnumsArray = roleRequireSet.toArray(UserTypeEnum[]::new);
+                    userService.checkUserRight(context.getCurrentLoginUser(), typeEnumsArray);
                 }
+                // TODO 目前没有 ROOT 以外的类型，有需要时再加
             }
 
             filterChain.doFilter(request, response);
