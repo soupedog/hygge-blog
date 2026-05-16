@@ -2,7 +2,7 @@ import React from 'react';
 import {Badge, List, Space} from "antd";
 import clsx from "clsx";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
-import {ArticleSummaryInfo} from "../../../rest/ApiClient";
+import {ArticleDto, CategoryDto} from "../../../rest/ApiClient";
 import {ArticleSummaryOrderType} from "../../properties/GlobalEnum";
 import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../util/UtilContainer";
 
@@ -10,7 +10,7 @@ function ArticleSummaryTabPaneItem({isAuthor, secretKey, orderType, articleSumma
     isAuthor: Boolean,
     secretKey: string | null,
     orderType: ArticleSummaryOrderType,
-    articleSummary: ArticleSummaryInfo
+    articleSummary: ArticleDto
 }) {
     switch (orderType) {
         case ArticleSummaryOrderType.CATEGORY:
@@ -80,16 +80,16 @@ function createFooterItemList({isAuthor, aid, wordCount, pageViews, selfPageView
     }
 }
 
-function getCategoryInfo(articleSummary: ArticleSummaryInfo): string {
+function getCategoryInfo(articleSummary: ArticleDto): string {
     let result = articleSummary.categoryTreeInfo.topicInfo.topicName;
 
-    articleSummary.categoryTreeInfo.categoryList.forEach((item) => {
+    articleSummary.categoryTreeInfo.categoryList.forEach((item: CategoryDto) => {
         result = result + " / " + item.categoryName
     });
     return result;
 }
 
-function renderCore(isAuthor: Boolean, secretKey: string | null, articleSummary: ArticleSummaryInfo) {
+function renderCore(isAuthor: Boolean, secretKey: string | null, articleSummary: ArticleDto) {
     let isDraft = articleSummary.articleState == "DRAFT";
     return (
         <List.Item
