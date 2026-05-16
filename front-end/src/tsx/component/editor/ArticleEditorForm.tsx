@@ -73,6 +73,9 @@ function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
                                 value.content = content;
                                 if (value.action == "update") {
                                     if (PropertiesHelper.isStringNotEmpty(value.aid)) {
+                                        localStorage.setItem(key_editor_draft, content);
+                                        message.info("草稿已自动缓存");
+
                                         ArticleService.updateArticle(value.aid, value, () => {
                                                 message.success("修改文章成功");
                                                 localStorage.removeItem(key_editor_draft);
@@ -83,6 +86,9 @@ function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
                                         message.warning("修改文章时 aid 不可为空");
                                     }
                                 } else if (value.action == "add") {
+                                    localStorage.setItem(key_editor_draft, content);
+                                    message.info("草稿已自动缓存");
+
                                     ArticleService.createArticle(value, (data) => {
                                             refreshFormInfo(updateContent, data!, articleForm);
                                             message.success("添加文章成功");
