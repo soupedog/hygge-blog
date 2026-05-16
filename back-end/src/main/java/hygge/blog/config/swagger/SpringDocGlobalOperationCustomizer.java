@@ -12,8 +12,6 @@ import org.springframework.web.method.HandlerMethod;
  * @author Xavier
  * @date 2022/7/17
  */
-
-
 @Component
 public class SpringDocGlobalOperationCustomizer implements GlobalOperationCustomizer {
     @Override
