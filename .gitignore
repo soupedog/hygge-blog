@@ -11,3 +11,5 @@ gen
 /front-end/package-lock.json
 /front-end/dist/
 /front-end/src/tsx/util/UtilContainer.tsx
+/back-end/src/main/resources/environment-local-to-external.properties
+/back-end/src/main/resources/environment-local.properties
