@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TopicDao extends JpaRepository<Topic, Integer> {
-
     Topic findTopicByTopicName(String TopicName);
 
     Topic findTopicByTid(String tid);

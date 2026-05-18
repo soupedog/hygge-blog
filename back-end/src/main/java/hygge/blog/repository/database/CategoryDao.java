@@ -19,7 +19,6 @@ public interface CategoryDao extends JpaRepository<Category, Integer> {
 
     Category findCategoryByCategoryName(String categoryName);
 
-
     @Query(value = "select * from category where categoryId in :categoryIdCollection", nativeQuery = true)
     List<Category> findCategoryByCategoryIdList(@Param("categoryIdCollection")Collection<Integer> categoryIdCollection);
 }

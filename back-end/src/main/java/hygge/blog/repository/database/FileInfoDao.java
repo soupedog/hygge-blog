@@ -19,7 +19,6 @@ import java.util.Collection;
  */
 @Repository
 public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
-
     /**
      * 根据文件名称判断是否已存在
      *
