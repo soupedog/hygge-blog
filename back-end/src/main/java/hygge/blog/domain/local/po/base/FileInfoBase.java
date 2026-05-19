@@ -2,7 +2,7 @@ package hygge.blog.domain.local.po.base;
 
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.inner.FileDescriptionDto;
-import hygge.blog.domain.local.enums.FileCopyTypeEnum;
+import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.inner.FileDescription;
 import jakarta.persistence.Column;
@@ -67,11 +67,11 @@ public abstract class FileInfoBase extends BasePo {
     @Column(columnDefinition = "enum ('CORE', 'QUOTE', 'ARTICLE_COVER', 'ARTICLE', 'BGM', 'OTHERS') default 'OTHERS'")
     protected FileTypeEnum fileType;
     /**
-     * 文件副本类型
+     * 文件缓存类型
      */
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum ('DEFAULT', 'NGINX') default 'DEFAULT'")
-    protected FileCopyTypeEnum fileCopyType;
+    protected FileCacheTypeEnum fileCacheType;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     protected FileDescription description;
@@ -89,7 +89,7 @@ public abstract class FileInfoBase extends BasePo {
                 .src(returnRelativePath())
                 .fileSize(unitConvertHelper.storageSmartFormatAsString(fileSize))
                 .fileType(fileType)
-                .fileCopyType(fileCopyType)
+                .fileCacheType(fileCacheType)
                 .lastUpdateTs(lastUpdateTs.getTime())
                 .createTs(createTs.getTime())
                 .build();

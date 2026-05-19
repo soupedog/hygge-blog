@@ -6,7 +6,7 @@ package hygge.blog.domain.local.enums;
  * @author Xavier
  * @date 2025/11/10
  */
-public enum FileCopyTypeEnum {
+public enum FileCacheTypeEnum {
     /**
      * 默认(即没有数据库外的副本)
      */
@@ -16,36 +16,36 @@ public enum FileCopyTypeEnum {
      */
     NGINX(1, "NGINX");
 
-    FileCopyTypeEnum(Integer index, String value) {
+    FileCacheTypeEnum(Integer index, String value) {
         this.index = index;
         this.value = value;
     }
 
-    public static FileCopyTypeEnum parse(Integer index) {
+    public static FileCacheTypeEnum parse(Integer index) {
         if (index == null) {
-            throw new IllegalArgumentException("Unexpected index of FileCopyTypeEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected index of FileCacheTypeEnum,it can't be null.");
         }
         switch (index) {
             case 0:
-                return FileCopyTypeEnum.DEFAULT;
+                return FileCacheTypeEnum.DEFAULT;
             case 1:
-                return FileCopyTypeEnum.NGINX;
+                return FileCacheTypeEnum.NGINX;
             default:
-                throw new IllegalArgumentException("Unexpected index of FileCopyTypeEnum,it can't be " + index + ".");
+                throw new IllegalArgumentException("Unexpected index of FileCacheTypeEnum,it can't be " + index + ".");
         }
     }
 
-    public static FileCopyTypeEnum parse(String value) {
+    public static FileCacheTypeEnum parse(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Unexpected value of FileCopyTypeEnum,it can't be null.");
+            throw new IllegalArgumentException("Unexpected value of FileCacheTypeEnum,it can't be null.");
         }
         switch (value) {
             case "DEFAULT":
-                return FileCopyTypeEnum.DEFAULT;
+                return FileCacheTypeEnum.DEFAULT;
             case "NGINX":
-                return FileCopyTypeEnum.NGINX;
+                return FileCacheTypeEnum.NGINX;
             default:
-                throw new IllegalArgumentException("Unexpected value of FileCopyTypeEnum,it can't be " + value + ".");
+                throw new IllegalArgumentException("Unexpected value of FileCacheTypeEnum,it can't be " + value + ".");
         }
     }
 

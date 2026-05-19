@@ -632,7 +632,7 @@ export interface FileInfo {
     src: string,
     extension: string,
     fileType: string,
-    fileCopyType: string,
+    fileCacheType: string,
     fileSize: string,
     isInHardDisk?: Boolean,
     description?: FileDescription

@@ -8,7 +8,7 @@ import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
-import hygge.blog.domain.local.enums.FileCopyTypeEnum;
+import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Category;
@@ -76,7 +76,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, true, "cid", null).toStringColumn(1, 255));
         forUpdate.add(new ColumnInfo(true, false, "name", null).toStringColumn(1, 255));
         forUpdate.add(new ColumnInfo(true, false, "fileType", null).toStringColumn(1, 30));
-        forUpdate.add(new ColumnInfo(true, false, "fileCopyType", null).toStringColumn(1, 30));
+        forUpdate.add(new ColumnInfo(true, false, "fileCacheType", null).toStringColumn(1, 30));
     }
 
     public FileServiceImpl(UserServiceImpl userService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
@@ -130,7 +130,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfo.setFileType(fileType);
                 if (needCopyToHardDisk) {
                     // 文件所属于公开类别则使用 Nginx 创建副本
-                    fileInfo.setFileCopyType(FileCopyTypeEnum.NGINX);
+                    fileInfo.setFileCacheType(FileCacheTypeEnum.NGINX);
                 }
                 fileInfo.setFileSize(temp.getSize());
                 fileInfo.setContent(temp.getBytes());
@@ -204,8 +204,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
 
         // 非公开的文章类别不允许创建 Nginx 文件副本
-        if (newOne.getFileCopyType() != null && newOne.getFileCopyType().equals(FileCopyTypeEnum.NGINX) && !canUpdateToNginxCopyType) {
-            throw new LightRuntimeException("File(" + articleCategoryName + ") can't be updated to ArticleCategory(" + articleCategoryName + ") with FileCopyType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+        if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !canUpdateToNginxCopyType) {
+            throw new LightRuntimeException("File(" + articleCategoryName + ") can't be updated to ArticleCategory(" + articleCategoryName + ") with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
         }
 
         boolean isPathChanged = !fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
@@ -214,10 +214,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             pathConflictCheck(oldAndBeenOverwrite);
         }
 
-        boolean copyTypeChanged = newOne.getFileCopyType() != null && !fileInfoView.getFileCopyType().equals(newOne.getFileCopyType());
+        boolean copyTypeChanged = newOne.getFileCacheType() != null && !fileInfoView.getFileCacheType().equals(newOne.getFileCacheType());
 
         if (copyTypeChanged) {
-            if (fileInfoView.getFileCopyType().equals(FileCopyTypeEnum.DEFAULT)) {
+            if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
                 // 无副本切换到有副本，仅新增副本
                 Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
                 if (fileInfoTemp.isEmpty()) {
@@ -234,7 +234,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 deleteFileInHardDisk(true, oldFile, oldCachePath);
             }
         } else {
-            if (fileInfoView.getFileCopyType().equals(FileCopyTypeEnum.NGINX)) {
+            if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
                 // 未切换副本类型，属于 Nginx，可能存在路径变更
                 // 检测是否存在硬盘副本
                 String newCachePath = filePath + oldAndBeenOverwrite.returnRelativePath();

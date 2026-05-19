@@ -36,7 +36,7 @@ function DefaultMarkdownEditor({cid, content, updateContent}: DefaultMarkdownEdi
                 if (fileInfoList) {
                     callBack(
                         fileInfoList.map(fileInfo => ({
-                            url: fileInfo.fileCopyType === "NGINX" ? UrlHelper.getBaseStaticSourceUrl() + fileInfo.src : UrlHelper.getBaseUrl() + "file/" + fileInfo.fileNo,
+                            url: fileInfo.fileCacheType === "NGINX" ? UrlHelper.getBaseStaticSourceUrl() + fileInfo.src : UrlHelper.getBaseUrl() + "file/" + fileInfo.fileNo,
                             alt: fileInfo.name,
                             title: fileInfo.name,
                         }))

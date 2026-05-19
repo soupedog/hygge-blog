@@ -120,7 +120,7 @@ function FileOperation() {
                                 </Form.Item>
                             </Col>
                         </Row>
-                        <Form.Item name={['fileCopyType']} label="副本备份类型"
+                        <Form.Item name={['fileCacheType']} label="副本备份类型"
                                    rules={[{required: true}]}
                                    initialValue={"DEFAULT"}>
                             <Radio.Group>
@@ -219,7 +219,7 @@ function FileOperation() {
         fileOperationForm.setFieldValue("extension", fileInfo.extension);
         fileOperationForm.setFieldValue("fileType", fileInfo.fileType);
         fileOperationForm.setFieldValue("cid", fileInfo.cid);
-        fileOperationForm.setFieldValue("fileCopyType", fileInfo.fileCopyType);
+        fileOperationForm.setFieldValue("fileCacheType", fileInfo.fileCacheType);
 
         if (fileInfo.description != null) {
             fileOperationForm.setFieldsValue({"description": {"content": fileInfo.description.content}});
