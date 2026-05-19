@@ -19,6 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Entity
+// Hibernate 会自动建表对视图无法正确适配，总会尝试自动创建(需要手工确定是创建好了视图)
 @Table(name = "fileInfo_glance_view")
 public class FileInfoView extends FileInfoBase {
 }

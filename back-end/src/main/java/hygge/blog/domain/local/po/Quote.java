@@ -58,7 +58,7 @@ public class Quote extends BasePo {
     /**
      * 可能的出处
      */
-    @Column(length = 2000)
+    @Column(columnDefinition = "varchar(2000) default '佚名'")
     private String source;
     /**
      * 传送门
