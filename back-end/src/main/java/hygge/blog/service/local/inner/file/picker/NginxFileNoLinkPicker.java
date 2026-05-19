@@ -27,16 +27,21 @@ import java.util.stream.Collectors;
 @Component
 public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
-    private final String nginxUrlPrefix;
+    public final String nginxUrlPrefix;
     private final FileServiceImpl fileService;
 
     private boolean validateMode = true;
     private Map<String, FileInfoView> forValidateMap;
 
     public NginxFileNoLinkPicker(@Value("${hyyge.blog.file.expose.nginx.prefix}") String nginxUrlPrefix, FileServiceImpl fileService) {
-        String regex = buildRegex(nginxUrlPrefix);
+        // 自动去除结尾反斜杠
+        String normalizedPrefix = nginxUrlPrefix.endsWith("/")
+                ? nginxUrlPrefix.substring(0, nginxUrlPrefix.length() - 1)
+                : nginxUrlPrefix;
+
+        String regex = buildRegex(normalizedPrefix);
         this.pattern = Pattern.compile(regex);
-        this.nginxUrlPrefix = nginxUrlPrefix;
+        this.nginxUrlPrefix = normalizedPrefix;
         this.fileService = fileService;
 
         validate();
@@ -52,7 +57,6 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
         Matcher matcher = pattern.matcher(targetLink);
         if (matcher.find()) {
             String categoryPath = matcher.group(1);
-            ;
             String filename = matcher.group("filename");
             String extension = matcher.group("ext");
 
@@ -99,7 +103,7 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
             String testKey = createValidateKey(fileTypeEnum, name, extension);
             forValidateMap.put(testKey, fileInfoView);
 
-            String link = nginxUrlPrefix.substring(0, nginxUrlPrefix.length() - 1) + fileTypeEnum.getUrlPath() + name + "." + extension;
+            String link = nginxUrlPrefix + fileTypeEnum.getPath() + name + "." + extension;
             if (ThreadLocalRandom.current().nextBoolean()) {
                 link = link + "?fileKey=XXXXXX";
             }
@@ -112,11 +116,11 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
 
         String exampleLinks = UtilCreator.INSTANCE.getDefaultJsonHelperInstance(false).formatAsString(successLinks);
 
+        this.validateMode = false;
         log.info("{} init success! exampleLinks:{}", this.getClass().getSimpleName(), exampleLinks);
     }
 
     private void cleanForValidate() {
-        this.validateMode = false;
         this.forValidateMap = null;
     }
 
@@ -125,20 +129,15 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     }
 
     private static String buildRegex(String nginxUrlPrefix) {
-        // 去掉 prefix 末尾的 /，因为枚举路径自带 /
-        String normalizedPrefix = nginxUrlPrefix.endsWith("/")
-                ? nginxUrlPrefix.substring(0, nginxUrlPrefix.length() - 1)
-                : nginxUrlPrefix;
-        String escapedPrefix = Pattern.quote(normalizedPrefix);
+        String escapedPrefix = Pattern.quote(nginxUrlPrefix);
 
         // 每个枚举路径放在独立的捕获组中，用 | 连接
         // 如 (/core/)|(/article/cover/)|...
         String pathRegex = FileTypeEnum.getAllByPathDepthDesc().stream()
-                .map(e -> "(" + Pattern.quote(e.getUrlPath()) + ")")
+                .map(e -> "(" + Pattern.quote(e.getPath()) + ")")
                 .collect(Collectors.joining("|"));
 
         // 路径捕获组就是 group(1)，哪个分支匹配到，group(1) 就是那个值
         return "^" + escapedPrefix + "(" + pathRegex + ")(?<filename>[^/]+?)\\.(?<ext>[^./?]+)(\\?.*)?$";
     }
-
 }

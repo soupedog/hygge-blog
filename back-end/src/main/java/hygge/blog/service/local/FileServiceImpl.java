@@ -67,7 +67,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
     private final FileInfoViewDao fileInfoViewDao;
-    public static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -147,11 +146,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
                 if (needCopyToHardDisk) {
                     createFileToHardDisk(fileInfo);
-                }
-
-                // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
-                if (isWindows) {
-                    item.setSrc(item.getSrc().replace(File.separator, "/"));
                 }
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
@@ -300,11 +294,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             File file = new File(cachePath);
             if (file.exists()) {
                 resultTempItem.setIsInHardDisk(true);
-            }
-
-            // 仅用于本地模拟启动统一化文件路径标识，本地调试是 Windows ，强行转换成 Linux
-            if (isWindows) {
-                resultTempItem.setSrc(resultTempItem.getSrc().replace(File.separator, "/"));
             }
             fileInfoDtoList.add(resultTempItem);
         });

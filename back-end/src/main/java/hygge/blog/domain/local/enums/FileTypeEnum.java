@@ -14,27 +14,27 @@ public enum FileTypeEnum {
     /**
      * 系统默认必须的一些图片
      */
-    CORE(File.separator + "core" + File.separator),
+    CORE(  "/core/" ),
     /**
      * 句子收藏用文件
      */
-    QUOTE(File.separator + "quote" + File.separator),
+    QUOTE("/quote/"),
     /**
      * 博文用封面
      */
-    ARTICLE_COVER(File.separator + "article" + File.separator + "cover" + File.separator),
+    ARTICLE_COVER("/article/cover/"),
     /**
      * 博文用文件
      */
-    ARTICLE(File.separator + "article" + File.separator),
+    ARTICLE("/article/"),
     /**
      * 文章背景音乐
      */
-    BGM(File.separator + "bgm" + File.separator),
+    BGM("/bgm/"),
     /**
      * 杂项文件
      */
-    OTHERS(File.separator + "others" + File.separator),
+    OTHERS("/others/"),
     ;
     private final String path;
 
@@ -45,19 +45,6 @@ public enum FileTypeEnum {
     public String getPath() {
         return path;
     }
-    /**
-     * 标准化 URL 路径，跨平台统一为正斜杠，首尾带 /
-     */
-    public String getUrlPath() {
-        String normalized = path.replace("\\", "/");
-        if (!normalized.startsWith("/")) {
-            normalized = "/" + normalized;
-        }
-        if (!normalized.endsWith("/")) {
-            normalized = normalized + "/";
-        }
-        return normalized;
-    }
 
     /**
      * 按路径深度倒序，长的优先匹配
@@ -65,7 +52,7 @@ public enum FileTypeEnum {
     public static List<FileTypeEnum> getAllByPathDepthDesc() {
         return Arrays.stream(values())
                 .sorted(Comparator
-                        .comparingInt((FileTypeEnum e) -> e.getUrlPath().length())
+                        .comparingInt((FileTypeEnum e) -> e.getPath().length())
                         .reversed())
                 .collect(Collectors.toList());
     }
@@ -75,7 +62,7 @@ public enum FileTypeEnum {
      */
     public static FileTypeEnum fromUrlPath(String urlPath) {
         for (FileTypeEnum e : values()) {
-            if (e.getUrlPath().equals(urlPath)) {
+            if (e.getPath().equals(urlPath)) {
                 return e;
             }
         }

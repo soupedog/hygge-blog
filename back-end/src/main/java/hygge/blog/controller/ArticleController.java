@@ -69,9 +69,9 @@ public class ArticleController implements ArticleControllerDoc {
         ArticleDto result = articleService.findArticleDetailByAid(true, aid);
 
         if (result != null) {
-            // 文本替换(该站点受保护文件，发放访问许可)
+            // 文本替换(该站点受保护文件，发放图片一次性授权)
             if (!raw) {
-                String newContent = markdownContentService.replaceMarkdownImageResource(result.getContent());
+                String newContent = markdownContentService.markdownOneTimeAuthorization(result.getContent());
                 result.setContent(newContent);
             }
             // 非管理员则记录访问日志

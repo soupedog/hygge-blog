@@ -6,23 +6,21 @@ import com.vladsch.flexmark.util.sequence.BasedSequence;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
+ * 给 markdown 文档里通过 API 方式对外暴露的图片出初始化可访问一次的授权
+ *
  * @author Xavier
  * @date 2025/11/10
  */
-
 @Component
-public class ImageResourceReplayVisitor implements Visitor<Image> {
-    @Value("${hyyge.blog.file.expose.api.prefix}")
-    private String linkPrefix;
-    private final ApiFileNoLinkPicker myNginxFileLinkPicker;
+public class ImageResourceOneTimeAuthorizationVisitor implements Visitor<Image> {
+    private final ApiFileNoLinkPicker apiFileNoLinkPicker;
     private final CacheFileKeyKeeper fileKeyKeeper;
 
-    public ImageResourceReplayVisitor(ApiFileNoLinkPicker myNginxFileLinkPicker, CacheFileKeyKeeper fileKeyKeeper) {
-        this.myNginxFileLinkPicker = myNginxFileLinkPicker;
+    public ImageResourceOneTimeAuthorizationVisitor(ApiFileNoLinkPicker apiFileNoLinkPicker, CacheFileKeyKeeper fileKeyKeeper) {
+        this.apiFileNoLinkPicker = apiFileNoLinkPicker;
         this.fileKeyKeeper = fileKeyKeeper;
     }
 
@@ -30,12 +28,12 @@ public class ImageResourceReplayVisitor implements Visitor<Image> {
     public void visit(@NotNull Image image) {
         String rawUrl = image.getUrl().toString();
 
-        String fileNo = myNginxFileLinkPicker.tryToGetFileNo(rawUrl);
+        String fileNo = apiFileNoLinkPicker.tryToGetFileNo(rawUrl);
 
+        // 匹配上格式，能取得 fileNo 就默认是当前系统通过 API 暴露的图片，准备进行一次性授权
         if (fileNo != null) {
-            // 是需要被保护的文件资源
             String fileKey = fileKeyKeeper.createFileKey(fileNo);
-            String newUrl = linkPrefix + fileNo + "?fileKey=" + fileKey;
+            String newUrl = apiFileNoLinkPicker.apiUrlPrefix + fileNo + "?fileKey=" + fileKey;
             // 本地调试可用
             // String newUrl = "http://localhost:8080/blog-service/api/main/file/static/" + fileNo + "?fileKey=" + fileKey;
             BasedSequence basedSequence = BasedSequence.of(newUrl);

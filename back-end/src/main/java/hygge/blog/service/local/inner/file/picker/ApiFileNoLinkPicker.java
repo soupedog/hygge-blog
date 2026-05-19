@@ -21,12 +21,18 @@ import java.util.regex.Pattern;
 @Component
 public class ApiFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
-    private final String apiUrlPrefix;
+    public final String apiUrlPrefix;
 
     public ApiFileNoLinkPicker(@Value("${hyyge.blog.file.expose.api.prefix}") String apiUrlPrefix) {
-        String regex = String.format("^%s([0-9a-fA-F]{32})(?:[?#].*)?", apiUrlPrefix);
+        // 自动补齐结尾反斜杠
+        String normalizedPrefix = apiUrlPrefix.endsWith("/")
+                ? apiUrlPrefix
+                : apiUrlPrefix + "/";
+
+        String regex = String.format("^%s([0-9a-fA-F]{32})(?:[?#].*)?", normalizedPrefix);
+
         this.pattern = Pattern.compile(regex);
-        this.apiUrlPrefix = apiUrlPrefix;
+        this.apiUrlPrefix = normalizedPrefix;
 
         validate();
     }

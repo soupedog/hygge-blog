@@ -7,7 +7,6 @@ package hygge.blog.service.local.inner.file.picker;
  * @date 2025/11/10
  */
 public interface FileKeyKeeper {
-
     /**
      * 文件秘钥文本生成器，不包含业务，单纯生成字符串机制
      */
