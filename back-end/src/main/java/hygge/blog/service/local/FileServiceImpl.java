@@ -67,7 +67,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
     private final FileInfoViewDao fileInfoViewDao;
-    private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+    public static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -84,6 +84,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;
         this.fileInfoViewDao = fileInfoViewDao;
+    }
+
+    public FileInfoView findFileInfoView(FileTypeEnum fileType, String name, String extension) {
+        return fileInfoViewDao.findByFileTypeAndNameAndExtension(fileType, name, extension);
     }
 
     public List<FileInfoDto> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {

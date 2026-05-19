@@ -1,4 +1,4 @@
-package hygge.blog.service.local.inner.file;
+package hygge.blog.service.local.inner.file.picker;
 
 /**
  * 文件秘钥托管器

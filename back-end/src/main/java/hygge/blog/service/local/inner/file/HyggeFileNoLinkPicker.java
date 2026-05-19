@@ -14,5 +14,5 @@ public interface HyggeFileNoLinkPicker {
     /**
      * 用于启动后自检，提取规则是否有效
      */
-    void validate(String targetLink);
+    void validate();
 }

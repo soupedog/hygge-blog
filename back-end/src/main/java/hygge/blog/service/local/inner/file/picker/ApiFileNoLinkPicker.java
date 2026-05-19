@@ -1,5 +1,6 @@
-package hygge.blog.service.local.inner.file;
+package hygge.blog.service.local.inner.file.picker;
 
+import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.RandomHelper;
@@ -20,13 +21,14 @@ import java.util.regex.Pattern;
 @Component
 public class ApiFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
+    private final String apiUrlPrefix;
 
-    public ApiFileNoLinkPicker(@Value("${hyyge.blog.file.expose.api.prefix}") String nginxUrlPrefix) {
-        String regex = String.format("^%s([0-9a-fA-F]{32})(?:[?#].*)?", nginxUrlPrefix);
+    public ApiFileNoLinkPicker(@Value("${hyyge.blog.file.expose.api.prefix}") String apiUrlPrefix) {
+        String regex = String.format("^%s([0-9a-fA-F]{32})(?:[?#].*)?", apiUrlPrefix);
         this.pattern = Pattern.compile(regex);
+        this.apiUrlPrefix = apiUrlPrefix;
 
-        String exampleLink = nginxUrlPrefix + UtilCreator.INSTANCE.getDefaultInstance(RandomHelper.class).getUniversallyUniqueIdentifier(true);
-        validate(exampleLink);
+        validate();
     }
 
     @Override
@@ -44,11 +46,12 @@ public class ApiFileNoLinkPicker implements HyggeFileNoLinkPicker {
     }
 
     @Override
-    public void validate(String targetLink) {
-        String fileNo = tryToGetFileNo(targetLink);
+    public void validate() {
+        String exampleLink = apiUrlPrefix + UtilCreator.INSTANCE.getDefaultInstance(RandomHelper.class).getUniversallyUniqueIdentifier(true);
+        String fileNo = tryToGetFileNo(exampleLink);
 
         if (fileNo != null) {
-            log.info("{} init success! exampleLink:{} → result:{}", this.getClass().getSimpleName(), targetLink, fileNo);
+            log.info("{} init success! exampleLink:{} → result:{}", this.getClass().getSimpleName(), exampleLink, fileNo);
         } else {
             throw new InternalRuntimeException(this.getClass().getSimpleName() + " init failed.");
         }

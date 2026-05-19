@@ -4,7 +4,7 @@ import com.vladsch.flexmark.ast.Image;
 import com.vladsch.flexmark.util.ast.Visitor;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
-import hygge.blog.service.local.inner.file.ApiFileNoLinkPicker;
+import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

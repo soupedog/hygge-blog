@@ -26,10 +26,13 @@ public interface FileInfoViewDao extends JpaRepository<FileInfoView, Integer> {
 
     /**
      * 判断文件是否已存在
-     *
-     * @return Integer fileId
      */
     boolean existsByFileTypeAndNameAndExtension(FileTypeEnum fileType, String name, String extension);
+
+    /**
+     * 根据入参查询对应文件信息
+     */
+    FileInfoView findByFileTypeAndNameAndExtension(FileTypeEnum fileType, String name, String extension);
 
     @Query(value = "from FileInfoView where fileType in :fileTypeCollection and (cid is null or cid in :cidCollection)")
     Page<FileInfoView> findFileInfoMultiple(@Param("fileTypeCollection") Collection<FileTypeEnum> fileTypeCollection, @Param("cidCollection") Collection<String> cidCollection, Pageable pageable);
