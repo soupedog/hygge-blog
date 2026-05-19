@@ -4,7 +4,7 @@ import com.vladsch.flexmark.ast.Image;
 import com.vladsch.flexmark.util.ast.Visitor;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
-import hygge.blog.service.local.inner.file.MyFileLinkPicker;
+import hygge.blog.service.local.inner.file.ApiFileNoLinkPicker;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,13 +16,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ImageResourceReplayVisitor implements Visitor<Image> {
-    @Value("${hyyge.blog.file.link.prefix}")
+    @Value("${hyyge.blog.file.expose.api.prefix}")
     private String linkPrefix;
-    private final MyFileLinkPicker myFileLinkPicker;
+    private final ApiFileNoLinkPicker myNginxFileLinkPicker;
     private final CacheFileKeyKeeper fileKeyKeeper;
 
-    public ImageResourceReplayVisitor(MyFileLinkPicker myFileLinkPicker, CacheFileKeyKeeper fileKeyKeeper) {
-        this.myFileLinkPicker = myFileLinkPicker;
+    public ImageResourceReplayVisitor(ApiFileNoLinkPicker myNginxFileLinkPicker, CacheFileKeyKeeper fileKeyKeeper) {
+        this.myNginxFileLinkPicker = myNginxFileLinkPicker;
         this.fileKeyKeeper = fileKeyKeeper;
     }
 
@@ -30,7 +30,7 @@ public class ImageResourceReplayVisitor implements Visitor<Image> {
     public void visit(@NotNull Image image) {
         String rawUrl = image.getUrl().toString();
 
-        String fileNo = myFileLinkPicker.tryToGetFileNo(rawUrl);
+        String fileNo = myNginxFileLinkPicker.tryToGetFileNo(rawUrl);
 
         if (fileNo != null) {
             // 是需要被保护的文件资源
