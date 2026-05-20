@@ -11,6 +11,7 @@ import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
 import hygge.blog.service.local.inner.markdown.ImageResourceApiToNginxVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceNginxToApiVisitor;
+import hygge.blog.service.local.inner.markdown.ImageResourceOldToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceOneTimeAuthorizationVisitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,12 @@ public class MarkdownContentServiceImpl {
     private final NodeVisitor visitor_OneTimeAuthorization;
     private final NodeVisitor visitor_ResourceApiToNginx;
     private final NodeVisitor visitor_ResourceNginxToApi;
+    private final NodeVisitor visitor_ResourceOldToApi;
 
-    private final NginxFileNoLinkPicker nginxFileNoLinkPicker;
-    private final NginxFileNoLinkPicker nginxFileNoLinkPicker_old;
-    private final ApiFileNoLinkPicker apiFileNoLinkPicker;
-    private final ApiFileNoLinkPicker apiFileNoLinkPicker_old;
+    public final NginxFileNoLinkPicker nginxFileNoLinkPicker;
+    public final NginxFileNoLinkPicker nginxFileNoLinkPicker_old;
+    public final ApiFileNoLinkPicker apiFileNoLinkPicker;
+    public final ApiFileNoLinkPicker apiFileNoLinkPicker_old;
 
     // 原生默认排版美化标准不做额外配置
     private static final Parser parser = Parser.builder().build();
@@ -56,6 +58,9 @@ public class MarkdownContentServiceImpl {
         this.visitor_ResourceNginxToApi = new NodeVisitor(
                 new VisitHandler<>(Image.class, new ImageResourceNginxToApiVisitor(apiFileNoLinkPicker, nginxFileNoLinkPicker))
         );
+        this.visitor_ResourceOldToApi = new NodeVisitor(
+                new VisitHandler<>(Image.class, new ImageResourceOldToApiVisitor(apiFileNoLinkPicker, apiFileNoLinkPicker_old, nginxFileNoLinkPicker_old))
+        );
     }
 
     public String markdownOneTimeAuthorization(String markdownContent) {
@@ -73,6 +78,12 @@ public class MarkdownContentServiceImpl {
     public String markdownImageResourceNginxToApi(String markdownContent) {
         Document markdownDocument = parser.parse(markdownContent);
         visitor_ResourceNginxToApi.visit(markdownDocument);
+        return formatter.render(markdownDocument);
+    }
+
+    public String markdownImageResourceOldToApi(String markdownContent) {
+        Document markdownDocument = parser.parse(markdownContent);
+        visitor_ResourceOldToApi.visit(markdownDocument);
         return formatter.render(markdownDocument);
     }
 }
