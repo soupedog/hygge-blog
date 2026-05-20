@@ -6,7 +6,6 @@ import com.vladsch.flexmark.util.sequence.BasedSequence;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
 /**
  * 给 markdown 文档里通过 API 方式对外暴露的图片替换为 Nginx 缓存资源(如果存在的话)
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
  * @author Xavier
  * @date 2026/5/19
  */
-@Component
 public class ImageResourceNginxToApiVisitor implements Visitor<Image> {
     private final ApiFileNoLinkPicker apiFileNoLinkPicker;
     private final NginxFileNoLinkPicker nginxFileNoLinkPicker;

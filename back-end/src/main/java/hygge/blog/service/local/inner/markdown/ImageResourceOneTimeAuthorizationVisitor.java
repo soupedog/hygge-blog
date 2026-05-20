@@ -6,7 +6,6 @@ import com.vladsch.flexmark.util.sequence.BasedSequence;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
 /**
  * 给 markdown 文档里通过 API 方式对外暴露的图片出初始化可访问一次的授权
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
  * @author Xavier
  * @date 2025/11/10
  */
-@Component
 public class ImageResourceOneTimeAuthorizationVisitor implements Visitor<Image> {
     private final ApiFileNoLinkPicker apiFileNoLinkPicker;
     private final CacheFileKeyKeeper fileKeyKeeper;

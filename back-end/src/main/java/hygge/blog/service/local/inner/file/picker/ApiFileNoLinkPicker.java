@@ -5,8 +5,6 @@ import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.RandomHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,12 +16,11 @@ import java.util.regex.Pattern;
  * @date 2025/11/10
  */
 @Slf4j
-@Component
 public class ApiFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
     public final String apiUrlPrefix;
 
-    public ApiFileNoLinkPicker(@Value("${hyyge.blog.file.expose.api.prefix}") String apiUrlPrefix) {
+    public ApiFileNoLinkPicker(String apiUrlPrefix) {
         // 自动补齐结尾反斜杠
         String normalizedPrefix = apiUrlPrefix.endsWith("/")
                 ? apiUrlPrefix

@@ -7,8 +7,6 @@ import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +22,6 @@ import java.util.stream.Collectors;
  * @date 2026/5/19
  */
 @Slf4j
-@Component
 public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
     public final String nginxUrlPrefix;
@@ -33,7 +30,7 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private boolean validateMode = true;
     private Map<String, FileInfoView> forValidateMap;
 
-    public NginxFileNoLinkPicker(@Value("${hyyge.blog.file.expose.nginx.prefix}") String nginxUrlPrefix, FileServiceImpl fileService) {
+    public NginxFileNoLinkPicker(String nginxUrlPrefix, FileServiceImpl fileService) {
         // 自动去除结尾反斜杠
         String normalizedPrefix = nginxUrlPrefix.endsWith("/")
                 ? nginxUrlPrefix.substring(0, nginxUrlPrefix.length() - 1)
