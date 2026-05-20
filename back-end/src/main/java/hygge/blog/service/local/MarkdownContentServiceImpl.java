@@ -13,6 +13,7 @@ import hygge.blog.service.local.inner.markdown.ImageResourceApiToNginxVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceNginxToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceOldToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceOneTimeAuthorizationVisitor;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,8 @@ public class MarkdownContentServiceImpl {
             @Value("${hyyge.blog.file.expose.nginx.prefix}") String nginxUrlPrefix,
             @Value("${hyyge.blog.file.expose.old.nginx.prefix:old.com/static/}") String nginxUrlPrefix_old,
             FileServiceImpl fileService,
-            CacheFileKeyKeeper fileKeyKeeper
+            CacheFileKeyKeeper fileKeyKeeper,
+            CategoryServiceImpl categoryService
     ) {
         this.nginxFileNoLinkPicker = new NginxFileNoLinkPicker(nginxUrlPrefix, fileService);
         this.nginxFileNoLinkPicker_old = new NginxFileNoLinkPicker(nginxUrlPrefix_old, fileService);
@@ -53,7 +55,7 @@ public class MarkdownContentServiceImpl {
                 new VisitHandler<>(Image.class, new ImageResourceOneTimeAuthorizationVisitor(apiFileNoLinkPicker, fileKeyKeeper))
         );
         this.visitor_ResourceApiToNginx = new NodeVisitor(
-                new VisitHandler<>(Image.class, new ImageResourceApiToNginxVisitor(apiFileNoLinkPicker, nginxFileNoLinkPicker, fileService))
+                new VisitHandler<>(Image.class, new ImageResourceApiToNginxVisitor(apiFileNoLinkPicker, nginxFileNoLinkPicker, fileService, categoryService))
         );
         this.visitor_ResourceNginxToApi = new NodeVisitor(
                 new VisitHandler<>(Image.class, new ImageResourceNginxToApiVisitor(apiFileNoLinkPicker, nginxFileNoLinkPicker))
