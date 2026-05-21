@@ -11,6 +11,7 @@ import hygge.blog.service.local.inner.markdown.ImageResourceApiToNginxVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceNginxToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceOldToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceOneTimeAuthorizationVisitor;
+import hygge.blog.service.local.inner.markdown.ImageResourceServerToLocalVisitor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,6 +28,7 @@ public class MarkdownContentServiceImpl {
     private final NodeVisitor visitor_ResourceApiToNginx;
     private final NodeVisitor visitor_ResourceNginxToApi;
     private final NodeVisitor visitor_ResourceOldToApi;
+    private final FileNoPickerServiceImpl fileNoPickerService;
 
     public MarkdownContentServiceImpl(FileNoPickerServiceImpl fileNoPickerService, CacheFileKeyKeeper fileKeyKeeper) {
         this.visitor_OneTimeAuthorization = new NodeVisitor(
@@ -41,6 +43,19 @@ public class MarkdownContentServiceImpl {
         this.visitor_ResourceOldToApi = new NodeVisitor(
                 new VisitHandler<>(Image.class, new ImageResourceOldToApiVisitor(fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.apiFileNoLinkPicker_old, fileNoPickerService.nginxFileNoLinkPicker_old))
         );
+        this.fileNoPickerService = fileNoPickerService;
+    }
+
+    public NodeVisitor getResourceServerToLocalVisitor(String pathPrefix) {
+        return new NodeVisitor(
+                new VisitHandler<>(Image.class, new ImageResourceServerToLocalVisitor(pathPrefix, fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.nginxFileNoLinkPicker))
+        );
+    }
+
+    public String markdownServerToLocal(NodeVisitor serverToLocalVisitor, String markdownContent) {
+        Document markdownDocument = parser.parse(markdownContent);
+        serverToLocalVisitor.visit(markdownDocument);
+        return formatter.render(markdownDocument);
     }
 
     public String markdownOneTimeAuthorization(String markdownContent) {

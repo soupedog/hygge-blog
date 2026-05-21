@@ -145,7 +145,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 result.add(item);
                 // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
                 if (needCopyToHardDisk) {
-                    createFileToHardDisk(fileInfo);
+                    createFileToHardDisk(getAbsolutePath(fileInfo), fileInfo);
                 }
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
@@ -224,7 +224,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 oldAndBeenOverwrite.setContent(fileInfoTemp.get().getContent());
 
-                createFileToHardDisk(oldAndBeenOverwrite);
+                createFileToHardDisk(getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite);
             } else {
                 // 有副本切换到无副本，仅删除旧副本
                 String oldCachePath = filePath + fileInfoView.returnRelativePath();
@@ -307,10 +307,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
 
         if (fileInfoTemp.isEmpty()) {
-            throw new InternalRuntimeException("FileInfo(" + fileNo + ") was not found.");
+            return;
         }
 
-        createFileToHardDisk(fileInfoTemp.get());
+        FileInfo fileInfo = fileInfoTemp.get();
+
+        createFileToHardDisk(getAbsolutePath(fileInfo), fileInfoTemp.get());
     }
 
     public void deleteFile(String fileNo) {
@@ -364,34 +366,47 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void createFileToHardDisk(FileInfo fileInfo) {
-        String path = filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
+    public void createFileToHardDisk(String absolutePath, FileInfo fileInfo) {
+        copyFileToHardDisk(absolutePath, fileInfo.getName(), fileInfo.getContent());
+    }
+
+    private String getAbsolutePath(FileInfo fileInfo) {
+        return filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
+    }
+
+    private void copyFileToHardDisk(String absolutePath, String fileName, byte[] content) {
         try {
-            File file = new File(path);
+            File file = new File(absolutePath);
 
             if (!file.isAbsolute()) {
-                throw new LightRuntimeException("Ptah(" + path + ") of File(" + fileInfo.getName() + ") was unexpected.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+                throw new LightRuntimeException("Ptah(" + absolutePath + ") of File(" + fileName + ") was unexpected.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
             if (file.exists()) {
-                throw new LightRuntimeException("File(" + fileInfo.getName() + ") already exist in HardDisk.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+                throw new LightRuntimeException("File(" + fileName + ") already exist in HardDisk.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
-            // 保障所需文件夹被创建
-            fileHelper.getOrCreateDirectoryIfNotExit(filePath + fileInfo.getFileType().getPath());
+            // 获取父目录
+            File parentDir = file.getParentFile();
+            //如果父目录不存在，则创建
+            if (parentDir != null && !parentDir.exists()) {
+                // 创建所有不存在的父目录
+                parentDir.mkdirs();
+            }
+
             boolean createNoConflict = file.createNewFile();
             if (!createNoConflict) {
-                throw new LightRuntimeException("File(" + fileInfo.getName() + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+                throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
             // 拷贝文件到磁盘
-            FileCopyUtils.copy(fileInfo.getContent(), Files.newOutputStream(file.toPath()));
-            log.info("Copy file " + path + " to hard disk success.");
+            FileCopyUtils.copy(content, Files.newOutputStream(file.toPath()));
+            log.info("Copy file " + absolutePath + " to hard disk success.");
         } catch (LightRuntimeException le) {
             // 主动抛出的已知异常已经标记了错误原因
             throw le;
         } catch (Exception e) {
-            throw new LightRuntimeException("Fail to copy file:[" + path + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
+            throw new LightRuntimeException("Fail to copy file:[" + absolutePath + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
         }
     }
 
