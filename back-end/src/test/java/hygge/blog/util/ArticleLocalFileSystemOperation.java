@@ -25,7 +25,6 @@ import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.config.HttpHelperAutoConfiguration;
 import hygge.web.util.http.configuration.HttpHelperConfiguration;
-import hygge.web.util.http.impl.DefaultHttpHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * 同步本地远端文档工具
+ * 本地文件系统与文档相关的操作工具
  *
  * @author Xavier
  * @date 2022/1/12
@@ -78,26 +77,24 @@ import java.util.List;
 )
 @SuppressWarnings({"java:S2699", "java:S3577"})
 @Slf4j
-class SynchronizeArticle extends HyggeJsonUtilContainer {
+class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
     private static final String path = "G:\\Xavier\\Documents\\md文档\\";
-    private static final String backup = "G:\\Xavier\\Documents\\md文档backup\\";
+    private static final String backupPath = "G:\\Xavier\\Documents\\md文档backup\\";
 
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
-    private LinkedHashMap<String, String> resultMap = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> resultMapForSynchronize = new LinkedHashMap<>();
     @Autowired
     private ArticleDao articleDao;
     @Autowired
     private ArticleServiceImpl articleService;
     @Autowired
     private CacheServiceImpl cacheService;
-    @Autowired
-    private DefaultHttpHelper httpHelper;
 
-    @Test
-    void doHttpRequest() {
-        httpHelper.get("http://www.baidu.com", String.class);
-    }
-
+    /**
+     * 自动同步本地 markdown 和 数据库端文章。
+     * 文件名和目录位置相匹配则认为是同一篇文章，根据最后修改时间戳最新的覆盖旧的。
+     * 可能本地自动覆盖服务端，也可能服务端覆盖本地端。
+     */
     @Test
     void doSynchronize() {
         log.info("开始同步");
@@ -111,7 +108,7 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
         hyggeRequestContext.setCurrentLoginUser(user);
 
         File rootDirectory = fileHelper.getOrCreateDirectoryIfNotExit(path);
-        File backupDirectory = new File(backup + ConstantParameters.FILE_SEPARATOR + timeHelper.format(System.currentTimeMillis(), DateTimeFormatModeEnum.FULL_TRIM));
+        File backupDirectory = new File(backupPath + ConstantParameters.FILE_SEPARATOR + timeHelper.format(System.currentTimeMillis(), DateTimeFormatModeEnum.FULL_TRIM));
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("articleId")));
 
@@ -133,7 +130,7 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
             pageable = articleListTemp.nextPageable();
         } while (!articleListTemp.isLast());
 
-        log.info("info：" + ConstantParameters.LINE_SEPARATOR + jsonHelperIndent.formatAsString(resultMap));
+        log.info("info：" + ConstantParameters.LINE_SEPARATOR + jsonHelperIndent.formatAsString(resultMapForSynchronize));
         log.info("cost:" + (System.currentTimeMillis() - start) + " ms");
     }
 
@@ -149,24 +146,24 @@ class SynchronizeArticle extends HyggeJsonUtilContainer {
             if (article.getContent().compareTo(localContent) != 0) {
                 // 本地数据同步到远端
                 if (localFile.lastModified() == articleLastUpdateTs) {
-                    resultMap.put(article.getTitle(), "idle");
+                    resultMapForSynchronize.put(article.getTitle(), "idle");
                 } else if (localFile.lastModified() < articleLastUpdateTs) {
                     // 远端数据同步到本地
                     fileHelper.saveTextFile(getFilePathByArticleCategory(backupDirectory, article), article.getTitle(), ".md", localContent);
                     fileHelper.saveTextFile(getFilePathByArticleCategory(saveDirectory, article), article.getTitle(), ".md", article.getContent());
-                    resultMap.put(article.getTitle(), "download");
+                    resultMapForSynchronize.put(article.getTitle(), "download");
                 } else {
                     LinkedHashMap<String, Object> updateData = new LinkedHashMap<>();
                     updateData.put("content", localContent);
                     hyggeRequestContext.setServiceStartTs(localFile.lastModified());
                     fileHelper.saveTextFile(getFilePathByArticleCategory(backupDirectory, article), article.getTitle(), ".md", article.getContent());
                     articleService.updateArticle(article.getAid(), updateData);
-                    resultMap.put(article.getTitle(), "upload");
+                    resultMapForSynchronize.put(article.getTitle(), "upload");
                 }
             }
         } else {
             fileHelper.saveTextFile(getFilePathByArticleCategory(saveDirectory, article), article.getTitle(), ".md", article.getContent());
-            resultMap.put(article.getTitle(), "download");
+            resultMapForSynchronize.put(article.getTitle(), "download");
         }
     }
 

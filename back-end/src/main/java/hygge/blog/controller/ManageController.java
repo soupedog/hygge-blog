@@ -29,8 +29,7 @@ public class ManageController implements ManageControllerDoc {
     @Override
     @RequireAuth
     @PostMapping(value = "/imageLink")
-    public ResponseEntity<HyggeBlogControllerResponse<String>> refreshImageLink(
-            @RequestParam ResourceLinkRefreshTypeEnum resourceLinkRefreshType) {
+    public ResponseEntity<HyggeBlogControllerResponse<String>> refreshImageLink(@RequestParam ResourceLinkRefreshTypeEnum resourceLinkRefreshType) {
 
         imageLinkRefreshService.freshAllArticle(resourceLinkRefreshType);
 
