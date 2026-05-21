@@ -6,10 +6,8 @@ import com.vladsch.flexmark.util.sequence.BasedSequence;
 import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.view.FileInfoView;
-import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
-import hygge.blog.service.local.normal.CategoryServiceImpl;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,14 +19,10 @@ import org.jetbrains.annotations.NotNull;
 public class ImageResourceApiToNginxVisitor implements Visitor<Image> {
     private final ApiFileNoLinkPicker apiFileNoLinkPicker;
     private final NginxFileNoLinkPicker nginxFileNoLinkPicker;
-    private final FileServiceImpl fileService;
-    private final CategoryServiceImpl categoryService;
 
-    public ImageResourceApiToNginxVisitor(ApiFileNoLinkPicker apiFileNoLinkPicker, NginxFileNoLinkPicker nginxFileNoLinkPicker, FileServiceImpl fileService, CategoryServiceImpl categoryService) {
+    public ImageResourceApiToNginxVisitor(ApiFileNoLinkPicker apiFileNoLinkPicker, NginxFileNoLinkPicker nginxFileNoLinkPicker) {
         this.apiFileNoLinkPicker = apiFileNoLinkPicker;
         this.nginxFileNoLinkPicker = nginxFileNoLinkPicker;
-        this.fileService = fileService;
-        this.categoryService = categoryService;
     }
 
     @Override
@@ -39,7 +33,7 @@ public class ImageResourceApiToNginxVisitor implements Visitor<Image> {
 
         if (fileNo != null) {
             // TODO 权限系统改造后这里也得相应处理
-            FileInfoView fileInfoView = fileService.findFileViewFromDB(fileNo).orElseGet(null);
+            FileInfoView fileInfoView = nginxFileNoLinkPicker.getFileService().findFileViewFromDB(fileNo).orElseGet(null);
 
             // 匹配上格式，就认为是可替换的目标资源
             if (fileInfoView != null) {
@@ -47,7 +41,7 @@ public class ImageResourceApiToNginxVisitor implements Visitor<Image> {
                 boolean canExpose = true;
 
                 if (fileInfoView.getCid() != null) {
-                    Category category = categoryService.findCategoryByCid(fileInfoView.getCid(), false);
+                    Category category = nginxFileNoLinkPicker.getCategoryService().findCategoryByCid(fileInfoView.getCid(), false);
 
                     if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessRuleTypeEnum.PUBLIC))) {
                         canExpose = false;

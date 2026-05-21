@@ -4,6 +4,7 @@ import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
+import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,13 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
     public final String nginxUrlPrefix;
     private final FileServiceImpl fileService;
+    private final CategoryServiceImpl categoryService;
 
     private boolean validateMode = true;
     private Map<String, FileInfoView> forValidateMap;
 
-    public NginxFileNoLinkPicker(String nginxUrlPrefix, FileServiceImpl fileService) {
+    public NginxFileNoLinkPicker(String nginxUrlPrefix, FileServiceImpl fileService, CategoryServiceImpl categoryService) {
+        this.categoryService = categoryService;
         // 自动去除结尾反斜杠
         String normalizedPrefix = nginxUrlPrefix.endsWith("/")
                 ? nginxUrlPrefix.substring(0, nginxUrlPrefix.length() - 1)
@@ -136,5 +139,13 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
 
         // 路径捕获组就是 group(1)，哪个分支匹配到，group(1) 就是那个值
         return "^" + escapedPrefix + "(" + pathRegex + ")(?<filename>[^/]+?)\\.(?<ext>[^./?]+)(\\?.*)?$";
+    }
+
+    public FileServiceImpl getFileService() {
+        return fileService;
+    }
+
+    public CategoryServiceImpl getCategoryService() {
+        return categoryService;
     }
 }
