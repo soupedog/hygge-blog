@@ -30,6 +30,10 @@ public class BlogGroupServiceImpl extends HyggeJsonUtilContainer {
         this.userService = userService;
     }
 
+    public boolean isUserInGroup(String gid, Integer userId) {
+        return blogGroupDao.existsByGidAndUserId(gid, userId);
+    }
+
     @Transactional
     public BlogGroup createCreateBlogGroup(BlogGroup blogGroup) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();

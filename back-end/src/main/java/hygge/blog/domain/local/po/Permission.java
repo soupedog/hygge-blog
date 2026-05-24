@@ -1,6 +1,5 @@
 package hygge.blog.domain.local.po;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import hygge.blog.domain.local.po.base.BasePo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,7 +39,7 @@ import java.util.List;
 public class Permission extends BasePo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "permission_id")
+    @Column(name = "permissionId")
     private Integer permissionId;
     /**
      * 权限名称，如 "管理员写权限"、"文章删除权限"
@@ -52,9 +51,8 @@ public class Permission extends BasePo {
      * 存储格式：JSON 数组字符串，如 "[1, 2, 3]"
      */
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "access_condition_ids")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<String> acIdList;
+    @Column(columnDefinition = "json")
+    private List<Integer> acIdList;
     /**
      * 权限描述
      */

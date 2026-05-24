@@ -1,6 +1,5 @@
 package hygge.blog.domain.local.enums;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -14,7 +13,7 @@ public enum FileTypeEnum {
     /**
      * 系统默认必须的一些图片
      */
-    CORE(  "/core/" ),
+    CORE("/core/"),
     /**
      * 句子收藏用文件
      */

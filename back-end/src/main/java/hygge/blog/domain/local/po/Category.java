@@ -66,6 +66,9 @@ public class Category extends BasePo {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private List<CategoryAccessRule> accessRuleList;
+
+    @Column(name = "permissionId")
+    private Integer permissionId;
     /**
      * 文章类别名称
      */

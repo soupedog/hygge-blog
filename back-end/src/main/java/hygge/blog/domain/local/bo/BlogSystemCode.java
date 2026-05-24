@@ -49,6 +49,10 @@ public enum BlogSystemCode implements HyggeCode {
      */
     TOPIC_NOT_FOUND(false, null, 404301, null),
     /**
+     * 权限未找到
+     */
+    PERMISSION_NOT_FOUND(false, null, 404801, null),
+    /**
      * 板块已存在
      */
     TOPIC_ALREADY_EXISTS(false, null, 404301, null),

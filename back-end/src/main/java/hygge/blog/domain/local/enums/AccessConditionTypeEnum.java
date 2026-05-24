@@ -10,7 +10,11 @@ public enum AccessConditionTypeEnum {
     /**
      * 仅自己可见
      */
-    PERSONAL(0, "PERSONAL"),
+    PERSONAL(-2, "PERSONAL"),
+    /**
+     * 公开可见
+     */
+    PUBLIC(-1, "PUBLIC"),
     /**
      * 秘钥访问
      */
@@ -31,10 +35,7 @@ public enum AccessConditionTypeEnum {
      * 周期开放可见
      */
     CRON(5, "CRON"),
-    /**
-     * 公开可见
-     */
-    PUBLIC(6, "PUBLIC");
+    ;
 
     AccessConditionTypeEnum(Integer index, String value) {
         this.index = index;
@@ -45,48 +46,34 @@ public enum AccessConditionTypeEnum {
         if (index == null) {
             throw new IllegalArgumentException("Unexpected index of AccessConditionTypeEnum,it can't be null.");
         }
-        switch (index) {
-            case 0:
-                return AccessConditionTypeEnum.PERSONAL;
-            case 1:
-                return AccessConditionTypeEnum.SECRET_KEY;
-            case 2:
-                return AccessConditionTypeEnum.GROUP;
-            case 3:
-                return AccessConditionTypeEnum.ROLE;
-            case 4:
-                return AccessConditionTypeEnum.SEX;
-            case 5:
-                return AccessConditionTypeEnum.CRON;
-            case 6:
-                return AccessConditionTypeEnum.PUBLIC;
-            default:
-                throw new IllegalArgumentException("Unexpected index of AccessConditionTypeEnum,it can't be " + index + ".");
-        }
+        return switch (index) {
+            case -2 -> PERSONAL;
+            case -1 -> PUBLIC;
+            case 1 -> SECRET_KEY;
+            case 2 -> GROUP;
+            case 3 -> ROLE;
+            case 4 -> SEX;
+            case 5 -> CRON;
+            default ->
+                    throw new IllegalArgumentException("Unexpected index of AccessConditionTypeEnum,it can't be " + index + ".");
+        };
     }
 
     public static AccessConditionTypeEnum parse(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Unexpected value of AccessConditionTypeEnum,it can't be null.");
         }
-        switch (value) {
-            case "PERSONAL":
-                return AccessConditionTypeEnum.PERSONAL;
-            case "SECRET_KEY":
-                return AccessConditionTypeEnum.SECRET_KEY;
-            case "GROUP":
-                return AccessConditionTypeEnum.GROUP;
-            case "ROLE":
-                return AccessConditionTypeEnum.ROLE;
-            case "SEX":
-                return AccessConditionTypeEnum.SEX;
-            case "CRON":
-                return AccessConditionTypeEnum.CRON;
-            case "PUBLIC":
-                return AccessConditionTypeEnum.PUBLIC;
-            default:
-                throw new IllegalArgumentException("Unexpected value of AccessConditionTypeEnum,it can't be " + value + ".");
-        }
+        return switch (value) {
+            case "PERSONAL" -> PERSONAL;
+            case "SECRET_KEY" -> SECRET_KEY;
+            case "GROUP" -> GROUP;
+            case "ROLE" -> ROLE;
+            case "SEX" -> SEX;
+            case "CRON" -> CRON;
+            case "PUBLIC" -> PUBLIC;
+            default ->
+                    throw new IllegalArgumentException("Unexpected value of AccessConditionTypeEnum,it can't be " + value + ".");
+        };
     }
 
     /**
@@ -97,9 +84,6 @@ public enum AccessConditionTypeEnum {
      * 枚举值
      */
     private String value;
-
-    /*非自动生成内容开始*/
-    /*非自动生成内容结束*/
 
     public Integer getIndex() {
         return index;

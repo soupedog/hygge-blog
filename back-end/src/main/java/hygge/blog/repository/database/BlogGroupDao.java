@@ -18,6 +18,10 @@ public interface BlogGroupDao extends JpaRepository<BlogGroup, Integer> {
 
     BlogGroup findBlogGroupByGroupName(String groupName);
 
+    boolean existsByGroupIdAndUserId(Integer groupId, Integer userId);
+
+    boolean existsByGidAndUserId(String gid, Integer userId);
+
     @Modifying
     @Transactional
     @Query(value = "delete from join_user_blog_group where groupId=:groupId and userId=:userId", nativeQuery = true)

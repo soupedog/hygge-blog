@@ -7,6 +7,7 @@ import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -26,7 +27,9 @@ import java.util.stream.Collectors;
 public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     private final Pattern pattern;
     public final String nginxUrlPrefix;
+    @Getter
     private final FileServiceImpl fileService;
+    @Getter
     private final CategoryServiceImpl categoryService;
 
     private boolean validateMode = true;
@@ -139,13 +142,5 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
 
         // 路径捕获组就是 group(1)，哪个分支匹配到，group(1) 就是那个值
         return "^" + escapedPrefix + "(" + pathRegex + ")(?<filename>[^/]+?)\\.(?<ext>[^./?]+)(\\?.*)?$";
-    }
-
-    public FileServiceImpl getFileService() {
-        return fileService;
-    }
-
-    public CategoryServiceImpl getCategoryService() {
-        return categoryService;
     }
 }
