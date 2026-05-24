@@ -3,7 +3,7 @@ package hygge.blog.service.local.inner.markdown;
 import com.vladsch.flexmark.ast.Image;
 import com.vladsch.flexmark.util.ast.Visitor;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
-import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
@@ -43,7 +43,7 @@ public class ImageResourceApiToNginxVisitor implements Visitor<Image> {
                 if (fileInfoView.getCid() != null) {
                     Category category = nginxFileNoLinkPicker.getCategoryService().findCategoryByCid(fileInfoView.getCid(), false);
 
-                    if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessRuleTypeEnum.PUBLIC))) {
+                    if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessConditionTypeEnum.PUBLIC))) {
                         canExpose = false;
                     }
                 }

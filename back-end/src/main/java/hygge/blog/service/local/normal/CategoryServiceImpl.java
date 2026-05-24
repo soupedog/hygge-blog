@@ -7,7 +7,7 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.CategoryDto;
-import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
@@ -40,7 +40,7 @@ import java.util.Map;
 @Service
 public class CategoryServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
-    private static final CategoryAccessRule DEFAULT_CATEGORY_ACCESS_RULE = CategoryAccessRule.builder().accessRuleType(AccessRuleTypeEnum.PERSONAL).requirement(false).build();
+    private static final CategoryAccessRule DEFAULT_CATEGORY_ACCESS_RULE = CategoryAccessRule.builder().accessRuleType(AccessConditionTypeEnum.PERSONAL).requirement(false).build();
 
     private final UserServiceImpl userService;
     private final ArticleCountServiceImpl articleCountService;
@@ -212,7 +212,7 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
     private void accessRuleListValidate(List<CategoryAccessRule> accessRuleList) {
         for (CategoryAccessRule accessRule : accessRuleList) {
             parameterHelper.objectNotNull("accessRuleType", accessRule.getAccessRuleType());
-            if (!(AccessRuleTypeEnum.PERSONAL.equals(accessRule.getAccessRuleType()) || AccessRuleTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()))) {
+            if (!(AccessConditionTypeEnum.PERSONAL.equals(accessRule.getAccessRuleType()) || AccessConditionTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()))) {
                 parameterHelper.stringNotEmpty("extendString", (Object) accessRule.getExtendString());
             }
         }

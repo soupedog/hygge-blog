@@ -2,10 +2,9 @@ package hygge.blog.domain.local.po;
 
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
-import hygge.blog.domain.local.enums.UserSexEnum;
 import hygge.blog.domain.local.po.base.BasePo;
 import hygge.blog.domain.local.po.inner.CategoryAccessRule;
 import jakarta.persistence.Column;
@@ -115,11 +114,11 @@ public class Category extends BasePo {
         if (targetUser == null) {
             // 访客
             if (parameterHelper.isNotEmpty(secretKey)) {
-                Optional<CategoryAccessRule> secretKeyAccessRuleTemp = accessRuleList.stream().filter(categoryAccessRule -> AccessRuleTypeEnum.SECRET_KEY.equals(categoryAccessRule.getAccessRuleType())).findFirst();
+                Optional<CategoryAccessRule> secretKeyAccessRuleTemp = accessRuleList.stream().filter(categoryAccessRule -> AccessConditionTypeEnum.SECRET_KEY.equals(categoryAccessRule.getAccessRuleType())).findFirst();
                 result = secretKey.equals(secretKeyAccessRuleTemp.map(CategoryAccessRule::getExtendString).orElse(null));
             }
 
-            return result || accessRuleList.stream().anyMatch(categoryAccessRule -> AccessRuleTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
+            return result || accessRuleList.stream().anyMatch(categoryAccessRule -> AccessConditionTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
         }
 
         for (CategoryAccessRule categoryAccessRule : accessRuleList) {
@@ -142,13 +141,13 @@ public class Category extends BasePo {
                         itemResult = true;
                     }
                     break;
-                case MALE:
-                    if (targetUser.getUserSex().equals(UserSexEnum.MAN)) {
+                case ROLE:
+                    if (targetUser.getUserType().getValue().equals(categoryAccessRule.getExtendString())) {
                         itemResult = true;
                     }
                     break;
-                case FEMALE:
-                    if (targetUser.getUserSex().equals(UserSexEnum.WOMAN)) {
+                case SEX:
+                    if (targetUser.getUserSex().getValue().equals(categoryAccessRule.getExtendString())) {
                         itemResult = true;
                     }
                     break;

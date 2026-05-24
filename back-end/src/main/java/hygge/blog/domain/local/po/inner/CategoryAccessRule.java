@@ -1,7 +1,7 @@
 package hygge.blog.domain.local.po.inner;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CategoryAccessRule {
     @Schema(title = "文章类别访问类型")
-    private AccessRuleTypeEnum accessRuleType;
+    private AccessConditionTypeEnum accessRuleType;
     @Schema(title = "是否为必要条件")
     private boolean requirement;
     @Schema(title = "扩展字段", description = "功能拓展字段，根据规则类型可能为：无意义、秘钥、组标识、时间表达式……")

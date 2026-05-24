@@ -7,7 +7,7 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
-import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
@@ -100,7 +100,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             Category category = categoryService.findCategoryByCid(cid, false);
             // 有且全都是 AccessRuleTypeEnum.PUBLIC 的就说明可以公开拷贝
             needCopyToHardDisk = category.getAccessRuleList().stream()
-                    .allMatch(accessRule -> AccessRuleTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
+                    .allMatch(accessRule -> AccessConditionTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
         }
 
         List<FileInfoDto> result = new ArrayList<>();
@@ -190,7 +190,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         String cid = (String) finalData.get("cid");
         if (cid != null) {
             Category category = categoryService.findCategoryByCid(cid, false);
-            canUpdateToNginxCopyType = category.getAccessRuleList().stream().allMatch(accessRule -> AccessRuleTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
+            canUpdateToNginxCopyType = category.getAccessRuleList().stream().allMatch(accessRule -> AccessConditionTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
             articleCategoryName = category.getCategoryName();
         }
 

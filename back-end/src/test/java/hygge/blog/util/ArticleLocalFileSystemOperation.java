@@ -7,7 +7,7 @@ import hygge.blog.config.database.DataBaseAutoConfig;
 import hygge.blog.config.util.http.HttpHelperAutoConfigurationForSpringBoot3;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
-import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Article;
@@ -208,7 +208,7 @@ class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
         }
 
         Category category = categoryService.findCategoryByCategoryId(article.getCategoryId(), false);
-        boolean isPublic = category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessRuleTypeEnum.PUBLIC));
+        boolean isPublic = category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessConditionTypeEnum.PUBLIC));
 
         if (!isPublic) {
             return;

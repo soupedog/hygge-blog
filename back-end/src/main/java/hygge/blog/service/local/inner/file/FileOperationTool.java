@@ -69,7 +69,6 @@ public class FileOperationTool {
             }
 
             // 使用 Spring FileCopyUtils 拷贝文件
-            // 方式1：从 byte[] 拷贝到文件
             FileCopyUtils.copy(content, targetPath.toFile());
 
             return FileOperationResult.builder()
