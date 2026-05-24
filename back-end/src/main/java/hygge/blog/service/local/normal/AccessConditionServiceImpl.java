@@ -17,20 +17,20 @@ import java.util.List;
  */
 @Service
 public class AccessConditionServiceImpl extends HyggeJsonUtilContainer {
-    public static final AccessCondition _PUBLIC = AccessCondition.builder()
-            .acId(AccessConditionTypeEnum.PUBLIC.getIndex())
-            .type(AccessConditionTypeEnum.PUBLIC)
-            .build();
-    public static final AccessCondition _PERSONAL = AccessCondition.builder()
-            .acId(AccessConditionTypeEnum.PERSONAL.getIndex())
-            .type(AccessConditionTypeEnum.PERSONAL)
-            .build();
-
     private final AccessConditionDao accessConditionDao;
 
     @Autowired
     public AccessConditionServiceImpl(AccessConditionDao accessConditionDao) {
         this.accessConditionDao = accessConditionDao;
+    }
+
+    public AccessCondition saveAccessCondition(AccessCondition accessCondition) {
+        parameterHelper.notEmpty("accessCondition", accessCondition);
+
+        if (!AccessConditionTypeEnum.PUBLIC.equals(accessCondition.getType())) {
+            parameterHelper.stringNotEmpty("ExtendString", (Object) accessCondition.getExtendString());
+        }
+        return accessConditionDao.save(accessCondition);
     }
 
     public List<AccessCondition> findAccessConditionsByAcIdCollection(Collection<Integer> acIdCollection) {

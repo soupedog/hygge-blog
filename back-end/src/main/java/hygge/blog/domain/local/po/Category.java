@@ -7,6 +7,7 @@ import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
 import hygge.blog.domain.local.po.base.BasePo;
 import hygge.blog.domain.local.po.inner.CategoryAccessRule;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,6 +23,7 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -67,7 +69,11 @@ public class Category extends BasePo {
     @Column(columnDefinition = "json")
     private List<CategoryAccessRule> accessRuleList;
 
+    /**
+     * 权限唯一标识，应与 {@link PermissionServiceImpl#_PUBLIC#getPermissionId()} 一致
+     */
     @Column(name = "permissionId")
+    @ColumnDefault("-1")
     private Integer permissionId;
     /**
      * 文章类别名称

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +30,6 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
             .permissionId(AccessConditionTypeEnum.PUBLIC.getIndex())
             .name("公开可见")
             .build();
-    public static final Permission _PERSONAL = Permission.builder()
-            .permissionId(AccessConditionTypeEnum.PERSONAL.getIndex())
-            .name("仅自己可见")
-            .build();
 
     private final AccessConditionServiceImpl accessConditionService;
     private final BlogGroupServiceImpl blogGroupService;
@@ -45,32 +42,50 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         this.permissionDao = permissionDao;
     }
 
-    public List<Integer> getActivePermissionOfUser(User targetUser, String secretKey) {
+    public Integer getPersonalPermissionIdOfUser(User targetUser) {
+        // userId 数字取负数代表仅当前用户可见
+        return -targetUser.getUserId();
+    }
+
+    public Permission savePermission(Permission permission) {
+        parameterHelper.stringNotEmpty("name", (Object) permission.getName());
+        collectionHelper.collectionNotEmpty("AcIdList", permission.getAcIdList());
+
+        List<AccessCondition> accessConditionList = accessConditionService.findAccessConditionsByAcIdCollection(permission.getAcIdList());
+        if (accessConditionList.size() != permission.getAcIdList().size()) {
+            throw new LightRuntimeException("请确保目标 acId 已存在。");
+        }
+
+        return permissionDao.save(permission);
+    }
+
+    public List<Integer> getActivePermissionIdListOfUser(User targetUser, String secretKey) {
         List<Integer> result = new ArrayList<>();
         // 公开访问权限默认给所有用户添加
         result.add(_PUBLIC.getPermissionId());
-        result.add(_PERSONAL.getPermissionId());
-
         if (targetUser == null) {
             return result;
         }
+        // 添加当前用户仅自己可见的 Permission
+        result.add(getPersonalPermissionIdOfUser(targetUser));
 
         List<Permission> permission_all = permissionDao.findAll();
 
         for (Permission item : permission_all) {
-            List<Integer> acIdList = item.getAcIdList();
-            updateActivePermissionResultByAcIdList(targetUser, result, secretKey, acIdList);
+            updateActivePermissionResultByAcIdList(targetUser, result, secretKey, item.getPermissionId());
         }
 
         return result;
     }
 
-    private void updateActivePermissionResultByAcIdList(User targetUser, List<Integer> result, String secretKey, List<Integer> acIdList) {
-        List<AccessCondition> all = accessConditionService.findAccessConditionsByAcIdCollection(acIdList);
+    private void updateActivePermissionResultByAcIdList(User targetUser, List<Integer> result, String secretKey, Integer permissionId) {
+        List<AccessCondition> all = accessConditionService.findAccessConditionsByAcIdCollection(Collections.singletonList(permissionId));
+        // isRequirement 为 true 的排前面
+        all.sort(Comparator.comparing(AccessCondition::isRequirement).reversed());
+
+        boolean needAdd = false;
 
         for (AccessCondition item : all) {
-            boolean needAdd = false;
-
             switch (item.getType()) {
                 case SECRET_KEY -> {
                     if (item.getExtendString().equals(secretKey)) {
@@ -96,9 +111,14 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
                 }
             }
 
-            if (needAdd) {
-                result.add(item.getAcId());
+            // 必要条件且当前未通过，一票否决判定为无权限
+            if (item.isRequirement() && !needAdd) {
+                return;
             }
+        }
+
+        if (needAdd) {
+            result.add(permissionId);
         }
     }
 

@@ -8,13 +8,13 @@ package hygge.blog.domain.local.enums;
  */
 public enum AccessConditionTypeEnum {
     /**
-     * 仅自己可见
+     * 仅自己可见(默认是 自己的 userId 添 - 号)
      */
-    PERSONAL(-2, "PERSONAL"),
+    PERSONAL(-1, "PERSONAL"),
     /**
      * 公开可见
      */
-    PUBLIC(-1, "PUBLIC"),
+    PUBLIC(0, "PUBLIC"),
     /**
      * 秘钥访问
      */
@@ -46,9 +46,13 @@ public enum AccessConditionTypeEnum {
         if (index == null) {
             throw new IllegalArgumentException("Unexpected index of AccessConditionTypeEnum,it can't be null.");
         }
+
+        if (index < 0) {
+            return PERSONAL;
+        }
+
         return switch (index) {
-            case -2 -> PERSONAL;
-            case -1 -> PUBLIC;
+            case 0 -> PUBLIC;
             case 1 -> SECRET_KEY;
             case 2 -> GROUP;
             case 3 -> ROLE;

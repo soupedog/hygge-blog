@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -48,6 +49,12 @@ public abstract class FileInfoBase extends BasePo {
      */
     @Column(nullable = false)
     protected Integer userId;
+    /**
+     * 权限唯一标识
+     */
+    @Column(name = "permissionId")
+    @ColumnDefault("-1")
+    protected Integer permissionId;
     /**
      * 文章类别唯一标识展示用编号(与类别共享权限)
      */
