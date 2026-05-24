@@ -56,10 +56,6 @@ public abstract class FileInfoBase extends BasePo {
     @ColumnDefault("-1")
     protected Integer permissionId;
     /**
-     * 文章类别唯一标识展示用编号(与类别共享权限)
-     */
-    protected String cid;
-    /**
      * 文件名称(不包含扩展名)
      */
     protected String name;
@@ -90,7 +86,7 @@ public abstract class FileInfoBase extends BasePo {
     public FileInfoDto toDto() {
         FileInfoDto result = FileInfoDto.builder()
                 .fileNo(fileNo)
-                .cid(cid)
+                .permissionId(permissionId)
                 .name(name)
                 .extension(extension)
                 .src(returnRelativePath())

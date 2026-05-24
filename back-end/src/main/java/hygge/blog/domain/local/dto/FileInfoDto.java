@@ -31,8 +31,8 @@ public class FileInfoDto {
     private String src;
     @Schema(title = "用户编号")
     private String uid;
-    @Schema(title = "文件所属文章类别")
-    protected String cid;
+    @Schema(title = "权限唯一标识", description = "决定满足什么权限才运行访问。即便未主动创建特殊权限默认也存在：\"0\"->公开可见、\"null\"->仅自身可见")
+    private Integer permissionId;
     @Schema(title = "文件名称(不包含扩展名)")
     private String name;
     @Schema(title = "文件扩展名(如 png)")

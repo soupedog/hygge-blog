@@ -34,12 +34,12 @@ public interface FileInfoViewDao extends JpaRepository<FileInfoView, Integer> {
      */
     FileInfoView findByFileTypeAndNameAndExtension(FileTypeEnum fileType, String name, String extension);
 
-    @Query(value = "from FileInfoView where fileType in :fileTypeCollection and (cid is null or cid in :cidCollection)")
-    Page<FileInfoView> findFileInfoMultiple(@Param("fileTypeCollection") Collection<FileTypeEnum> fileTypeCollection, @Param("cidCollection") Collection<String> cidCollection, Pageable pageable);
+    @Query(value = "from FileInfoView where fileType in :fileTypeCollection and permissionId in :activePermissionIdList")
+    Page<FileInfoView> findFileInfoMultiple(@Param("fileTypeCollection") Collection<FileTypeEnum> fileTypeCollection, @Param("activePermissionIdList") Collection<Integer> activePermissionIdList, Pageable pageable);
 
     /**
      * @param keywordPattern 需要手工添加符号如 "%张三%", 才代表要求名称包含张三
      */
-    @Query(value = "from FileInfoView where (cid is null or cid in :cidCollection) and name like :keywordPattern")
-    Page<FileInfoView> findFileInfoByNameMultiple(@Param("keywordPattern") String keywordPattern, @Param("cidCollection") Collection<String> cidCollection, Pageable pageable);
+    @Query(value = "from FileInfoView where permissionId in :activePermissionIdList and name like :keywordPattern")
+    Page<FileInfoView> findFileInfoByNameMultiple(@Param("keywordPattern") String keywordPattern, @Param("activePermissionIdList") Collection<Integer> activePermissionIdList, Pageable pageable);
 }

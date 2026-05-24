@@ -4,7 +4,6 @@ import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
-import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import lombok.Getter;
@@ -29,14 +28,11 @@ public class NginxFileNoLinkPicker implements HyggeFileNoLinkPicker {
     public final String nginxUrlPrefix;
     @Getter
     private final FileServiceImpl fileService;
-    @Getter
-    private final CategoryServiceImpl categoryService;
 
     private boolean validateMode = true;
     private Map<String, FileInfoView> forValidateMap;
 
-    public NginxFileNoLinkPicker(String nginxUrlPrefix, FileServiceImpl fileService, CategoryServiceImpl categoryService) {
-        this.categoryService = categoryService;
+    public NginxFileNoLinkPicker(String nginxUrlPrefix, FileServiceImpl fileService) {
         // 自动去除结尾反斜杠
         String normalizedPrefix = nginxUrlPrefix.endsWith("/")
                 ? nginxUrlPrefix.substring(0, nginxUrlPrefix.length() - 1)

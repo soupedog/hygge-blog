@@ -3,8 +3,6 @@ package hygge.blog.service.local.inner.markdown;
 import com.vladsch.flexmark.ast.Image;
 import com.vladsch.flexmark.util.ast.Visitor;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
-import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
-import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.FileServiceImpl;
@@ -12,6 +10,7 @@ import hygge.blog.service.local.inner.file.FileOperationResult;
 import hygge.blog.service.local.inner.file.FileOperationTool;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,22 +57,13 @@ public class ImageResourceServerToLocalVisitor implements Visitor<Image> {
     }
 
     public FileOperationResult tryToCopyToLocal(String fileNo) {
-        // TODO 权限系统改造后这里也得相应处理
         FileServiceImpl fileService = nginxFileNoLinkPicker.getFileService();
         FileInfoView fileInfoView = fileService.findFileViewFromDB(fileNo).orElseGet(null);
 
         // 匹配上格式，就认为是可替换的目标资源
         if (fileInfoView != null) {
             // 是否可以对外暴露
-            boolean canExpose = true;
-
-            if (fileInfoView.getCid() != null) {
-                Category category = nginxFileNoLinkPicker.getCategoryService().findCategoryByCid(fileInfoView.getCid(), false);
-
-                if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessConditionTypeEnum.PUBLIC))) {
-                    canExpose = false;
-                }
-            }
+            boolean canExpose = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId());
 
             if (canExpose) {
                 // 正式从数据库查询完整文件

@@ -3,11 +3,10 @@ package hygge.blog.service.local.inner.markdown;
 import com.vladsch.flexmark.ast.Image;
 import com.vladsch.flexmark.util.ast.Visitor;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
-import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
-import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,21 +31,12 @@ public class ImageResourceApiToNginxVisitor implements Visitor<Image> {
         String fileNo = apiFileNoLinkPicker.tryToGetFileNo(rawUrl);
 
         if (fileNo != null) {
-            // TODO 权限系统改造后这里也得相应处理
             FileInfoView fileInfoView = nginxFileNoLinkPicker.getFileService().findFileViewFromDB(fileNo).orElseGet(null);
 
             // 匹配上格式，就认为是可替换的目标资源
             if (fileInfoView != null) {
                 // 是否可以对外暴露
-                boolean canExpose = true;
-
-                if (fileInfoView.getCid() != null) {
-                    Category category = nginxFileNoLinkPicker.getCategoryService().findCategoryByCid(fileInfoView.getCid(), false);
-
-                    if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessConditionTypeEnum.PUBLIC))) {
-                        canExpose = false;
-                    }
-                }
+                boolean canExpose = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId());
 
                 if (canExpose) {
                     String newUrl = nginxFileNoLinkPicker.nginxUrlPrefix + fileInfoView.returnRelativePath();

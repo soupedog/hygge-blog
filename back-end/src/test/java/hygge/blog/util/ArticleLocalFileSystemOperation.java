@@ -19,6 +19,7 @@ import hygge.blog.service.local.MarkdownContentServiceImpl;
 import hygge.blog.service.local.inner.markdown.ImageResourceServerToLocalVisitor;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import hygge.commons.constant.ConstantParameters;
 import hygge.commons.constant.enums.DateTimeFormatModeEnum;
 import hygge.util.UtilCreator;
@@ -188,7 +189,7 @@ class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
         }
 
         Category category = categoryService.findCategoryByCategoryId(article.getCategoryId(), false);
-        boolean isPublic = category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessConditionTypeEnum.PUBLIC));
+        boolean isPublic = PermissionServiceImpl._PUBLIC.getPermissionId().equals(category.getPermissionId());
 
         if (!isPublic) {
             return;

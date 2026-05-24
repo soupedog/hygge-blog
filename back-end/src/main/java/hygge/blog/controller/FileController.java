@@ -11,13 +11,12 @@ import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
-import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
-import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import hygge.commons.constant.enums.GlobalHyggeCodeEnum;
 import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.util.log.annotation.ControllerLog;
@@ -50,12 +49,12 @@ import java.util.Optional;
 @RequestMapping(value = "/blog-service/api/main")
 public class FileController extends HyggeJsonUtilContainer implements FileControllerDoc {
     private final FileServiceImpl fileService;
-    private final CategoryServiceImpl categoryService;
+    private final PermissionServiceImpl permissionService;
     private final CacheFileKeyKeeper cacheFileKeyKeeper;
 
-    public FileController(FileServiceImpl fileService, CategoryServiceImpl categoryService, CacheFileKeyKeeper cacheFileKeyKeeper) {
+    public FileController(FileServiceImpl fileService, PermissionServiceImpl permissionService, CacheFileKeyKeeper cacheFileKeyKeeper) {
         this.fileService = fileService;
-        this.categoryService = categoryService;
+        this.permissionService = permissionService;
         this.cacheFileKeyKeeper = cacheFileKeyKeeper;
     }
 
@@ -111,8 +110,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
         }
         FileInfoView fileInfoView = resultTempView.get();
 
-        // 文件 cid 不为 null 则认为是非公开文件
-        boolean shouldExpose = fileInfoView.getCid() == null;
+        boolean shouldExpose = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId());
 
         // 如果为非公开文件，尝试用 fileKey 授权
         if (!shouldExpose && fileKey != null && !fileKey.isEmpty()) {
@@ -130,13 +128,9 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
         // 如果为非公开文件，尝试用用户权限授权
         if (!shouldExpose) {
             // 验证访问权限
-            String cid = fileInfoView.getCid();
-            if (parameterHelper.isNotEmpty(cid)) {
-                List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
-
-                Optional<Category> accessibleCategoryTemp = categoryList.stream().filter(item -> cid.equals(item.getCid())).findAny();
-                shouldExpose = accessibleCategoryTemp.isPresent();
-            }
+            Integer permissionId = fileInfoView.getPermissionId();
+            List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(currentUser, null);
+            shouldExpose = activePermissionIdList.stream().anyMatch(item -> item.equals(permissionId));
         }
 
         // 无权访问返回 404

@@ -1,12 +1,8 @@
 package hygge.blog.domain.local.po;
 
-import hygge.blog.common.HyggeRequestContext;
-import hygge.blog.common.HyggeRequestTracker;
-import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
 import hygge.blog.domain.local.po.base.BasePo;
-import hygge.blog.domain.local.po.inner.CategoryAccessRule;
 import hygge.blog.service.local.normal.PermissionServiceImpl;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,11 +22,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 文章类别
@@ -62,13 +53,6 @@ public class Category extends BasePo {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "enum ('DEFAULT', 'PATH') default 'DEFAULT'")
     private CategoryTypeEnum categoryType;
-    /**
-     * 文章类别访问规则
-     */
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "json")
-    private List<CategoryAccessRule> accessRuleList;
-
     /**
      * 权限唯一标识，应与 {@link PermissionServiceImpl#_PUBLIC#getPermissionId()} 一致
      */
@@ -110,74 +94,4 @@ public class Category extends BasePo {
     @Column(nullable = false, columnDefinition = "enum ('INACTIVE', 'ACTIVE') default 'ACTIVE'")
     @Enumerated(EnumType.STRING)
     private CategoryStateEnum categoryState;
-
-    public boolean accessibleForUser(User targetUser) {
-        if (parameterHelper.isEmpty(accessRuleList)) {
-            return false;
-        }
-
-        boolean result = false;
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
-
-        if (targetUser == null) {
-            // 访客
-            if (parameterHelper.isNotEmpty(secretKey)) {
-                Optional<CategoryAccessRule> secretKeyAccessRuleTemp = accessRuleList.stream().filter(categoryAccessRule -> AccessConditionTypeEnum.SECRET_KEY.equals(categoryAccessRule.getAccessRuleType())).findFirst();
-                result = secretKey.equals(secretKeyAccessRuleTemp.map(CategoryAccessRule::getExtendString).orElse(null));
-            }
-
-            return result || accessRuleList.stream().anyMatch(categoryAccessRule -> AccessConditionTypeEnum.PUBLIC.equals(categoryAccessRule.getAccessRuleType()));
-        }
-
-        for (CategoryAccessRule categoryAccessRule : accessRuleList) {
-            boolean itemResult = false;
-            switch (categoryAccessRule.getAccessRuleType()) {
-                case SECRET_KEY:
-                    if (categoryAccessRule.getExtendString().equals(context.getObject(HyggeRequestContext.Key.SECRET_KEY))) {
-                        itemResult = true;
-                    }
-                    break;
-                case PERSONAL:
-                    // 当前类别创建人与当前登录用户相符时放行
-                    if (getUserId().equals(targetUser.getUserId())) {
-                        itemResult = true;
-                    }
-                    break;
-                case GROUP:
-                    List<BlogGroup> groupList = targetUser.getBlogGroupList();
-                    if (groupList.stream().anyMatch(group -> group.getGid().equals(categoryAccessRule.getExtendString()))) {
-                        itemResult = true;
-                    }
-                    break;
-                case ROLE:
-                    if (targetUser.getUserType().getValue().equals(categoryAccessRule.getExtendString())) {
-                        itemResult = true;
-                    }
-                    break;
-                case SEX:
-                    if (targetUser.getUserSex().getValue().equals(categoryAccessRule.getExtendString())) {
-                        itemResult = true;
-                    }
-                    break;
-                case CRON:
-                    // 暂时不会出现，先偷个懒
-                    break;
-                default:
-                    itemResult = true;
-            }
-
-            if (categoryAccessRule.isRequirement()) {
-                // 是必要条件则有一票否决权,必要条件一但不满足则返回无权限
-                if (!itemResult) {
-                    return false;
-                } else {
-                    result = true;
-                }
-            } else {
-                result = result || itemResult;
-            }
-        }
-        return result;
-    }
 }

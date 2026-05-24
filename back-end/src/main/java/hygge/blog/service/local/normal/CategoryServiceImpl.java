@@ -7,7 +7,6 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.CategoryDto;
-import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.CategoryStateEnum;
 import hygge.blog.domain.local.enums.CategoryTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
@@ -15,7 +14,6 @@ import hygge.blog.domain.local.po.ArticleCountInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
-import hygge.blog.domain.local.po.inner.CategoryAccessRule;
 import hygge.blog.repository.database.CategoryDao;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
@@ -40,16 +38,17 @@ import java.util.Map;
 @Service
 public class CategoryServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
-    private static final CategoryAccessRule DEFAULT_CATEGORY_ACCESS_RULE = CategoryAccessRule.builder().accessRuleType(AccessConditionTypeEnum.PERSONAL).requirement(false).build();
+    private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     private final UserServiceImpl userService;
     private final ArticleCountServiceImpl articleCountService;
+    private final PermissionServiceImpl permissionService;
     private final TopicServiceImpl topicService;
     private final CategoryDao categoryDao;
-    private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
+
 
     static {
-        forUpdate.add(new ColumnInfo(true, false, "accessRuleList", null));
+        forUpdate.add(new ColumnInfo(true, false, "permissionId", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "categoryName", null).toStringColumn(1, 500));
         forUpdate.add(new ColumnInfo(true, false, "tid", null).toStringColumn(0, 500));
         forUpdate.add(new ColumnInfo(true, false, "uid", null).toStringColumn(0, 500));
@@ -58,9 +57,10 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "categoryState", null).toStringColumn(0, 50));
     }
 
-    public CategoryServiceImpl(UserServiceImpl userService, ArticleCountServiceImpl articleCountService, TopicServiceImpl topicService, CategoryDao categoryDao) {
+    public CategoryServiceImpl(UserServiceImpl userService, ArticleCountServiceImpl articleCountService, PermissionServiceImpl permissionService, TopicServiceImpl topicService, CategoryDao categoryDao) {
         this.userService = userService;
         this.articleCountService = articleCountService;
+        this.permissionService = permissionService;
         this.topicService = topicService;
         this.categoryDao = categoryDao;
     }
@@ -71,15 +71,17 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         parameterHelper.stringNotEmpty("categoryName", (Object) categoryDto.getCategoryName());
         categoryDto.setOrderVal(parameterHelper.integerFormatOfNullable("orderVal", categoryDto.getOrderVal(), 0));
 
-        accessRuleListValidate(categoryDto.getAccessRuleList());
-
-        if (categoryDto.getAccessRuleList().isEmpty()) {
-            categoryDto.getAccessRuleList().add(DEFAULT_CATEGORY_ACCESS_RULE);
-        }
-
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
         userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
+
+        // 不传则为仅自己可见
+        if (categoryDto.getPermissionId() == null) {
+            categoryDto.setPermissionId(permissionService.getPersonalPermissionIdOfUser(currentUser));
+        } else if (categoryDto.getPermissionId() > PermissionServiceImpl._PUBLIC.getPermissionId()) {
+            // permissionId 大于公开可见授权 id 为在数据库有记录的，需要验证存在性
+            permissionService.findPermissionByPermissionId(categoryDto.getPermissionId(), false);
+        }
 
         Category category = PoDtoMapper.INSTANCE.dtoToPo(categoryDto);
         category.setCid(randomHelper.getUniversallyUniqueIdentifier(true));
@@ -164,9 +166,19 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
             newOne.setDepth(parentCategory.getDepth() + 1);
         }
 
-        if (newOne.getAccessRuleList() != null) {
-            collectionHelper.collectionNotEmpty("accessRuleList", newOne.getAccessRuleList());
-            accessRuleListValidate(newOne.getAccessRuleList());
+        Integer permissionId = (Integer) finalData.get("permissionId");
+        if (permissionId != null) {
+            if (permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId())) {
+                // 公开类型直接添加
+                newOne.setPermissionId(permissionId);
+            } else if (permissionId < PermissionServiceImpl._PUBLIC.getPermissionId()) {
+                // 负数代表仅自己可见
+                newOne.setParentId(permissionService.getPersonalPermissionIdOfUser(currentUser));
+            } else {
+                // permissionId 大于公开可见授权 id 为在数据库有记录的，需要验证存在性
+                permissionService.findPermissionByPermissionId(permissionId, false);
+                newOne.setPermissionId(permissionId);
+            }
         }
 
         OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
@@ -178,11 +190,24 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         Example<Category> example = Example.of(Category.builder().categoryState(CategoryStateEnum.ACTIVE).build());
         List<Category> categoryList = categoryDao.findAll(example, Sort.by(Sort.Order.desc("orderVal")));
 
-        List<Category> result = categoryList.stream().filter(category -> category.accessibleForUser(currentUser)).toList();
+        List<Category> result = getAccessibleCategoryForUser(categoryList, currentUser);
+
         if (parameterHelper.isNotEmpty(topicIdRequirement)) {
             result = result.stream().filter(category -> topicIdRequirement.contains(category.getTopicId())).toList();
         }
         return result;
+    }
+
+    private List<Category> getAccessibleCategoryForUser(List<Category> maxRangeList, User targetUser) {
+        List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(targetUser, null);
+
+        return collectionHelper.filterNonemptyItemAsArrayList(false, maxRangeList, category -> {
+            if (activePermissionIdList.stream().anyMatch(permissionId -> permissionId.equals(category.getPermissionId()))) {
+                return category;
+            } else {
+                return null;
+            }
+        });
     }
 
     private void nameConflictCheck(String categoryName) {
@@ -207,14 +232,5 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException(String.format("Category(%s) was not found.", info), BlogSystemCode.ARTICLE_CATEGORY_NOT_FOUND);
         }
         return categoryTemp;
-    }
-
-    private void accessRuleListValidate(List<CategoryAccessRule> accessRuleList) {
-        for (CategoryAccessRule accessRule : accessRuleList) {
-            parameterHelper.objectNotNull("accessRuleType", accessRule.getAccessRuleType());
-            if (!(AccessConditionTypeEnum.PERSONAL.equals(accessRule.getAccessRuleType()) || AccessConditionTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()))) {
-                parameterHelper.stringNotEmpty("extendString", (Object) accessRule.getExtendString());
-            }
-        }
     }
 }

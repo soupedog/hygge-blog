@@ -30,12 +30,12 @@ public class CategoryDto {
     private String tid;
     @Schema(title = "文章类别编号", description = "系统自动生成文章类别编号")
     private String cid;
+    @Schema(title = "权限唯一标识", description = "决定满足什么权限才运行访问。即便未主动创建特殊权限默认也存在：\"0\"->公开可见、\"null\"->仅自身可见")
+    private Integer permissionId;
     @Schema(title = "文章类别类型", description = "PATH 类型下不允许挂载文章")
     private CategoryTypeEnum categoryType;
     @Schema(title = "文章类别名称", description = "创建者自定义的文章类别名称")
     private String categoryName;
-    @Schema(title = "文章类别访问规则", description = "限制文章类别可见性")
-    private List<CategoryAccessRule> accessRuleList;
     @Schema(title = "用户编号", description = "系统自动生成用户编号", example = "U00000001")
     private String uid;
     @Schema(title = "文章类别父节点编号", description = "系统自动生成文章类别编号")

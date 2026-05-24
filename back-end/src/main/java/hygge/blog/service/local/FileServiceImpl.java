@@ -7,7 +7,6 @@ import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
-import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
@@ -19,6 +18,7 @@ import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.commons.exception.LightRuntimeException;
@@ -29,6 +29,7 @@ import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -63,7 +64,9 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
     @Value("${file.upload.path}")
     private String filePath;
+
     private final UserServiceImpl userService;
+    private final PermissionServiceImpl permissionService;
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
     private final FileInfoViewDao fileInfoViewDao;
@@ -72,14 +75,16 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
     static {
         forUpdate.add(new ColumnInfo(true, true, "description", null));
-        forUpdate.add(new ColumnInfo(true, true, "cid", null).toStringColumn(1, 255));
+        forUpdate.add(new ColumnInfo(true, true, "permissionId", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "name", null).toStringColumn(1, 255));
         forUpdate.add(new ColumnInfo(true, false, "fileType", null).toStringColumn(1, 30));
         forUpdate.add(new ColumnInfo(true, false, "fileCacheType", null).toStringColumn(1, 30));
     }
 
-    public FileServiceImpl(UserServiceImpl userService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
+    @Autowired
+    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
         this.userService = userService;
+        this.permissionService = permissionService;
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;
         this.fileInfoViewDao = fileInfoViewDao;
@@ -93,15 +98,20 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-        boolean needCopyToHardDisk = true;
+
+        Integer permissionId;
 
         if (cid != null) {
-            // 目标类别必须存在
+            // 目标类别必须存在，权限就以类别为准
             Category category = categoryService.findCategoryByCid(cid, false);
-            // 有且全都是 AccessRuleTypeEnum.PUBLIC 的就说明可以公开拷贝
-            needCopyToHardDisk = category.getAccessRuleList().stream()
-                    .allMatch(accessRule -> AccessConditionTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
+            permissionId = category.getPermissionId();
+        } else {
+            // 类别不存在，权限默认为仅自己可见
+            permissionId = permissionService.getPersonalPermissionIdOfUser(currentUser);
         }
+
+        // 是 PUBLIC 则需要拷贝
+        boolean needCopyToHardDisk = permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId());
 
         List<FileInfoDto> result = new ArrayList<>();
 
@@ -127,10 +137,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileNo(fileNo);
                 fileInfo.setUserId(currentUser.getUserId());
-                fileInfo.setCid(cid);
+                fileInfo.setPermissionId(permissionId);
                 fileInfo.setExtension(extension);
                 fileInfo.setName(name);
                 fileInfo.setFileType(fileType);
+
                 if (needCopyToHardDisk) {
                     // 文件所属于公开类别则使用 Nginx 创建副本
                     fileInfo.setFileCacheType(FileCacheTypeEnum.NGINX);
@@ -184,14 +195,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         });
 
         boolean canUpdateToNginxCopyType = false;
-        String articleCategoryName = null;
 
-        // 存在 cid 修改时，需要验证新 cid 存在性
-        String cid = (String) finalData.get("cid");
-        if (cid != null) {
-            Category category = categoryService.findCategoryByCid(cid, false);
-            canUpdateToNginxCopyType = category.getAccessRuleList().stream().allMatch(accessRule -> AccessConditionTypeEnum.PUBLIC.equals(accessRule.getAccessRuleType()));
-            articleCategoryName = category.getCategoryName();
+        Integer permissionId = (Integer) finalData.get("permissionId");
+        if (permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId())) {
+            // 公开类型直接添加
+            canUpdateToNginxCopyType = true;
         }
 
         FileInfo oldAndBeenOverwrite = new FileInfo();
@@ -203,7 +211,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         // 非公开的文章类别不允许创建 Nginx 文件副本
         if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !canUpdateToNginxCopyType) {
-            throw new LightRuntimeException("File(" + articleCategoryName + ") can't be updated to ArticleCategory(" + articleCategoryName + ") with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            throw new LightRuntimeException("File(" + fileInfoView.getName() + ") can't be updated to Permission(" + permissionId + ") with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
         }
 
         boolean isPathChanged = !fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
@@ -278,13 +286,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         FileInfoInfo result = new FileInfoInfo();
 
         List<FileInfoDto> fileInfoDtoList = new ArrayList<>();
-        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
-
-        List<String> cidList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCid);
+        List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(currentUser, null);
 
         Sort sort = Sort.by(Sort.Order.asc("createTs"));
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
-        Page<FileInfoView> resultTemp = fileInfoViewDao.findFileInfoMultiple(actualFileTypes, cidList, pageable);
+        Page<FileInfoView> resultTemp = fileInfoViewDao.findFileInfoMultiple(actualFileTypes, activePermissionIdList, pageable);
 
         resultTemp.stream().forEach(item -> {
             FileInfoDto resultTempItem = item.toDto();
