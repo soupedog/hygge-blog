@@ -52,10 +52,11 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     public HomepageFetchResult fetch(Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
+        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
 
         List<Topic> topicList = topicService.findAllTopic();
 
-        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+        List<Category> categoryList = categoryService.getAccessibleCategoryList(secretKey, currentUser, null);
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, categoryList, Category::getCategoryId);
 
@@ -117,9 +118,10 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     public ArticleSummaryInfo findArticleSummaryOfTopic(String tid, int currentPage, int pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
+        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
 
         Topic topic = topicService.findTopicByTid(tid, false);
-        List<Category> accessibleCategoryList = categoryService.getAccessibleCategoryList(currentUser, collectionHelper.createCollection(topic.getTopicId()));
+        List<Category> accessibleCategoryList = categoryService.getAccessibleCategoryList(secretKey, currentUser, collectionHelper.createCollection(topic.getTopicId()));
 
         List<Integer> accessibleCategoryIdList = collectionHelper.filterNonemptyItemAsArrayList(false, accessibleCategoryList, Category::getCategoryId);
         return articleService.findArticleSummaryInfoByCategoryId(accessibleCategoryIdList, accessibleCategoryList, context.isGuest() ? null : currentUser.getUserId(), currentPage, pageSize);
@@ -128,11 +130,12 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     public ArticleSummaryInfo findArticleSummaryOfCategory(String cid, int currentPage, int pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
+        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
 
         Category category = categoryService.findCategoryByCid(cid, true);
         List<Category> accessibleCategoryList;
         if (category != null) {
-            accessibleCategoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+            accessibleCategoryList = categoryService.getAccessibleCategoryList(secretKey, currentUser, null);
             accessibleCategoryList = accessibleCategoryList.stream().filter(item -> item.getCategoryId().equals(category.getCategoryId())).toList();
         } else {
             accessibleCategoryList = new ArrayList<>(0);

@@ -61,17 +61,25 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
 
     public List<Integer> getActivePermissionIdListOfUser(User targetUser, String secretKey) {
         List<Integer> result = new ArrayList<>();
+        boolean isLoginUser = targetUser != null;
+
+        if (isLoginUser) {
+            // 添加当前用户仅自己可见的 Permission
+            result.add(getPersonalPermissionIdOfUser(targetUser));
+        }
+
         // 公开访问权限默认给所有用户添加
         result.add(_PUBLIC.getPermissionId());
-        if (targetUser == null) {
-            return result;
-        }
-        // 添加当前用户仅自己可见的 Permission
-        result.add(getPersonalPermissionIdOfUser(targetUser));
 
         List<Permission> permission_all = permissionDao.findAll();
 
         for (Permission item : permission_all) {
+            // 权限的创建者，直接授权
+            if (isLoginUser && item.getUserId().equals(targetUser.getUserId())) {
+                result.add(item.getPermissionId());
+                continue;
+            }
+
             updateActivePermissionResultByAcIdList(targetUser, result, secretKey, item.getPermissionId());
         }
 
@@ -83,6 +91,7 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         // isRequirement 为 true 的排前面
         all.sort(Comparator.comparing(AccessCondition::isRequirement).reversed());
 
+        boolean isLoginUser = targetUser != null;
         boolean needAdd = false;
 
         for (AccessCondition item : all) {
@@ -93,19 +102,19 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
                     }
                 }
                 case GROUP -> {
-                    if (blogGroupService.isUserInGroup(item.getExtendString(), targetUser.getUserId())) {
+                    if (isLoginUser && blogGroupService.isUserInGroup(item.getExtendString(), targetUser.getUserId())) {
                         needAdd = true;
                     }
                 }
                 case ROLE -> {
                     UserTypeEnum expectType = UserTypeEnum.parse(item.getExtendString());
-                    if (expectType.equals(targetUser.getUserType())) {
+                    if (isLoginUser && expectType.equals(targetUser.getUserType())) {
                         needAdd = true;
                     }
                 }
                 case SEX -> {
                     UserSexEnum expectType = UserSexEnum.parse(item.getExtendString());
-                    if (expectType.equals(targetUser.getUserSex())) {
+                    if (isLoginUser && expectType.equals(targetUser.getUserSex())) {
                         needAdd = true;
                     }
                 }

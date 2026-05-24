@@ -218,8 +218,9 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
 
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
+        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
 
-        List<Category> categoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+        List<Category> categoryList = categoryService.getAccessibleCategoryList(secretKey, currentUser, null);
 
         Category currentCategory = categoryList.stream().filter(item -> item.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
         if (currentCategory == null) {

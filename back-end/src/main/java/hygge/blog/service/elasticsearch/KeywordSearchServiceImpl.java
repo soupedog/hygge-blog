@@ -54,8 +54,9 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
     public ArticleSummaryInfo articleKeyWordSearch(String keyword, Integer currentPage, Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
+        String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
 
-        List<Category> allowableCategoryList = categoryService.getAccessibleCategoryList(currentUser, null);
+        List<Category> allowableCategoryList = categoryService.getAccessibleCategoryList(secretKey, currentUser, null);
 
         SearchResponse<ArticleQuoteSearchCache> resultTemp = keywordSearch(keyword, ArticleQuoteSearchCache.Type.ARTICLE, allowableCategoryList, currentPage, pageSize);
 

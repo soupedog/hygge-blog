@@ -186,11 +186,11 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         return categoryDao.save(old);
     }
 
-    public List<Category> getAccessibleCategoryList(User currentUser, Collection<Integer> topicIdRequirement) {
+    public List<Category> getAccessibleCategoryList(String secretKey, User currentUser, Collection<Integer> topicIdRequirement) {
         Example<Category> example = Example.of(Category.builder().categoryState(CategoryStateEnum.ACTIVE).build());
         List<Category> categoryList = categoryDao.findAll(example, Sort.by(Sort.Order.desc("orderVal")));
 
-        List<Category> result = getAccessibleCategoryForUser(categoryList, currentUser);
+        List<Category> result = getAccessibleCategoryForUser(categoryList, currentUser, secretKey);
 
         if (parameterHelper.isNotEmpty(topicIdRequirement)) {
             result = result.stream().filter(category -> topicIdRequirement.contains(category.getTopicId())).toList();
@@ -198,8 +198,8 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    private List<Category> getAccessibleCategoryForUser(List<Category> maxRangeList, User targetUser) {
-        List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(targetUser, null);
+    private List<Category> getAccessibleCategoryForUser(List<Category> maxRangeList, User targetUser, String secretKey) {
+        List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(targetUser, secretKey);
 
         return collectionHelper.filterNonemptyItemAsArrayList(false, maxRangeList, category -> {
             if (activePermissionIdList.stream().anyMatch(permissionId -> permissionId.equals(category.getPermissionId()))) {

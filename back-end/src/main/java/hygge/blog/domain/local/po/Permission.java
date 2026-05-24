@@ -13,6 +13,7 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -41,6 +42,11 @@ public class Permission extends BasePo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "permissionId")
     private Integer permissionId;
+    /**
+     * 拥有者唯一标识(拥有者本人默认直接获得授权)
+     */
+    @Column(nullable = false)
+    private Integer userId;
     /**
      * 权限名称，如 "管理员写权限"、"文章删除权限"
      */
