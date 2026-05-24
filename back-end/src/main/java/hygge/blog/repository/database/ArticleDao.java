@@ -20,6 +20,11 @@ import java.util.List;
  */
 @Repository
 public interface ArticleDao extends JpaRepository<Article, Integer> {
+    @Modifying
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Query(value = "update article set content=:content where articleId=:articleId", nativeQuery = true)
+    int updateContentOnly(@Param("articleId") int articleId, @Param("content") String content);
+
     Article findArticleByTitle(String title);
 
     @Modifying

@@ -77,8 +77,10 @@ public class ImageLinkRefreshServiceImpl {
         }
 
         if (!rawContent.equals(newContent)) {
-            article.setContent(newContent);
-            articleDao.save(article);
+            int affectedRows = articleDao.updateContentOnly(article.getArticleId(), newContent);
+            if (affectedRows != 1) {
+                log.error("fail to update Article({}): affectedRows={}", article.getTitle(), affectedRows);
+            }
         }
     }
 }
