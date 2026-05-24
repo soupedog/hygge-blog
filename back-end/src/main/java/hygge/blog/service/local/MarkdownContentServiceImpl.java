@@ -6,6 +6,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
+import com.vladsch.flexmark.util.ast.Visitor;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
 import hygge.blog.service.local.inner.markdown.ImageResourceApiToNginxVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceNginxToApiVisitor;
@@ -46,10 +47,14 @@ public class MarkdownContentServiceImpl {
         this.fileNoPickerService = fileNoPickerService;
     }
 
-    public NodeVisitor getResourceServerToLocalVisitor(String pathPrefix) {
+    public NodeVisitor getImageNodeVisitor(Visitor<Image> visitor) {
         return new NodeVisitor(
-                new VisitHandler<>(Image.class, new ImageResourceServerToLocalVisitor(pathPrefix, fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.nginxFileNoLinkPicker))
+                new VisitHandler<>(Image.class, visitor)
         );
+    }
+
+    public ImageResourceServerToLocalVisitor getImageResourceServerToLocalVisitor(String pathPrefix) {
+        return new ImageResourceServerToLocalVisitor(pathPrefix, fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.nginxFileNoLinkPicker);
     }
 
     public String markdownServerToLocal(NodeVisitor serverToLocalVisitor, String markdownContent) {

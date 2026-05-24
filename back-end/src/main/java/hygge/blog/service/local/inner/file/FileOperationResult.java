@@ -18,6 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileOperationResult {
+    private Object extension;
     private String msg;
     private Throwable throwable;
     private ResultType resultType;

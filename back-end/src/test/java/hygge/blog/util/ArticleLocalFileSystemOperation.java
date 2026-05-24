@@ -1,17 +1,26 @@
 package hygge.blog.util;
 
+import com.vladsch.flexmark.util.ast.NodeVisitor;
 import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.config.database.DataBaseAutoConfig;
 import hygge.blog.config.util.http.HttpHelperAutoConfigurationForSpringBoot3;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
+import hygge.blog.domain.local.enums.AccessRuleTypeEnum;
+import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Article;
+import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.EventServiceImpl;
+import hygge.blog.service.local.FileNoPickerServiceImpl;
+import hygge.blog.service.local.FileServiceImpl;
+import hygge.blog.service.local.MarkdownContentServiceImpl;
+import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
+import hygge.blog.service.local.inner.markdown.ImageResourceServerToLocalVisitor;
 import hygge.blog.service.local.normal.ArticleCountServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
@@ -39,6 +48,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -72,7 +82,11 @@ import java.util.List;
                 CategoryServiceImpl.class,
                 TopicServiceImpl.class,
                 EventServiceImpl.class,
-                CacheServiceImpl.class
+                CacheServiceImpl.class,
+                MarkdownContentServiceImpl.class,
+                FileNoPickerServiceImpl.class,
+                FileServiceImpl.class,
+                CacheFileKeyKeeper.class
         }
 )
 @SuppressWarnings({"java:S2699", "java:S3577"})
@@ -80,15 +94,22 @@ import java.util.List;
 class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
     private static final String path = "G:\\Xavier\\Documents\\md文档\\";
     private static final String backupPath = "G:\\Xavier\\Documents\\md文档backup\\";
+    private static final String staticBlogPath = "G:\\Xavier\\Documents\\fuwari\\";
 
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     private LinkedHashMap<String, String> resultMapForSynchronize = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> resultMapForBuild = new LinkedHashMap<>();
+    private List<String> fileNoOfNeedCopy = new ArrayList<>();
     @Autowired
     private ArticleDao articleDao;
     @Autowired
     private ArticleServiceImpl articleService;
     @Autowired
     private CacheServiceImpl cacheService;
+    @Autowired
+    private CategoryServiceImpl categoryService;
+    @Autowired
+    private MarkdownContentServiceImpl markdownContentService;
 
     /**
      * 自动同步本地 markdown 和 数据库端文章。
@@ -97,6 +118,7 @@ class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
      */
     @Test
     void doSynchronize() {
+        resultMapForSynchronize.clear();
         log.info("开始同步");
         long start = System.currentTimeMillis();
 
@@ -133,6 +155,105 @@ class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
         log.info("info：" + ConstantParameters.LINE_SEPARATOR + jsonHelperIndent.formatAsString(resultMapForSynchronize));
         log.info("cost:" + (System.currentTimeMillis() - start) + " ms");
     }
+
+    /**
+     * 为服务端的公开文章构建本地的 fuwari 标准资源
+     */
+    @Test
+    void buildFuwariResource() {
+        fileNoOfNeedCopy.clear();
+        resultMapForBuild.clear();
+        log.info("开始构建");
+        long start = System.currentTimeMillis();
+
+        HyggeRequestContext hyggeRequestContext = HyggeRequestTracker.getContext();
+        User user = new User();
+        user.setUserId(1);
+        user.setUid("U00000001");
+        user.setUserType(UserTypeEnum.ROOT);
+        hyggeRequestContext.setCurrentLoginUser(user);
+
+        ImageResourceServerToLocalVisitor imageVisitor = markdownContentService.getImageResourceServerToLocalVisitor(staticBlogPath + "images");
+
+        NodeVisitor nodeVisitor = markdownContentService.getImageNodeVisitor(imageVisitor);
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("articleId")));
+
+        Page<Article> articleListTemp = articleDao.findAll(pageable);
+        log.info("共计 {} 篇文章待检测。", articleListTemp.getTotalElements());
+        do {
+            if (pageable.getPageNumber() != 0) {
+                // 不是第一页则进行查询
+                articleListTemp = articleDao.findAll(pageable);
+            }
+
+            List<Article> articleList = articleListTemp.getContent();
+
+            for (Article article : articleList) {
+                buildForSingle(nodeVisitor, article);
+            }
+
+            log.info("完成第 {} 页检测，准备进入下一页。", pageable.getPageNumber() + 1);
+            pageable = articleListTemp.nextPageable();
+        } while (!articleListTemp.isLast());
+
+        log.info("info：" + ConstantParameters.LINE_SEPARATOR + jsonHelperIndent.formatAsString(resultMapForSynchronize));
+        log.info("cost:" + (System.currentTimeMillis() - start) + " ms");
+    }
+
+    private void buildForSingle(NodeVisitor nodeVisitor, Article article) {
+        // 非激活状态，不构建资源
+        if (!article.getArticleState().equals(ArticleStateEnum.ACTIVE)) {
+            return;
+        }
+
+        Category category = categoryService.findCategoryByCategoryId(article.getCategoryId(), false);
+        boolean isPublic = category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessRuleTypeEnum.PUBLIC));
+
+        if (!isPublic) {
+            return;
+        }
+
+        // TODO 改造成 fileNo
+        fileNoOfNeedCopy.add(article.getImageSrc());
+
+        String title, ts, description, tag, categoryStringVal, coverImage;
+
+        title = article.getTitle();
+        ts = timeHelper.format(article.getCreateTs().getTime(), DateTimeFormatModeEnum.DATE);
+        description = article.getSummary();
+        tag = category.getCategoryName();
+
+        CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(article.getCategoryId());
+        if (categoryTreeInfo.getCategoryList().size() > 1) {
+            categoryStringVal = categoryTreeInfo.getCategoryList().get(0).getCategoryName();
+        } else {
+            categoryStringVal = categoryTreeInfo.getTopicInfo().getTopicName();
+        }
+
+        coverImage = "";
+
+        String markdownInfo = String.format("---\n" +
+                        "title: %s\n" +
+                        "published: %s\n" +
+                        "description: %s\n" +
+                        "tags: [ %s ]\n" +
+                        "category: %s\n" +
+//                        "image: \"%s\"\n" +
+                        "draft: false\n" +
+                        "---\n\n",
+                title,
+                ts,
+                description,
+                tag,
+                categoryStringVal
+//                coverImage
+        );
+
+        String newContent = markdownInfo + markdownContentService.markdownServerToLocal(nodeVisitor, article.getContent());
+        fileHelper.saveTextFile(staticBlogPath + tag, title, ".md", newContent);
+    }
+
 
     private void synchronizeForSingle(HyggeRequestContext hyggeRequestContext, File saveDirectory, File backupDirectory, Article article) {
         String fileName = article.getTitle() + ".md";

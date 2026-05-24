@@ -45,45 +45,57 @@ public class ImageResourceServerToLocalVisitor implements Visitor<Image> {
         String fileNo = apiFileNoLinkPicker.tryToGetFileNo(rawUrl);
 
         if (fileNo != null) {
-            // TODO 权限系统改造后这里也得相应处理
-            FileServiceImpl fileService = nginxFileNoLinkPicker.getFileService();
-            FileInfoView fileInfoView = fileService.findFileViewFromDB(fileNo).orElseGet(null);
+            FileOperationResult copyResult = tryToCopyToLocal(fileNo);
 
-            // 匹配上格式，就认为是可替换的目标资源
-            if (fileInfoView != null) {
-                // 是否可以对外暴露
-                boolean canExpose = true;
+            if (FileOperationResult.ResultType.SUCCESS.equals(copyResult.getResultType())) {
+                String newSrc = "../images" + copyResult.getExtension().toString();
+                BasedSequence basedSequence = BasedSequence.of(newSrc);
+                image.setUrl(basedSequence);
+                image.setPageRef(basedSequence);
+            }
 
-                if (fileInfoView.getCid() != null) {
-                    Category category = nginxFileNoLinkPicker.getCategoryService().findCategoryByCid(fileInfoView.getCid(), false);
+        }
+    }
 
-                    if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessRuleTypeEnum.PUBLIC))) {
-                        canExpose = false;
-                    }
+    public FileOperationResult tryToCopyToLocal(String fileNo) {
+        // TODO 权限系统改造后这里也得相应处理
+        FileServiceImpl fileService = nginxFileNoLinkPicker.getFileService();
+        FileInfoView fileInfoView = fileService.findFileViewFromDB(fileNo).orElseGet(null);
+
+        // 匹配上格式，就认为是可替换的目标资源
+        if (fileInfoView != null) {
+            // 是否可以对外暴露
+            boolean canExpose = true;
+
+            if (fileInfoView.getCid() != null) {
+                Category category = nginxFileNoLinkPicker.getCategoryService().findCategoryByCid(fileInfoView.getCid(), false);
+
+                if (!category.getAccessRuleList().stream().allMatch(categoryAccessRule -> categoryAccessRule.getAccessRuleType().equals(AccessRuleTypeEnum.PUBLIC))) {
+                    canExpose = false;
                 }
+            }
 
-                if (canExpose) {
-                    // 正式从数据库查询完整文件
-                    Optional<FileInfo> fileInfoTemp = fileService.findFileFromDB(fileNo);
+            if (canExpose) {
+                // 正式从数据库查询完整文件
+                Optional<FileInfo> fileInfoTemp = fileService.findFileFromDB(fileNo);
 
-                    if (fileInfoTemp.isPresent()) {
-                        FileInfo fileInfo = fileInfoTemp.get();
-                        String relativePath = fileInfo.returnRelativePath();
-                        String newPath = pathPrefix + relativePath;
-                        FileOperationResult copyResult = FileOperationTool.copyFile(newPath, fileInfo.getName(), fileInfo.getContent());
+                if (fileInfoTemp.isPresent()) {
+                    FileInfo fileInfo = fileInfoTemp.get();
+                    String relativePath = fileInfo.returnRelativePath();
+                    String newPath = pathPrefix + relativePath;
 
-                        if (FileOperationResult.ResultType.SUCCESS.equals(copyResult.getResultType())) {
-                            String newSrc = "../images" + relativePath;
-                            BasedSequence basedSequence = BasedSequence.of(newSrc);
-                            image.setUrl(basedSequence);
-                            image.setPageRef(basedSequence);
-                            log.info("File({}) copy to local:{}", fileNo, newPath);
-                        } else {
-                            log.error(copyResult.getMsg());
-                        }
+                    FileOperationResult copyResult = FileOperationTool.copyFile(newPath, fileInfo.getName(), fileInfo.getContent());
+                    copyResult.setExtension(relativePath);
+                    if (FileOperationResult.ResultType.SUCCESS.equals(copyResult.getResultType())) {
+                        log.info("File({}) copy to local:{}", fileNo, newPath);
+                    } else {
+                        log.error(copyResult.getMsg());
                     }
+
+                    return copyResult;
                 }
             }
         }
+        return null;
     }
 }
