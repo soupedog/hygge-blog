@@ -50,6 +50,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     private final ArticleDao articleDao;
     private final UserServiceImpl userService;
+    private final PermissionServiceImpl permissionService;
     private final CategoryServiceImpl categoryService;
     private final CacheServiceImpl cacheService;
     private final EventServiceImpl eventService;
@@ -68,9 +69,10 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
-    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
+    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
         this.articleDao = articleDao;
         this.userService = userService;
+        this.permissionService = permissionService;
         this.categoryService = categoryService;
         this.cacheService = cacheService;
         this.eventService = eventService;
@@ -220,10 +222,13 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         User currentUser = context.getCurrentLoginUser();
         String secretKey = context.getObject(HyggeRequestContext.Key.SECRET_KEY);
 
-        List<Category> categoryList = categoryService.getAccessibleCategoryList(secretKey, currentUser, null);
+        Category category = categoryService.findCategoryByCategoryId(article.getCategoryId(), true);
+        if (category == null) {
+            // 正常数据这个是不可能触发的
+            return null;
+        }
 
-        Category currentCategory = categoryList.stream().filter(item -> item.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
-        if (currentCategory == null) {
+        if (!permissionService.isPermissionPassed(category.getPermissionId(), currentUser, secretKey)) {
             // 当前用户无权访问
             return null;
         }
@@ -232,9 +237,9 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         // userId → uid
         String authorUid = cacheService.userIdToUid(article.getUserId());
         result.setUid(authorUid);
-        result.setCid(currentCategory.getCid());
+        result.setCid(category.getCid());
 
-        CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
+        CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(category.getCategoryId());
         result.setCategoryTreeInfo(categoryTreeInfo);
 
         // 如果允许更新浏览量

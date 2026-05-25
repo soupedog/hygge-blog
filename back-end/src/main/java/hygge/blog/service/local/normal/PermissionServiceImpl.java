@@ -59,6 +59,16 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         return permissionDao.save(permission);
     }
 
+
+    boolean isPermissionPassed(Integer permissionId, User targetUser, String secretKey) {
+        Permission permission = findPermissionByPermissionId(permissionId, true);
+        if (permission == null) {
+            return false;
+        }
+
+        return getPermissionIdIfPassed(permission.getPermissionId(), targetUser, secretKey) != null;
+    }
+
     public List<Integer> getActivePermissionIdListOfUser(User targetUser, String secretKey) {
         List<Integer> result = new ArrayList<>();
         boolean isLoginUser = targetUser != null;
@@ -80,57 +90,61 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
                 continue;
             }
 
-            updateActivePermissionResultByAcIdList(targetUser, result, secretKey, item.getPermissionId());
+            Integer permissionId = getPermissionIdIfPassed(item.getPermissionId(), targetUser, secretKey);
+
+            if (permissionId != null) {
+                result.add(permissionId);
+            }
         }
 
         return result;
     }
 
-    private void updateActivePermissionResultByAcIdList(User targetUser, List<Integer> result, String secretKey, Integer permissionId) {
-        List<AccessCondition> all = accessConditionService.findAccessConditionsByAcIdCollection(Collections.singletonList(permissionId));
+    /**
+     * 用户是否有对应授权，如果有则返回 permissionId，否则返回 null
+     */
+    private Integer getPermissionIdIfPassed(Integer permissionId, User targetUser, String secretKey) {
+        List<AccessCondition> accessCondition_all = findAccessConditionListByPermissionId(permissionId);
         // isRequirement 为 true 的排前面
-        all.sort(Comparator.comparing(AccessCondition::isRequirement).reversed());
+        accessCondition_all.sort(Comparator.comparing(AccessCondition::isRequirement).reversed());
 
         boolean isLoginUser = targetUser != null;
-        boolean needAdd = false;
+        Integer result = null;
 
-        for (AccessCondition item : all) {
+        for (AccessCondition item : accessCondition_all) {
             switch (item.getType()) {
                 case SECRET_KEY -> {
                     if (item.getExtendString().equals(secretKey)) {
-                        needAdd = true;
+                        result = permissionId;
                     }
                 }
                 case GROUP -> {
                     if (isLoginUser && blogGroupService.isUserInGroup(item.getExtendString(), targetUser.getUserId())) {
-                        needAdd = true;
+                        result = permissionId;
                     }
                 }
                 case ROLE -> {
                     UserTypeEnum expectType = UserTypeEnum.parse(item.getExtendString());
                     if (isLoginUser && expectType.equals(targetUser.getUserType())) {
-                        needAdd = true;
+                        result = permissionId;
                     }
                 }
                 case SEX -> {
                     UserSexEnum expectType = UserSexEnum.parse(item.getExtendString());
                     if (isLoginUser && expectType.equals(targetUser.getUserSex())) {
-                        needAdd = true;
+                        result = permissionId;
                     }
                 }
             }
 
             // 必要条件且当前未通过，一票否决判定为无权限
-            if (item.isRequirement() && !needAdd) {
-                return;
+            if (item.isRequirement() && result == null) {
+                return null;
             }
         }
 
-        if (needAdd) {
-            result.add(permissionId);
-        }
+        return result;
     }
-
 
     public List<AccessCondition> findAccessConditionListByPermissionId(Integer permissionId) {
         Permission permission = findPermissionByPermissionId(permissionId, true);
