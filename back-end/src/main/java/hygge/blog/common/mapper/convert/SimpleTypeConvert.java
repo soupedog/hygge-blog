@@ -8,12 +8,20 @@ import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.util.template.HyggeJsonUtilContainer;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * @author Xavier
  * @date 2022/8/29
  */
 public class SimpleTypeConvert extends HyggeJsonUtilContainer {
+    public Instant timestampToInstant(Timestamp target) {
+        return target == null ? null : target.toInstant();
+    }
+
+    public Timestamp instantToTimestamp(Instant target) {
+        return target == null ? null : Timestamp.from(target);
+    }
 
     public Long timestampAsLong(Timestamp target) {
         return target == null ? null : target.getTime();

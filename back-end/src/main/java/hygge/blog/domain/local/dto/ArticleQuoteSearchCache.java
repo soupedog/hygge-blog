@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * 描述信息：<br/>
@@ -112,15 +112,16 @@ public class ArticleQuoteSearchCache {
     private StateEnum state;
     /**
      * 创建时间 utc 毫秒级时间戳(共享)
+     * Spring Boot 提供的工具内部目前就是这个类型，不用会有异常提示
      */
-    @Field(type = FieldType.Date, format = {DateFormat.epoch_millis})
-    private Timestamp createTs;
+    @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
+    private Instant createTs;
     /**
      * 最后修改时间 utc 毫秒级时间戳(共享)
+     * Spring Boot 提供的工具内部目前就是这个类型，不用会有异常提示
      */
-    @Field(type = FieldType.Date, format = {DateFormat.epoch_millis})
-    private Timestamp lastUpdateTs;
-
+    @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
+    private Instant lastUpdateTs;
     /**
      * 句子编号
      */

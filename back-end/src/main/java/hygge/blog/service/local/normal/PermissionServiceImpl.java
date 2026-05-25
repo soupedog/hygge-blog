@@ -42,7 +42,14 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         this.permissionDao = permissionDao;
     }
 
+    /**
+     * 可能返回 null，仅当用户为 null 时
+     */
     public Integer getPersonalPermissionIdOfUser(User targetUser) {
+        if (targetUser == null) {
+            return null;
+        }
+
         // userId 数字取负数代表仅当前用户可见
         return -targetUser.getUserId();
     }
@@ -59,14 +66,21 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         return permissionDao.save(permission);
     }
 
-
     boolean isPermissionPassed(Integer permissionId, User targetUser, String secretKey) {
+        // 如果是负数权限代表仅自己可见，且不会在数据库中记录，内存中处理即可
+        if (permissionId != null && permissionId < 0) {
+            Integer userPermissionId = getPersonalPermissionIdOfUser(targetUser);
+            if (permissionId.equals(userPermissionId)) {
+                return true;
+            }
+        }
+
         Permission permission = findPermissionByPermissionId(permissionId, true);
         if (permission == null) {
             return false;
         }
 
-        return getPermissionIdIfPassed(permission.getPermissionId(), targetUser, secretKey) != null;
+        return getPermissionIdIfPassed(permission, targetUser, secretKey) != null;
     }
 
     public List<Integer> getActivePermissionIdListOfUser(User targetUser, String secretKey) {
@@ -85,12 +99,12 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
 
         for (Permission item : permission_all) {
             // 权限的创建者，直接授权
-            if (isLoginUser && item.getUserId().equals(targetUser.getUserId())) {
+            if (isLoginUser && item.isOwnerOfTargetUser(targetUser.getUserId())) {
                 result.add(item.getPermissionId());
                 continue;
             }
 
-            Integer permissionId = getPermissionIdIfPassed(item.getPermissionId(), targetUser, secretKey);
+            Integer permissionId = getPermissionIdIfPassed(item, targetUser, secretKey);
 
             if (permissionId != null) {
                 result.add(permissionId);
@@ -101,38 +115,48 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
     }
 
     /**
-     * 用户是否有对应授权，如果有则返回 permissionId，否则返回 null
+     * permission 是 database 来的数据，因此该方法内 permissionId 无负数，无需检测尽自己可见类型
      */
-    private Integer getPermissionIdIfPassed(Integer permissionId, User targetUser, String secretKey) {
-        List<AccessCondition> accessCondition_all = findAccessConditionListByPermissionId(permissionId);
-        // isRequirement 为 true 的排前面
-        accessCondition_all.sort(Comparator.comparing(AccessCondition::isRequirement).reversed());
+    private Integer getPermissionIdIfPassed(Permission permission, User targetUser, String secretKey) {
+        if (permission == null) {
+            return null;
+        }
 
         boolean isLoginUser = targetUser != null;
+
+        // 权限的创建者，直接授权
+        if (isLoginUser && permission.isOwnerOfTargetUser(targetUser.getUserId())) {
+            return permission.getPermissionId();
+        }
+
+        List<AccessCondition> accessCondition_all = findAccessConditionListByPermissionId(permission);
+        // isRequirement 为 true 的排前面，他们是必要条件
+        accessCondition_all.sort(Comparator.comparing(AccessCondition::isRequirement).reversed());
+
         Integer result = null;
 
         for (AccessCondition item : accessCondition_all) {
             switch (item.getType()) {
                 case SECRET_KEY -> {
                     if (item.getExtendString().equals(secretKey)) {
-                        result = permissionId;
+                        result = permission.getPermissionId();
                     }
                 }
                 case GROUP -> {
                     if (isLoginUser && blogGroupService.isUserInGroup(item.getExtendString(), targetUser.getUserId())) {
-                        result = permissionId;
+                        result = permission.getPermissionId();
                     }
                 }
                 case ROLE -> {
                     UserTypeEnum expectType = UserTypeEnum.parse(item.getExtendString());
                     if (isLoginUser && expectType.equals(targetUser.getUserType())) {
-                        result = permissionId;
+                        result = permission.getPermissionId();
                     }
                 }
                 case SEX -> {
                     UserSexEnum expectType = UserSexEnum.parse(item.getExtendString());
                     if (isLoginUser && expectType.equals(targetUser.getUserSex())) {
-                        result = permissionId;
+                        result = permission.getPermissionId();
                     }
                 }
             }
@@ -146,9 +170,15 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public List<AccessCondition> findAccessConditionListByPermissionId(Integer permissionId) {
+    /**
+     * 用户是否有对应授权，如果有则返回 permissionId，否则返回 null
+     */
+    private Integer getPermissionIdIfPassed(Integer permissionId, User targetUser, String secretKey) {
         Permission permission = findPermissionByPermissionId(permissionId, true);
+        return getPermissionIdIfPassed(permission, targetUser, secretKey);
+    }
 
+    public List<AccessCondition> findAccessConditionListByPermissionId(Permission permission) {
         if (permission == null) {
             return Collections.emptyList();
         }

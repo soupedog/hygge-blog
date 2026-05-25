@@ -13,7 +13,6 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -64,4 +63,11 @@ public class Permission extends BasePo {
      */
     @Column
     private String description;
+
+    public boolean isOwnerOfTargetUser(Integer targetUserId) {
+        if (targetUserId == null) {
+            return false;
+        }
+        return userId.equals(targetUserId);
+    }
 }
