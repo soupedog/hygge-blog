@@ -109,28 +109,28 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
             return (ResponseEntity<byte[]>) failWithWrapper(HttpStatus.NOT_FOUND, null, BlogSystemCode.FAIL_TO_QUERY_FILE, null, null, null, emptyResponseWrapper);
         }
         FileInfoView fileInfoView = resultTempView.get();
-
-        boolean shouldExpose = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId());
-
-        // 如果为非公开文件，尝试用 fileKey 授权
-        if (!shouldExpose && fileKey != null && !fileKey.isEmpty()) {
-            shouldExpose = cacheFileKeyKeeper.writeOffFileKey(fileNo, fileKey);
-        }
+        Integer permissionId = fileInfoView.getPermissionId();
 
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-        // 如果为非公开文件，尝试用管理员权限授权
-        if (!shouldExpose && currentUser != null && UserTypeEnum.ROOT.equals(currentUser.getUserType())) {
-            shouldExpose = true;
+        boolean shouldExpose = false;
+
+        // 尝试用 fileKey 授权
+        if (fileKey != null && !fileKey.isEmpty()) {
+            shouldExpose = cacheFileKeyKeeper.writeOffFileKey(fileNo, fileKey);
         }
 
-        // 如果为非公开文件，尝试用用户权限授权
+        if (!shouldExpose && currentUser != null) {
+            // 管理员 默认所有文件可管理
+            if (UserTypeEnum.ROOT.equals(currentUser.getUserType())) {
+                shouldExpose = true;
+            }
+        }
+
+        // 尝试用户权限去授权
         if (!shouldExpose) {
-            // 验证访问权限
-            Integer permissionId = fileInfoView.getPermissionId();
-            List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(currentUser, null);
-            shouldExpose = activePermissionIdList.stream().anyMatch(item -> item.equals(permissionId));
+            shouldExpose = permissionService.isPermissionPassed(permissionId, currentUser, null);
         }
 
         // 无权访问返回 404

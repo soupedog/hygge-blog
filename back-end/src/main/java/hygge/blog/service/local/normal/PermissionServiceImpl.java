@@ -66,7 +66,7 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         return permissionDao.save(permission);
     }
 
-    boolean isPermissionPassed(Integer permissionId, User targetUser, String secretKey) {
+    public boolean isPermissionPassed(Integer permissionId, User targetUser, String secretKey) {
         // 如果是负数权限代表仅自己可见，且不会在数据库中记录，内存中处理即可
         if (permissionId != null && permissionId < 0) {
             Integer userPermissionId = getPersonalPermissionIdOfUser(targetUser);
@@ -173,7 +173,7 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
     /**
      * 用户是否有对应授权，如果有则返回 permissionId，否则返回 null
      */
-    private Integer getPermissionIdIfPassed(Integer permissionId, User targetUser, String secretKey) {
+    public Integer getPermissionIdIfPassed(Integer permissionId, User targetUser, String secretKey) {
         Permission permission = findPermissionByPermissionId(permissionId, true);
         return getPermissionIdIfPassed(permission, targetUser, secretKey);
     }

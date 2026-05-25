@@ -98,7 +98,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-
         Integer permissionId;
 
         if (cid != null) {
