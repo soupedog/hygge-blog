@@ -9,7 +9,6 @@ import hygge.blog.service.client.IPQueryClient;
 import hygge.util.template.HyggeJsonUtilContainer;
 import hygge.web.util.http.bo.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -89,11 +88,10 @@ public class ArticleBrowseLogServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void freshBrowseLogTypeBackgroundJob() {
-        Example<ArticleBrowseLog> example = Example.of(ArticleBrowseLog.builder().browseLogType(BrowseLogTypeEnum.UNCHECKED).build());
         // 时间正排尝试取前 20 个
         PageRequest page = PageRequest.of(0, 20, Sort.by(Sort.Order.asc("createTs")));
 
-        Page<ArticleBrowseLog> resultTemp = articleBrowseLogDao.findAll(example, page);
+        Page<ArticleBrowseLog> resultTemp = articleBrowseLogDao.findArticleBrowseLogsByUserAgentIsNotNullAndBrowseLogType(BrowseLogTypeEnum.UNCHECKED, page);
         List<ArticleBrowseLog> result = resultTemp.getContent();
         List<ArticleBrowseLog> needRefresh = new ArrayList<>(20);
 

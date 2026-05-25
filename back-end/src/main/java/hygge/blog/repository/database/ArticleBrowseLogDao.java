@@ -1,6 +1,9 @@
 package hygge.blog.repository.database;
 
+import hygge.blog.domain.local.enums.BrowseLogTypeEnum;
 import hygge.blog.domain.local.po.ArticleBrowseLog;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +26,8 @@ public interface ArticleBrowseLogDao extends JpaRepository<ArticleBrowseLog, Int
 
     @Query(value = "SELECT * FROM article_browse_log WHERE ip=:ip AND ipLocation IS NOT NULL AND latitude IS NOT NULL AND longitude IS NOT NULL limit 1", nativeQuery = true)
     ArticleBrowseLog findIpLocationInfoFromLocal(@Param("ip") String ip);
+
+    Page<ArticleBrowseLog> findArticleBrowseLogsByUserAgentIsNotNullAndBrowseLogType(BrowseLogTypeEnum browseLogType, Pageable pageable);
 
     @Modifying
     @Transactional(propagation = Propagation.REQUIRES_NEW)
