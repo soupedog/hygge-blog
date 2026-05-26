@@ -62,8 +62,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private static final List<FileTypeEnum> TYPE_FOR_ALL = collectionHelper.createCollection(FileTypeEnum.values());
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 
-    @Value("${file.upload.path}")
-    private String filePath;
+    @Value("${file.root-in-server.path}")
+    private String fileRootPath;
 
     private final UserServiceImpl userService;
     private final PermissionServiceImpl permissionService;
@@ -94,28 +94,42 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return fileInfoViewDao.findByFileTypeAndNameAndExtension(fileType, name, extension);
     }
 
-    public List<FileInfoDto> uploadFile(String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
+    public List<FileInfoDto> uploadFile(Integer permissionId, String cid, FileTypeEnum fileType, List<MultipartFile> filesList) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-        Integer permissionId;
+        Integer actualPermissionId = null;
 
-        if (cid != null) {
-            // 目标类别必须存在，权限就以类别为准
-            Category category = categoryService.findCategoryByCid(cid, false);
-            permissionId = category.getPermissionId();
-        } else {
-            // 类别不存在，权限默认为仅自己可见
-            permissionId = permissionService.getPersonalPermissionIdOfUser(currentUser);
+        if (permissionService.isPermissionPassed(permissionId, currentUser, null)) {
+            actualPermissionId = permissionId;
         }
 
-        // 是 PUBLIC 则需要拷贝
-        boolean needCopyToHardDisk = permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId());
+        if (actualPermissionId == null) {
+            if (cid != null) {
+                // 目标类别必须存在，权限就以类别为准
+                Category category = categoryService.findCategoryByCid(cid, false);
+                actualPermissionId = category.getPermissionId();
+            } else {
+                // 类别不存在，权限默认为仅自己可见
+                actualPermissionId = permissionService.getPersonalPermissionIdOfUser(currentUser);
+            }
+        }
+
+        if (actualPermissionId == null) {
+            throw new LightRuntimeException("Please log in and try again.", BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+        }
+
+        // 是 PUBLIC 则默认创建缓存拷贝
+        boolean needCreateCache = actualPermissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId());
 
         List<FileInfoDto> result = new ArrayList<>();
 
         for (MultipartFile temp : filesList) {
             String fileName = temp.getOriginalFilename();
+            if (fileName == null) {
+                throw new LightRuntimeException("Please confirm that the file name is not empty.");
+            }
+
             String extension = null;
             // 不带扩展名的文件名
             String name = null;
@@ -124,6 +138,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             if (indexOfLastPoint > 0 && indexOfLastPoint < fileName.length() - 1) {
                 extension = fileName.substring(indexOfLastPoint + 1);
                 name = fileName.substring(0, indexOfLastPoint);
+            }
+
+            if (extension == null) {
+                throw new LightRuntimeException("Please confirm the file name has an extension.");
             }
 
             if (fileInfoViewDao.existsByFileTypeAndNameAndExtension(fileType, name, extension)) {
@@ -141,10 +159,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfo.setName(name);
                 fileInfo.setFileType(fileType);
 
-                if (needCopyToHardDisk) {
+                if (needCreateCache) {
                     // 文件所属于公开类别则使用 Nginx 创建副本
                     fileInfo.setFileCacheType(FileCacheTypeEnum.NGINX);
                 }
+
                 fileInfo.setFileSize(temp.getSize());
                 fileInfo.setContent(temp.getBytes());
 
@@ -153,9 +172,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 FileInfoDto item = fileInfo.toDto();
                 result.add(item);
-                // 没有权限控制的文件允许 NGINX 作为静态资源，拷贝到磁盘
-                if (needCopyToHardDisk) {
-                    createFileToHardDisk(getAbsolutePath(fileInfo), fileInfo);
+
+                // NGINX 作为静态资源，绝对路径指向 Nginx 根目录即可，将文件拷贝到磁盘
+                if (needCreateCache) {
+                    createCacheFile(getAbsolutePath(fileInfo), fileInfo);
                 }
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
@@ -231,10 +251,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 oldAndBeenOverwrite.setContent(fileInfoTemp.get().getContent());
 
-                createFileToHardDisk(getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite);
+                createCacheFile(getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite);
             } else {
                 // 有副本切换到无副本，仅删除旧副本
-                String oldCachePath = filePath + fileInfoView.returnRelativePath();
+                String oldCachePath = fileRootPath + fileInfoView.returnRelativePath();
                 File oldFile = new File(oldCachePath);
                 deleteFileInHardDisk(true, oldFile, oldCachePath);
             }
@@ -242,14 +262,14 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
                 // 未切换副本类型，属于 Nginx，可能存在路径变更
                 // 检测是否存在硬盘副本
-                String newCachePath = filePath + oldAndBeenOverwrite.returnRelativePath();
-                String oldCachePath = filePath + fileInfoView.returnRelativePath();
+                String newCachePath = fileRootPath + oldAndBeenOverwrite.returnRelativePath();
+                String oldCachePath = fileRootPath + fileInfoView.returnRelativePath();
 
                 File oldFile = new File(oldCachePath);
                 if (oldFile.exists()) {
                     File newFile = new File(newCachePath);
                     // 保障所需文件夹被创建
-                    fileHelper.getOrCreateDirectoryIfNotExit(filePath + oldAndBeenOverwrite.getFileType().getPath());
+                    fileHelper.getOrCreateDirectoryIfNotExit(fileRootPath + oldAndBeenOverwrite.getFileType().getPath());
                     try {
                         FileCopyUtils.copy(oldFile, newFile);
                         log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
@@ -282,7 +302,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
 
         List<FileTypeEnum> actualFileTypes = fileTypes == null ? TYPE_FOR_ALL : fileTypes;
-        FileInfoInfo result = new FileInfoInfo();
 
         List<FileInfoDto> fileInfoDtoList = new ArrayList<>();
         List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(currentUser, null);
@@ -295,7 +314,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             FileInfoDto resultTempItem = item.toDto();
 
             // 检测是否存在硬盘副本
-            String cachePath = filePath + resultTempItem.getSrc();
+            String cachePath = fileRootPath + resultTempItem.getSrc();
             File file = new File(cachePath);
             if (file.exists()) {
                 resultTempItem.setIsInHardDisk(true);
@@ -303,9 +322,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             fileInfoDtoList.add(resultTempItem);
         });
 
-        result.setFileInfoList(fileInfoDtoList);
-        result.setTotalCount(resultTemp.getTotalElements());
-        return result;
+        return FileInfoInfo.builder()
+                .fileInfoList(fileInfoDtoList)
+                .totalCount(resultTemp.getTotalElements())
+                .build();
     }
 
     public void createFileCopyFromDBToHardDisk(String fileNo) {
@@ -317,7 +337,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         FileInfo fileInfo = fileInfoTemp.get();
 
-        createFileToHardDisk(getAbsolutePath(fileInfo), fileInfoTemp.get());
+        createCacheFile(getAbsolutePath(fileInfo), fileInfoTemp.get());
     }
 
     public void deleteFile(String fileNo) {
@@ -330,7 +350,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         fileInfoViewTemp.ifPresent((fileInfoView) -> {
             // 检测是否存在硬盘副本
-            String cachePath = filePath + fileInfoView.toDto().getSrc();
+            String cachePath = fileRootPath + fileInfoView.toDto().getSrc();
             File file = new File(cachePath);
             deleteFileInHardDisk(file.exists(), file, cachePath);
             long affectedRows = fileInfoDao.deleteByFileNo(fileNo);
@@ -371,12 +391,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void createFileToHardDisk(String absolutePath, FileInfo fileInfo) {
+    public void createCacheFile(String absolutePath, FileInfo fileInfo) {
         copyFileToHardDisk(absolutePath, fileInfo.getName(), fileInfo.getContent());
     }
 
     private String getAbsolutePath(FileInfo fileInfo) {
-        return filePath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
+        return fileRootPath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
     }
 
     private void copyFileToHardDisk(String absolutePath, String fileName, byte[] content) {

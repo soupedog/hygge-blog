@@ -8,7 +8,6 @@ import hygge.blog.domain.local.bo.BlogSystemCode;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
-import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.FileInfo;
@@ -63,10 +62,10 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     @PostMapping(value = "/file", consumes = "multipart/form-data")
     @ControllerLog(ignoreParamNames = "filesList")
     public ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>> upload(@RequestParam(value = "type") FileTypeEnum fileType,
-                                                                                 @RequestParam(value = "fileCacheType", required = false, defaultValue = "DEFAULT") FileCacheTypeEnum fileCacheType,
+                                                                                 @RequestParam(value = "permissionId", required = false) Integer permissionId,
                                                                                  @RequestParam(value = "cid", required = false) String cid,
                                                                                  @RequestParam(value = "files") List<MultipartFile> filesList) {
-        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>>) success(fileService.uploadFile(cid, fileType, filesList));
+        return (ResponseEntity<HyggeBlogControllerResponse<List<FileInfoDto>>>) success(fileService.uploadFile(permissionId, cid, fileType, filesList));
     }
 
     @Override
