@@ -200,6 +200,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         if (targetFileInfoTemp.isEmpty()) {
             throw new LightRuntimeException("File(" + fileNo + ") was not found.", BlogSystemCode.FAIL_TO_QUERY_FILE);
         }
+
         FileInfoView fileInfoView = targetFileInfoTemp.get();
         User owner = userService.findUserByUserId(fileInfoView.getUserId(), false);
 
@@ -213,12 +214,18 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             return finalDataTemp;
         });
 
-        boolean canUpdateToNginxCopyType = false;
+        boolean isAllowCaching = false;
 
         Integer permissionId = (Integer) finalData.get("permissionId");
-        if (permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId())) {
-            // 公开类型直接添加
-            canUpdateToNginxCopyType = true;
+        if (permissionId != null) {
+            if (!permissionService.isPermissionPassed(permissionId, currentUser, null)) {
+                throw new LightRuntimeException("Please confirm the permissionId is correct.");
+            }
+
+            if (permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId())) {
+                // 公开类型，才允许缓存
+                isAllowCaching = true;
+            }
         }
 
         FileInfo oldAndBeenOverwrite = new FileInfo();
@@ -229,7 +236,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
 
         // 非公开的文章类别不允许创建 Nginx 文件副本
-        if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !canUpdateToNginxCopyType) {
+        if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !isAllowCaching) {
             throw new LightRuntimeException("File(" + fileInfoView.getName() + ") can't be updated to Permission(" + permissionId + ") with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
         }
 

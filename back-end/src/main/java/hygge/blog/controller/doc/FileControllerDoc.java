@@ -7,6 +7,9 @@ import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +30,11 @@ public interface FileControllerDoc extends HyggeBlogController<ResponseEntity<?>
     ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(String fileNo);
 
     @Operation(summary = "修改部分文件信息", description = "修改文件名称，描述")
+    @RequestBody(
+            content = {@Content(schema =
+            @Schema(ref = "#/components/schemas/FileInfoDto")
+            )}
+    )
     ResponseEntity<HyggeBlogControllerResponse<Void>> updateFileInfo(String fileNo, Map<String, Object> data);
 
     @Operation(summary = "查询文件特定信息", description = "根据文件唯一标识查询文件信息")
