@@ -1,8 +1,8 @@
 package hygge.blog.service.local;
 
+import hygge.blog.service.local.inner.file.FileUrlBuilder;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,17 +16,10 @@ public class FileNoPickerServiceImpl {
     public final ApiFileNoLinkPicker apiFileNoLinkPicker;
     public final ApiFileNoLinkPicker apiFileNoLinkPicker_old;
 
-    public FileNoPickerServiceImpl(
-            @Value("${hyyge.blog.file.expose.api.prefix}") String apiUrlPrefix,
-            @Value("${hyyge.blog.file.expose.old.api.prefix:old.com/}") String apiUrlPrefix_old,
-            @Value("${hyyge.blog.file.expose.nginx.prefix}") String nginxUrlPrefix,
-            @Value("${hyyge.blog.file.expose.old.nginx.prefix:old.com/static/}") String nginxUrlPrefix_old,
-            FileServiceImpl fileService
-    ) {
-        this.nginxFileNoLinkPicker = new NginxFileNoLinkPicker(nginxUrlPrefix, fileService);
-        this.nginxFileNoLinkPicker_old = new NginxFileNoLinkPicker(nginxUrlPrefix_old, fileService);
-        this.apiFileNoLinkPicker = new ApiFileNoLinkPicker(apiUrlPrefix);
-        this.apiFileNoLinkPicker_old = new ApiFileNoLinkPicker(apiUrlPrefix_old);
+    public FileNoPickerServiceImpl(FileUrlBuilder fileUrlBuilder, FileServiceImpl fileService) {
+        this.nginxFileNoLinkPicker = new NginxFileNoLinkPicker(fileUrlBuilder.nginxUrlPrefix, fileService);
+        this.nginxFileNoLinkPicker_old = new NginxFileNoLinkPicker(fileUrlBuilder.nginxUrlPrefix_old, fileService);
+        this.apiFileNoLinkPicker = new ApiFileNoLinkPicker(fileUrlBuilder.apiUrlPrefix);
+        this.apiFileNoLinkPicker_old = new ApiFileNoLinkPicker(fileUrlBuilder.apiUrlPrefix_old);
     }
-
 }

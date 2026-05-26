@@ -21,16 +21,10 @@ public class ApiFileNoLinkPicker implements HyggeFileNoLinkPicker {
     public final String apiUrlPrefix;
 
     public ApiFileNoLinkPicker(String apiUrlPrefix) {
-        // 自动补齐结尾反斜杠
-        String normalizedPrefix = apiUrlPrefix.endsWith("/")
-                ? apiUrlPrefix
-                : apiUrlPrefix + "/";
-
-        String regex = String.format("^%s([0-9a-fA-F]{32})(?:[?#].*)?", normalizedPrefix);
+        String regex = String.format("^%s([0-9a-fA-F]{32})(?:[?#].*)?", apiUrlPrefix);
 
         this.pattern = Pattern.compile(regex);
-        this.apiUrlPrefix = normalizedPrefix;
-
+        this.apiUrlPrefix = apiUrlPrefix;
         validate();
     }
 

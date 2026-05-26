@@ -27,8 +27,8 @@ import lombok.Setter;
 public class FileInfoDto {
     @Schema(title = "文件编号")
     private String fileNo;
-    @Schema(title = "文件链接")
-    private String src;
+    @Schema(title = "文件相对路径")
+    private String relativePath;
     @Schema(title = "用户编号")
     private String uid;
     @Schema(title = "权限唯一标识", description = "决定满足什么权限才运行访问。即便未主动创建特殊权限默认也存在：\"0\"->公开可见、\"null\"->仅自身可见")
@@ -44,8 +44,10 @@ public class FileInfoDto {
     private FileDescriptionDto description;
     @Schema(title = "文件大小")
     private String fileSize;
-    @Schema(title = "是否已存在硬盘副本")
-    private Boolean isInHardDisk;
+    @Schema(title = "缓存链接")
+    private String cacheLink;
+    @Schema(title = "API 链接")
+    private String apiLink;
     @Schema(title = "创建时间", description = "UTC 毫秒级时间戳")
     protected Long createTs;
     @Schema(title = "最后修改时间", description = "UTC 毫秒级时间戳")

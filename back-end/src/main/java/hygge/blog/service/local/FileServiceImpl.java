@@ -17,6 +17,7 @@ import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
+import hygge.blog.service.local.inner.file.FileUrlBuilder;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.PermissionServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
@@ -70,6 +71,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final FileInfoDao fileInfoDao;
     private final FileInfoViewDao fileInfoViewDao;
+    private final FileUrlBuilder fileUrlBuilder;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -82,12 +84,13 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     @Autowired
-    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao) {
+    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder) {
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;
         this.fileInfoViewDao = fileInfoViewDao;
+        this.fileUrlBuilder = fileUrlBuilder;
     }
 
     public FileInfoView findFileInfoView(FileTypeEnum fileType, String name, String extension) {
@@ -100,7 +103,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         Integer actualPermissionId = null;
 
-        if (permissionService.isPermissionPassed(permissionId, currentUser, null)) {
+        switch (fileType) {
+            // 句子收藏和系统核心组件默认都是公开可见
+            case CORE, QUOTE -> actualPermissionId = PermissionServiceImpl._PUBLIC.getPermissionId();
+        }
+
+        if (actualPermissionId == null && permissionService.isPermissionPassed(permissionId, currentUser, null)) {
             actualPermissionId = permissionId;
         }
 
@@ -171,12 +179,15 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfoDao.save(fileInfo);
 
                 FileInfoDto item = fileInfo.toDto();
-                result.add(item);
 
                 // NGINX 作为静态资源，绝对路径指向 Nginx 根目录即可，将文件拷贝到磁盘
                 if (needCreateCache) {
                     createCacheFile(getAbsolutePath(fileInfo), fileInfo);
                 }
+
+                // 存在检测 Nginx 缓存，需要在缓存之后再初始化
+                initLink(item);
+                result.add(item);
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
                 throw le;
@@ -298,8 +309,17 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         User currentUser = context.getCurrentLoginUser();
         // 是否有文件查询权限
         userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
+        Optional<FileInfoView> fileInfoViewTemp = findFileViewFromDB(fileNo);
 
-        return findFileViewFromDB(fileNo).map(FileInfoBase::toDto).orElse(null);
+        if (fileInfoViewTemp.isEmpty()) {
+            return null;
+        }
+
+        FileInfoView fileInfoView = fileInfoViewTemp.get();
+        FileInfoDto resultTempItem = fileInfoView.toDto();
+        initLink(resultTempItem);
+
+        return resultTempItem;
     }
 
     public FileInfoInfo findFileInfoPageQuery(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
@@ -319,13 +339,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         resultTemp.stream().forEach(item -> {
             FileInfoDto resultTempItem = item.toDto();
-
-            // 检测是否存在硬盘副本
-            String cachePath = fileRootPath + resultTempItem.getSrc();
-            File file = new File(cachePath);
-            if (file.exists()) {
-                resultTempItem.setIsInHardDisk(true);
-            }
+            initLink(resultTempItem);
             fileInfoDtoList.add(resultTempItem);
         });
 
@@ -333,6 +347,17 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 .fileInfoList(fileInfoDtoList)
                 .totalCount(resultTemp.getTotalElements())
                 .build();
+    }
+
+    private void initLink(FileInfoDto dto) {
+        // 初始化 API 链接
+        dto.setApiLink(fileUrlBuilder.getFileApiLink(dto.getFileNo()));
+        // 检测是否存在硬盘副本
+        String cachePath = fileRootPath + dto.getRelativePath();
+        File file = new File(cachePath);
+        if (file.exists()) {
+            dto.setCacheLink(fileUrlBuilder.getFileCacheLink(dto.getRelativePath()));
+        }
     }
 
     public void createFileCopyFromDBToHardDisk(String fileNo) {
@@ -357,7 +382,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         fileInfoViewTemp.ifPresent((fileInfoView) -> {
             // 检测是否存在硬盘副本
-            String cachePath = fileRootPath + fileInfoView.toDto().getSrc();
+            String cachePath = fileRootPath + fileInfoView.toDto().getRelativePath();
             File file = new File(cachePath);
             deleteFileInHardDisk(file.exists(), file, cachePath);
             long affectedRows = fileInfoDao.deleteByFileNo(fileNo);

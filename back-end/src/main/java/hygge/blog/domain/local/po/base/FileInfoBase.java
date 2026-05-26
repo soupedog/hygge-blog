@@ -89,7 +89,7 @@ public abstract class FileInfoBase extends BasePo {
                 .permissionId(permissionId)
                 .name(name)
                 .extension(extension)
-                .src(returnRelativePath())
+                .relativePath(returnRelativePath())
                 .fileSize(unitConvertHelper.storageSmartFormatAsString(fileSize))
                 .fileType(fileType)
                 .fileCacheType(fileCacheType)

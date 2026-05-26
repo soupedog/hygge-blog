@@ -78,6 +78,11 @@ public class Article extends BasePo {
     @Column(nullable = false, length = 1000)
     private String imageSrc;
     /**
+     * 文章配图文件编号
+     */
+    @Column
+    private String coverFileNo;
+    /**
      * 文章摘要
      */
     @Column(length = 3000)
