@@ -15,4 +15,7 @@ import org.springframework.http.ResponseEntity;
 public interface ManageControllerDoc extends HyggeBlogController<ResponseEntity<?>> {
     @Operation(summary = "全部文章图片链接更新", description = "更新文章图片链接")
     ResponseEntity<HyggeBlogControllerResponse<String>> refreshImageLink(ResourceLinkRefreshTypeEnum resourceLinkRefreshType);
+
+    @Operation(summary = "全部公开可见文件缓存更新", description = "更新公开可见文件缓存")
+    ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(Boolean forceOverWrite);
 }

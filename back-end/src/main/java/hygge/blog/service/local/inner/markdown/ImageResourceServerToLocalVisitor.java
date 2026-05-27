@@ -52,7 +52,6 @@ public class ImageResourceServerToLocalVisitor implements Visitor<Image> {
                 image.setUrl(basedSequence);
                 image.setPageRef(basedSequence);
             }
-
         }
     }
 
@@ -74,7 +73,7 @@ public class ImageResourceServerToLocalVisitor implements Visitor<Image> {
                     String relativePath = fileInfo.returnRelativePath();
                     String newPath = pathPrefix + relativePath;
 
-                    FileOperationResult copyResult = FileOperationTool.copyFile(newPath, fileInfo.getName(), fileInfo.getContent());
+                    FileOperationResult copyResult = FileOperationTool.copyFile(false, newPath, fileInfo.getName(), fileInfo.getContent());
                     copyResult.setExtension(relativePath);
                     if (FileOperationResult.ResultType.SUCCESS.equals(copyResult.getResultType())) {
                         log.info("File({}) copy to local:{}", fileNo, newPath);

@@ -23,6 +23,10 @@ public class FileOperationResult {
     private Throwable throwable;
     private ResultType resultType;
 
+    public boolean isSuccess() {
+        return ResultType.SUCCESS.equals(resultType);
+    }
+
     public enum ResultType {
         SUCCESS,
         ALREADY_EXISTS,

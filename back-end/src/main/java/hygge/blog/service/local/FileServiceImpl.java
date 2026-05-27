@@ -17,6 +17,8 @@ import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
+import hygge.blog.service.local.inner.file.FileOperationResult;
+import hygge.blog.service.local.inner.file.FileOperationTool;
 import hygge.blog.service.local.inner.file.FileUrlBuilder;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.PermissionServiceImpl;
@@ -43,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -274,7 +275,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 // 有副本切换到无副本，仅删除旧副本
                 String oldCachePath = fileRootPath + fileInfoView.returnRelativePath();
                 File oldFile = new File(oldCachePath);
-                deleteFileInHardDisk(true, oldFile, oldCachePath);
+                FileOperationTool.deleteFile(oldFile);
             }
         } else {
             if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
@@ -290,8 +291,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                     fileHelper.getOrCreateDirectoryIfNotExit(fileRootPath + oldAndBeenOverwrite.getFileType().getPath());
                     try {
                         FileCopyUtils.copy(oldFile, newFile);
+                        FileOperationTool.deleteFile(oldFile);
                         log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
-                        deleteFileInHardDisk(true, oldFile, oldCachePath);
                     } catch (IOException e) {
                         throw new InternalRuntimeException("Fail to copy old file to new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE, e);
                     }
@@ -360,16 +361,26 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void createFileCopyFromDBToHardDisk(String fileNo) {
-        Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
+    public boolean createFileCopyFromDBToHardDisk(boolean forceOverWrite, String fileNo) {
+        Optional<FileInfo> fileInfoTemp = findFileFromDB(fileNo);
 
         if (fileInfoTemp.isEmpty()) {
-            return;
+            log.warn("FileInfo({}) was empty.", fileNo);
+            return false;
         }
 
         FileInfo fileInfo = fileInfoTemp.get();
 
-        createCacheFile(getAbsolutePath(fileInfo), fileInfoTemp.get());
+        FileOperationResult copyResult = FileOperationTool.copyFile(forceOverWrite, getAbsolutePath(fileInfo), fileInfo.getName(), fileInfo.getContent());
+
+        boolean result = copyResult.isSuccess();
+
+        if (!forceOverWrite) {
+            if (!result) {
+                log.info(copyResult.getMsg());
+            }
+        }
+        return result;
     }
 
     public void deleteFile(String fileNo) {
@@ -383,8 +394,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         fileInfoViewTemp.ifPresent((fileInfoView) -> {
             // 检测是否存在硬盘副本
             String cachePath = fileRootPath + fileInfoView.toDto().getRelativePath();
+
             File file = new File(cachePath);
-            deleteFileInHardDisk(file.exists(), file, cachePath);
+            if (file.exists()) {
+                FileOperationTool.deleteFile(file);
+            }
+
             long affectedRows = fileInfoDao.deleteByFileNo(fileNo);
             if (affectedRows > 0) {
                 log.info("delete file({}) success, affected rows:{}.", fileInfoView.getName(), affectedRows);
@@ -424,57 +439,17 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void createCacheFile(String absolutePath, FileInfo fileInfo) {
-        copyFileToHardDisk(absolutePath, fileInfo.getName(), fileInfo.getContent());
-    }
-
-    private String getAbsolutePath(FileInfo fileInfo) {
-        return fileRootPath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
-    }
-
-    private void copyFileToHardDisk(String absolutePath, String fileName, byte[] content) {
-        try {
-            File file = new File(absolutePath);
-
-            if (!file.isAbsolute()) {
-                throw new LightRuntimeException("Ptah(" + absolutePath + ") of File(" + fileName + ") was unexpected.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-            }
-
-            if (file.exists()) {
-                throw new LightRuntimeException("File(" + fileName + ") already exist in HardDisk.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-            }
-
-            // 获取父目录
-            File parentDir = file.getParentFile();
-            //如果父目录不存在，则创建
-            if (parentDir != null && !parentDir.exists()) {
-                // 创建所有不存在的父目录
-                parentDir.mkdirs();
-            }
-
-            boolean createNoConflict = file.createNewFile();
-            if (!createNoConflict) {
-                throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
-            }
-
-            // 拷贝文件到磁盘
-            FileCopyUtils.copy(content, Files.newOutputStream(file.toPath()));
-            log.info("Copy file " + absolutePath + " to hard disk success.");
-        } catch (LightRuntimeException le) {
-            // 主动抛出的已知异常已经标记了错误原因
-            throw le;
-        } catch (Exception e) {
-            throw new LightRuntimeException("Fail to copy file:[" + absolutePath + "].", BlogSystemCode.FAIL_TO_UPLOAD_FILE, e);
-        }
-    }
-
-    public void deleteFileInHardDisk(boolean needDelete, File file, String filePath) {
-        if (needDelete) {
-            boolean deleteSuccess = file.delete();
-            if (!deleteSuccess) {
-                log.info("Delete file({}) in HardDisk failed.", filePath);
+        FileOperationResult copyResult = FileOperationTool.copyFile(false, absolutePath, fileInfo.getName(), fileInfo.getContent());
+        if (!copyResult.getResultType().equals(FileOperationResult.ResultType.SUCCESS)) {
+            if (copyResult.getThrowable() != null) {
+                throw new InternalRuntimeException(copyResult.getMsg());
             } else {
-                log.info("Delete file({}) in HardDisk success.", filePath);
+                throw new LightRuntimeException(copyResult.getMsg());
             }
         }
+    }
+
+    public String getAbsolutePath(FileInfo fileInfo) {
+        return fileRootPath + fileInfo.getFileType().getPath() + fileInfo.getName() + "." + fileInfo.getExtension();
     }
 }
