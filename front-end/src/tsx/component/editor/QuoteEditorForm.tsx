@@ -53,8 +53,8 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
                             onFinish={(value) => {
                                 value.content = content;
 
-                                if (!PropertiesHelper.isStringNotEmpty(value.imageSrc)) {
-                                    value.imageSrc = null;
+                                if (!PropertiesHelper.isStringNotEmpty(value.coverFileNo)) {
+                                    value.coverFileNo = null;
                                 }
 
                                 if (!PropertiesHelper.isStringNotEmpty(value.remarks)) {
@@ -93,7 +93,7 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
                             <Form.Item name={['quoteId']} label="句子编号" rules={[{required: false}]}>
                                 <Input/>
                             </Form.Item>
-                            <Form.Item name={['imageSrc']} label="句子配图"
+                            <Form.Item name={['coverFileNo']} label="句子封面图"
                                        rules={[{required: false}]}>
                                 <Select
                                     showSearch
@@ -169,7 +169,7 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
             data?.main?.fileInfoList.forEach((item) => {
                 container?.push({
                     label: item.name + " --- " + item.fileSize,
-                    value: UrlHelper.getBaseStaticSourceUrl() + item.src,
+                    value: item.fileNo,
                 });
             });
             updateBackgroundImageInfoList(container);
@@ -184,7 +184,7 @@ function QuoteEditorForm({updateContent}: { updateContent: Function }) {
 
         quoteForm.setFieldsValue({
             quoteId: quoteDto.quoteId,
-            imageSrc: quoteDto.imageSrc,
+            coverFileNo: quoteDto.coverFileNo,
             remarks: quoteDto.remarks,
             source: quoteDto.source,
             portal: quoteDto.portal,

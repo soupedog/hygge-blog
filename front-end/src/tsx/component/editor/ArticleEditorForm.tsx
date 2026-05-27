@@ -115,7 +115,7 @@ function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
                                     }}
                                 />
                             </Form.Item>
-                            <Form.Item name={['imageSrc']} label="文章主图"
+                            <Form.Item name={['coverFileNo']} label="文章主图"
                                        rules={[{required: true}]}>
                                 <Select
                                     showSearch
@@ -280,7 +280,7 @@ function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
             data?.main?.fileInfoList.forEach((item) => {
                 container?.push({
                     label: item.name + " --- " + item.fileSize,
-                    value: item.apiLink,
+                    value: item.fileNo,
                 });
             });
             updateBackgroundImageInfoList(container);
@@ -307,7 +307,7 @@ function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
             },
             cid: article.cid,
             title: article.title,
-            imageSrc: article.imageSrc,
+            coverFileNo: article.coverFileNo,
             summary: article.summary,
             articleState: article.articleState
         });
