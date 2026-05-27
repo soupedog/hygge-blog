@@ -226,18 +226,16 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             return finalDataTemp;
         });
 
-        boolean isAllowCaching = false;
+        // 公开可见类型，才允许缓存
+        boolean isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId());
 
         Integer permissionId = (Integer) finalData.get("permissionId");
         if (permissionId != null) {
             if (!permissionService.isPermissionPassed(permissionId, currentUser, null)) {
                 throw new LightRuntimeException("Please confirm the permissionId is correct.");
             }
-
-            if (permissionId.equals(PermissionServiceImpl._PUBLIC.getPermissionId())) {
-                // 公开类型，才允许缓存
-                isAllowCaching = true;
-            }
+            // 用户主动指定了授权类型，需要重新检测
+            isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(permissionId);
         }
 
         FileInfo oldAndBeenOverwrite = new FileInfo();

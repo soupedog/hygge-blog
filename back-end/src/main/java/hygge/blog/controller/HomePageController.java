@@ -1,5 +1,7 @@
 package hygge.blog.controller;
 
+import hygge.blog.common.HyggeRequestContext;
+import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.controller.doc.HomePageControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
@@ -8,9 +10,12 @@ import hygge.blog.domain.local.dto.HomepageFetchResult;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
 import hygge.blog.domain.local.po.Announcement;
+import hygge.blog.domain.local.po.Permission;
+import hygge.blog.domain.local.po.User;
 import hygge.blog.service.elasticsearch.KeywordSearchServiceImpl;
 import hygge.blog.service.local.normal.AnnouncementServiceImpl;
 import hygge.blog.service.local.normal.HomePageServiceImpl;
+import hygge.blog.service.local.normal.PermissionServiceImpl;
 import hygge.web.util.log.annotation.ControllerLog;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,11 +38,13 @@ public class HomePageController implements HomePageControllerDoc {
     private final HomePageServiceImpl homePageService;
     private final AnnouncementServiceImpl announcementService;
     private final KeywordSearchServiceImpl fuzzySearchService;
+    private final PermissionServiceImpl permissionService;
 
-    public HomePageController(HomePageServiceImpl homePageService, AnnouncementServiceImpl announcementService, KeywordSearchServiceImpl fuzzySearchService) {
+    public HomePageController(HomePageServiceImpl homePageService, AnnouncementServiceImpl announcementService, KeywordSearchServiceImpl fuzzySearchService, PermissionServiceImpl permissionService) {
         this.homePageService = homePageService;
         this.announcementService = announcementService;
         this.fuzzySearchService = fuzzySearchService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -100,5 +108,14 @@ public class HomePageController implements HomePageControllerDoc {
         List<Announcement> resultTemp = announcementService.fetchAnnouncement(currentPage, pageSize);
         List<AnnouncementDto> result = resultTemp.stream().map(PoDtoMapper.INSTANCE::poToDto).toList();
         return (ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>>) success(result);
+    }
+
+    @Override
+    @GetMapping("/home/fetch/permission")
+    public ResponseEntity<HyggeBlogControllerResponse<List<Permission>>> queryPermissionOfCurrentUser() {
+        HyggeRequestContext context = HyggeRequestTracker.getContext();
+        User currentUser = context.getCurrentLoginUser();
+        ArrayList<Permission> result = permissionService.getActivePermissionListOfUser(currentUser, null);
+        return (ResponseEntity<HyggeBlogControllerResponse<List<Permission>>>) success(result);
     }
 }

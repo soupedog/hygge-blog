@@ -42,6 +42,22 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         this.permissionDao = permissionDao;
     }
 
+    public Integer formatPermissionIdFromFrontEnd(User targetUser, Integer permissionId) {
+        if (permissionId != null && permissionId < 0) {
+            if (targetUser != null && targetUser.getUserId() != null) {
+                return -targetUser.getUserId();
+            }
+        }
+        return permissionId;
+    }
+
+    public Integer formatPermissionIdToFrontEnd(Integer permissionId) {
+        if (permissionId != null && permissionId < 0) {
+            return AccessConditionTypeEnum.PERSONAL.getIndex();
+        }
+        return permissionId;
+    }
+
     /**
      * 可能返回 null，仅当用户为 null 时
      */
@@ -83,35 +99,35 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
         return getPermissionIdIfPassed(permission, targetUser, secretKey) != null;
     }
 
-    public List<Integer> getActivePermissionIdListOfUser(User targetUser, String secretKey) {
-        List<Integer> result = new ArrayList<>();
+    public ArrayList<Permission> getActivePermissionListOfUser(User targetUser, String secretKey) {
+        ArrayList<Permission> result = new ArrayList<>();
         boolean isLoginUser = targetUser != null;
 
         if (isLoginUser) {
             // 添加当前用户仅自己可见的 Permission
-            result.add(getPersonalPermissionIdOfUser(targetUser));
+            result.add(Permission.builder()
+                    .permissionId(getPersonalPermissionIdOfUser(targetUser))
+                    .name("仅自己可见")
+                    .build());
         }
-
         // 公开访问权限默认给所有用户添加
-        result.add(_PUBLIC.getPermissionId());
-
+        result.add(_PUBLIC);
         List<Permission> permission_all = permissionDao.findAll();
 
         for (Permission item : permission_all) {
-            // 权限的创建者，直接授权
-            if (isLoginUser && item.isOwnerOfTargetUser(targetUser.getUserId())) {
-                result.add(item.getPermissionId());
-                continue;
-            }
-
             Integer permissionId = getPermissionIdIfPassed(item, targetUser, secretKey);
 
             if (permissionId != null) {
-                result.add(permissionId);
+                result.add(item);
             }
         }
 
         return result;
+    }
+
+    public List<Integer> getActivePermissionIdListOfUser(User targetUser, String secretKey) {
+        List<Permission> resultTemp = getActivePermissionListOfUser(targetUser, secretKey);
+        return collectionHelper.filterNonemptyItemAsArrayList(false, resultTemp, Permission::getPermissionId);
     }
 
     /**

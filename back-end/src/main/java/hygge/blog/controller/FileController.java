@@ -113,10 +113,10 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-        boolean shouldExpose = false;
+        boolean shouldExpose = PermissionServiceImpl._PUBLIC.getPermissionId().equals(permissionId);
 
         // 尝试用 fileKey 授权
-        if (fileKey != null && !fileKey.isEmpty()) {
+        if (!shouldExpose && fileKey != null && !fileKey.isEmpty()) {
             shouldExpose = cacheFileKeyKeeper.writeOffFileKey(fileNo, fileKey);
         }
 

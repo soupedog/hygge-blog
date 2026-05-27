@@ -6,6 +6,7 @@ import hygge.blog.domain.local.dto.AnnouncementDto;
 import hygge.blog.domain.local.dto.HomepageFetchResult;
 import hygge.blog.domain.local.dto.QuoteInfo;
 import hygge.blog.domain.local.dto.inner.ArticleSummaryInfo;
+import hygge.blog.domain.local.po.Permission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -38,4 +39,7 @@ public interface HomePageControllerDoc extends HyggeBlogController<ResponseEntit
 
     @Operation(summary = "公告查询", description = "在公告加载时需要拉取的数据")
     ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>> announcementFetch(int currentPage, int pageSize);
+
+    @Operation(summary = "授权类型查询", description = "查询当前用户的可用授权类型")
+    ResponseEntity<HyggeBlogControllerResponse<List<Permission>>> queryPermissionOfCurrentUser();
 }
