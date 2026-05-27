@@ -61,7 +61,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "configuration", null));
         forUpdate.add(new ColumnInfo(true, false, "cid", null).toStringColumn(1, 50));
         forUpdate.add(new ColumnInfo(true, false, "title", null).toStringColumn(1, 500));
-        forUpdate.add(new ColumnInfo(true, true, "imageSrc", null).toStringColumn(0, 1000));
+        forUpdate.add(new ColumnInfo(true, true, "coverFileNo", null).toStringColumn(0, 1000));
         forUpdate.add(new ColumnInfo(true, true, "summary", null).toStringColumn(0, 3000));
         forUpdate.add(new ColumnInfo(true, true, "content", null).toStringColumn(0, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "orderGlobal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
@@ -82,7 +82,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     public Article createArticle(ArticleDto articleDto) {
         parameterHelper.stringNotEmpty("cid", (Object) articleDto.getCid());
         parameterHelper.stringNotEmpty("title", (Object) articleDto.getTitle());
-        parameterHelper.stringNotEmpty("imageSrc", (Object) articleDto.getImageSrc());
+        parameterHelper.stringNotEmpty("coverFileNo", (Object) articleDto.getCoverFileNo());
 
         ArticleConfiguration articleConfiguration = articleDto.getConfiguration();
         articleConfigurationValidate(articleConfiguration);
@@ -187,9 +187,8 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                 articleDto.setEditable(true);
             }
 
-            // userId → uid
-            String authorUid = cacheService.userIdToUid(item.getUserId());
-            articleDto.setUid(authorUid);
+            initUid(item.getUserId(), articleDto);
+            initFileUrl(articleDto);
 
             return articleDto;
         }));
@@ -234,9 +233,9 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         }
 
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(article);
-        // userId → uid
-        String authorUid = cacheService.userIdToUid(article.getUserId());
-        result.setUid(authorUid);
+        initUid(article.getUserId(), result);
+        initFileUrl(result);
+
         result.setCid(category.getCid());
 
         CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(category.getCategoryId());
@@ -273,6 +272,23 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                     log.error("更新文章(" + articleId + ") 浏览量 失败.", e);
                     return null;
                 });
+    }
+
+    public void initUid(Integer userId, ArticleDto dto) {
+        if (dto == null || userId == null) {
+            return;
+        }
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(userId);
+        dto.setUid(authorUid);
+    }
+
+    public void initFileUrl(ArticleDto dto) {
+        if (dto == null || dto.getCoverFileNo() == null) {
+            return;
+        }
+
+        dto.setImageSrc(cacheService.fileNoToFileUrl(dto.getCoverFileNo()));
     }
 
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {

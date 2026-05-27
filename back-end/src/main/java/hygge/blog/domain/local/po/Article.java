@@ -73,12 +73,7 @@ public class Article extends BasePo {
     @Column(nullable = false, unique = true, length = 500)
     private String title;
     /**
-     * 文章配图链接
-     */
-    @Column(nullable = false, length = 1000)
-    private String imageSrc;
-    /**
-     * 文章配图文件编号
+     * 文章封面文件编号
      */
     @Column
     private String coverFileNo;
@@ -124,7 +119,7 @@ public class Article extends BasePo {
     @Enumerated(EnumType.STRING)
     private ArticleStateEnum articleState;
 
-    public Article(Timestamp createTs, Timestamp lastUpdateTs, Integer articleId, String aid, Integer categoryId, Integer userId, String title, String imageSrc, String summary, Integer wordCount, Integer pageViews, Integer selfPageViews, Integer orderGlobal, Integer orderCategory) {
+    public Article(Timestamp createTs, Timestamp lastUpdateTs, Integer articleId, String aid, Integer categoryId, Integer userId, String title, String coverFileNo, String summary, Integer wordCount, Integer pageViews, Integer selfPageViews, Integer orderGlobal, Integer orderCategory) {
         this.createTs = createTs;
         this.lastUpdateTs = lastUpdateTs;
         this.articleId = articleId;
@@ -132,7 +127,7 @@ public class Article extends BasePo {
         this.categoryId = categoryId;
         this.userId = userId;
         this.title = title;
-        this.imageSrc = imageSrc;
+        this.coverFileNo = coverFileNo;
         this.summary = summary;
         this.wordCount = wordCount;
         this.pageViews = pageViews;

@@ -37,6 +37,8 @@ public class ArticleDto {
     private String title;
     @Schema(title = "文章配图链接")
     private String imageSrc;
+    @Schema(title = "文章封面文件编号")
+    private String coverFileNo;
     @Schema(title = "文章摘要")
     private String summary;
     @Schema(title = "文章内容")

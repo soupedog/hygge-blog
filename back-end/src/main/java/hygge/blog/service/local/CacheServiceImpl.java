@@ -3,9 +3,12 @@ package hygge.blog.service.local;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
+import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.domain.local.po.view.FileInfoView;
+import hygge.blog.service.local.inner.file.FileUrlBuilder;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.TopicServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 对于复杂查询进行缓存的查询逻辑实现类
@@ -29,11 +33,15 @@ public class CacheServiceImpl {
     private final CategoryServiceImpl categoryService;
     private final TopicServiceImpl topicService;
     private final UserServiceImpl userService;
+    private final FileServiceImpl fileService;
+    private final FileUrlBuilder fileUrlBuilder;
 
-    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService) {
+    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService, FileServiceImpl fileService, FileUrlBuilder fileUrlBuilder) {
         this.categoryService = categoryService;
         this.topicService = topicService;
         this.userService = userService;
+        this.fileService = fileService;
+        this.fileUrlBuilder = fileUrlBuilder;
     }
 
     /**
@@ -81,5 +89,25 @@ public class CacheServiceImpl {
     public String userIdToUid(Integer userId) {
         User user = userService.findUserByUserId(userId, true);
         return user == null ? null : user.getUid();
+    }
+
+    /**
+     * 根据 fileNo 获取对应的 file 外部访问链接
+     */
+    @Cacheable(cacheNames = "fileNoToFileUrlMappingCache", key = "'fileNoToFileUrl'+#fileNo", unless = "#result == null")
+    public String fileNoToFileUrl(String fileNo) {
+        Optional<FileInfoView> fileInfoViewTemp = fileService.findFileViewFromDB(fileNo);
+
+        if (fileInfoViewTemp.isEmpty()) {
+            return null;
+        }
+
+        FileInfoView fileInfoView = fileInfoViewTemp.get();
+
+        if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
+            return fileUrlBuilder.getFileApiLink(fileNo);
+        }
+
+        return null;
     }
 }

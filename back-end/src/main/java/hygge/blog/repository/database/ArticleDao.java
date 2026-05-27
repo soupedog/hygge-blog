@@ -45,11 +45,11 @@ public interface ArticleDao extends JpaRepository<Article, Integer> {
     Article findArticleByAid(String aid);
 
     @Query(countQuery = "select count(*) from article where categoryId in :accessibleCategoryList and (articleState='ACTIVE' or userId=:userId) ",
-            value = "select null as configuration,null as content,createTs,lastUpdateTs,articleId,aid,categoryId,userId,title,imageSrc,coverFileNo,summary,wordCount,pageViews,selfPageViews,orderGlobal,orderCategory,articleState from article where categoryId in :accessibleCategoryList and (articleState='ACTIVE' or userId=:userId)", nativeQuery = true)
+            value = "select null as configuration,null as content,createTs,lastUpdateTs,articleId,aid,categoryId,userId,title,coverFileNo,summary,wordCount,pageViews,selfPageViews,orderGlobal,orderCategory,articleState from article where categoryId in :accessibleCategoryList and (articleState='ACTIVE' or userId=:userId)", nativeQuery = true)
     Page<Article> findArticleSummary(@Param("accessibleCategoryList") List<Integer> accessibleCategoryList, @Param("userId") Integer userId, Pageable pageable);
 
     @Query(countQuery = "select count(*) from article where categoryId in :accessibleCategoryList and articleState='ACTIVE' ",
-            value = "select null as configuration,null as content,createTs,lastUpdateTs,articleId,aid,categoryId,userId,title,imageSrc,coverFileNo,summary,wordCount,pageViews,selfPageViews,orderGlobal,orderCategory,articleState from article where categoryId in :accessibleCategoryList and articleState='ACTIVE' ", nativeQuery = true)
+            value = "select null as configuration,null as content,createTs,lastUpdateTs,articleId,aid,categoryId,userId,title,coverFileNo,summary,wordCount,pageViews,selfPageViews,orderGlobal,orderCategory,articleState from article where categoryId in :accessibleCategoryList and articleState='ACTIVE' ", nativeQuery = true)
     Page<Article> findArticleSummary(@Param("accessibleCategoryList") List<Integer> accessibleCategoryList, Pageable pageable);
 
     @Query(value = "select new hygge.blog.domain.local.po.ArticleCountInfo(categoryId, count(articleId)) from Article where categoryId in :accessibleCategoryList and articleState='ACTIVE' group by categoryId")
