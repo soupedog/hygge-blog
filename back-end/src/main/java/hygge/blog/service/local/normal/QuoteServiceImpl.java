@@ -118,22 +118,36 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
         List<QuoteDto> list = collectionHelper.filterNonemptyItemAsArrayList(false, resultTemp.getContent(), (item -> {
             QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(item);
 
+            Integer authorUserId = item.getUserId();
             // 鉴别并赋值当前用户是否有编辑权限
-            if (item.getUserId().equals(Optional.ofNullable(currentUser).map(User::getUserId).orElse(null))) {
+            if (authorUserId.equals(Optional.ofNullable(currentUser).map(User::getUserId).orElse(null))) {
                 quoteDto.setEditable(true);
             }
-            // userId → uid
-            String authorUid = cacheService.userIdToUid(item.getUserId());
-            quoteDto.setUid(authorUid);
 
-            // fileNo → url
-            quoteDto.setImageSrc(cacheService.fileNoToFileUrl(item.getCoverFileNo()));
+            initUidAndFileURL(authorUserId, quoteDto);
 
             return quoteDto;
         }));
         result.setQuoteList(list);
         result.setTotalCount(resultTemp.getTotalElements());
         return result;
+    }
+
+    public void initUidAndFileURL(Integer userId, QuoteDto dto) {
+        if (dto == null) {
+            return;
+        }
+
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(userId);
+        if (authorUid != null) {
+            dto.setUid(authorUid);
+        }
+        // fileNo → url
+        String fileURL = cacheService.fileNoToFileUrl(dto.getCoverFileNo());
+        if (fileURL != null) {
+            dto.setImageSrc(fileURL);
+        }
     }
 
     public Quote findQuoteByQuoteId(Integer quoteId, boolean nullable) {

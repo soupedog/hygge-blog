@@ -90,9 +90,10 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
 
     public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
         ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
-        articleDto.setUid(cacheService.userIdToUid(article.getUserId()));
-        articleDto.setCid(currentCategory.getCid());
 
+        articleService.initUidAndFileURL(article.getUserId(),articleDto);
+
+        articleDto.setCid(currentCategory.getCid());
         articleDto.setCategoryTreeInfo(categoryTreeInfo);
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
@@ -116,9 +117,8 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
 
     private void refreshQuote(Quote quote) {
         QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
-        // userId → uid
-        String authorUid = cacheService.userIdToUid(quote.getUserId());
-        quoteDto.setUid(authorUid);
+
+        quoteService.initUidAndFileURL(quote.getUserId(), quoteDto);
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
         articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);

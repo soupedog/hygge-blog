@@ -87,6 +87,9 @@ public class CacheServiceImpl {
      */
     @Cacheable(cacheNames = "userIdToUidMappingCache", key = "'UserIdToUid'+#userId", unless = "#result == null")
     public String userIdToUid(Integer userId) {
+        if (userId == null) {
+            return null;
+        }
         User user = userService.findUserByUserId(userId, true);
         return user == null ? null : user.getUid();
     }

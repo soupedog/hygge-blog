@@ -187,8 +187,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                 articleDto.setEditable(true);
             }
 
-            initUid(item.getUserId(), articleDto);
-            initFileUrl(articleDto);
+            initUidAndFileURL(item.getUserId(), articleDto);
 
             return articleDto;
         }));
@@ -233,8 +232,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         }
 
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(article);
-        initUid(article.getUserId(), result);
-        initFileUrl(result);
+        initUidAndFileURL(article.getUserId(), result);
 
         result.setCid(category.getCid());
 
@@ -274,21 +272,22 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                 });
     }
 
-    public void initUid(Integer userId, ArticleDto dto) {
-        if (dto == null || userId == null) {
-            return;
-        }
-        // userId → uid
-        String authorUid = cacheService.userIdToUid(userId);
-        dto.setUid(authorUid);
-    }
 
-    public void initFileUrl(ArticleDto dto) {
+    public void initUidAndFileURL(Integer userId, ArticleDto dto) {
         if (dto == null) {
             return;
         }
 
-        dto.setImageSrc(cacheService.fileNoToFileUrl(dto.getCoverFileNo()));
+        // userId → uid
+        String authorUid = cacheService.userIdToUid(userId);
+        if (authorUid != null) {
+            dto.setUid(authorUid);
+        }
+        // fileNo → url
+        String fileURL = cacheService.fileNoToFileUrl(dto.getCoverFileNo());
+        if (fileURL != null) {
+            dto.setImageSrc(fileURL);
+        }
     }
 
     private void articleConfigurationValidate(ArticleConfiguration articleConfiguration) {
