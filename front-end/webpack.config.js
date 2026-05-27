@@ -118,7 +118,7 @@ var config = {
         new CopyPlugin({
             patterns: [
                 { from: './node_modules/abbr-title-tap/browser/abbr-title-tap.min.js', to: './js' },
-                { from: './node_modules/abbr-title-tap/browser/styles.min.css', to: './css' }
+                { from: './node_modules/abbr-title-tap/browser/styles.min.css', to: './css' },
             ],
         }),
         new BundleAnalyzerPlugin()

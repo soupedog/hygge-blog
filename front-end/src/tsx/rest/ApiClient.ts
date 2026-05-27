@@ -227,6 +227,7 @@ export interface TopicDto {
 
 export interface CategoryDto {
     cid: string,
+    permissionId: number,
     categoryName: string,
     categoryType: string,
     orderVal: number,
@@ -381,6 +382,12 @@ export interface QuoteResponse {
     totalCount: number
 }
 
+export interface Permission {
+    permissionId: number,
+    name: string,
+    description: string,
+}
+
 export class HomePageService {
     static fetch(successHook?: (input?: HyggeResponse<AllOverviewInfo>) => void,
                  beforeHook?: () => void,
@@ -393,6 +400,28 @@ export class HomePageService {
             headers: UserService.getHeader()
         }).then((axiosResponse) => {
                 let response: HyggeResponse<AllOverviewInfo> = axiosResponse.data;
+                if (successHook != null && response.code == 200) {
+                    successHook(response);
+                }
+            }
+        ).finally(() => {
+            if (finallyHook != null) {
+                finallyHook();
+            }
+        });
+    }
+
+    static fetchPermission(successHook?: (input?: HyggeResponse<Permission[]>) => void,
+                             beforeHook?: () => void,
+                             finallyHook?: () => void): void {
+        if (beforeHook != null) {
+            beforeHook();
+        }
+
+        axios.get("main/home/fetch/permission", {
+            headers: UserService.getHeader()
+        }).then((axiosResponse) => {
+                let response: HyggeResponse<Permission[]> = axiosResponse.data;
                 if (successHook != null && response.code == 200) {
                     successHook(response);
                 }
@@ -627,14 +656,16 @@ export class QuoteService {
 
 export interface FileInfo {
     fileNo: string,
-    cid: string,
+    relativePath: string,
+    uid: string,
+    permissionId: number,
     name: string,
-    src: string,
     extension: string,
     fileType: string,
     fileCacheType: string,
     fileSize: string,
-    isInHardDisk?: Boolean,
+    cacheLink?: string,
+    apiLink: string,
     description?: FileDescription
 }
 

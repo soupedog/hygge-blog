@@ -1,21 +1,7 @@
 import "../../style/fileOperation.less"
 
 import React, {useEffect, useState} from 'react';
-import {
-    Button,
-    Col,
-    ConfigProvider,
-    DatePicker,
-    Form,
-    Input,
-    Layout,
-    message,
-    Radio,
-    Row,
-    Select,
-    TreeSelect,
-    Upload
-} from "antd";
+import {Button, Col, ConfigProvider, DatePicker, Form, Input, Layout, message, Radio, Row, Select, Upload} from "antd";
 import zhCN from "antd/lib/locale/zh_CN";
 import {Content, Header} from "antd/es/layout/layout";
 import {class_file_operation_form, class_index_title} from "../component/properties/ElementNameContainer";
@@ -23,13 +9,13 @@ import {LogHelper, PropertiesHelper, UrlHelper} from "../util/UtilContainer";
 import HyggeFooter from "../component/HyggeFooter";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {UploadOutlined} from "@ant-design/icons";
-import {AllOverviewInfo, FileInfo, FileService, HomePageService, UserService} from "../rest/ApiClient";
+import {FileInfo, FileService, HomePageService, Permission, UserService} from "../rest/ApiClient";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
 import {useParams} from "react-router-dom";
 
 function FileOperation() {
-    const [categoryInfoList, updateCategoryInfoList] = useState([]);
+    const [permissionList, updatePermissionList] = useState([]);
     const [actualUrl, updateActualUrl] = useState("");
     const [fileNoRequired, updateFileNoRequired] = useState(true);
     const [fileOperationForm] = Form.useForm();
@@ -39,7 +25,7 @@ function FileOperation() {
         // 改页面标题
         document.title = "文件操作";
 
-        refreshCategoryInfoList(updateCategoryInfoList);
+        refreshCategoryInfoList(updatePermissionList);
         // 依赖静态值表示仅初始化时调用一次
     }, []);
 
@@ -68,6 +54,7 @@ function FileOperation() {
                                     }
                                 })
                             } else if (value.action == "update") {
+                                console.log(value)
                                 FileService.updateFileInfo(value, (da) => {
                                     message.success("文件信息更新成功。")
                                 });
@@ -105,17 +92,15 @@ function FileOperation() {
                             <Col span={6}>
                             </Col>
                             <Col span={12}>
-                                <Form.Item name={['cid']} label="所属文章类型" rules={[{required: false}]}>
-                                    <TreeSelect
+                                <Form.Item name={['permissionId']} label="授权类型" rules={[{required: true}]}
+                                           initialValue="公开可见">
+                                    <Select
                                         style={{width: '100%'}}
                                         styles={{
                                             popup: {root: {maxHeight: 400, overflow: 'auto'}},
                                         }}
-                                        treeData={categoryInfoList}
-                                        placeholder="请选择文章类型"
-                                        treeDefaultExpandAll
-                                        onChange={() => {
-                                        }}
+                                        options={permissionList}
+                                        placeholder="请选择授权类型"
                                     />
                                 </Form.Item>
                             </Col>
@@ -218,7 +203,7 @@ function FileOperation() {
         fileOperationForm.setFieldValue("name", fileInfo.name);
         fileOperationForm.setFieldValue("extension", fileInfo.extension);
         fileOperationForm.setFieldValue("fileType", fileInfo.fileType);
-        fileOperationForm.setFieldValue("cid", fileInfo.cid);
+        fileOperationForm.setFieldValue("permissionId", fileInfo.permissionId);
         fileOperationForm.setFieldValue("fileCacheType", fileInfo.fileCacheType);
 
         if (fileInfo.description != null) {
@@ -237,37 +222,20 @@ function FileOperation() {
         }
     }
 
-    function refreshCategoryInfoList(updateCategoryInfoList: Function) {
-        HomePageService.fetch((data) => {
-            let response: AllOverviewInfo | undefined = data?.main
-            let categoryContainer: any = [];
+    function refreshCategoryInfoList(updatePermissionList: Function) {
+        HomePageService.fetchPermission((data) => {
+            let response: Permission[] | undefined = data?.main;
+            let optionContainer: any[] = new Array<number>();
 
-            response?.topicOverviewInfoList.forEach((topicOverviewInfo) => {
-
-                let childrenList: any = [];
-
-                topicOverviewInfo.categoryListInfo.forEach((item) => {
-                    if (item.categoryType == "DEFAULT") {
-                        childrenList.push({
-                            title: item.categoryName,
-                            value: item.cid,
-                        });
-                    }
+            response?.forEach(permission => {
+                optionContainer.push({
+                    label: permission.name,
+                    value: permission.permissionId,
                 });
+            })
 
-                let parent = {
-                    title: topicOverviewInfo.topicInfo.topicName,
-                    value: topicOverviewInfo.topicInfo.tid,
-                    disabled: true,
-                    children: childrenList
-                };
-
-                categoryContainer.push(parent)
-            });
-
-            updateCategoryInfoList(categoryContainer);
-
-            message.info("类别信息已尝试拉取");
+            updatePermissionList(optionContainer);
+            message.info("授权类别信息已尝试拉取");
         })
     }
 

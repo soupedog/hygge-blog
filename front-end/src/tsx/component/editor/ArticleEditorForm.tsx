@@ -6,7 +6,7 @@ import {useParams} from "react-router-dom";
 import {
     AllOverviewInfo,
     ArticleDto,
-    ArticleService,
+    ArticleService, CategoryDto,
     FileService,
     HomePageService,
     HyggeResponse
@@ -280,7 +280,7 @@ function ArticleEditorForm({updateCid, updateContent}: ArticleEditorFormProps) {
             data?.main?.fileInfoList.forEach((item) => {
                 container?.push({
                     label: item.name + " --- " + item.fileSize,
-                    value: UrlHelper.getBaseStaticSourceUrl() + item.src,
+                    value: item.apiLink,
                 });
             });
             updateBackgroundImageInfoList(container);
