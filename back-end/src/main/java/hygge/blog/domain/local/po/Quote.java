@@ -46,10 +46,10 @@ public class Quote extends BasePo {
     @Column(nullable = false)
     private Integer userId;
     /**
-     * 主图绝对路径
+     * 封面图文件编号
      */
-    @Column(length = 1000)
-    private String imageSrc;
+    @Column
+    private String coverFileNo;
     /**
      * 内容
      */

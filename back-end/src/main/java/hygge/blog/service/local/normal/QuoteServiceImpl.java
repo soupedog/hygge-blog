@@ -51,7 +51,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
     static {
-        forUpdate.add(new ColumnInfo(true, true, "imageSrc", null).toStringColumn(0, 1000));
+        forUpdate.add(new ColumnInfo(true, true, "coverFileNo", null).toStringColumn(0, 255));
         forUpdate.add(new ColumnInfo(true, false, "content", null).toStringColumn(1, 5000));
         forUpdate.add(new ColumnInfo(true, true, "source", null).toStringColumn(0, 2000));
         forUpdate.add(new ColumnInfo(true, true, "portal", null).toStringColumn(0, 2000));
@@ -125,6 +125,10 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
             // userId → uid
             String authorUid = cacheService.userIdToUid(item.getUserId());
             quoteDto.setUid(authorUid);
+
+            // fileNo → url
+            quoteDto.setImageSrc(cacheService.fileNoToFileUrl(item.getCoverFileNo()));
+
             return quoteDto;
         }));
         result.setQuoteList(list);

@@ -284,7 +284,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void initFileUrl(ArticleDto dto) {
-        if (dto == null || dto.getCoverFileNo() == null) {
+        if (dto == null) {
             return;
         }
 

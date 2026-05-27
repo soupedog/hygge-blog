@@ -96,6 +96,10 @@ public class CacheServiceImpl {
      */
     @Cacheable(cacheNames = "fileNoToFileUrlMappingCache", key = "'fileNoToFileUrl'+#fileNo", unless = "#result == null")
     public String fileNoToFileUrl(String fileNo) {
+        if (fileNo == null) {
+            return null;
+        }
+
         Optional<FileInfoView> fileInfoViewTemp = fileService.findFileViewFromDB(fileNo);
 
         if (fileInfoViewTemp.isEmpty()) {

@@ -28,6 +28,8 @@ public class QuoteDto {
     private String uid;
     @Schema(title = "主图绝对路径")
     private String imageSrc;
+    @Schema(title = "封面图文件编号")
+    private String coverFileNo;
     @Schema(title = "内容")
     private String content;
     @Schema(title = "可能的出处")
