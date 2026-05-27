@@ -91,6 +91,10 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
             }
         }
 
+        if (_PUBLIC.getPermissionId().equals(permissionId)) {
+            return true;
+        }
+
         Permission permission = findPermissionByPermissionId(permissionId, true);
         if (permission == null) {
             return false;

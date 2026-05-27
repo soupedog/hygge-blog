@@ -247,7 +247,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         // 非公开的文章类别不允许创建 Nginx 文件副本
         if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !isAllowCaching) {
-            throw new LightRuntimeException("File(" + fileInfoView.getName() + ") can't be updated to Permission(" + permissionId + ") with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            throw new LightRuntimeException("File(" + fileInfoView.getName() + ") can't be updated to Permission(negative) with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
         }
 
         boolean isPathChanged = !fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
@@ -268,7 +268,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 oldAndBeenOverwrite.setContent(fileInfoTemp.get().getContent());
 
-                createCacheFile(getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite);
+                // 缓存更新流程允许文件覆盖
+                FileOperationTool.copyFile(true, getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite.getName(), oldAndBeenOverwrite.getContent());
             } else {
                 // 有副本切换到无副本，仅删除旧副本
                 String oldCachePath = fileRootPath + fileInfoView.returnRelativePath();
