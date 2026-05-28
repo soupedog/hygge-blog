@@ -35,7 +35,8 @@ public class CacheServiceWithBusinessLogicImpl extends HyggeJsonUtilContainer {
         if (resultTemp != null) {
             result = resultTemp.getSrc();
 
-            if (resultTemp.isApiLink()) {
+            // 非公开类型自动授权
+            if (resultTemp.isApiLink() && !resultTemp.isPublic()) {
                 result = result + "?fileKey=" + fileService.generateOneTimeFileKey(fileNo);
             }
         }
@@ -46,7 +47,7 @@ public class CacheServiceWithBusinessLogicImpl extends HyggeJsonUtilContainer {
         CacheObjectContainer.FileAccessUrl resultTemp = cacheService.fileNoToFileUrl(fileNo);
         String result = null;
 
-        if (resultTemp != null && !resultTemp.isApiLink()) {
+        if (resultTemp != null && resultTemp.isPublic()) {
             result = resultTemp.getSrc();
         }
 

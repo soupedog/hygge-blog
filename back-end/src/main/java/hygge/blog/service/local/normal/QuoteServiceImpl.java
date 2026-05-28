@@ -127,7 +127,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
                 quoteDto.setEditable(true);
             }
 
-            initUidAndFileURL(authorUserId, quoteDto);
+            initUidAndCoverURL(authorUserId, quoteDto);
 
             return quoteDto;
         }));
@@ -136,7 +136,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
         return result;
     }
 
-    public void initUidAndFileURL(Integer userId, QuoteDto dto) {
+    public void initUidAndCoverURL(Integer userId, QuoteDto dto) {
         if (dto == null) {
             return;
         }

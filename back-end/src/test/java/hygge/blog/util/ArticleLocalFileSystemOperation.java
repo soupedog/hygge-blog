@@ -196,7 +196,7 @@ class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
         }
 
         // TODO 改造成 fileNo
-        fileNoOfNeedCopy.add(article.getImageSrc());
+        fileNoOfNeedCopy.add(article.getCoverFileNo());
 
         String title, ts, description, tag, categoryStringVal, coverImage;
 

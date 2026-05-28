@@ -208,7 +208,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
                 articleDto.setEditable(true);
             }
 
-            initUidAndFileURL(item.getUserId(), articleDto);
+            initUidAndCoverURL(item.getUserId(), articleDto);
 
             return articleDto;
         }));
@@ -253,7 +253,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         }
 
         ArticleDto result = PoDtoMapper.INSTANCE.poToDto(article);
-        initUidAndFileURL(article.getUserId(), result);
+        initUidAndCoverURL(article.getUserId(), result);
 
         result.setCid(category.getCid());
 
@@ -294,7 +294,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     }
 
 
-    public void initUidAndFileURL(Integer userId, ArticleDto dto) {
+    public void initUidAndCoverURL(Integer userId, ArticleDto dto) {
         if (dto == null) {
             return;
         }

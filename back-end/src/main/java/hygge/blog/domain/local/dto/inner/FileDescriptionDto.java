@@ -25,4 +25,6 @@ public class FileDescriptionDto {
     private String content;
     @Schema(title = "时间指向(描述文件的诞生时间等)")
     private Long timePointer;
+    @Schema(title = "文件 Nginx 缓存链接")
+    private String nginxLink;
 }

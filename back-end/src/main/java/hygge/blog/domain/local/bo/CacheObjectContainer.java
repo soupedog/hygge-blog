@@ -21,6 +21,7 @@ public class CacheObjectContainer {
     @AllArgsConstructor
     public static class FileAccessUrl {
         private String src;
+        private boolean isPublic;
         private boolean isApiLink;
     }
 }

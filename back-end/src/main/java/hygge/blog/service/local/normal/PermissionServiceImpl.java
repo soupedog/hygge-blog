@@ -83,8 +83,12 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public boolean isPermissionPassed(Integer permissionId, User targetUser, String secretKey) {
+        if (permissionId == null) {
+            return false;
+        }
+
         // 如果是负数权限代表仅自己可见，且不会在数据库中记录，内存中处理即可
-        if (permissionId != null && permissionId < 0) {
+        if (permissionId < 0) {
             Integer userPermissionId = getPersonalPermissionIdOfUser(targetUser);
             if (permissionId.equals(userPermissionId)) {
                 return true;

@@ -115,14 +115,17 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public String getFileCacheLink(FileInfoBase fileInfoBase) {
-        if (fileInfoBase == null
-                || fileInfoBase.getDescription() == null
-                || fileInfoBase.getDescription().getCacheLink() == null
-                || fileInfoBase.getDescription().getCacheLink().trim().isEmpty()) {
+        if (fileInfoBase == null || fileInfoBase.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
             return null;
         }
 
-        return fileInfoBase.getDescription().getCacheLink();
+        if (fileInfoBase.getDescription() == null
+                || fileInfoBase.getDescription().getNginxLink() == null
+                || fileInfoBase.getDescription().getNginxLink().trim().isEmpty()) {
+            return null;
+        }
+
+        return fileInfoBase.getDescription().getNginxLink();
     }
 
     public String getFileApiLink(String fileNo) {
@@ -165,6 +168,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         return CacheObjectContainer.FileAccessUrl.builder()
                 .src(result)
+                .isPublic(PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoBase.getPermissionId()))
                 .isApiLink(isApiLink)
                 .build();
     }
@@ -177,15 +181,13 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
 
-        Integer actualPermissionId = null;
+        Integer actualPermissionId = permissionId;
 
-        switch (fileType) {
-            // 句子收藏和系统核心组件默认都是公开可见
-            case CORE, QUOTE -> actualPermissionId = PermissionServiceImpl._PUBLIC.getPermissionId();
-        }
-
-        if (actualPermissionId == null && permissionService.isPermissionPassed(permissionId, currentUser, null)) {
-            actualPermissionId = permissionId;
+        if (actualPermissionId == null) {
+            switch (fileType) {
+                // 句子收藏和系统核心组件默认都是公开可见
+                case CORE, QUOTE -> actualPermissionId = PermissionServiceImpl._PUBLIC.getPermissionId();
+            }
         }
 
         if (actualPermissionId == null) {
@@ -200,7 +202,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
 
         if (actualPermissionId == null) {
-            throw new LightRuntimeException("Please log in and try again.", BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+            throw new LightRuntimeException("Please login and try again.", BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+        }
+
+        if (!permissionService.isPermissionPassed(permissionId, currentUser, null)) {
+            throw new LightRuntimeException(BlogSystemCode.INSUFFICIENT_PERMISSIONS.getPublicMessage(), BlogSystemCode.INSUFFICIENT_PERMISSIONS);
         }
 
         // 是 PUBLIC 则默认创建缓存拷贝
@@ -288,8 +294,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException("File(" + fileNo + ") was not found.", BlogSystemCode.FAIL_TO_QUERY_FILE);
         }
 
-        FileInfoView fileInfoView = targetFileInfoTemp.get();
-        User owner = userService.findUserByUserId(fileInfoView.getUserId(), false);
+        FileInfoView oldFileInfoView = targetFileInfoTemp.get();
+        User owner = userService.findUserByUserId(oldFileInfoView.getUserId(), false);
 
         // 是否有修改权限
         userService.checkUserRightOrHimself(owner, UserTypeEnum.ROOT);
@@ -302,7 +308,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         });
 
         // 公开可见类型，才允许缓存
-        boolean isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId());
+        boolean isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(oldFileInfoView.getPermissionId());
 
         Integer permissionId = (Integer) finalData.get("permissionId");
         if (permissionId != null) {
@@ -314,7 +320,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
 
         FileInfo oldAndBeenOverwrite = new FileInfo();
-        OverrideMapper.INSTANCE.viewOverrideToPo(fileInfoView, oldAndBeenOverwrite);
+        OverrideMapper.INSTANCE.viewOverrideToPo(oldFileInfoView, oldAndBeenOverwrite);
 
         FileInfo newOne = MapToAnyMapper.INSTANCE.mapToFileInfo(finalData);
 
@@ -322,19 +328,21 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         // 非公开的文章类别不允许创建 Nginx 文件副本
         if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !isAllowCaching) {
-            throw new LightRuntimeException("File(" + fileInfoView.getName() + ") can't be updated to Permission(negative) with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            throw new LightRuntimeException("File(" + oldFileInfoView.getName() + ") can't be updated to Permission(negative) with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
         }
 
-        boolean isPathChanged = !fileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
+        boolean isPathChanged = !oldFileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
 
         if (isPathChanged) {
             pathConflictCheck(oldAndBeenOverwrite);
         }
 
-        boolean copyTypeChanged = newOne.getFileCacheType() != null && !fileInfoView.getFileCacheType().equals(newOne.getFileCacheType());
+        boolean copyTypeChanged = newOne.getFileCacheType() != null && !oldFileInfoView.getFileCacheType().equals(newOne.getFileCacheType());
+
+        String nginxLink = fileUrlBuilder.getFileCacheLinkByRelativePath(oldFileInfoView.returnRelativePath());
 
         if (copyTypeChanged) {
-            if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
+            if (oldFileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
                 // 无副本切换到有副本，仅新增副本
                 Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
                 if (fileInfoTemp.isEmpty()) {
@@ -345,18 +353,24 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 // 缓存更新流程允许文件覆盖
                 FileOperationTool.copyFile(true, getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite.getName(), oldAndBeenOverwrite.getContent());
+
+                // 更新 nginx 信息
+                oldAndBeenOverwrite.getDescription().setNginxLink(nginxLink);
             } else {
                 // 有副本切换到无副本，仅删除旧副本
-                String oldCachePath = fileRootPath + fileInfoView.returnRelativePath();
+                String oldCachePath = fileRootPath + oldFileInfoView.returnRelativePath();
                 File oldFile = new File(oldCachePath);
                 FileOperationTool.deleteFile(oldFile);
+
+                // 清除 Nginx 相关信息
+                oldAndBeenOverwrite.getDescription().setNginxLink(null);
             }
         } else {
-            if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
+            if (oldFileInfoView.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
                 // 未切换副本类型，属于 Nginx，可能存在路径变更
                 // 检测是否存在硬盘副本
                 String newCachePath = fileRootPath + oldAndBeenOverwrite.returnRelativePath();
-                String oldCachePath = fileRootPath + fileInfoView.returnRelativePath();
+                String oldCachePath = fileRootPath + oldFileInfoView.returnRelativePath();
 
                 File oldFile = new File(oldCachePath);
                 if (oldFile.exists()) {
@@ -366,6 +380,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                     try {
                         FileCopyUtils.copy(oldFile, newFile);
                         FileOperationTool.deleteFile(oldFile);
+                        // 更新 nginx 信息
+                        oldAndBeenOverwrite.getDescription().setNginxLink(nginxLink);
                         log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
                     } catch (IOException e) {
                         throw new InternalRuntimeException("Fail to copy old file to new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE, e);
@@ -521,6 +537,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 throw new LightRuntimeException(copyResult.getMsg());
             }
         }
+
+        // 更新数据库记录
+        String cacheLink = fileUrlBuilder.getFileCacheLinkByRelativePath(fileInfo.returnRelativePath());
+        fileInfoDao.updateFileCacheLink(fileInfo.getFileNo(), FileCacheTypeEnum.NGINX, cacheLink);
     }
 
     public String getAbsolutePath(FileInfo fileInfo) {

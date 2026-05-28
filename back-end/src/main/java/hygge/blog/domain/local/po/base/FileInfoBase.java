@@ -84,7 +84,7 @@ public abstract class FileInfoBase extends BasePo {
     protected Long fileSize;
 
     public FileInfoDto toDto() {
-        FileInfoDto result = FileInfoDto.builder()
+        return FileInfoDto.builder()
                 .fileNo(fileNo)
                 .permissionId(permissionId)
                 .name(name)
@@ -92,24 +92,15 @@ public abstract class FileInfoBase extends BasePo {
                 .relativePath(returnRelativePath())
                 .fileSize(unitConvertHelper.storageSmartFormatAsString(fileSize))
                 .fileType(fileType)
+                .description(FileDescriptionDto.builder()
+                        .content(Optional.ofNullable(description).map(FileDescription::getContent).orElse(null))
+                        .timePointer(Optional.ofNullable(description).map(FileDescription::getTimePointer).map(Timestamp::getTime).orElse(null))
+                        .nginxLink(Optional.ofNullable(description).map(FileDescription::getNginxLink).orElse(null))
+                        .build())
                 .fileCacheType(fileCacheType)
                 .lastUpdateTs(lastUpdateTs.getTime())
                 .createTs(createTs.getTime())
                 .build();
-
-        // FileDescription 对象可空，非空时才尝试初始化
-        Optional.ofNullable(description).ifPresent((info) -> {
-            if (parameterHelper.atLeastOneNotEmpty(info.getContent(), info.getTimePointer())) {
-                // 至少有一个非空字段才初始化
-                result.setDescription(
-                        FileDescriptionDto.builder()
-                                .content(info.getContent())
-                                .timePointer(Optional.ofNullable(info.getTimePointer()).map(Timestamp::getTime).orElse(null))
-                                .build()
-                );
-            }
-        });
-        return result;
     }
 
     public String returnRelativePath() {
