@@ -1,23 +1,22 @@
 package hygge.blog.service.local;
 
 import hygge.blog.common.mapper.PoDtoMapper;
+import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
-import hygge.blog.domain.local.po.view.FileInfoView;
-import hygge.blog.service.local.inner.file.FileUrlBuilder;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.TopicServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
+import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 对于复杂查询进行缓存的查询逻辑实现类
@@ -28,19 +27,17 @@ import java.util.Optional;
  * @date 2023/7/26
  */
 @Service
-public class CacheServiceImpl {
+public class CacheServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final TopicServiceImpl topicService;
     private final UserServiceImpl userService;
     private final FileServiceImpl fileService;
-    private final FileUrlBuilder fileUrlBuilder;
 
-    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService, FileServiceImpl fileService, FileUrlBuilder fileUrlBuilder) {
+    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService, FileServiceImpl fileService) {
         this.categoryService = categoryService;
         this.topicService = topicService;
         this.userService = userService;
         this.fileService = fileService;
-        this.fileUrlBuilder = fileUrlBuilder;
     }
 
     /**
@@ -97,19 +94,10 @@ public class CacheServiceImpl {
      * 根据 fileNo 获取对应的 file 外部访问链接
      */
     @Cacheable(cacheNames = "fileNoToFileUrlMappingCache", key = "'fileNoToFileUrl'+#fileNo", unless = "#result == null")
-    public String fileNoToFileUrl(String fileNo) {
+    public CacheObjectContainer.FileAccessUrl fileNoToFileUrl(String fileNo) {
         if (fileNo == null) {
             return null;
         }
-
-        Optional<FileInfoView> fileInfoViewTemp = fileService.findFileViewFromDB(fileNo);
-
-        if (fileInfoViewTemp.isEmpty()) {
-            return null;
-        }
-
-        FileInfoView fileInfoView = fileInfoViewTemp.get();
-
-        return fileService.getFileAccessUrl(fileInfoView.getFileNo());
+        return fileService.getFileAccessUrl(fileNo);
     }
 }

@@ -14,6 +14,7 @@ import hygge.blog.domain.local.po.Quote;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.CacheServiceWithBusinessLogicImpl;
 import hygge.blog.service.local.EventServiceImpl;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
@@ -46,6 +47,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
     private final QuoteDao quoteDao;
     private final UserServiceImpl userService;
     private final CacheServiceImpl cacheService;
+    private final CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic;
     private final EventServiceImpl eventService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
@@ -60,10 +62,11 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "quoteState", null).toStringColumn(0, 50));
     }
 
-    public QuoteServiceImpl(QuoteDao quoteDao, UserServiceImpl userService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
+    public QuoteServiceImpl(QuoteDao quoteDao, UserServiceImpl userService, CacheServiceImpl cacheService, CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic, EventServiceImpl eventService) {
         this.quoteDao = quoteDao;
         this.userService = userService;
         this.cacheService = cacheService;
+        this.cacheServiceWithBusinessLogic = cacheServiceWithBusinessLogic;
         this.eventService = eventService;
     }
 
@@ -144,7 +147,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
             dto.setUid(authorUid);
         }
         // fileNo → url
-        String fileURL = cacheService.fileNoToFileUrl(dto.getCoverFileNo());
+        String fileURL = cacheServiceWithBusinessLogic.getAccessUrlIfPublic(dto.getCoverFileNo());
         if (fileURL != null) {
             dto.setImageSrc(fileURL);
         }

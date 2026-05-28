@@ -1,14 +1,11 @@
 package hygge.blog.service.local.inner.markdown.impl;
 
 import hygge.blog.domain.local.po.Article;
-import hygge.blog.domain.local.po.view.FileInfoView;
-import hygge.blog.service.local.FileServiceImpl;
+import hygge.blog.service.local.CacheServiceWithBusinessLogicImpl;
 import hygge.blog.service.local.inner.markdown.ReplaceCheckResult;
 import hygge.blog.service.local.inner.markdown.impl.base.BaseResourceReplacer;
-import hygge.blog.service.local.normal.PermissionServiceImpl;
 import hygge.commons.exception.InternalRuntimeException;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -18,10 +15,10 @@ import java.util.regex.Pattern;
 public class ArticleResourceReplacerForExpose extends BaseResourceReplacer<Article> {
     private static final Pattern UUID_32_PATTERN = Pattern.compile("^[0-9a-fA-F]{32}$");
 
-    private final FileServiceImpl fileService;
+    private final CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic;
 
-    public ArticleResourceReplacerForExpose(FileServiceImpl fileService) {
-        this.fileService = fileService;
+    public ArticleResourceReplacerForExpose(CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic) {
+        this.cacheServiceWithBusinessLogic = cacheServiceWithBusinessLogic;
     }
 
     @Override
@@ -41,14 +38,9 @@ public class ArticleResourceReplacerForExpose extends BaseResourceReplacer<Artic
 
         if (resource != null) {
             if (UUID_32_PATTERN.matcher(resource).matches()) {
-                Optional<FileInfoView> fileInfoViewTemp = fileService.findFileViewFromDB(resource);
-                if (fileInfoViewTemp.isPresent()) {
-                    FileInfoView fileInfoView = fileInfoViewTemp.get();
-                    newResource = fileService.getFileAccessUrl(fileInfoView);
-                    // 非公开文件则直接发放一次性文件授权
-                    if (!fileInfoView.getPermissionId().equals(PermissionServiceImpl._PUBLIC.getPermissionId())) {
-                        newResource = newResource + "?fileKey=" + fileService.generateOneTimeFileKey(fileInfoView.getFileNo());
-                    }
+                newResource = cacheServiceWithBusinessLogic.smartGetAccessUrl(resource);
+
+                if (newResource != null) {
                     needReplace = true;
                 }
             }

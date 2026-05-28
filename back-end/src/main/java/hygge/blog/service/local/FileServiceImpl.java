@@ -5,6 +5,7 @@ import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.common.mapper.MapToAnyMapper;
 import hygge.blog.common.mapper.OverrideMapper;
 import hygge.blog.domain.local.bo.BlogSystemCode;
+import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.dto.FileInfoDto;
 import hygge.blog.domain.local.dto.FileInfoInfo;
 import hygge.blog.domain.local.enums.FileCacheTypeEnum;
@@ -104,15 +105,36 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return fileKeyKeeper.generateOneTimeFileKey(fileNo);
     }
 
-    public String getFileCacheLinkByRelativePath(String relativePath) {
-        if (relativePath == null || relativePath.isEmpty()) {
-            throw new InternalRuntimeException("[relativePath] can't be empty.");
+    public String getFileCacheLink(String fileNo) {
+        if (parameterHelper.isEmpty(fileNo)) {
+            return null;
         }
-        return fileUrlBuilder.getFileCacheLinkByRelativePath(relativePath);
+        Optional<FileInfoView> fileInfoViewTemp = findFileViewFromDB(fileNo);
+
+        return fileInfoViewTemp.map(this::getFileCacheLink).orElse(null);
     }
 
-    public String getFileAccessUrl(String fileNo) {
-        if (fileNo == null || fileNo.isEmpty()) {
+    public String getFileCacheLink(FileInfoBase fileInfoBase) {
+        if (fileInfoBase == null
+                || fileInfoBase.getDescription() == null
+                || fileInfoBase.getDescription().getCacheLink() == null
+                || fileInfoBase.getDescription().getCacheLink().trim().isEmpty()) {
+            return null;
+        }
+
+        return fileInfoBase.getDescription().getCacheLink();
+    }
+
+    public String getFileApiLink(String fileNo) {
+        if (parameterHelper.isEmpty(fileNo)) {
+            return null;
+        }
+
+        return fileUrlBuilder.getFileApiLinkByFileNo(fileNo);
+    }
+
+    public CacheObjectContainer.FileAccessUrl getFileAccessUrl(String fileNo) {
+        if (parameterHelper.isEmpty(fileNo)) {
             return null;
         }
 
@@ -121,11 +143,30 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return fileInfoViewTemp.map(this::getFileAccessUrl).orElse(null);
     }
 
-    public String getFileAccessUrl(FileInfoBase fileInfoBase) {
+    public CacheObjectContainer.FileAccessUrl getFileAccessUrl(FileInfoBase fileInfoBase) {
         if (fileInfoBase == null) {
             return null;
         }
-        return fileUrlBuilder.getFileApiLinkByFileNo(fileInfoBase.getFileNo());
+
+        boolean isApiLink = false;
+        // 优先查缓存文件
+        String result = getFileCacheLink(fileInfoBase);
+
+        if (result == null) {
+            result = getFileApiLink(fileInfoBase.getFileNo());
+            if (!parameterHelper.isEmpty(result)) {
+                isApiLink = true;
+            }
+        }
+
+        if (result == null) {
+            return null;
+        }
+
+        return CacheObjectContainer.FileAccessUrl.builder()
+                .src(result)
+                .isApiLink(isApiLink)
+                .build();
     }
 
     public FileInfoView findFileInfoView(FileTypeEnum fileType, String name, String extension) {

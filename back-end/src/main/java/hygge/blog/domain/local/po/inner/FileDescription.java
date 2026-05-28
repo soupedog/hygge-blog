@@ -31,4 +31,6 @@ public class FileDescription {
     private String content;
     @Schema(title = "时间指向(描述文件的诞生时间等)")
     private Timestamp timePointer;
+    @Schema(title = "文件缓存链接")
+    private String cacheLink;
 }

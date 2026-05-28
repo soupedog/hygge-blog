@@ -3,7 +3,7 @@ package hygge.blog.service.local.inner.markdown.impl;
 import com.vladsch.flexmark.ast.Image;
 import com.vladsch.flexmark.util.ast.Visitor;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
-import hygge.blog.service.local.FileServiceImpl;
+import hygge.blog.service.local.CacheServiceWithBusinessLogicImpl;
 import hygge.blog.service.local.inner.markdown.ReplaceCheckResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 public class ArticleImageVisitorForExpose implements Visitor<Image> {
     private final ArticleResourceReplacerForExpose resourceReplacer;
 
-    public ArticleImageVisitorForExpose(FileServiceImpl fileService) {
-        this.resourceReplacer = new ArticleResourceReplacerForExpose(fileService);
+    public ArticleImageVisitorForExpose(CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic) {
+        this.resourceReplacer = new ArticleResourceReplacerForExpose(cacheServiceWithBusinessLogic);
     }
 
     @Override

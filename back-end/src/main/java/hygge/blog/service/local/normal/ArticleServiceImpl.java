@@ -19,6 +19,7 @@ import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.service.local.ArticleContentServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.CacheServiceWithBusinessLogicImpl;
 import hygge.blog.service.local.EventServiceImpl;
 import hygge.blog.service.local.inner.markdown.FlexmarkWordCounter;
 import hygge.commons.exception.LightRuntimeException;
@@ -56,6 +57,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private final PermissionServiceImpl permissionService;
     private final CategoryServiceImpl categoryService;
     private final CacheServiceImpl cacheService;
+    private final CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic;
     private final EventServiceImpl eventService;
     private final ArticleContentServiceImpl articleContentService;
 
@@ -74,12 +76,13 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     }
 
     @Autowired
-    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, EventServiceImpl eventService, ArticleContentServiceImpl articleContentService) {
+    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic, EventServiceImpl eventService, ArticleContentServiceImpl articleContentService) {
         this.articleDao = articleDao;
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
         this.cacheService = cacheService;
+        this.cacheServiceWithBusinessLogic = cacheServiceWithBusinessLogic;
         this.eventService = eventService;
         this.articleContentService = articleContentService;
     }
@@ -302,7 +305,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
             dto.setUid(authorUid);
         }
         // fileNo → url
-        String fileURL = cacheService.fileNoToFileUrl(dto.getCoverFileNo());
+        String fileURL = cacheServiceWithBusinessLogic.getAccessUrlIfPublic(dto.getCoverFileNo());
         if (fileURL != null) {
             dto.setImageSrc(fileURL);
         }

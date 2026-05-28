@@ -26,10 +26,10 @@ public class ArticleContentServiceImpl {
 
     private final FileNoPickerServiceImpl fileNoPickerService;
 
-    public ArticleContentServiceImpl(FileNoPickerServiceImpl fileNoPickerService, FileServiceImpl fileService) {
+    public ArticleContentServiceImpl(FileNoPickerServiceImpl fileNoPickerService, CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic) {
         this.fileNoPickerService = fileNoPickerService;
         this.visitor_for_expose = new NodeVisitor(
-                new VisitHandler<>(Image.class, new ArticleImageVisitorForExpose(fileService))
+                new VisitHandler<>(Image.class, new ArticleImageVisitorForExpose(cacheServiceWithBusinessLogic))
         );
     }
 
