@@ -9,11 +9,11 @@ import hygge.blog.domain.local.dto.ArticleDto;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.ArticleContentServiceImpl;
-import hygge.blog.service.local.MarkdownContentServiceImpl;
 import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
 import hygge.commons.annotation.HyggeExpressionForOutputFunction;
 import hygge.web.util.log.annotation.ControllerLog;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,13 +37,12 @@ public class ArticleController implements ArticleControllerDoc {
     private final ArticleServiceImpl articleService;
     private final ArticleBrowseLogServiceImpl articleBrowseLogService;
     private final ArticleContentServiceImpl articleContentService;
-    private final MarkdownContentServiceImpl markdownContentService;
 
-    public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService, ArticleContentServiceImpl articleContentService, MarkdownContentServiceImpl markdownContentService) {
+    @Autowired
+    public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService, ArticleContentServiceImpl articleContentService) {
         this.articleService = articleService;
         this.articleBrowseLogService = articleBrowseLogService;
         this.articleContentService = articleContentService;
-        this.markdownContentService = markdownContentService;
     }
 
     @Override

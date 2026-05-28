@@ -3,7 +3,6 @@ package hygge.blog.service.local.inner.file.picker;
 import hygge.blog.domain.local.enums.FileTypeEnum;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.service.local.FileServiceImpl;
-import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import lombok.Getter;

@@ -1,4 +1,7 @@
-package hygge.blog.service.local.inner.markdown.image;
+package hygge.blog.service.local.inner.markdown.impl.base;
+
+import hygge.blog.service.local.inner.markdown.ResourceReplacer;
+import hygge.blog.service.local.inner.markdown.ReplaceCheckResult;
 
 /**
  * @author Xavier

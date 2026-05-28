@@ -1,6 +1,5 @@
 package hygge.blog.service.local.inner.file.picker;
 
-import hygge.blog.service.local.inner.file.HyggeFileNoLinkPicker;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.definition.RandomHelper;

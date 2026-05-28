@@ -1,8 +1,10 @@
-package hygge.blog.service.local.inner.markdown.image;
+package hygge.blog.service.local.inner.markdown.impl;
 
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
+import hygge.blog.service.local.inner.markdown.ReplaceCheckResult;
+import hygge.blog.service.local.inner.markdown.impl.base.BaseResourceReplacer;
 import hygge.commons.exception.InternalRuntimeException;
 
 /**

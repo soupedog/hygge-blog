@@ -104,7 +104,6 @@ public class HomePageController implements HomePageControllerDoc {
     @ControllerLog(inputParamEnable = false, outputParamEnable = false)
     public ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>> announcementFetch(@RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                                 @RequestParam(required = false, defaultValue = "100") int pageSize) {
-
         List<Announcement> resultTemp = announcementService.fetchAnnouncement(currentPage, pageSize);
         List<AnnouncementDto> result = resultTemp.stream().map(PoDtoMapper.INSTANCE::poToDto).toList();
         return (ResponseEntity<HyggeBlogControllerResponse<List<AnnouncementDto>>>) success(result);

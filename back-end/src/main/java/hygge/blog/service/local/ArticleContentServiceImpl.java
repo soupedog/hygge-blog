@@ -7,8 +7,8 @@ import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 import hygge.blog.domain.local.po.Article;
-import hygge.blog.service.local.inner.markdown.image.ArticleImageVisitorForExpose;
-import hygge.blog.service.local.inner.markdown.image.ArticleImageVisitorForSave;
+import hygge.blog.service.local.inner.markdown.impl.ArticleImageVisitorForExpose;
+import hygge.blog.service.local.inner.markdown.impl.ArticleImageVisitorForSave;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,4 +1,4 @@
-package hygge.blog.service.local.inner.markdown.image;
+package hygge.blog.service.local.inner.markdown;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

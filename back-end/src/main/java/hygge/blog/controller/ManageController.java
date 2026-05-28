@@ -3,9 +3,7 @@ package hygge.blog.controller;
 import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.ManageControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
-import hygge.blog.domain.local.enums.ResourceLinkRefreshTypeEnum;
 import hygge.blog.service.local.FileCacheRefreshServiceImpl;
-import hygge.blog.service.local.ImageLinkRefreshServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,22 +19,10 @@ import java.sql.Timestamp;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class ManageController implements ManageControllerDoc {
-    private final ImageLinkRefreshServiceImpl imageLinkRefreshService;
     private final FileCacheRefreshServiceImpl fileCacheRefreshService;
 
-    public ManageController(ImageLinkRefreshServiceImpl imageLinkRefreshService, FileCacheRefreshServiceImpl fileCacheRefreshService) {
-        this.imageLinkRefreshService = imageLinkRefreshService;
+    public ManageController(FileCacheRefreshServiceImpl fileCacheRefreshService) {
         this.fileCacheRefreshService = fileCacheRefreshService;
-    }
-
-    @Override
-    @RequireAuth
-    @PostMapping(value = "/refresh/imageLink")
-    public ResponseEntity<HyggeBlogControllerResponse<String>> refreshImageLink(@RequestParam ResourceLinkRefreshTypeEnum resourceLinkRefreshType) {
-
-        imageLinkRefreshService.freshAllArticle(resourceLinkRefreshType);
-
-        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("正在处理:" + new Timestamp(System.currentTimeMillis()));
     }
 
     @Override

@@ -8,9 +8,6 @@ import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 import com.vladsch.flexmark.util.ast.Visitor;
 import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
-import hygge.blog.service.local.inner.markdown.ImageResourceApiToNginxVisitor;
-import hygge.blog.service.local.inner.markdown.ImageResourceNginxToApiVisitor;
-import hygge.blog.service.local.inner.markdown.ImageResourceOldToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceServerToLocalVisitor;
 import org.springframework.stereotype.Service;
 
@@ -24,21 +21,9 @@ public class MarkdownContentServiceImpl {
     private static final Parser parser = Parser.builder().build();
     private static final Formatter formatter = Formatter.builder().build();
 
-    private final NodeVisitor visitor_ResourceApiToNginx;
-    private final NodeVisitor visitor_ResourceNginxToApi;
-    private final NodeVisitor visitor_ResourceOldToApi;
     private final FileNoPickerServiceImpl fileNoPickerService;
 
     public MarkdownContentServiceImpl(FileNoPickerServiceImpl fileNoPickerService, CacheFileKeyKeeper fileKeyKeeper) {
-        this.visitor_ResourceApiToNginx = new NodeVisitor(
-                new VisitHandler<>(Image.class, new ImageResourceApiToNginxVisitor(fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.nginxFileNoLinkPicker))
-        );
-        this.visitor_ResourceNginxToApi = new NodeVisitor(
-                new VisitHandler<>(Image.class, new ImageResourceNginxToApiVisitor(fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.nginxFileNoLinkPicker))
-        );
-        this.visitor_ResourceOldToApi = new NodeVisitor(
-                new VisitHandler<>(Image.class, new ImageResourceOldToApiVisitor(fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.apiFileNoLinkPicker_old, fileNoPickerService.nginxFileNoLinkPicker_old))
-        );
         this.fileNoPickerService = fileNoPickerService;
     }
 
@@ -55,24 +40,6 @@ public class MarkdownContentServiceImpl {
     public String markdownServerToLocal(NodeVisitor serverToLocalVisitor, String markdownContent) {
         Document markdownDocument = parser.parse(markdownContent);
         serverToLocalVisitor.visit(markdownDocument);
-        return formatter.render(markdownDocument);
-    }
-
-    public String markdownImageResourceApiToNginx(String markdownContent) {
-        Document markdownDocument = parser.parse(markdownContent);
-        visitor_ResourceApiToNginx.visit(markdownDocument);
-        return formatter.render(markdownDocument);
-    }
-
-    public String markdownImageResourceNginxToApi(String markdownContent) {
-        Document markdownDocument = parser.parse(markdownContent);
-        visitor_ResourceNginxToApi.visit(markdownDocument);
-        return formatter.render(markdownDocument);
-    }
-
-    public String markdownImageResourceOldToApi(String markdownContent) {
-        Document markdownDocument = parser.parse(markdownContent);
-        visitor_ResourceOldToApi.visit(markdownDocument);
         return formatter.render(markdownDocument);
     }
 }
