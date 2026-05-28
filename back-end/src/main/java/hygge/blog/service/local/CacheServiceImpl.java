@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static hygge.blog.domain.local.bo.CacheObjectContainer.NAME_CATEGORY_TREE;
+import static hygge.blog.domain.local.bo.CacheObjectContainer.NAME_FILE_NO_URL_MAPPING;
+import static hygge.blog.domain.local.bo.CacheObjectContainer.NAME_USERID_UID_MAPPING;
+
 /**
  * 对于复杂查询进行缓存的查询逻辑实现类
  * <p>
@@ -43,7 +47,7 @@ public class CacheServiceImpl extends HyggeJsonUtilContainer {
     /**
      * 从传入的文章类型构造类别树一直到根节点
      */
-    @Cacheable(cacheNames = "categoryTreeInfoCache", key = "'CategoryTree'+#categoryId", unless = "#result == null")
+    @Cacheable(cacheNames = NAME_CATEGORY_TREE, key = "'CategoryTree'+#categoryId", unless = "#result == null")
     public CategoryTreeInfo getCategoryTreeFormCurrent(Integer categoryId) {
         Category currentCategory = categoryService.findCategoryByCategoryId(categoryId, false);
         Topic topic = topicService.findTopicByTopicId(currentCategory.getTopicId(), false);
@@ -81,7 +85,7 @@ public class CacheServiceImpl extends HyggeJsonUtilContainer {
     /**
      * 根据 userId 获取对应的 uid
      */
-    @Cacheable(cacheNames = "userIdToUidMappingCache", key = "'UserIdToUid'+#userId", unless = "#result == null")
+    @Cacheable(cacheNames = NAME_USERID_UID_MAPPING, key = "'UserIdToUid'+#userId", unless = "#result == null")
     public String userIdToUid(Integer userId) {
         if (userId == null) {
             return null;
@@ -93,7 +97,7 @@ public class CacheServiceImpl extends HyggeJsonUtilContainer {
     /**
      * 根据 fileNo 获取对应的 file 外部访问链接
      */
-    @Cacheable(cacheNames = "fileNoToFileUrlMappingCache", key = "'fileNoToFileUrl'+#fileNo", unless = "#result == null")
+    @Cacheable(cacheNames = NAME_FILE_NO_URL_MAPPING, key = "'fileNoToFileUrl'+#fileNo", unless = "#result == null")
     public CacheObjectContainer.FileAccessUrl fileNoToFileUrl(String fileNo) {
         if (fileNo == null) {
             return null;

@@ -2,6 +2,7 @@ package hygge.blog.controller;
 
 import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.CacheControllerDoc;
+import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.commons.exception.LightRuntimeException;
 import org.springframework.cache.Cache;
@@ -28,10 +29,10 @@ public class CacheController implements CacheControllerDoc {
     @Override
     @RequireAuth
     @DeleteMapping("/cache")
-    public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheName", defaultValue = "categoryTreeInfoCache") String cacheName) {
-        Cache cache = cacheManager.getCache(cacheName);
+    public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheName", defaultValue = "CATEGORY_TREE") CacheObjectContainer.CacheTypeEnum cacheType) {
+        Cache cache = cacheManager.getCache(cacheType.getValue());
         if (cache == null) {
-            throw new LightRuntimeException("Cache(" + cacheName + ") was not found.");
+            throw new LightRuntimeException("Cache(" + cacheType.getValue() + ") was not found.");
         }
 
         cache.clear();
