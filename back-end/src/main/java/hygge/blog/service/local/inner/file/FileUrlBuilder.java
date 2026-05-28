@@ -24,11 +24,11 @@ public class FileUrlBuilder {
         this.nginxUrlPrefix_old = autoRemoveLastForwardSlash(nginxUrlPrefix_old);
     }
 
-    public String getFileCacheLink(String relativePath) {
+    public String getFileCacheLinkByRelativePath(String relativePath) {
         return nginxUrlPrefix + relativePath;
     }
 
-    public String getFileApiLink(String fileNo) {
+    public String getFileApiLinkByFileNo(String fileNo) {
         return apiUrlPrefix + fileNo;
     }
 

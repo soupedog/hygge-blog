@@ -13,11 +13,11 @@ public interface FileKeyKeeper {
     String genderKey(String fileNo);
 
     /**
-     * 为特定文件生成文件秘钥
+     * 为特定文件生成一次性文件授权秘钥
      *
      * @return 文件秘钥
      */
-    String createFileKey(String fileNo);
+    String generateOneTimeFileKey(String fileNo);
 
     /**
      * 核销特定文件的秘钥是否成功

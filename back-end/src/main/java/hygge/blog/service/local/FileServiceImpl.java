@@ -17,6 +17,7 @@ import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
+import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
 import hygge.blog.service.local.inner.file.FileOperationResult;
 import hygge.blog.service.local.inner.file.FileOperationTool;
 import hygge.blog.service.local.inner.file.FileUrlBuilder;
@@ -73,6 +74,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private final FileInfoDao fileInfoDao;
     private final FileInfoViewDao fileInfoViewDao;
     private final FileUrlBuilder fileUrlBuilder;
+    private final CacheFileKeyKeeper fileKeyKeeper;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -85,13 +87,45 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     @Autowired
-    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder) {
+    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder, CacheFileKeyKeeper fileKeyKeeper) {
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
         this.fileInfoDao = fileInfoDao;
         this.fileInfoViewDao = fileInfoViewDao;
         this.fileUrlBuilder = fileUrlBuilder;
+        this.fileKeyKeeper = fileKeyKeeper;
+    }
+
+    public String generateOneTimeFileKey(String fileNo) {
+        if (fileNo == null || fileNo.isEmpty()) {
+            throw new InternalRuntimeException("[fileNo] can't be empty.");
+        }
+        return fileKeyKeeper.generateOneTimeFileKey(fileNo);
+    }
+
+    public String getFileCacheLinkByRelativePath(String relativePath) {
+        if (relativePath == null || relativePath.isEmpty()) {
+            throw new InternalRuntimeException("[relativePath] can't be empty.");
+        }
+        return fileUrlBuilder.getFileCacheLinkByRelativePath(relativePath);
+    }
+
+    public String getFileAccessUrl(String fileNo) {
+        if (fileNo == null || fileNo.isEmpty()) {
+            return null;
+        }
+
+        Optional<FileInfoView> fileInfoViewTemp = findFileViewFromDB(fileNo);
+
+        return fileInfoViewTemp.map(this::getFileAccessUrl).orElse(null);
+    }
+
+    public String getFileAccessUrl(FileInfoBase fileInfoBase) {
+        if (fileInfoBase == null) {
+            return null;
+        }
+        return fileUrlBuilder.getFileApiLinkByFileNo(fileInfoBase.getFileNo());
     }
 
     public FileInfoView findFileInfoView(FileTypeEnum fileType, String name, String extension) {
@@ -351,12 +385,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
     private void initLink(FileInfoDto dto) {
         // 初始化 API 链接
-        dto.setApiLink(fileUrlBuilder.getFileApiLink(dto.getFileNo()));
+        dto.setApiLink(fileUrlBuilder.getFileApiLinkByFileNo(dto.getFileNo()));
         // 检测是否存在硬盘副本
         String cachePath = fileRootPath + dto.getRelativePath();
         File file = new File(cachePath);
         if (file.exists()) {
-            dto.setCacheLink(fileUrlBuilder.getFileCacheLink(dto.getRelativePath()));
+            dto.setCacheLink(fileUrlBuilder.getFileCacheLinkByRelativePath(dto.getRelativePath()));
         }
     }
 

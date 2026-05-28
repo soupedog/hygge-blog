@@ -11,7 +11,6 @@ import hygge.blog.service.local.inner.file.CacheFileKeyKeeper;
 import hygge.blog.service.local.inner.markdown.ImageResourceApiToNginxVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceNginxToApiVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceOldToApiVisitor;
-import hygge.blog.service.local.inner.markdown.ImageResourceOneTimeAuthorizationVisitor;
 import hygge.blog.service.local.inner.markdown.ImageResourceServerToLocalVisitor;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +24,12 @@ public class MarkdownContentServiceImpl {
     private static final Parser parser = Parser.builder().build();
     private static final Formatter formatter = Formatter.builder().build();
 
-    private final NodeVisitor visitor_OneTimeAuthorization;
     private final NodeVisitor visitor_ResourceApiToNginx;
     private final NodeVisitor visitor_ResourceNginxToApi;
     private final NodeVisitor visitor_ResourceOldToApi;
     private final FileNoPickerServiceImpl fileNoPickerService;
 
     public MarkdownContentServiceImpl(FileNoPickerServiceImpl fileNoPickerService, CacheFileKeyKeeper fileKeyKeeper) {
-        this.visitor_OneTimeAuthorization = new NodeVisitor(
-                new VisitHandler<>(Image.class, new ImageResourceOneTimeAuthorizationVisitor(fileNoPickerService.apiFileNoLinkPicker, fileKeyKeeper))
-        );
         this.visitor_ResourceApiToNginx = new NodeVisitor(
                 new VisitHandler<>(Image.class, new ImageResourceApiToNginxVisitor(fileNoPickerService.apiFileNoLinkPicker, fileNoPickerService.nginxFileNoLinkPicker))
         );
@@ -60,12 +55,6 @@ public class MarkdownContentServiceImpl {
     public String markdownServerToLocal(NodeVisitor serverToLocalVisitor, String markdownContent) {
         Document markdownDocument = parser.parse(markdownContent);
         serverToLocalVisitor.visit(markdownDocument);
-        return formatter.render(markdownDocument);
-    }
-
-    public String markdownOneTimeAuthorization(String markdownContent) {
-        Document markdownDocument = parser.parse(markdownContent);
-        visitor_OneTimeAuthorization.visit(markdownDocument);
         return formatter.render(markdownDocument);
     }
 

@@ -35,7 +35,7 @@ public class CacheFileKeyKeeper extends HyggeJsonUtilContainer implements FileKe
      * 同步方法，防止键重复
      */
     @Override
-    public synchronized String createFileKey(String fileNo) {
+    public synchronized String generateOneTimeFileKey(String fileNo) {
         String fileKey = genderKey(fileNo);
 
         while (fileKeyCache.getIfPresent(fileKey) != null) {

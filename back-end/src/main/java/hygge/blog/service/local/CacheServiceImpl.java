@@ -3,7 +3,6 @@ package hygge.blog.service.local;
 import hygge.blog.common.mapper.PoDtoMapper;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
-import hygge.blog.domain.local.enums.FileCacheTypeEnum;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Topic;
 import hygge.blog.domain.local.po.User;
@@ -111,10 +110,6 @@ public class CacheServiceImpl {
 
         FileInfoView fileInfoView = fileInfoViewTemp.get();
 
-        if (fileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
-            return fileUrlBuilder.getFileApiLink(fileNo);
-        }
-
-        return null;
+        return fileService.getFileAccessUrl(fileInfoView.getFileNo());
     }
 }

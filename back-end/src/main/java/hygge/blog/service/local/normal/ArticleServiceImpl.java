@@ -17,14 +17,17 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.inner.ArticleConfiguration;
 import hygge.blog.repository.database.ArticleDao;
+import hygge.blog.service.local.ArticleContentServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.EventServiceImpl;
+import hygge.blog.service.local.inner.markdown.FlexmarkWordCounter;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +57,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private final CategoryServiceImpl categoryService;
     private final CacheServiceImpl cacheService;
     private final EventServiceImpl eventService;
+    private final ArticleContentServiceImpl articleContentService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -69,13 +73,15 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
-    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
+    @Autowired
+    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, EventServiceImpl eventService, ArticleContentServiceImpl articleContentService) {
         this.articleDao = articleDao;
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
         this.cacheService = cacheService;
         this.eventService = eventService;
+        this.articleContentService = articleContentService;
     }
 
     @Transactional
@@ -94,7 +100,6 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         nameConflictCheck(articleDto.getTitle());
 
         Article article = PoDtoMapper.INSTANCE.dtoToPo(articleDto);
-        article.setWordCount(article.getContent() == null ? 0 : article.getContent().length());
         article.setUserId(currentUser.getUserId());
         article.setAid(randomHelper.getUniversallyUniqueIdentifier(true));
         Category category = categoryService.findCategoryByCid(articleDto.getCid(), false);
@@ -102,12 +107,25 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         article.setOrderGlobal(parameterHelper.parseObjectOfNullable("orderGlobal", article.getOrderGlobal(), 0));
         article.setOrderCategory(parameterHelper.parseObjectOfNullable("orderCategory", article.getOrderCategory(), 0));
 
+        contentReplaceForSave(article);
+
         Article result = articleDao.save(article);
 
         Integer articleId = result.getArticleId();
 
         eventService.refreshArticleByArticleId(articleId);
         return result;
+    }
+
+    private void contentReplaceForSave(Article article) {
+        String content = article.getContent();
+        if (content == null || content.trim().isEmpty()) {
+            article.setWordCount(0);
+        } else {
+            String newContent = articleContentService.forSaveContent(article);
+            article.setContent(newContent);
+            article.setWordCount(FlexmarkWordCounter.quickCount(article.getContent()));
+        }
     }
 
     @Transactional
@@ -134,7 +152,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
             newOne.setCategoryId(category.getCategoryId());
         }
         if (finalData.containsKey("content")) {
-            newOne.setWordCount(newOne.getContent() == null ? 0 : newOne.getContent().length());
+            contentReplaceForSave(newOne);
         }
         if (newOne.getConfiguration() != null) {
             articleConfigurationValidate(newOne.getConfiguration());

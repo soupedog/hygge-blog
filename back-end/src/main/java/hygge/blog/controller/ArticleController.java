@@ -8,6 +8,7 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.domain.local.dto.ArticleDto;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.User;
+import hygge.blog.service.local.ArticleContentServiceImpl;
 import hygge.blog.service.local.MarkdownContentServiceImpl;
 import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
 import hygge.blog.service.local.normal.ArticleServiceImpl;
@@ -35,11 +36,13 @@ import java.util.Optional;
 public class ArticleController implements ArticleControllerDoc {
     private final ArticleServiceImpl articleService;
     private final ArticleBrowseLogServiceImpl articleBrowseLogService;
+    private final ArticleContentServiceImpl articleContentService;
     private final MarkdownContentServiceImpl markdownContentService;
 
-    public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService, MarkdownContentServiceImpl markdownContentService) {
+    public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService, ArticleContentServiceImpl articleContentService, MarkdownContentServiceImpl markdownContentService) {
         this.articleService = articleService;
         this.articleBrowseLogService = articleBrowseLogService;
+        this.articleContentService = articleContentService;
         this.markdownContentService = markdownContentService;
     }
 
@@ -71,7 +74,7 @@ public class ArticleController implements ArticleControllerDoc {
         if (result != null) {
             // 文本替换(该站点受保护文件，发放图片一次性授权)
             if (!raw) {
-                String newContent = markdownContentService.markdownOneTimeAuthorization(result.getContent());
+                String newContent = articleContentService.forExposeContent(result.getContent());
                 result.setContent(newContent);
             }
             // 非管理员则记录访问日志
