@@ -15,6 +15,7 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.domain.local.po.base.FileInfoBase;
+import hygge.blog.domain.local.po.inner.FileDescription;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
@@ -205,7 +206,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException("Please login and try again.", BlogSystemCode.INSUFFICIENT_PERMISSIONS);
         }
 
-        if (!permissionService.isPermissionPassed(permissionId, currentUser, null)) {
+        if (!permissionService.isPermissionPassed(actualPermissionId, currentUser, null)) {
             throw new LightRuntimeException(BlogSystemCode.INSUFFICIENT_PERMISSIONS.getPublicMessage(), BlogSystemCode.INSUFFICIENT_PERMISSIONS);
         }
 
@@ -252,6 +253,9 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 if (needCreateCache) {
                     // 文件所属于公开类别则使用 Nginx 创建副本
                     fileInfo.setFileCacheType(FileCacheTypeEnum.NGINX);
+                    fileInfo.setDescription(FileDescription.builder()
+                            .nginxLink(fileUrlBuilder.getFileNginxLinkByRelativePath(fileInfo.returnRelativePath()))
+                            .build());
                 }
 
                 fileInfo.setFileSize(temp.getSize());
@@ -269,6 +273,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 // 存在检测 Nginx 缓存，需要在缓存之后再初始化
                 initLink(item);
+
+                // 文件上传者默认有权限，直接发放授权
+                if (!PermissionServiceImpl._PUBLIC.getPermissionId().equals(item.getPermissionId())) {
+                    item.setApiLink(item.getApiLink() + "?fileKey=" + generateOneTimeFileKey(fileNo));
+                }
+
                 result.add(item);
             } catch (LightRuntimeException le) {
                 // 主动抛出的已知异常已经标记了错误原因
