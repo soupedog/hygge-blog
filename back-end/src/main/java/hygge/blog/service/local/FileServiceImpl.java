@@ -339,7 +339,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         boolean copyTypeChanged = newOne.getFileCacheType() != null && !oldFileInfoView.getFileCacheType().equals(newOne.getFileCacheType());
 
-        String nginxLink = fileUrlBuilder.getFileCacheLinkByRelativePath(oldFileInfoView.returnRelativePath());
+        String nginxLink = fileUrlBuilder.getFileNginxLinkByRelativePath(oldFileInfoView.returnRelativePath());
 
         if (copyTypeChanged) {
             if (oldFileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
@@ -447,7 +447,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         String cachePath = fileRootPath + dto.getRelativePath();
         File file = new File(cachePath);
         if (file.exists()) {
-            dto.setCacheLink(fileUrlBuilder.getFileCacheLinkByRelativePath(dto.getRelativePath()));
+            dto.setCacheLink(fileUrlBuilder.getFileNginxLinkByRelativePath(dto.getRelativePath()));
         }
     }
 
@@ -464,6 +464,10 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         FileOperationResult copyResult = FileOperationTool.copyFile(forceOverWrite, getAbsolutePath(fileInfo), fileInfo.getName(), fileInfo.getContent());
 
         boolean result = copyResult.isSuccess();
+
+        if (result) {
+            fileInfoDao.updateFileCacheLink(fileNo, FileCacheTypeEnum.NGINX, fileUrlBuilder.getFileNginxLinkByRelativePath(fileInfo.returnRelativePath()));
+        }
 
         if (!forceOverWrite) {
             if (!result) {
@@ -482,19 +486,24 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         Optional<FileInfoView> fileInfoViewTemp = fileInfoViewDao.findOne(Example.of(FileInfoView.builder().fileNo(fileNo).build()));
 
         fileInfoViewTemp.ifPresent((fileInfoView) -> {
-            // 检测是否存在硬盘副本
-            String cachePath = fileRootPath + fileInfoView.toDto().getRelativePath();
 
-            File file = new File(cachePath);
-            if (file.exists()) {
-                FileOperationTool.deleteFile(file);
-            }
+            deleteFileInHardDisk(fileInfoView);
 
             long affectedRows = fileInfoDao.deleteByFileNo(fileNo);
             if (affectedRows > 0) {
                 log.info("delete file({}) success, affected rows:{}.", fileInfoView.getName(), affectedRows);
             }
         });
+    }
+
+    public void deleteFileInHardDisk(FileInfoBase fileInfoBase) {
+        // 检测是否存在硬盘副本
+        String cachePath = fileRootPath + fileInfoBase.toDto().getRelativePath();
+
+        File file = new File(cachePath);
+        if (file.exists()) {
+            FileOperationTool.deleteFile(file);
+        }
     }
 
     public Optional<FileInfo> findFileFromDB(String fileNo) {
@@ -539,7 +548,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
 
         // 更新数据库记录
-        String cacheLink = fileUrlBuilder.getFileCacheLinkByRelativePath(fileInfo.returnRelativePath());
+        String cacheLink = fileUrlBuilder.getFileNginxLinkByRelativePath(fileInfo.returnRelativePath());
         fileInfoDao.updateFileCacheLink(fileInfo.getFileNo(), FileCacheTypeEnum.NGINX, cacheLink);
     }
 

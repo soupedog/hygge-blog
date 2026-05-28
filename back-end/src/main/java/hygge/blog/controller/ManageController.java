@@ -5,6 +5,7 @@ import hygge.blog.controller.doc.ManageControllerDoc;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.service.local.FileCacheRefreshServiceImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +30,15 @@ public class ManageController implements ManageControllerDoc {
     @RequireAuth
     @PostMapping(value = "/refresh/fileCache")
     public ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(@RequestParam(required = false, defaultValue = "false") Boolean forceOverWrite) {
-        fileCacheRefreshService.freshAllPublicFileCache(forceOverWrite);
+        fileCacheRefreshService.freshAllPublicFileCache(forceOverWrite, true);
+        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("正在处理:" + new Timestamp(System.currentTimeMillis()));
+    }
+
+    @Override
+    @RequireAuth
+    @DeleteMapping(value = "/refresh/fileCache")
+    public ResponseEntity<HyggeBlogControllerResponse<String>> removePublicFileCache() {
+        fileCacheRefreshService.freshAllPublicFileCache(true, false);
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("正在处理:" + new Timestamp(System.currentTimeMillis()));
     }
 }

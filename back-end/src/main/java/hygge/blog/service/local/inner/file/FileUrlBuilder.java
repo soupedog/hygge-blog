@@ -24,7 +24,7 @@ public class FileUrlBuilder {
         this.nginxUrlPrefix_old = autoRemoveLastForwardSlash(nginxUrlPrefix_old);
     }
 
-    public String getFileCacheLinkByRelativePath(String relativePath) {
+    public String getFileNginxLinkByRelativePath(String relativePath) {
         return nginxUrlPrefix + relativePath;
     }
 

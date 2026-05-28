@@ -1,12 +1,11 @@
 package hygge.blog.service.local;
 
 import hygge.blog.domain.local.po.view.FileInfoView;
+import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
-import hygge.blog.service.local.inner.file.FileUrlBuilder;
 import hygge.blog.service.local.normal.PermissionServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,17 +26,17 @@ public class FileCacheRefreshServiceImpl {
     private static final AtomicBoolean conflictFlag = new AtomicBoolean(false);
 
     private final FileServiceImpl fileService;
-    private final FileUrlBuilder fileUrlBuilder;
     private final FileInfoViewDao fileInfoViewDao;
+    private final FileInfoDao fileInfoDao;
 
     @Autowired
-    public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileUrlBuilder fileUrlBuilder, FileInfoViewDao fileInfoViewDao) {
+    public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao) {
         this.fileService = fileService;
-        this.fileUrlBuilder = fileUrlBuilder;
         this.fileInfoViewDao = fileInfoViewDao;
+        this.fileInfoDao = fileInfoDao;
     }
 
-    public void freshAllPublicFileCache(boolean forceOverWrite) {
+    public void freshAllPublicFileCache(boolean forceOverWrite, boolean isAdd) {
         // 尝试获取执行权（false -> true）
         if (!conflictFlag.compareAndSet(false, true)) {
             throw new IllegalStateException("冲突，请等待未执行完的任务执行完");
@@ -49,12 +48,7 @@ public class FileCacheRefreshServiceImpl {
 
             Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("fileId")));
 
-            Example<FileInfoView> example = Example.of(FileInfoView.builder()
-                    .permissionId(PermissionServiceImpl._PUBLIC.getPermissionId())
-                    .build()
-            );
-
-            Page<FileInfoView> fileInfoViewPage = fileInfoViewDao.findAll(example, pageable);
+            Page<FileInfoView> fileInfoViewPage = fileInfoViewDao.findAll(pageable);
 
             List<FileInfoView> fileInfoViewList = null;
             do {
@@ -64,7 +58,14 @@ public class FileCacheRefreshServiceImpl {
                 fileInfoViewList = fileInfoViewPage.getContent();
 
                 fileInfoViewList.forEach(fileInfoView -> {
-                    freshSingleFile(forceOverWrite, totalCount, fileInfoView);
+                    if (PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoView.getPermissionId())) {
+                        // 只处理公开可见类型
+                        if (isAdd) {
+                            freshSingleFile_add(forceOverWrite, totalCount, fileInfoView);
+                        } else {
+                            freshSingleFile_remove(totalCount, fileInfoView);
+                        }
+                    }
                 });
             } while (!fileInfoViewPage.isLast());
 
@@ -75,9 +76,15 @@ public class FileCacheRefreshServiceImpl {
         }
     }
 
-    public void freshSingleFile(boolean forceOverWrite, AtomicInteger totalCount, FileInfoView fileInfoView) {
+    public void freshSingleFile_add(boolean forceOverWrite, AtomicInteger totalCount, FileInfoView fileInfoView) {
         if (fileService.createFileCopyFromDBToHardDisk(forceOverWrite, fileInfoView.getFileNo())) {
             totalCount.incrementAndGet();
         }
+    }
+
+    public void freshSingleFile_remove(AtomicInteger totalCount, FileInfoView fileInfoView) {
+        fileService.deleteFileInHardDisk(fileInfoView);
+        fileInfoDao.removeFileCacheLink(fileInfoView.getFileNo());
+        totalCount.incrementAndGet();
     }
 }

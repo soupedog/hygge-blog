@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
  */
 @Tag(name = "管理操作 Controller", description = "博客站管理员专属操作")
 public interface ManageControllerDoc extends HyggeBlogController<ResponseEntity<?>> {
-    @Operation(summary = "全部公开可见文件缓存更新", description = "更新公开可见文件缓存")
+    @Operation(summary = "更新全部公开可见文件缓存", description = "更新公开可见文件缓存")
     ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(Boolean forceOverWrite);
+
+    @Operation(summary = "移除全部公开可见文件缓存", description = "移除公开可见文件缓存")
+    ResponseEntity<HyggeBlogControllerResponse<String>> removePublicFileCache();
 }
