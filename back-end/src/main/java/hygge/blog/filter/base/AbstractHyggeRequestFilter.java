@@ -28,7 +28,7 @@ import java.time.temporal.ChronoUnit;
 public abstract class AbstractHyggeRequestFilter extends OncePerRequestFilter {
     protected static final Logger log = LoggerFactory.getLogger(AbstractHyggeRequestFilter.class);
     protected static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
-    protected static final JsonHelper<ObjectMapper> jsonHelper = UtilCreator.INSTANCE.getDefaultJsonHelperInstance(false);
+    protected static final JsonHelper<ObjectMapper> jsonHelper_indent = UtilCreator.INSTANCE.getDefaultJsonHelperInstance(true);
 
     /**
      * 慢请求耗时门槛(毫秒)

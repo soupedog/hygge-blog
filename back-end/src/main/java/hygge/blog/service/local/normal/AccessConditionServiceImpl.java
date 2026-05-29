@@ -19,7 +19,6 @@ import java.util.List;
 public class AccessConditionServiceImpl extends HyggeJsonUtilContainer {
     private final AccessConditionDao accessConditionDao;
 
-    @Autowired
     public AccessConditionServiceImpl(AccessConditionDao accessConditionDao) {
         this.accessConditionDao = accessConditionDao;
     }

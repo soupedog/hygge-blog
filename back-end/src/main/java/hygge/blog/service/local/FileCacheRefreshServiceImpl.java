@@ -29,7 +29,6 @@ public class FileCacheRefreshServiceImpl {
     private final FileInfoViewDao fileInfoViewDao;
     private final FileInfoDao fileInfoDao;
 
-    @Autowired
     public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao) {
         this.fileService = fileService;
         this.fileInfoViewDao = fileInfoViewDao;

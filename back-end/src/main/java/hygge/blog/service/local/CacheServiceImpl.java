@@ -42,7 +42,6 @@ public class CacheServiceImpl extends HyggeJsonUtilContainer {
     private final FileServiceImpl fileService;
     private final CacheManager cacheManager;
 
-    @Autowired
     public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService, FileServiceImpl fileService, CacheManager cacheManager) {
         this.categoryService = categoryService;
         this.topicService = topicService;

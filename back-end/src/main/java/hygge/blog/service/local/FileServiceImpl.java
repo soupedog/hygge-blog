@@ -88,7 +88,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "fileCacheType", null).toStringColumn(1, 30));
     }
 
-    @Autowired
     public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder, CacheFileKeyKeeper fileKeyKeeper) {
         this.userService = userService;
         this.permissionService = permissionService;

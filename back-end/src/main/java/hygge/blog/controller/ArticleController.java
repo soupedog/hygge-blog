@@ -38,7 +38,6 @@ public class ArticleController implements ArticleControllerDoc {
     private final ArticleBrowseLogServiceImpl articleBrowseLogService;
     private final ArticleContentServiceImpl articleContentService;
 
-    @Autowired
     public ArticleController(ArticleServiceImpl articleService, ArticleBrowseLogServiceImpl articleBrowseLogService, ArticleContentServiceImpl articleContentService) {
         this.articleService = articleService;
         this.articleBrowseLogService = articleBrowseLogService;

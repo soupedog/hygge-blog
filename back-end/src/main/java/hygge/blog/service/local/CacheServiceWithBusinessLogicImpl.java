@@ -14,7 +14,6 @@ public class CacheServiceWithBusinessLogicImpl extends HyggeJsonUtilContainer {
     private final CacheServiceImpl cacheService;
     private final FileServiceImpl fileService;
 
-    @Autowired
     public CacheServiceWithBusinessLogicImpl(CacheServiceImpl cacheService, FileServiceImpl fileService) {
         this.cacheService = cacheService;
         this.fileService = fileService;

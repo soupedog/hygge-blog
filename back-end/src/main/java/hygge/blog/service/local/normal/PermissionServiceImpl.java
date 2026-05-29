@@ -35,7 +35,6 @@ public class PermissionServiceImpl extends HyggeJsonUtilContainer {
     private final BlogGroupServiceImpl blogGroupService;
     private final PermissionDao permissionDao;
 
-    @Autowired
     public PermissionServiceImpl(AccessConditionServiceImpl accessConditionService, BlogGroupServiceImpl blogGroupService, PermissionDao permissionDao) {
         this.accessConditionService = accessConditionService;
         this.blogGroupService = blogGroupService;

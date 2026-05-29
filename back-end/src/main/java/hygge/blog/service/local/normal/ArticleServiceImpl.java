@@ -75,7 +75,6 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
-    @Autowired
     public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic, EventServiceImpl eventService, ArticleContentServiceImpl articleContentService) {
         this.articleDao = articleDao;
         this.userService = userService;

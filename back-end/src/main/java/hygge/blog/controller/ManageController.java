@@ -7,7 +7,6 @@ import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
 import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.FileCacheRefreshServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,11 +27,18 @@ public class ManageController implements ManageControllerDoc {
     private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
     private final CacheServiceImpl cacheService;
 
-    @Autowired
     public ManageController(FileCacheRefreshServiceImpl fileCacheRefreshService, RefreshElasticSearchServiceImpl refreshElasticSearchService, CacheServiceImpl cacheService) {
         this.fileCacheRefreshService = fileCacheRefreshService;
         this.refreshElasticSearchService = refreshElasticSearchService;
         this.cacheService = cacheService;
+    }
+
+    @Override
+    @RequireAuth
+    @DeleteMapping("/cache")
+    public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheType", defaultValue = "CATEGORY_TREE") CacheObjectContainer.CacheTypeEnum cacheType) {
+        cacheService.clearCache(cacheType);
+        return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
     }
 
     @Override

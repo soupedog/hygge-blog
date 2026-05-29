@@ -8,6 +8,7 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.filter.base.AbstractHyggeRequestFilter;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.blog.service.local.normal.UserTokenServiceImpl;
+import hygge.commons.constant.ConstantParameters;
 import hygge.commons.exception.InternalRuntimeException;
 import hygge.commons.exception.main.HyggeRuntimeException;
 import jakarta.annotation.PostConstruct;
@@ -83,7 +84,7 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
             }
         }
 
-        String logInfo = "Permission verification for automatic registration:" + jsonHelper.formatAsString(directMatcherMap);
+        String logInfo = "Permission verification for automatic registration:" + ConstantParameters.LINE_SEPARATOR + jsonHelper_indent.formatAsString(directMatcherMap);
         log.info(logInfo);
     }
 
