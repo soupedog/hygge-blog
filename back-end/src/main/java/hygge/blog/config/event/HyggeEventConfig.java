@@ -19,7 +19,7 @@ public class HyggeEventConfig {
     }
 
     @Bean
-    public FileCacheRefreshListener esRefreshListener(CacheManager cacheManager) {
+    public FileCacheRefreshListener fileCacheRefreshListener(CacheManager cacheManager) {
         return new FileCacheRefreshListener(cacheManager);
     }
 }

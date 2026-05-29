@@ -46,7 +46,6 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
     private final TopicServiceImpl topicService;
     private final CategoryDao categoryDao;
 
-
     static {
         forUpdate.add(new ColumnInfo(true, false, "permissionId", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "categoryName", null).toStringColumn(1, 500));

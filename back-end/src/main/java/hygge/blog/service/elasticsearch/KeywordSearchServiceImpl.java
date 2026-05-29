@@ -218,7 +218,7 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
 
     private static final FetchSourceFilter QUOTE_SOURCE_FILTER = new FetchSourceFilter(
             new String[]{
-                    "esId", "type", "quoteId", "source", "portal", "remarks", "uid", "imageSrc",
+                    "esId", "type", "quoteId", "source", "content", "portal", "remarks", "uid", "imageSrc",
                     "state", "createTs", "lastUpdateTs"
             },
             new String[0]
