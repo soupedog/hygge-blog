@@ -37,7 +37,7 @@ public class ManageController implements ManageControllerDoc {
     @RequireAuth
     @DeleteMapping("/cache")
     public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheType", defaultValue = "CATEGORY_TREE") CacheObjectContainer.CacheTypeEnum cacheType) {
-        cacheService.clearCache(cacheType);
+        cacheService.clearCacheByType(cacheType);
         return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
     }
 
@@ -47,7 +47,7 @@ public class ManageController implements ManageControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(@RequestParam(required = false, defaultValue = "false") Boolean forceOverWrite) {
         fileCacheRefreshService.freshAllPublicFileCache(forceOverWrite, true);
         // 更新完图片资源需要刷新缓存
-        cacheService.clearCache(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
+        cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
         refreshElasticSearchService.freshAllArticle();
         refreshElasticSearchService.freshAllQuote();
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));
@@ -59,7 +59,7 @@ public class ManageController implements ManageControllerDoc {
     public ResponseEntity<HyggeBlogControllerResponse<String>> removePublicFileCache() {
         fileCacheRefreshService.freshAllPublicFileCache(true, false);
         // 更新完图片资源需要刷新缓存
-        cacheService.clearCache(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
+        cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
         refreshElasticSearchService.freshAllArticle();
         refreshElasticSearchService.freshAllQuote();
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));

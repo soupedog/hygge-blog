@@ -35,7 +35,6 @@ import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -77,6 +76,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     private final FileInfoViewDao fileInfoViewDao;
     private final FileUrlBuilder fileUrlBuilder;
     private final CacheFileKeyKeeper fileKeyKeeper;
+    private final EventServiceImpl eventService;
 
     private static final Collection<ColumnInfo> forUpdate = new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "fileCacheType", null).toStringColumn(1, 30));
     }
 
-    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder, CacheFileKeyKeeper fileKeyKeeper) {
+    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder, CacheFileKeyKeeper fileKeyKeeper, EventServiceImpl eventService) {
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
@@ -96,6 +96,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         this.fileInfoViewDao = fileInfoViewDao;
         this.fileUrlBuilder = fileUrlBuilder;
         this.fileKeyKeeper = fileKeyKeeper;
+        this.eventService = eventService;
     }
 
     public String generateOneTimeFileKey(String fileNo) {
@@ -402,6 +403,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
 
         fileInfoDao.save(oldAndBeenOverwrite);
+        // 更新默认清空旧查询缓存
+        eventService.refreshFileCacheLinkByFileNo(fileNo);
     }
 
     public FileInfoDto findFileInfo(String fileNo) {
@@ -502,6 +505,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             if (affectedRows > 0) {
                 log.info("delete file({}) success, affected rows:{}.", fileInfoView.getName(), affectedRows);
             }
+            // 删除默认清空旧查询缓存
+            eventService.refreshFileCacheLinkByFileNo(fileNo);
         });
     }
 

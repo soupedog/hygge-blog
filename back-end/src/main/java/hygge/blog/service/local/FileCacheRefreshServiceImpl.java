@@ -5,7 +5,6 @@ import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
 import hygge.blog.service.local.normal.PermissionServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,11 +27,13 @@ public class FileCacheRefreshServiceImpl {
     private final FileServiceImpl fileService;
     private final FileInfoViewDao fileInfoViewDao;
     private final FileInfoDao fileInfoDao;
+    private final EventServiceImpl eventService;
 
-    public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao) {
+    public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, EventServiceImpl eventService) {
         this.fileService = fileService;
         this.fileInfoViewDao = fileInfoViewDao;
         this.fileInfoDao = fileInfoDao;
+        this.eventService = eventService;
     }
 
     public void freshAllPublicFileCache(boolean forceOverWrite, boolean isAdd) {
@@ -82,8 +83,12 @@ public class FileCacheRefreshServiceImpl {
     }
 
     public void freshSingleFile_remove(AtomicInteger totalCount, FileInfoView fileInfoView) {
+        // 尝试删除物理文件
         fileService.deleteFileInHardDisk(fileInfoView);
+        // 删除数据库中旧缓存链接并置为无缓存状态
         fileInfoDao.removeFileCacheLink(fileInfoView.getFileNo());
+        // 删除链接查询缓存
+        eventService.refreshFileCacheLinkByFileNo(fileInfoView.getFileNo());
         totalCount.incrementAndGet();
     }
 }

@@ -3,6 +3,8 @@ package hygge.blog.service.local;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.event.ESRefreshEvent;
 import hygge.blog.event.ESRefreshEventInfo;
+import hygge.blog.event.FileCacheRefreshEvent;
+import hygge.blog.event.FileCacheRefreshEventInfo;
 import hygge.blog.event.base.HyggeEvent;
 import hygge.blog.event.listener.base.HyggeEventListener;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +31,13 @@ public class EventServiceImpl {
         fireEvent(event);
     }
 
+    public void refreshFileCacheLinkByFileNo(String fileNo) {
+        FileCacheRefreshEvent event = new FileCacheRefreshEvent(
+                new FileCacheRefreshEventInfo(fileNo)
+        );
+        fireEvent(event);
+    }
+
     public void refreshQuoteByQuoteId(Integer quoteId) {
         ESRefreshEvent event = new ESRefreshEvent(
                 new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.QUOTE, false, quoteId)
@@ -36,7 +45,7 @@ public class EventServiceImpl {
         fireEvent(event);
     }
 
-    public void fireEvent(HyggeEvent<?> event) {
+    private void fireEvent(HyggeEvent<?> event) {
         applicationEventPublisher.publishEvent(event);
     }
 }

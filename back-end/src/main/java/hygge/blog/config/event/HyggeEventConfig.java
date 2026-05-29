@@ -1,7 +1,9 @@
 package hygge.blog.config.event;
 
 import hygge.blog.event.listener.ESRefreshListener;
+import hygge.blog.event.listener.FileCacheRefreshListener;
 import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,9 +13,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class HyggeEventConfig {
-
     @Bean
     public ESRefreshListener esRefreshListener(RefreshElasticSearchServiceImpl refreshElasticSearchService) {
         return new ESRefreshListener(refreshElasticSearchService);
+    }
+
+    @Bean
+    public FileCacheRefreshListener esRefreshListener(CacheManager cacheManager) {
+        return new FileCacheRefreshListener(cacheManager);
     }
 }
