@@ -19,7 +19,6 @@ import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +75,13 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
+    public void freshSingleArticleAsync(Integer articleId) {
+        CompletableFuture.runAsync(() -> freshSingleArticle(articleId)).exceptionally(e -> {
+            log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
+            return null;
+        });
+    }
+
     public void freshSingleArticle(Integer articleId) {
         Article article = articleService.findArticleByArticleId(articleId, false);
         Category currentCategory = categoryService.findCategoryByCategoryId(article.getCategoryId(), false);
@@ -84,36 +90,9 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         freshSingleArticle(article, currentCategory, categoryTreeInfo);
     }
 
-    public void freshSingleArticleAsync(Integer articleId) {
-        CompletableFuture.runAsync(() -> freshSingleArticle(articleId)).exceptionally(e -> {
-            log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
-    }
-
-    public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
+    private void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
         ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(article, currentCategory, categoryTreeInfo);
         searchingCacheDao.save(articleQuoteSearchCache);
-    }
-
-    private ArticleQuoteSearchCache buildEsDto(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
-        ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
-
-        articleService.initUidAndCoverURL(article.getUserId(), articleDto);
-
-        articleDto.setCid(currentCategory.getCid());
-        articleDto.setCategoryTreeInfo(categoryTreeInfo);
-
-        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
-        articleQuoteSearchCache.initEsId(article.getArticleId(), ArticleQuoteSearchCache.Type.ARTICLE);
-        articleQuoteSearchCache.setCategoryId(article.getCategoryId());
-        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
-        return articleQuoteSearchCache;
-    }
-
-    public void freshSingleQuote(Integer quoteId) {
-        Quote quote = quoteService.findQuoteByQuoteId(quoteId, false);
-        refreshSingleQuote(quote);
     }
 
     public void freshSingleQuoteAsync(Integer quoteId) {
@@ -123,19 +102,14 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         });
     }
 
+    public void freshSingleQuote(Integer quoteId) {
+        Quote quote = quoteService.findQuoteByQuoteId(quoteId, false);
+        refreshSingleQuote(quote);
+    }
+
     private void refreshSingleQuote(Quote quote) {
         ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(quote);
         searchingCacheDao.save(articleQuoteSearchCache);
-    }
-
-    private @NotNull ArticleQuoteSearchCache buildEsDto(Quote quote) {
-        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
-        quoteService.initUidAndCoverURL(quote.getUserId(), quoteDto);
-
-        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
-        articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
-        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-        return articleQuoteSearchCache;
     }
 
     public void freshAllArticle() {
@@ -209,5 +183,31 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         } while (!quoteTemp.isLast());
 
         log.info("已刷新句子数 {} 耗时 {} ms", totalCount.get(), System.currentTimeMillis() - startTs);
+    }
+
+    private ArticleQuoteSearchCache buildEsDto(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
+        ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
+
+        articleService.initUidAndCoverURL(article.getUserId(), articleDto);
+
+        articleDto.setCid(currentCategory.getCid());
+        articleDto.setCategoryTreeInfo(categoryTreeInfo);
+
+        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.articleDtoToEs(articleDto);
+        articleQuoteSearchCache.initEsId(article.getArticleId(), ArticleQuoteSearchCache.Type.ARTICLE);
+        articleQuoteSearchCache.setCategoryId(article.getCategoryId());
+        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
+        return articleQuoteSearchCache;
+    }
+
+    private ArticleQuoteSearchCache buildEsDto(Quote quote) {
+        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
+
+        quoteService.initUidAndCoverURL(quote.getUserId(), quoteDto);
+
+        ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
+        articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
+        articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
+        return articleQuoteSearchCache;
     }
 }
