@@ -45,8 +45,7 @@ function renderMainImage(imageSrc: string | undefined) {
             <div style={{
                 width: "100%",
                 height: "400px",
-                backgroundSize: "cover",
-                background: "url(" + imageSrc + ") no-repeat center"
+                background: "url(" + imageSrc + ") no-repeat center / cover"
             }}/>
         );
     }
