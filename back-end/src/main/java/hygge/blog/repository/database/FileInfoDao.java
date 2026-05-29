@@ -28,11 +28,11 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "update fileInfo set fileCacheType = :#{#fileCacheType.getValue()}, description = JSON_SET(COALESCE(description, '{}'), '$.nginxLink', :cacheLink) where fileNo = :fileNo", nativeQuery = true)
+    @Query(value = "update file_info set fileCacheType = :#{#fileCacheType.getValue()}, description = JSON_SET(COALESCE(description, '{}'), '$.nginxLink', :cacheLink) where fileNo = :fileNo", nativeQuery = true)
     int updateFileCacheLink(@Param("fileNo") String fileNo, @Param("fileCacheType") FileCacheTypeEnum fileCacheType, @Param("cacheLink") String cacheLink);
 
     @Modifying
     @Transactional
-    @Query(value = "update fileInfo set fileCacheType = 'DEFAULT', description = JSON_REMOVE(COALESCE(description, '{}'), '$.nginxLink') where fileNo = :fileNo", nativeQuery = true)
+    @Query(value = "update file_info set fileCacheType = 'DEFAULT', description = JSON_REMOVE(COALESCE(description, '{}'), '$.nginxLink') where fileNo = :fileNo", nativeQuery = true)
     int removeFileCacheLink(@Param("fileNo") String fileNo);
 }
