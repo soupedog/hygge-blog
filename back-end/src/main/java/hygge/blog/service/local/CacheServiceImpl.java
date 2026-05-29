@@ -10,7 +10,11 @@ import hygge.blog.domain.local.po.User;
 import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.TopicServiceImpl;
 import hygge.blog.service.local.normal.UserServiceImpl;
+import hygge.commons.exception.LightRuntimeException;
 import hygge.util.template.HyggeJsonUtilContainer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +40,24 @@ public class CacheServiceImpl extends HyggeJsonUtilContainer {
     private final TopicServiceImpl topicService;
     private final UserServiceImpl userService;
     private final FileServiceImpl fileService;
+    private final CacheManager cacheManager;
 
-    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService, FileServiceImpl fileService) {
+    @Autowired
+    public CacheServiceImpl(CategoryServiceImpl categoryService, TopicServiceImpl topicService, UserServiceImpl userService, FileServiceImpl fileService, CacheManager cacheManager) {
         this.categoryService = categoryService;
         this.topicService = topicService;
         this.userService = userService;
         this.fileService = fileService;
+        this.cacheManager = cacheManager;
+    }
+
+    public void clearCache(CacheObjectContainer.CacheTypeEnum cacheType) {
+        Cache cache = cacheManager.getCache(cacheType.getValue());
+        if (cache == null) {
+            throw new LightRuntimeException("Cache(" + cacheType.getValue() + ") was not found.");
+        }
+
+        cache.clear();
     }
 
     /**

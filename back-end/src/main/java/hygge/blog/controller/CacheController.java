@@ -4,9 +4,8 @@ import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.CacheControllerDoc;
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
-import hygge.commons.exception.LightRuntimeException;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import hygge.blog.service.local.CacheServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,23 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/blog-service/api/main")
 public class CacheController implements CacheControllerDoc {
-    private final CacheManager cacheManager;
+    private final CacheServiceImpl cacheService;
 
-    public CacheController(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
+    @Autowired
+    public CacheController(CacheServiceImpl cacheService) {
+        this.cacheService = cacheService;
     }
 
     @Override
     @RequireAuth
     @DeleteMapping("/cache")
-    public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheName", defaultValue = "CATEGORY_TREE") CacheObjectContainer.CacheTypeEnum cacheType) {
-        Cache cache = cacheManager.getCache(cacheType.getValue());
-        if (cache == null) {
-            throw new LightRuntimeException("Cache(" + cacheType.getValue() + ") was not found.");
-        }
-
-        cache.clear();
-
+    public ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(@RequestParam(value = "cacheType", defaultValue = "CATEGORY_TREE") CacheObjectContainer.CacheTypeEnum cacheType) {
+        cacheService.clearCache(cacheType);
         return (ResponseEntity<HyggeBlogControllerResponse<Void>>) success();
     }
 }
