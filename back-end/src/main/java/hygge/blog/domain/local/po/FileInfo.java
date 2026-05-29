@@ -31,7 +31,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "fileInfo", indexes = {@Index(name = "index_fileNo", columnList = "fileNo", unique = true)})
+@Table(name = "file_info", indexes = {@Index(name = "index_fileNo", columnList = "fileNo", unique = true)})
 public class FileInfo extends FileInfoBase {
     @Lob
     @Column(columnDefinition = "longblob", updatable = false)

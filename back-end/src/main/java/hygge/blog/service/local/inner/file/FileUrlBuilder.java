@@ -10,18 +10,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileUrlBuilder {
     public final String apiUrlPrefix;
-    public final String apiUrlPrefix_old;
     public final String nginxUrlPrefix;
-    public final String nginxUrlPrefix_old;
 
     public FileUrlBuilder(@Value("${hyyge.blog.file.expose.api.prefix}") String apiUrlPrefix,
-                          @Value("${hyyge.blog.file.expose.old.api.prefix:old.com/}") String apiUrlPrefix_old,
-                          @Value("${hyyge.blog.file.expose.nginx.prefix}") String nginxUrlPrefix,
-                          @Value("${hyyge.blog.file.expose.old.nginx.prefix:old.com/static/}") String nginxUrlPrefix_old) {
+                          @Value("${hyyge.blog.file.expose.nginx.prefix}") String nginxUrlPrefix) {
         this.apiUrlPrefix = autoFillForwardSlashToEnd(apiUrlPrefix);
-        this.apiUrlPrefix_old = autoFillForwardSlashToEnd(apiUrlPrefix_old);
         this.nginxUrlPrefix = autoRemoveLastForwardSlash(nginxUrlPrefix);
-        this.nginxUrlPrefix_old = autoRemoveLastForwardSlash(nginxUrlPrefix_old);
     }
 
     public String getFileNginxLinkByRelativePath(String relativePath) {
