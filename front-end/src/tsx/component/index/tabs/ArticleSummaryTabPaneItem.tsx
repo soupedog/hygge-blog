@@ -4,7 +4,7 @@ import clsx from "clsx";
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from "@ant-design/icons";
 import {ArticleDto, CategoryDto} from "../../../rest/ApiClient";
 import {ArticleSummaryOrderType} from "../../properties/GlobalEnum";
-import {PropertiesHelper, TimeHelper, UrlHelper} from "../../../util/UtilContainer";
+import {PropertiesHelper, TimeHelper, TimeType, UrlHelper} from "../../../util/UtilContainer";
 
 function ArticleSummaryTabPaneItem({isAuthor, secretKey, orderType, articleSummary}: {
     isAuthor: Boolean,
@@ -57,7 +57,7 @@ function createFooterItemList({isAuthor, aid, wordCount, pageViews, selfPageView
                 <IconText icon={EditTwoTone} text={"字数 " + wordCount}
                           key={"word_count_" + aid}/>,
                 <IconText icon={DashboardTwoTone}
-                          text={"创建于 " + TimeHelper.formatTimeStampToString(createTs)}
+                          text={"创建于 " + TimeHelper.formatTimeStampToString(createTs, TimeType.yyyy_mm_dd)}
                           key={"create_ts_" + aid}/>,
                 <IconText icon={EyeTwoTone} text={"浏览量 " + pageViews}
                           key={"page_view_" + aid}/>,
@@ -71,7 +71,7 @@ function createFooterItemList({isAuthor, aid, wordCount, pageViews, selfPageView
                 <IconText icon={EditTwoTone} text={"字数 " + wordCount}
                           key={"word_count_" + aid}/>,
                 <IconText icon={DashboardTwoTone}
-                          text={TimeHelper.formatTimeStampToString(createTs)}
+                          text={TimeHelper.formatTimeStampToString(createTs, TimeType.yyyy_mm_dd)}
                           key={"create_ts_" + aid}/>,
                 <IconText icon={EyeTwoTone} text={"浏览量 " + pageViews}
                           key={"page_view_" + aid}/>,

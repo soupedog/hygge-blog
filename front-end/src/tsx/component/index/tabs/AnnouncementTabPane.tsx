@@ -1,7 +1,7 @@
 import React from 'react';
 import {Timeline} from "antd";
 import {AnnouncementDto} from "../../../rest/ApiClient";
-import {TimeHelper} from "../../../util/UtilContainer";
+import {TimeHelper, TimeType} from "../../../util/UtilContainer";
 
 function AnnouncementTabPane({announcementDtoList}: { announcementDtoList: AnnouncementDto[] }) {
     return (
@@ -20,7 +20,7 @@ function createTimelineItems(announcementList: AnnouncementDto[]) {
         result.push(
             {
                 color: item.color,
-                label: TimeHelper.formatTimeStampToString(item.createTs),
+                label: TimeHelper.formatTimeStampToString(item.createTs, TimeType.yyyy_mm_dd),
                 children: <>
                     {
                         item.paragraphList.map((paragraph, index) => {

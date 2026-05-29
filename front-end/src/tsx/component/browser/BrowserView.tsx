@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import MusicPlayer from "../player/MusicPlayer";
-import {ArticleConfiguration, ArticleDto, UserService} from "../../rest/ApiClient";
+import {ArticleConfiguration, ArticleDto} from "../../rest/ApiClient";
 import {Affix, Breadcrumb, Card, FloatButton, Layout, message, Space, Tree} from "antd";
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
 import HyggeFooter from "../HyggeFooter";
@@ -9,7 +9,7 @@ import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import {TreeProps} from "antd/es/tree/Tree";
 import {AntdTreeNodeInfo, CreateTocTreeInputParam, MdHelper, TreeNodeInfo} from "../markdown/util/MdHelper";
-import {TimeHelper} from "../../util/UtilContainer";
+import {TimeHelper, TimeType} from "../../util/UtilContainer";
 import {MdPreview} from "md-editor-rt";
 import {allowAll, editor_id_for_browser} from "../markdown/properties/MarkDownStaticValue";
 
@@ -134,10 +134,10 @@ function renderArticle(article: ArticleDto | undefined, tocEnable: Boolean, upda
                                 <IconText icon={EditTwoTone} text={"字数 " + article.wordCount}
                                           key={"word_count_" + article.aid}/>
                                 <IconText icon={DashboardTwoTone}
-                                          text={"创建于 " + TimeHelper.formatTimeStampToString(article.createTs)}
+                                          text={"创建于 " + TimeHelper.formatTimeStampToString(article.createTs, TimeType.yyyy_mm_dd)}
                                           key={"create_ts_" + article.aid}/>
                                 <IconText icon={DashboardTwoTone}
-                                          text={"最后修改于 " + TimeHelper.formatTimeStampToString(article.lastUpdateTs)}
+                                          text={"最后修改于 " + TimeHelper.formatTimeStampToString(article.lastUpdateTs, TimeType.yyyy_mm_dd)}
                                           key={"lastUpdate_ts_" + article.aid}/>
                                 <IconText icon={EyeTwoTone} text={"浏览量 " + article.pageViews}
                                           key={"page_view_" + article.aid}/>
