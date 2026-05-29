@@ -19,6 +19,7 @@ import hygge.blog.service.local.normal.CategoryServiceImpl;
 import hygge.blog.service.local.normal.QuoteServiceImpl;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,9 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,9 +92,14 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
+        ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(article, currentCategory, categoryTreeInfo);
+        searchingCacheDao.save(articleQuoteSearchCache);
+    }
+
+    private ArticleQuoteSearchCache buildEsDto(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
         ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
 
-        articleService.initUidAndCoverURL(article.getUserId(),articleDto);
+        articleService.initUidAndCoverURL(article.getUserId(), articleDto);
 
         articleDto.setCid(currentCategory.getCid());
         articleDto.setCategoryTreeInfo(categoryTreeInfo);
@@ -100,12 +108,12 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         articleQuoteSearchCache.initEsId(article.getArticleId(), ArticleQuoteSearchCache.Type.ARTICLE);
         articleQuoteSearchCache.setCategoryId(article.getCategoryId());
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.ARTICLE);
-        searchingCacheDao.save(articleQuoteSearchCache);
+        return articleQuoteSearchCache;
     }
 
     public void freshSingleQuote(Integer quoteId) {
         Quote quote = quoteService.findQuoteByQuoteId(quoteId, false);
-        refreshQuote(quote);
+        refreshSingleQuote(quote);
     }
 
     public void freshSingleQuoteAsync(Integer quoteId) {
@@ -115,27 +123,37 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         });
     }
 
-    private void refreshQuote(Quote quote) {
-        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
+    private void refreshSingleQuote(Quote quote) {
+        ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(quote);
+        searchingCacheDao.save(articleQuoteSearchCache);
+    }
 
+    private @NotNull ArticleQuoteSearchCache buildEsDto(Quote quote) {
+        QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
         quoteService.initUidAndCoverURL(quote.getUserId(), quoteDto);
 
         ArticleQuoteSearchCache articleQuoteSearchCache = ElasticToDtoMapper.INSTANCE.quoteDtoToEs(quoteDto);
         articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
-        searchingCacheDao.save(articleQuoteSearchCache);
+        return articleQuoteSearchCache;
     }
 
     public void freshAllArticle() {
         long startTs = System.currentTimeMillis();
         AtomicInteger totalCount = new AtomicInteger(0);
-
         List<Category> allCategoryList = categoryDao.findAll();
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("articleId")));
+        Map<Integer, Category> allCategoryMap = collectionHelper.filterNonemptyItemAsHashMap(allCategoryList, (Category::getCategoryId), item -> item);
+
+        int pageSize = 25;
+
+        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Order.asc("articleId")));
 
         Page<Article> articleTemp = articleDao.findAll(pageable);
 
         List<Article> articleList = null;
+
+        List<ArticleQuoteSearchCache> forSaveBatch = new ArrayList<>(pageSize);
+
         do {
             if (articleList != null) {
                 articleTemp = articleDao.findAll(articleTemp.nextPageable());
@@ -143,14 +161,18 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
             articleList = articleTemp.getContent();
 
             articleList.forEach(article -> {
-                Category currentCategory = allCategoryList.stream().filter(category -> category.getCategoryId().equals(article.getCategoryId())).findFirst().orElse(null);
+                Category currentCategory = allCategoryMap.get(article.getCategoryId());
                 // 数据无误时，文章必属于全部文章类别中的一种，不可能空指针异常
                 CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
 
-                freshSingleArticle(article, currentCategory, categoryTreeInfo);
-
-                totalCount.incrementAndGet();
+                ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(article, currentCategory, categoryTreeInfo);
+                forSaveBatch.add(articleQuoteSearchCache);
             });
+
+            searchingCacheDao.saveAll(forSaveBatch);
+            totalCount.getAndAdd(forSaveBatch.size());
+            forSaveBatch.clear();
+
         } while (!articleTemp.isLast());
 
         log.info("已刷新文章数 {} 耗时 {} ms", totalCount.get(), System.currentTimeMillis() - startTs);
@@ -160,7 +182,11 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         long startTs = System.currentTimeMillis();
         AtomicInteger totalCount = new AtomicInteger(0);
 
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("quoteId")));
+        int pageSize = 75;
+
+        List<ArticleQuoteSearchCache> forSaveBatch = new ArrayList<>(pageSize);
+
+        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Order.asc("quoteId")));
 
         Page<Quote> quoteTemp = quoteDao.findAll(pageable);
 
@@ -172,9 +198,14 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
             quoteList = quoteTemp.getContent();
 
             quoteList.forEach(quote -> {
-                refreshQuote(quote);
-                totalCount.incrementAndGet();
+                ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(quote);
+                forSaveBatch.add(articleQuoteSearchCache);
             });
+
+            searchingCacheDao.saveAll(forSaveBatch);
+            totalCount.addAndGet(forSaveBatch.size());
+            forSaveBatch.clear();
+
         } while (!quoteTemp.isLast());
 
         log.info("已刷新句子数 {} 耗时 {} ms", totalCount.get(), System.currentTimeMillis() - startTs);
