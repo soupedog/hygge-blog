@@ -19,5 +19,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ArticleCountInfo {
     private Integer categoryId;
-    private Long count;
+    private Integer count;
 }

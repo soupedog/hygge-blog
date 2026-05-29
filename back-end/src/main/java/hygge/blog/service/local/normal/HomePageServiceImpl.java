@@ -19,8 +19,8 @@ import hygge.util.template.HyggeJsonUtilContainer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Xavier
@@ -62,6 +62,8 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
 
         List<ArticleCountInfo> articleCountInfoList = articleCountService.findArticleCountInfoOfCategory(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
 
+        HashMap<Integer, Integer> articleCountInfoMap = collectionHelper.filterNonemptyItemAsHashMap(articleCountInfoList, ArticleCountInfo::getCategoryId, ArticleCountInfo::getCount);
+
         HomepageFetchResult result = HomepageFetchResult.builder().topicOverviewInfoList(new ArrayList<>()).build();
 
         // 记录首个 Topic 对象
@@ -77,8 +79,7 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
 
             categoryList.stream().filter(category -> category.getTopicId().equals(topic.getTopicId())).forEach(category -> {
                 CategoryDto categoryDto = PoDtoMapper.INSTANCE.poToDto(category);
-                Optional<ArticleCountInfo> articleCountInfoTemp = articleCountInfoList.stream().filter(articleCountInfo -> articleCountInfo.getCategoryId().equals(category.getCategoryId())).findFirst();
-                Integer count = articleCountInfoTemp.map(articleCountInfo -> articleCountInfo.getCount().intValue()).orElse(0);
+                int count = articleCountInfoMap.getOrDefault(category.getCategoryId(), 0);
                 // 非管理员隐藏挂载文章数目为 0 的类别
                 if (!context.isMaintainer() && count < 1) {
                     return;
