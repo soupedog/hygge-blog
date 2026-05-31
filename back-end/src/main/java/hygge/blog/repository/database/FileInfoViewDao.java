@@ -34,8 +34,9 @@ public interface FileInfoViewDao extends JpaRepository<FileInfoView, Integer> {
      */
     FileInfoView findByFileTypeAndNameAndExtension(FileTypeEnum fileType, String name, String extension);
 
-    @Query(value = "from FileInfoView where fileType in :fileTypeCollection and permissionId in :activePermissionIdList")
-    Page<FileInfoView> findFileInfoMultiple(@Param("fileTypeCollection") Collection<FileTypeEnum> fileTypeCollection, @Param("activePermissionIdList") Collection<Integer> activePermissionIdList, Pageable pageable);
+    Page<FileInfoView> findFileInfoViewByNameLikeAndFileTypeInAndPermissionIdIn(String keywords, Collection<FileTypeEnum> fileTypeCollection, Collection<Integer> permissionIdCollection, Pageable pageable);
+
+    Page<FileInfoView> findFileInfoViewByFileTypeInAndPermissionIdIn(Collection<FileTypeEnum> fileTypeCollection, Collection<Integer> permissionIdCollection, Pageable pageable);
 
     /**
      * @param keywordPattern 需要手工添加符号如 "%张三%", 才代表要求名称包含张三

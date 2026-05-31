@@ -69,6 +69,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     }
 
     @Override
+    @RequireAuth
     @DeleteMapping("/file/{fileNo}")
     public ResponseEntity<HyggeBlogControllerResponse<Void>> deleteFile(@PathVariable("fileNo") String fileNo) {
         fileService.deleteFile(fileNo);
@@ -76,6 +77,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     }
 
     @Override
+    @RequireAuth
     @PutMapping("/file/{fileNo}")
     public ResponseEntity<HyggeBlogControllerResponse<Void>> updateFileInfo(@PathVariable("fileNo") String fileNo, @RequestBody Map<String, Object> data) {
         fileService.updateFileInfo(fileNo, data);
@@ -83,6 +85,7 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     }
 
     @Override
+    @RequireAuth
     @GetMapping("/file/{fileNo}")
     public ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>> findFileInfo(@PathVariable("fileNo") String fileNo) {
         FileInfoDto result = fileService.findFileInfo(fileNo);
@@ -90,12 +93,14 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     }
 
     @Override
+    @RequireAuth
     @GetMapping("/file")
     @ControllerLog(inputParamEnable = false, outputParamEnable = false)
-    public ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfoList(@RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
+    public ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>> findFileInfoList(@RequestParam(value = "keywords", required = false) String keywords,
+                                                                                      @RequestParam(value = "type", required = false) List<FileTypeEnum> fileTypes,
                                                                                       @RequestParam(required = false, defaultValue = "1") int currentPage,
                                                                                       @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        return (ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>>) success(fileService.findFileInfoPageQuery(fileTypes, currentPage, pageSize));
+        return (ResponseEntity<HyggeBlogControllerResponse<FileInfoInfo>>) success(fileService.findFileInfoPageQuery(fileTypes, keywords, currentPage, pageSize));
     }
 
     @GetMapping(value = "/file/static/{fileNo}")

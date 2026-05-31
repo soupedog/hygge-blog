@@ -408,10 +408,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public FileInfoDto findFileInfo(String fileNo) {
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
-        // 是否有文件查询权限
-        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
         Optional<FileInfoView> fileInfoViewTemp = findFileViewFromDB(fileNo);
 
         if (fileInfoViewTemp.isEmpty()) {
@@ -425,11 +421,9 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         return resultTempItem;
     }
 
-    public FileInfoInfo findFileInfoPageQuery(List<FileTypeEnum> fileTypes, Integer currentPage, Integer pageSize) {
+    public FileInfoInfo findFileInfoPageQuery(List<FileTypeEnum> fileTypes, String keywords, Integer currentPage, Integer pageSize) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
-        // 是否有文件查询权限
-        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
 
         List<FileTypeEnum> actualFileTypes = fileTypes == null ? TYPE_FOR_ALL : fileTypes;
 
@@ -438,7 +432,22 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         Sort sort = Sort.by(Sort.Order.asc("createTs"));
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
-        Page<FileInfoView> resultTemp = fileInfoViewDao.findFileInfoMultiple(actualFileTypes, activePermissionIdList, pageable);
+
+        Page<FileInfoView> resultTemp;
+        if (parameterHelper.isEmpty(keywords)) {
+            resultTemp = fileInfoViewDao.findFileInfoViewByFileTypeInAndPermissionIdIn(
+                    actualFileTypes,
+                    activePermissionIdList,
+                    pageable
+            );
+        } else {
+            resultTemp = fileInfoViewDao.findFileInfoViewByNameLikeAndFileTypeInAndPermissionIdIn(
+                    "%" + keywords + "%",
+                    actualFileTypes,
+                    activePermissionIdList,
+                    pageable
+            );
+        }
 
         resultTemp.stream().forEach(item -> {
             FileInfoDto resultTempItem = item.toDto();
@@ -490,11 +499,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     }
 
     public void deleteFile(String fileNo) {
-        HyggeRequestContext context = HyggeRequestTracker.getContext();
-        User currentUser = context.getCurrentLoginUser();
-        // 是否有文件删除权限
-        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
-
         Optional<FileInfoView> fileInfoViewTemp = fileInfoViewDao.findOne(Example.of(FileInfoView.builder().fileNo(fileNo).build()));
 
         fileInfoViewTemp.ifPresent((fileInfoView) -> {
