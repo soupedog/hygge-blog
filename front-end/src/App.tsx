@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Loading from "./pages/Loading.tsx";
 
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示(毕竟最先被展示的是 index 页)
-const Login = lazy(() => import("./pages/Login.tsx"));
+const Signin = lazy(() => import("./pages/./Signin.tsx"));
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -17,8 +17,8 @@ createRoot(document.getElementById('root')!).render(
         <Suspense fallback={<Loading key={"Loading"}/>}>
             <BrowserRouter>
                 <Routes>
-                    <Route path={"/signin"} element={<NotFound key={"NotFound"} delayTime={3000}/>}/>
-                    <Route path={"/login"} element={<Login key={"Login"}/>}/>
+                    <Route path={"/signup"} element={<NotFound key={"NotFound"} delayTime={3000}/>}/>
+                    <Route path={"/signin"} element={<Signin key={"Signin"}/>}/>
                     <Route index path={"/"} element={<Index key={"Index"}/>}/>
                     {/*从上到下匹配，上方全未匹配命中则说明 404 */}
                     <Route path={"*"} element={<NotFound key={"NotFound"} delayTime={3000}/>}/>

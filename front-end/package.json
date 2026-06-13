@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.2.5",
     "antd": "^6.4.3",
     "aplayer-ts": "^2.6.0",
     "modern-normalize": "^3.0.1",
