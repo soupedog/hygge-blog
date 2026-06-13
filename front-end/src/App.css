@@ -34,7 +34,7 @@
     cursor: pointer;
 }
 
-.text1 {
-    background-color: #fbb21e;
-    font-size: 64px;
+.fullPage {
+    height: 100%;
+    width: 100%;
 }
