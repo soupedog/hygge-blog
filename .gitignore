@@ -13,3 +13,5 @@ gen
 /front-end/src/tsx/util/UtilContainer.tsx
 /back-end/src/main/resources/environment-local-to-external.properties
 /back-end/src/main/resources/environment-local.properties
+/front-end/.env.local
+/front-end/.env.production.local

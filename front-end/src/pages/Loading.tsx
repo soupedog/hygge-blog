@@ -1,9 +1,10 @@
 import "./Loading.css"
+import {appConfiguration} from '../configuration/app.configuration'
 
 export default function Loading() {
-    const icpInfo: string = "省ICP备XXXXXXXX号-X";
-    const codePrefix: string = "省公网安备";
-    const code: string = "XXXXXXXXXXX";
+    const icpInfo: string = appConfiguration.icpInfo;
+    const codePrefix: string = appConfiguration.codePrefix;
+    const code: string = appConfiguration.code;
 
     return (
         <div className="lazy-fallback-wrapper">
