@@ -18,7 +18,7 @@ const MusicPlayer = lazy(() => import("./pages/MusicPlayer.tsx"));
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         {/*懒加载需要一同连用的组件，fallback 是加载未成功时要展示的内容*/}
-        <Suspense fallback={<Loading text={"test"}/>}>
+        <Suspense fallback={<Loading />}>
             <BrowserRouter>
                 <Routes>
                     <Route path={"/"} element={<AppLayout key={"layout"}/>}>

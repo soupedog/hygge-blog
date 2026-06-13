@@ -1,0 +1,271 @@
+/* 重置可能的边距影响 - 仅作用于 fallback 容器内部，不污染外部 */
+.lazy-fallback-wrapper {
+    --lf-bg-start: #f8fafc;
+    --lf-bg-end: #eef2f8;
+    --lf-card-white: #ffffff;
+    --lf-primary: #2563eb;
+    --lf-primary-light: #3b82f6;
+    --lf-text-dark: #0f172a;
+    --lf-text-medium: #334155;
+    --lf-text-soft: #64748b;
+    --lf-border-light: #e2e8f0;
+    --lf-shadow-card: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+    --lf-warning-bg: #fffbeb;
+    --lf-warning-text: #b45309;
+
+    /* 占满整个视口 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, var(--lf-bg-start) 0%, var(--lf-bg-end) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', 'Helvetica Neue', sans-serif;
+    z-index: 9999;
+    margin: 0;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* 卡片容器 - 最大宽度限制但保持响应式居中 */
+.lazy-fallback-card {
+    max-width: 560px;
+    width: 100%;
+    background: var(--lf-card-white);
+    border-radius: 2rem;
+    box-shadow: var(--lf-shadow-card);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    animation: lazy-fallback-fadeUp 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+}
+
+/* 主体区域 */
+.lazy-fallback-main {
+    padding: 2rem 2rem 1.8rem 2rem;
+}
+
+/* 提示头部 */
+.lazy-fallback-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.6rem;
+}
+
+.lazy-fallback-icon {
+    background: #eef2ff;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.2rem;
+    color: var(--lf-primary);
+    flex-shrink: 0;
+}
+
+.lazy-fallback-title h3 {
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--lf-text-dark);
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.lazy-fallback-title p {
+    font-size: 0.8rem;
+    color: var(--lf-text-soft);
+    margin-top: 2px;
+    margin: 2px 0 0 0;
+    padding: 0;
+}
+
+/* 列表样式 - 带宽 + 依赖大小 + 预计加载时间 */
+.lazy-fallback-list {
+    background: #f9f9fc;
+    border-radius: 1.5rem;
+    padding: 0.2rem;
+    border: 1px solid var(--lf-border-light);
+    margin: 1.2rem 0 1.6rem 0;
+}
+
+.lazy-fallback-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--lf-border-light);
+}
+
+.lazy-fallback-item:last-child {
+    border-bottom: none;
+}
+
+.lazy-fallback-label {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-weight: 500;
+    color: var(--lf-text-medium);
+    font-size: 0.95rem;
+}
+
+.lazy-fallback-value {
+    background: white;
+    padding: 0.2rem 0.9rem;
+    border-radius: 32px;
+    font-weight: 600;
+    color: var(--lf-text-dark);
+    font-family: monospace;
+    font-size: 0.9rem;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02), 0 1px 1px rgba(0, 0, 0, 0.02);
+}
+
+.lazy-fallback-highlight {
+    color: var(--lf-primary-light);
+}
+
+/* 浏览器兼容性提示卡片 */
+.lazy-fallback-compat {
+    background: var(--lf-warning-bg);
+    border-left: 4px solid #f59e0b;
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    margin: 0.8rem 0 0.5rem 0;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.lazy-fallback-compat-content {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--lf-warning-text);
+}
+
+.lazy-fallback-compat-content strong {
+    font-weight: 600;
+    color: #b45309;
+}
+
+.lazy-fallback-browser-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.lazy-fallback-browser-badge {
+    display: inline-block;
+    background: white;
+    border-radius: 20px;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #92400e;
+    border: 0.5px solid #fed7aa;
+    font-family: monospace;
+}
+
+/* 底部备案信息 - 单行显示，顺序：网盾图片 + 粤公网安备号 + ICP备案号 */
+.lazy-fallback-icp {
+    text-align: center;
+    margin-top: 1.2rem;
+    padding-top: 0.75rem;
+    font-size: 0.7rem;
+    color: var(--lf-text-soft);
+    border-top: 1px solid var(--lf-border-light);
+    line-height: 1.5;
+}
+
+.lazy-fallback-icp a {
+    color: var(--lf-text-soft);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.lazy-fallback-icp a:hover {
+    color: var(--lf-primary);
+    text-decoration: underline;
+}
+
+/* 备案信息分隔符样式 */
+.lazy-fallback-icp-sep {
+    margin: 0 0.5rem;
+    color: var(--lf-border-light);
+}
+
+/* 网盾图片样式 */
+.lazy-fallback-icp-shield {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    vertical-align: middle;
+}
+
+.lazy-fallback-icp-shield-icon {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    background: none;
+}
+
+/* 动画 - 使用独立命名避免冲突 */
+@keyframes lazy-fallback-fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式 - 类名控制 */
+@media (max-width: 560px) {
+    .lazy-fallback-main {
+        padding: 1.2rem 1.2rem;
+    }
+
+    .lazy-fallback-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .lazy-fallback-compat {
+        padding: 0.8rem;
+    }
+
+    .lazy-fallback-wrapper {
+        padding: 1rem;
+    }
+
+    /* 小屏幕备案信息允许换行但保持可读性 */
+    .lazy-fallback-icp-line {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .lazy-fallback-icp-sep {
+        margin: 0 0.25rem;
+    }
+}
+
+/* 默认屏幕大时单行显示 */
+@media (min-width: 561px) {
+    .lazy-fallback-icp-line {
+        white-space: nowrap;
+    }
+}
