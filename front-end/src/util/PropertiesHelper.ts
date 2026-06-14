@@ -73,15 +73,15 @@ export default class PropertiesHelper {
      * PropertiesHelper.arrayToString({ array: [{id:1},{id:2}], itemKey: 'id' }) // '1,2'
      */
     static arrayToString<T extends Record<string, any>>(inputParam: ArrayFormatInputParam<T>): string {
-        const { array, isStandard = false, itemKey } = inputParam;
+        const {array, isStandard = false, itemKey} = inputParam;
 
         if (!array.length) {
-            return isStandard ? '[]' : "";
+            return isStandard ? '[]' : '';
         }
 
         const parts = array.map(item => {
             if (itemKey != null && item && typeof item === 'object') {
-                return String(item[itemKey] ?? "");
+                return String(item[itemKey] ?? '');
             }
             return String(item);
         });
