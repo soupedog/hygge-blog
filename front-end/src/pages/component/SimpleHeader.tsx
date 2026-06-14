@@ -1,11 +1,13 @@
 import * as React from 'react';
 import {Header} from 'antd/es/layout/layout';
+import {Spin} from 'antd';
 
 export interface SimpleHeaderProps {
-    readonly title: string
+    readonly title: string;
+    readonly isAnyPending: boolean;
 }
 
-const headerTitleStyle: React.CSSProperties = {
+const simpleHeaderTitleStyle: React.CSSProperties = {
     float: 'left',
     width: '6.25rem',
     height: '2rem',
@@ -19,10 +21,17 @@ const headerTitleStyle: React.CSSProperties = {
     borderRadius: '0.25rem'
 }
 
-export default function SimpleHeader({title}: SimpleHeaderProps) {
+const simpleHeaderSpinStyle: React.CSSProperties = {
+    float: 'right',
+    margin: '1rem 0 1rem 0',
+}
+
+export default function SimpleHeader({title, isAnyPending}: SimpleHeaderProps) {
+
     return (
         <Header>
-            <div style={headerTitleStyle}>{title}</div>
+            <div style={simpleHeaderTitleStyle}>{title}</div>
+            <Spin spinning={isAnyPending} size='large' style={simpleHeaderSpinStyle}/>
         </Header>
     );
 }

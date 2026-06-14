@@ -7,6 +7,7 @@ import SimpleHeader from './component/SimpleHeader.tsx';
 import AppFooter from './component/AppFooter.tsx';
 import {useUserService} from '../util/ApiService.ts';
 import UrlHelper from '../util/UrlHelper.ts';
+import {useIsMutating} from '@tanstack/react-query';
 
 interface FieldType {
     username?: string;
@@ -16,6 +17,8 @@ interface FieldType {
 export default function Signin() {
     const [form] = Form.useForm();
     const {signIn} = useUserService();
+    // 全局的 Pending 检测，如果单独则如 signIn.isPending 即可
+    const isAnyPending = useIsMutating() > 0;
 
     const handleLogin = (values: any) => {
         // 再次提供 onSuccess 并不是覆盖，而是包括 useUserService 内已经定义的共计两个方法都会执行
@@ -36,7 +39,7 @@ export default function Signin() {
 
     return (
         <Layout>
-            <SimpleHeader title={'登录'}/>
+            <SimpleHeader title={'登录'} isAnyPending={isAnyPending}/>
             <Content style={{minHeight: '35rem'}}>
                 <Form
                     name='basic'
