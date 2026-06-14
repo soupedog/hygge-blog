@@ -1,4 +1,4 @@
-import type {StorageKey} from "../enums/EnumKeeper.ts";
+import type {StorageKey} from '../enums/EnumKeeper.ts';
 
 /**
  * localStorage 工具类

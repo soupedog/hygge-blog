@@ -28,28 +28,28 @@ export default class PropertiesHelper {
      * 判断是否为非空字符串
      */
     static isStringNotEmpty(target: unknown): target is string {
-        return typeof target === "string" && target.length > 0;
+        return typeof target === 'string' && target.length > 0;
     }
 
     /**
      * 判断是否为有效数字（不包括 NaN）
      */
     static isNumberNotNull(target: unknown): target is number {
-        return typeof target === "number" && !isNaN(target);
+        return typeof target === 'number' && !isNaN(target);
     }
 
     /**
      * 判断是否为有效布尔值
      */
     static isBooleanNotNull(target: unknown): target is boolean {
-        return typeof target === "boolean";
+        return typeof target === 'boolean';
     }
 
     /**
      * 判断是否为非空对象（不包含 null，且为 object 类型，不包括数组）
      */
     static isObjectNotNull(target: unknown): target is object {
-        return target !== null && typeof target === "object" && !Array.isArray(target);
+        return target !== null && typeof target === 'object' && !Array.isArray(target);
     }
 
     /**
@@ -63,30 +63,30 @@ export default class PropertiesHelper {
      * 判断是否为有效函数
      */
     static isFunctionNotNull(target: unknown): target is Function {
-        return typeof target === "function";
+        return typeof target === 'function';
     }
 
     /**
      * 将数组转换为字符串
      * @example
-     * PropertiesHelper.arrayToString({ array: [1,2,3], isStandard: true }) // "[1,2,3]"
-     * PropertiesHelper.arrayToString({ array: [{id:1},{id:2}], itemKey: "id" }) // "1,2"
+     * PropertiesHelper.arrayToString({ array: [1,2,3], isStandard: true }) // '[1,2,3]'
+     * PropertiesHelper.arrayToString({ array: [{id:1},{id:2}], itemKey: 'id' }) // '1,2'
      */
     static arrayToString<T extends Record<string, any>>(inputParam: ArrayFormatInputParam<T>): string {
         const { array, isStandard = false, itemKey } = inputParam;
 
         if (!array.length) {
-            return isStandard ? "[]" : "";
+            return isStandard ? '[]' : "";
         }
 
         const parts = array.map(item => {
-            if (itemKey != null && item && typeof item === "object") {
+            if (itemKey != null && item && typeof item === 'object') {
                 return String(item[itemKey] ?? "");
             }
             return String(item);
         });
 
-        const result = parts.join(",");
+        const result = parts.join(',');
         return isStandard ? `[${result}]` : result;
     }
 }

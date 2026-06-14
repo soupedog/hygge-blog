@@ -1,8 +1,9 @@
 import {useEffect} from 'react';
-import {useNavigate} from "react-router-dom";
-import UrlHelper from "../util/UrlHelper.ts";
-import {UserClient} from "../util/ApiClient.ts";
-import {ClientScope} from "../enums/EnumKeeper.ts";
+import {useNavigate} from 'react-router-dom';
+import UrlHelper from '../util/UrlHelper.ts';
+import {UserClient} from '../util/ApiClient.ts';
+import {ClientScope} from '../enums/EnumKeeper.ts';
+import {httpClient} from '../util/HttpClient.ts';
 
 export default function AppInit() {
     const navigate = useNavigate();
@@ -11,6 +12,9 @@ export default function AppInit() {
         // 依赖静态值表示仅初始化时调用一次
         UrlHelper.init(navigate);
         UserClient.init(ClientScope.WEB);
+
+        // 初始化单例
+        httpClient.initInterceptors();
     }, []);
 
     // 只负责初始化工具，无需渲染组件
