@@ -1,5 +1,6 @@
 import {useEffect} from 'react';
 import {Layout} from 'antd';
+
 import AppFooter from './component/AppFooter.tsx';
 
 export default function Home() {

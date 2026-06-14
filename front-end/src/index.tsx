@@ -6,7 +6,7 @@ import './index.css'
 import Loading from './pages/Loading.tsx';
 import {BrowserRouter} from 'react-router-dom';
 
-const AppInit = lazy(() => import('./pages/./App'));
+const AppInit = lazy(() => import('./pages/App.tsx'));
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

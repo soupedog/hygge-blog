@@ -1,5 +1,6 @@
 import {useEffect} from 'react';
 import {Button, Result} from 'antd';
+
 import UrlHelper from '../util/UrlHelper.ts';
 
 export interface NotFoundProps {
@@ -16,11 +17,11 @@ export default function NotFound({delayTime}: NotFoundProps) {
 
     return (
         <Result
-            status='404'
-            title='目标资源未找到'
-            subTitle='很抱歉, 您所访问的资源不存在，将在 3 秒内自动为您返回主页。'
+            status="404"
+            title="目标资源未找到"
+            subTitle="很抱歉, 您所访问的资源不存在，将在 3 秒内自动为您返回主页。"
             extra={
-                <Button type='primary' onClick={() => {
+                <Button type="primary" onClick={() => {
                     UrlHelper.navigateTo({path: '/', canBack: false, delayTime: delayTime});
                 }}>
                     立即返回主页

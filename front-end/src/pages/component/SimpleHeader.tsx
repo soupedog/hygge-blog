@@ -1,5 +1,5 @@
-import {Header} from 'antd/es/layout/layout';
 import * as React from 'react';
+import {Header} from 'antd/es/layout/layout';
 
 export interface SimpleHeaderProps {
     readonly title: string

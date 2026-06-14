@@ -1,10 +1,11 @@
 import {lazy, useEffect} from 'react';
 import {Route, Routes, useNavigate} from 'react-router-dom';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+
 import UrlHelper from '../util/UrlHelper.ts';
 import {UserClient} from '../util/ApiClient.ts';
 import {ClientScope} from '../enums/EnumKeeper.ts';
 import {httpClient} from '../util/HttpClient.ts';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient();
