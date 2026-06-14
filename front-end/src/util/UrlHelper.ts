@@ -1,21 +1,25 @@
 import {appConfiguration} from '../configuration/app.configuration'
-import PropertiesHelper from "./PropertiesHelper.ts";
-import type {NavigateFunction} from "react-router-dom";
+import PropertiesHelper from './PropertiesHelper.ts';
+import type {NavigateFunction} from 'react-router-dom';
 
 export interface QueryStringValue {
     [key: string]: string | number | boolean | null | undefined;
 }
 
 export interface AppNavigateConfig {
-    inNewTab: boolean;
-    path?: string;
-    finalUrl?: string;
+    path: string;
     delayTime?: number;
-    navigateFunction?: NavigateFunction,
     canBack?: boolean;
 }
 
 export default class UrlHelper {
+    private static navigateInstance: NavigateFunction | null = null;
+
+    /** 初始化（在 App 组件中调用一次） */
+    static init(navigate: NavigateFunction) {
+        this.navigateInstance = navigate;
+    }
+
     static getHomePagePrefix(): string {
         return appConfiguration.host_FE;
     }
@@ -101,8 +105,8 @@ export default class UrlHelper {
      * @returns 参数值（已解码），不存在时返回 null
      * @example
      * // 当前 URL: https://example.com?name=hello%20world&age=18#top
-     * getQueryString('name') // "hello world"
-     * getQueryString('age')  // "18"
+     * getQueryString('name') // 'hello world'
+     * getQueryString('age')  // '18'
      * getQueryString('none') // null
      */
     static getQueryString(key: string): string | null {
@@ -117,49 +121,42 @@ export default class UrlHelper {
     }
 
     static navigateTo(config: AppNavigateConfig): void {
-        if (!config.inNewTab && config.navigateFunction == null) {
-            throw new Error(`[navigateFunction] can't be null when the [inNewTab] is ${config.inNewTab}`);
+        if (this.navigateInstance == null) {
+            throw new Error('[navigateInstance] was null.');
         }
 
-        let actualUrl: string;
+        const navigate = this.navigateInstance;
 
-        if (config.path != null) {
-            // 确保 path 以 / 开头
-            const normalizedPath = config.path.startsWith('/') ? config.path : `/${config.path}`;
+        // 确保 path 以 / 开头
+        const normalizedPath = config.path.startsWith('/') ? config.path : `/${config.path}`;
 
-            actualUrl = this.getHomePagePrefix() + normalizedPath;
-        } else if (config.finalUrl != null) {
-            actualUrl = config.finalUrl;
+        let actualPath: string = this.getHomePagePrefix() + normalizedPath;
+
+        const secretKey = this.getQueryString('secretKey');
+        actualPath = this.mergeUrl(actualPath, {secretKey: secretKey})
+
+        // 非新开窗口用单页面应用跳转工具
+        // 前面共享了 URL 处理工具需要把 host 去除
+        actualPath = actualPath.replace(this.getHomePagePrefix(), '');
+        const actualCanBack = PropertiesHelper.booleanOfNullable({target: config.canBack, defaultValue: true});
+        const actualReplace = !actualCanBack;
+
+        if (config.delayTime != null) {
+            window.setTimeout(() => {
+                navigate(actualPath, {replace: actualReplace});
+            }, config.delayTime);
         } else {
-            actualUrl = this.getHomePagePrefix();
+            navigate(actualPath, {replace: actualReplace});
         }
+    }
 
-        const secretKey = this.getQueryString("secretKey");
-        actualUrl = this.mergeUrl(actualUrl, {secretKey: secretKey})
-
-        if (config.inNewTab) {
-            if (config.delayTime != null) {
-                window.setTimeout(function () {
-                    window.open(actualUrl);
-                }, config.delayTime);
-            } else {
-                window.open(actualUrl);
-            }
-            return;
+    static openInNewTab(url: string, delayTime?: number) {
+        if (delayTime != null) {
+            window.setTimeout(function () {
+                window.open(url);
+            }, delayTime);
         } else {
-            // 非新开窗口用单页面应用跳转工具
-            // 前面共享了 URL 处理工具需要把 host 去除
-            actualUrl = actualUrl.replace(this.getHomePagePrefix(), "");
-            const actualCanBack = PropertiesHelper.booleanOfNullable({target: config.canBack, defaultValue: true});
-            const actualReplace = !actualCanBack;
-
-            if (config.delayTime != null) {
-                window.setTimeout(function () {
-                    config.navigateFunction!(actualUrl, {replace: actualReplace});
-                }, config.delayTime);
-            } else {
-                config.navigateFunction!(actualUrl, {replace: actualReplace});
-            }
+            window.open(url);
         }
     }
 }

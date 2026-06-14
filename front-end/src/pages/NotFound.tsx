@@ -1,19 +1,16 @@
 import {useEffect} from 'react';
 import {Button, Result} from "antd";
-import {useNavigate} from "react-router-dom";
 import UrlHelper from "../util/UrlHelper.ts";
 
 export interface NotFoundProps {
-    readonly delayTime: number
+    readonly delayTime: number;
 }
 
 export default function NotFound({delayTime}: NotFoundProps) {
-    const navigate = useNavigate();
-
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
-        window.setTimeout(function () {
-            UrlHelper.navigateTo({inNewTab: false, navigateFunction: navigate, canBack: false, delayTime: delayTime});
+        window.setTimeout(() => {
+            UrlHelper.navigateTo({path: "/", canBack: false, delayTime: delayTime});
         }, delayTime);
     }, []);
 
@@ -24,7 +21,7 @@ export default function NotFound({delayTime}: NotFoundProps) {
             subTitle="很抱歉, 您所访问的资源不存在，将在 3 秒内自动为您返回主页。"
             extra={
                 <Button type="primary" onClick={() => {
-                    UrlHelper.navigateTo({inNewTab: false, navigateFunction: navigate, canBack: false});
+                    UrlHelper.navigateTo({path: "/", canBack: false, delayTime: delayTime});
                 }}>
                     立即返回主页
                 </Button>
