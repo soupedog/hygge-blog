@@ -1,5 +1,3 @@
-import type {StorageKey} from '../enums/EnumKeeper.ts';
-
 /**
  * localStorage 工具类
  * 提供类型安全的存储操作
@@ -53,7 +51,7 @@ export default class StorageHelper {
     public static update<T extends object>(key: string, partial: Partial<T>): void {
         const current = this.get<T>(key);
         if (current) {
-            const updated = { ...current, ...partial };
+            const updated = {...current, ...partial};
             this.set(key, updated);
         } else {
             console.warn(`[StorageUtil] Cannot update ${key}: no existing data found`);
