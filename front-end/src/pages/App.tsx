@@ -11,7 +11,7 @@ import {httpClient} from '../util/HttpClient.ts';
 const queryClient = new QueryClient();
 
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示
-const Index = lazy(() => import('./Home.tsx'));
+const Home = lazy(() => import('./Home.tsx'));
 const NotFound = lazy(() => import('./NotFound.tsx'));
 const Signin = lazy(() => import('./Signin.tsx'));
 
@@ -37,7 +37,7 @@ export default function App() {
                 <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/signin'} element={<Signin key={'Signin'}/>}/>
-                <Route path={'/'} element={<Index key={'Home'}/>}/>
+                <Route path={'/'} element={<Home key={'Home'}/>}/>
                 {/*从上到下匹配，上方全未匹配命中则说明 404 */}
                 <Route path={'*'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
             </Routes>
