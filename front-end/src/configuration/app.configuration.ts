@@ -2,6 +2,8 @@ export interface AppConfiguration {
     icpInfo: string
     codePrefix: string
     code: string
+    host_FE: string
+    host_BE: string
 }
 
 // 直接导出配置对象
@@ -9,7 +11,9 @@ export interface AppConfiguration {
 export const appConfiguration: AppConfiguration = {
     icpInfo: import.meta.env.VITE_ICP_INFO || "默认ICP备号",
     codePrefix: import.meta.env.VITE_CODE_PREFIX || "默认公网安备",
-    code: import.meta.env.VITE_CODE || "00000000"
+    code: import.meta.env.VITE_CODE || "00000000",
+    host_FE: import.meta.env.VITE_HOST_FE || "http://localhost:5173/",
+    host_BE: import.meta.env.VITE_HOST_BE || "http://localhost:8080/",
 }
 
 // 开发环境打印配置（仅开发环境）

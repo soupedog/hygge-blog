@@ -1,6 +1,5 @@
 import {useEffect} from "react";
 import {Button, Form, Input, Layout, Space} from "antd";
-import {useNavigate} from "react-router-dom";
 import {Content} from "antd/es/layout/layout";
 import SimpleHeader from "./component/SimpleHeader.tsx";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
@@ -13,7 +12,6 @@ interface FieldType {
 
 export default function Signin() {
     const [form] = Form.useForm();
-    const navigate = useNavigate();
 
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
@@ -33,6 +31,7 @@ export default function Signin() {
                     onFinishFailed={(errorInfo) => {
                         console.log(errorInfo);
                     }}
+                    // 不再记录历史信息
                     autoComplete="off"
                 >
                     <div style={{width: "20rem", margin: "8rem auto 2rem auto"}}>
