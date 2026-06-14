@@ -4,8 +4,9 @@ import StorageHelper from './StorageHelper.ts';
 import {ClientScope, StorageKey} from '../enums/EnumKeeper.ts';
 import PropertiesHelper from './PropertiesHelper.ts';
 import {httpClient} from './HttpClient.ts';
+import {appConfiguration} from '../configuration/app.configuration.ts';
 
-const apiZIndex = 20001;
+const toastZIndex = appConfiguration.toastDefaultZIndex;
 
 export interface HyggeResponse<T> {
     code: number;
@@ -118,7 +119,7 @@ export class UserClient {
 
         if (requestHeader != null) {
             StorageHelper.set(StorageKey.AUTO_LOGIN_DISABLED, '已禁止再次触发自动登陆');
-            message.success({content: '尝试用令牌刷新秘钥自动登录。', style: {zIndex: apiZIndex}});
+            message.info({content: '尝试用令牌刷新秘钥自动登录。', style: {zIndex: toastZIndex}});
             // 刷新令牌
             clientResponse = await httpClient.post('/sign/in', {}, {headers: requestHeader});
         } else {
@@ -129,7 +130,7 @@ export class UserClient {
         // 能到这里说明没被拦截器拦截，已经正确请求到后端服务器
         const response: HyggeResponse<any> = clientResponse.data;
 
-        if (clientResponse.data.main.code == 200) {
+        if (response.code == 200) {
             // 每次登录成功则运行重试刷新令牌至少一次
             let user = response.main.user;
             StorageHelper.set(StorageKey.USER_UID, user.uid);
@@ -137,8 +138,73 @@ export class UserClient {
             StorageHelper.set(StorageKey.USER_REFRESH_KEY, response.main.refreshKey);
             StorageHelper.set(StorageKey.USER_INFO, user);
             StorageHelper.remove(StorageKey.AUTO_LOGIN_DISABLED);
+            message.info({content: '用户登录缓存信息已更新！', style: {zIndex: toastZIndex}});
         }
 
         return response.main;
     }
+}
+
+export interface ArticleConfiguration {
+    backgroundMusicType: string,
+    mediaPlayType: string,
+    src: string,
+    coverSrc?: string,
+    name?: string,
+    artist?: string,
+    lrc?: string
+}
+
+export interface TopicDto {
+    tid: string,
+    topicName: string,
+    orderVal: number
+}
+
+export interface CategoryDto {
+    cid: string,
+    permissionId: number,
+    categoryName: string,
+    categoryType: string,
+    orderVal: number,
+    articleCount?: number
+}
+
+export interface CategoryTreeInfo {
+    topicInfo: TopicDto,
+    categoryList: CategoryDto[],
+}
+
+export interface ArticleDto {
+    aid: string,
+    configuration: ArticleConfiguration,
+    categoryTreeInfo: CategoryTreeInfo,
+    cid: string,
+    uid: string,
+    title: string,
+    imageSrc: string,
+    coverFileNo: string,
+    summary: string,
+    content: string,
+    wordCount: number,
+    pageViews: number,
+    selfPageViews: number,
+    orderGlobal: number,
+    orderCategory: number,
+    articleState: string,
+    createTs: number,
+    lastUpdateTs: number,
+    editable: boolean
+}
+
+export class PostClient {
+
+    static async findArticleByAid(aid: string): Promise<ArticleDto> {
+        const clientResponse = await httpClient.get('/main/article/' + aid, {
+            headers: UserClient.getHeader()
+        });
+
+        return clientResponse.data.main;
+    }
+
 }

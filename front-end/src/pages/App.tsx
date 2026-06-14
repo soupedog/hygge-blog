@@ -9,11 +9,12 @@ import {httpClient} from '../util/HttpClient.ts';
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient();
-
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示
+
 const Home = lazy(() => import('./Home.tsx'));
 const NotFound = lazy(() => import('./NotFound.tsx'));
 const Signin = lazy(() => import('./Signin.tsx'));
+const PostBrowser = lazy(() => import('./PostBrowser.tsx'));
 
 export default function App() {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <Routes>
-                <Route path={'/post/:pid'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                <Route path={'/post/:pid'} element={<PostBrowser key={'PostBrowser'}/>}/>
                 <Route path={'/manage/editor/post'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/manage/editor/quote'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/manage/file/glance'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>

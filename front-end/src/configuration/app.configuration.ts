@@ -1,9 +1,10 @@
 export interface AppConfiguration {
-    icpInfo: string
-    codePrefix: string
-    code: string
-    host_FE: string
-    host_BE: string
+    icpInfo: string;
+    codePrefix: string;
+    code: string;
+    host_FE: string;
+    host_BE: string;
+    toastDefaultZIndex: number;
 }
 
 // 直接导出配置对象
@@ -14,6 +15,7 @@ export const appConfiguration: AppConfiguration = {
     code: import.meta.env.VITE_CODE || '00000000',
     host_FE: import.meta.env.VITE_HOST_FE || 'http://localhost:5173/',
     host_BE: import.meta.env.VITE_HOST_BE || 'http://localhost:8080/',
+    toastDefaultZIndex: 20001,
 }
 
 // 开发环境打印配置（仅开发环境）
