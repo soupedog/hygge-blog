@@ -17,3 +17,15 @@ export class ClientScope {
     private constructor() {
     }
 }
+
+export class TimeType {
+    // 2022-8-4
+    static readonly yyyy_mm_dd = '0';
+    // 21:39:44
+    static readonly hh_mm_ss = '1';
+    // 2022-8-4 21:39:44
+    static readonly yyyy_mm_dd_hh_mm_ss = '2';
+
+    private constructor() {
+    }
+}

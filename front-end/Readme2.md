@@ -14,4 +14,7 @@ pnpm add @tanstack/react-query
 
 # TS 版本音乐播放器
 pnpm add aplayer-ts
+
+# markdown 工具
+pnpm add md-editor-rt
 ```
