@@ -5,36 +5,21 @@ import {useParams} from 'react-router-dom';
 import './PostBrowser.css'
 
 import {usePostService} from '../util/ApiService.ts';
-import {Breadcrumb, Card, Layout, message, Space} from 'antd';
-import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
+import {Breadcrumb, Card, FloatButton, Layout, message, Space, Tree, type TreeProps} from 'antd';
+import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
 import {type ArticleDto, UserClient} from '../util/ApiClient.ts';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import UrlHelper from '../util/UrlHelper.ts';
 import AppFooter from './component/AppFooter.tsx';
 import {Content} from 'antd/es/layout/layout';
 import Sider from 'antd/es/layout/Sider';
-import SimpleHeader from './component/SimpleHeader.tsx';
 import {TimeHelper} from '../util/TimeHelper.ts';
 import {TimeType} from '../enums/EnumKeeper.ts';
 import {MdPreview} from 'md-editor-rt';
+import {type AntdTreeNodeInfo, type CreateTocTreeInputParam, MdHelper, type TreeNodeInfo} from '../util/markdown/MdHelper.ts';
+import PostBrowserHeader from './component/PostBrowserHeader.tsx';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
-
-const contentStyle: React.CSSProperties = {
-    // textAlign: 'center',
-    // minHeight: '666px',
-    // lineHeight: '120px',
-    // color: '#fff',
-    // backgroundColor: '#0958d9',
-};
-
-const siderStyle: React.CSSProperties = {
-    // textAlign: 'center',
-    // lineHeight: '120px',
-    color: '#fff',
-    backgroundColor: '#1677ff',
-};
-
 const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
     <Space>
         {React.createElement(icon)}
@@ -42,8 +27,34 @@ const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
     </Space>
 );
 
+// 目录选中自动跳转函数
+const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
+    // @ts-ignore
+    let item: TreeNodeInfo = info.node;
+
+    // 用标签类型 + data-line 属性做筛选
+    let element = document.querySelector(item.nodeName + '[data-line="' + item.dataLine + '"]');
+
+    if (element != undefined) {
+        // 滚动到锚点元素的顶部(offsetTop 是数字类型，你可以在此基础上追加偏移量)
+
+        window.scrollTo({
+            // @ts-ignore
+            top: element.offsetTop + 540,
+            behavior: 'smooth'
+        });
+
+        // 拿到 dom 元素可以直接使用此方法滚动到目标位置(无法追加偏移量)
+        // element.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+    } else {
+        message.warning('未找到对应跳转锚点');
+    }
+};
+
 export default function PostBrowser() {
     const [post, updatePost] = useState<ArticleDto | undefined>(undefined);
+    const [tocEnable, updateTocEnable] = useState<boolean>(false);
+    const [tocTree, updateTocTree] = useState<Array<TreeNodeInfo>>([]);
     const {pid} = useParams();
     const {findArticleByAidMutation} = usePostService();
 
@@ -54,6 +65,12 @@ export default function PostBrowser() {
                     // 依赖静态值表示仅初始化时调用一次
                     document.title = `${data.title} | 我的小宅子`;
                     updatePost(data);
+
+                    // 需要等待 markdown Html 元素渲染完成
+                    window.setTimeout(() => {
+                        initToc();
+                    }, 1000);
+
                 } else {
                     message.warning({content: '目标文章不存在，2 秒内自动跳转回主页，请稍后……', duration: 2, style: {zIndex: toastZIndex}});
                     UrlHelper.navigateTo({path: '/', delayTime: 2000, canBack: false});
@@ -72,17 +89,34 @@ export default function PostBrowser() {
 
     return (
         <Layout>
-            <SimpleHeader title={'测试'} isAnyPending={false}/>
+            <PostBrowserHeader title={'测试'} isAnyPending={false}/>
             <div className={'PostBrowser_image'} style={{
                 width: '100%',
                 height: '25rem',
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
             <Layout>
-                <Sider width='20%' style={siderStyle} collapsed={false}>
-                    Sider
+                <Sider style={{backgroundColor: '#F0F2F5', paddingTop: '12rem'}} width='20%' collapsedWidth={0} collapsed={!tocEnable}>
+                    {tocEnable ? <Card variant={'borderless'} styles={{body: {padding: 8}}}
+                                       style={{
+                                           marginRight: '0.5rem',
+                                           position: 'sticky',
+                                           top: '12rem'
+                                       }}
+                                       className={'postBrowserToc'}>
+                        <div className='tocTitle'>目录
+                        </div>
+                        <Tree
+                            defaultExpandAll={true}
+                            showLine={true}
+                            treeData={tocTree as any}
+                            switcherIcon={<DownOutlined/>}
+                            onSelect={onSelect}
+                        >
+                        </Tree>
+                    </Card> : null}
                 </Sider>
-                <Content style={contentStyle}>
+                <Content>
                     <Card title={post.title} variant={'borderless'} style={{
                         marginTop: '1rem'
                     }}>
@@ -115,6 +149,12 @@ export default function PostBrowser() {
                         <MdPreview value={post.content} sanitize={(html) => html}/>
                     </Card>
                 </Content>
+                <FloatButton.Group shape='square' style={{zIndex: 20001}}>
+                    <FloatButton onClick={() => {
+                        updateTocEnable(!tocEnable);
+                    }}/>
+                    <FloatButton.BackTop visibilityHeight={0}/>
+                </FloatButton.Group>
             </Layout>
             <AppFooter/>
         </Layout>
@@ -138,5 +178,36 @@ export default function PostBrowser() {
             );
         })
         return result;
+    }
+
+    function initToc() {
+        let antdTreeNodeInfos = new Array<TreeNodeInfo>();
+        let map = new Map<number, TreeNodeInfo>();
+
+        document.querySelectorAll('H1[data-line][id], H2[data-line][id], H3[data-line][id], H4[data-line][id], H5[data-line][id], H6[data-line][id]').forEach((item, index) => {
+            let antdTreeNode: TreeNodeInfo = {
+                title: item.textContent,
+                children: new Array<AntdTreeNodeInfo>(),
+                index: index,
+                id: item.id,
+                dataLine: item.getAttribute('data-line')!,
+                nodeName: item.tagName,
+            };
+
+            antdTreeNodeInfos.push(antdTreeNode);
+            map.set(index, antdTreeNode);
+        });
+
+        let currentTOC = MdHelper.initTitleTree({
+            currentTOCArray: antdTreeNodeInfos,
+            allTocNodeMap: map
+        } as CreateTocTreeInputParam);
+
+        if (currentTOC.length > 0) {
+            updateTocTree(currentTOC);
+            updateTocEnable(true);
+        } else {
+            message.info('未找到目录结构');
+        }
     }
 }
