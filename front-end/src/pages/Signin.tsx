@@ -4,6 +4,8 @@ import {Content} from "antd/es/layout/layout";
 import SimpleHeader from "./component/SimpleHeader.tsx";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import AppFooter from "./component/AppFooter.tsx";
+import {UserClient} from "../util/ApiClient.ts";
+import UrlHelper from "../util/UrlHelper.ts";
 
 interface FieldType {
     username?: string;
@@ -26,7 +28,11 @@ export default function Signin() {
                     name="basic"
                     form={form}
                     onFinish={(values) => {
-                        console.log(values);
+                        UserClient.signIn(values.username, values.password, {
+                            successHook: (data) => {
+                                UrlHelper.navigateTo({path: "/", canBack: false});
+                            }
+                        });
                     }}
                     onFinishFailed={(errorInfo) => {
                         console.log(errorInfo);

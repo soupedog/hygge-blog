@@ -109,15 +109,15 @@ export default class UrlHelper {
      * getQueryString('age')  // '18'
      * getQueryString('none') // null
      */
-    static getQueryString(key: string): string | null {
+    static getQueryString(key: string): string | undefined {
         if (typeof window === 'undefined' || !window.location) {
-            return null; // 支持 SSR 环境
+            return undefined; // 支持 SSR 环境
         }
 
         const urlParams = new URLSearchParams(window.location.search);
         const value = urlParams.get(key);
 
-        return value !== null ? decodeURIComponent(value) : null;
+        return value !== null ? decodeURIComponent(value) : undefined;
     }
 
     static navigateTo(config: AppNavigateConfig): void {
