@@ -5,8 +5,8 @@ import {useParams} from 'react-router-dom';
 import './PostBrowser.css'
 
 import {usePostService} from '../util/ApiService.ts';
-import {Breadcrumb, Card, FloatButton, Layout, message, Space, Tree, type TreeProps} from 'antd';
-import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone} from '@ant-design/icons';
+import {Breadcrumb, Button, Card, Flex, FloatButton, Layout, message, Space, Tree, type TreeProps} from 'antd';
+import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone, MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import {type ArticleDto, UserClient} from '../util/ApiClient.ts';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import UrlHelper from '../util/UrlHelper.ts';
@@ -45,7 +45,7 @@ const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
         });
 
         // 拿到 dom 元素可以直接使用此方法滚动到目标位置(无法追加偏移量)
-        // element.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
+        // element.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
     } else {
         message.warning('未找到对应跳转锚点');
     }
@@ -53,7 +53,9 @@ const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
 
 export default function PostBrowser() {
     const [post, updatePost] = useState<ArticleDto | undefined>(undefined);
+    const [expandAllEnable, updateExpandAllEnable] = useState<boolean>(false);
     const [tocEnable, updateTocEnable] = useState<boolean>(false);
+    const [siderWidth, updateSiderWidth] = useState<number>(20);
     const [tocTree, updateTocTree] = useState<Array<TreeNodeInfo>>([]);
     const {pid} = useParams();
     const {findArticleByAidMutation} = usePostService();
@@ -96,7 +98,7 @@ export default function PostBrowser() {
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
             <Layout>
-                <Sider style={{backgroundColor: '#F0F2F5', paddingTop: '12rem'}} width='20%' collapsedWidth={0} collapsed={!tocEnable}>
+                <Sider style={{backgroundColor: '#F0F2F5', paddingTop: '12rem'}} width={`${siderWidth}%`} collapsedWidth={0} collapsed={!tocEnable}>
                     {tocEnable ? <Card variant={'borderless'} styles={{body: {padding: 8}}}
                                        style={{
                                            marginRight: '0.5rem',
@@ -104,16 +106,25 @@ export default function PostBrowser() {
                                            top: '12rem'
                                        }}
                                        className={'postBrowserToc'}>
-                        <div className='tocTitle'>目录
-                        </div>
+                        <div className='tocTitle'>目录</div>
                         <Tree
-                            defaultExpandAll={true}
+                            defaultExpandAll={expandAllEnable}
                             showLine={true}
                             treeData={tocTree as any}
                             switcherIcon={<DownOutlined/>}
                             onSelect={onSelect}
                         >
                         </Tree>
+                        <Flex justify={'center'}>
+                            <Space.Compact>
+                                <Button onClick={() => {
+                                    updateSiderWidth(Math.max(siderWidth - 5, 20));
+                                }} icon={<MinusOutlined/>}/>
+                                <Button onClick={() => {
+                                    updateSiderWidth(Math.min(siderWidth + 5, 50));
+                                }} icon={<PlusOutlined/>}/>
+                            </Space.Compact>
+                        </Flex>
                     </Card> : null}
                 </Sider>
                 <Content>
@@ -145,11 +156,11 @@ export default function PostBrowser() {
                             </Space>
                         </div>
                     </Card>
-                    <Card style={{marginTop: '20px'}} variant={'borderless'}>
+                    <Card style={{marginTop: '1rem'}} variant={'borderless'}>
                         <MdPreview value={post.content} sanitize={(html) => html}/>
                     </Card>
                 </Content>
-                <FloatButton.Group shape='square' style={{zIndex: 20001}}>
+                <FloatButton.Group shape='square' style={{zIndex: toastZIndex}}>
                     <FloatButton onClick={() => {
                         updateTocEnable(!tocEnable);
                     }}/>
@@ -204,6 +215,9 @@ export default function PostBrowser() {
         } as CreateTocTreeInputParam);
 
         if (currentTOC.length > 0) {
+            if (antdTreeNodeInfos.length < 10) {
+                updateExpandAllEnable(true);
+            }
             updateTocTree(currentTOC);
             updateTocEnable(true);
         } else {

@@ -18,6 +18,7 @@
     "antd": "^6.4.3",
     "aplayer-ts": "^2.6.0",
     "axios": "^1.17.0",
+    "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
     "markdown-it-mark": "^4.0.0",
     "md-editor-rt": "^6.5.1",
