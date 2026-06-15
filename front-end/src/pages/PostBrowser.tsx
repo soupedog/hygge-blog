@@ -7,7 +7,7 @@ import './PostBrowser.css'
 import {usePostService} from '../util/ApiService.ts';
 import {Breadcrumb, Button, Card, Flex, FloatButton, Layout, message, Space, Tree, type TreeProps} from 'antd';
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone, MinusOutlined, PlusOutlined} from '@ant-design/icons';
-import {type ArticleDto, UserClient} from '../util/ApiClient.ts';
+import {type ArticleConfiguration, type ArticleDto, UserClient} from '../util/ApiClient.ts';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import UrlHelper from '../util/UrlHelper.ts';
 import AppFooter from './component/AppFooter.tsx';
@@ -18,6 +18,7 @@ import {TimeType} from '../enums/EnumKeeper.ts';
 import {MdPreview} from 'md-editor-rt';
 import {type AntdTreeNodeInfo, type CreateTocTreeInputParam, MdHelper, type TreeNodeInfo} from '../util/markdown/MdHelper.ts';
 import PostBrowserHeader from './component/PostBrowserHeader.tsx';
+import MusicPlayer from './component/MusicPlayer.tsx';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
 const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
@@ -97,6 +98,7 @@ export default function PostBrowser() {
                 height: '25rem',
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
+            {renderMusicPlayer(post.configuration)}
             <Layout>
                 <Content>
                     <Card title={post.title} variant={'borderless'} style={{
@@ -174,6 +176,10 @@ export default function PostBrowser() {
             <AppFooter/>
         </Layout>
     );
+
+    function renderMusicPlayer(configuration: ArticleConfiguration) {
+        return (<MusicPlayer configuration={configuration}/>);
+    }
 
     function renderBreadcrumbItems(article: ArticleDto) {
         let result = [];
