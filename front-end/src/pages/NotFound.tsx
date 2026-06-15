@@ -22,7 +22,7 @@ export default function NotFound({delayTime}: NotFoundProps) {
             subTitle='很抱歉, 您所访问的资源不存在，将在 3 秒内自动为您返回主页。'
             extra={
                 <Button type='primary' onClick={() => {
-                    UrlHelper.navigateTo({path: '/', canBack: false, delayTime: delayTime});
+                    UrlHelper.navigateTo({path: '/', canBack: false});
                 }}>
                     立即返回主页
                 </Button>

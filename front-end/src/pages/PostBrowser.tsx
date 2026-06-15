@@ -4,7 +4,7 @@ import {useParams} from 'react-router-dom';
 
 import './PostBrowser.css'
 
-import {Breadcrumb, Button, Card, Flex, FloatButton, Layout, message, Space, Tree, type TreeProps} from 'antd';
+import {Breadcrumb, Button, Card, Flex, FloatButton, Layout, message, Space, Tooltip, Tree, type TreeProps} from 'antd';
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone, MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import {usePostService} from '../util/ApiService.ts';
@@ -92,7 +92,7 @@ export default function PostBrowser() {
 
     return (
         <Layout>
-            <PostBrowserHeader title={'测试'} isAnyPending={false}/>
+            <PostBrowserHeader isAnyPending={false}/>
             <div className={'PostBrowser_image'} style={{
                 width: '100%',
                 height: '25rem',
@@ -150,27 +150,35 @@ export default function PostBrowser() {
                             onSelect={onSelect}
                         >
                         </Tree>
-                        <Flex justify={'center'}>
+                        <Flex justify={'center'} style={{marginTop: '2rem'}}>
                             <Space.Compact>
-                                <Button onClick={() => {
-                                    updateSiderWidth(Math.max(siderWidth - 5, 20));
-                                }} icon={<MinusOutlined/>}/>
-                                <Button onClick={() => {
-                                    updateSiderWidth(Math.min(siderWidth + 5, 50));
-                                }} icon={<PlusOutlined/>}/>
+                                <Tooltip placement='top' title={'收窄目录'}>
+                                    <Button onClick={() => {
+                                        updateSiderWidth(Math.max(siderWidth - 5, 20));
+                                    }} icon={<MinusOutlined/>}/>
+                                </Tooltip>
+                                <Tooltip placement='top' title={'拓宽目录'}>
+                                    <Button onClick={() => {
+                                        updateSiderWidth(Math.min(siderWidth + 5, 50));
+                                    }} icon={<PlusOutlined/>}/>
+                                </Tooltip>
                             </Space.Compact>
                         </Flex>
                     </Card> : null}
                 </Sider>
                 <FloatButton.Group shape='square' style={{zIndex: toastZIndex}}>
-                    <FloatButton onClick={() => {
-                        if (tocTree.length > 0) {
-                            updateTocEnable(!tocEnable);
-                        } else {
-                            message.info('未找到目录结构');
-                        }
-                    }}/>
-                    <FloatButton.BackTop visibilityHeight={0}/>
+                    <Tooltip placement='left' title={'目录'}>
+                        <FloatButton onClick={() => {
+                            if (tocTree.length > 0) {
+                                updateTocEnable(!tocEnable);
+                            } else {
+                                message.info('未找到目录结构');
+                            }
+                        }}/>
+                    </Tooltip>
+                    <Tooltip placement='left' title={'回到顶部'}>
+                        <FloatButton.BackTop visibilityHeight={0}/>
+                    </Tooltip>
                 </FloatButton.Group>
             </Layout>
             <AppFooter/>

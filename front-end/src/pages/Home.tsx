@@ -5,6 +5,7 @@ import AppFooter from './component/AppFooter.tsx';
 
 export default function Home() {
     useEffect(() => {
+        document.title = `我的小宅子`;
     }, []);
 
     return (

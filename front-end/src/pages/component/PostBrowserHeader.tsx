@@ -1,37 +1,24 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {Header} from 'antd/es/layout/layout';
-import {Spin} from 'antd';
+import {Flex, Spin, Tooltip} from 'antd';
 import clsx from 'clsx';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
+import {RollbackOutlined} from '@ant-design/icons';
+import UrlHelper from '../../util/UrlHelper.ts';
+import AppUserMenu from './AppUserMenu.tsx';
 
 const headerZIndex = appConfiguration.toastDefaultZIndex - 10;
 
 export interface PostBrowserHeaderProps {
-    readonly title: string;
     readonly isAnyPending: boolean;
 }
 
-const PostBrowserHeaderTitleStyle: React.CSSProperties = {
-    float: 'left',
-    width: '6.25rem',
-    height: '2rem',
-    margin: '1rem',
-    background: 'rgba(255, 255, 255, 0.3)',
-    fontSize: '1.125rem',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    lineHeight: '2rem',
-    color: 'white',
-    borderRadius: '0.25rem'
-}
-
 const PostBrowserHeaderSpinStyle: React.CSSProperties = {
-    float: 'right',
     margin: '1rem 0 1rem 0',
 }
 
-export default function PostBrowserHeader({title, isAnyPending}: PostBrowserHeaderProps) {
+export default function PostBrowserHeader({isAnyPending}: PostBrowserHeaderProps) {
     const [isTransparent, setIsTransparent] = useState(true);
 
     useEffect(() => {
@@ -56,8 +43,19 @@ export default function PostBrowserHeader({title, isAnyPending}: PostBrowserHead
         <Header className={clsx({
             'backgroundTransparent': isTransparent
         })} style={{position: 'fixed', zIndex: headerZIndex, width: '100%'}}>
-            <div style={PostBrowserHeaderTitleStyle}>{title}</div>
-            <Spin spinning={isAnyPending} size='large' style={PostBrowserHeaderSpinStyle}/>
+            <Flex justify={'space-between'} style={{height: '100%'}}>
+                <Flex className={'PostBrowserHeader-left'} justify={'flex-start'} style={{width: '50%'}}>
+                    <Tooltip placement='bottom' title={'返回首页'}>
+                        <RollbackOutlined onClick={() => {
+                            UrlHelper.navigateTo({path: '/'});
+                        }} style={{color: '#fff', fontWeight: 'bold', fontSize: '2rem', lineHeight: '4rem'}}/>
+                    </Tooltip>
+                </Flex>
+                <Flex className={'PostBrowserHeader-right'} justify={'flex-end'} style={{width: '50%'}}>
+                    <AppUserMenu/>
+                    <Spin spinning={isAnyPending} size='large' style={PostBrowserHeaderSpinStyle}/>
+                </Flex>
+            </Flex>
         </Header>
     );
 }
