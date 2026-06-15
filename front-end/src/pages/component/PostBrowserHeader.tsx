@@ -5,7 +5,7 @@ import {Spin} from 'antd';
 import clsx from 'clsx';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
 
-const headerZIndex = appConfiguration.toastDefaultZIndex - 1;
+const headerZIndex = appConfiguration.toastDefaultZIndex - 10;
 
 export interface PostBrowserHeaderProps {
     readonly title: string;

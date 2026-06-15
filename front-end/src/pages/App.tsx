@@ -30,6 +30,11 @@ const NotFound = lazy(() => import('./NotFound.tsx'));
 const Signin = lazy(() => import('./Signin.tsx'));
 const PostBrowser = lazy(() => import('./PostBrowser.tsx'));
 
+// 在应用初始化时配置
+message.config({
+    getContainer: () => document.getElementById('root') || document.body,
+    top: 64,  // 可调整距离顶部的距离
+});
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
 // Markdown 工具全局配置

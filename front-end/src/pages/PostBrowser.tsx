@@ -98,35 +98,6 @@ export default function PostBrowser() {
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
             <Layout>
-                <Sider style={{backgroundColor: '#F0F2F5', paddingTop: '12rem'}} width={`${siderWidth}%`} collapsedWidth={0} collapsed={!tocEnable}>
-                    {tocEnable ? <Card variant={'borderless'} styles={{body: {padding: 8}}}
-                                       style={{
-                                           marginRight: '0.5rem',
-                                           position: 'sticky',
-                                           top: '12rem'
-                                       }}
-                                       className={'postBrowserToc'}>
-                        <div className='tocTitle'>目录</div>
-                        <Tree
-                            defaultExpandAll={expandAllEnable}
-                            showLine={true}
-                            treeData={tocTree as any}
-                            switcherIcon={<DownOutlined/>}
-                            onSelect={onSelect}
-                        >
-                        </Tree>
-                        <Flex justify={'center'}>
-                            <Space.Compact>
-                                <Button onClick={() => {
-                                    updateSiderWidth(Math.max(siderWidth - 5, 20));
-                                }} icon={<MinusOutlined/>}/>
-                                <Button onClick={() => {
-                                    updateSiderWidth(Math.min(siderWidth + 5, 50));
-                                }} icon={<PlusOutlined/>}/>
-                            </Space.Compact>
-                        </Flex>
-                    </Card> : null}
-                </Sider>
                 <Content>
                     <Card title={post.title} variant={'borderless'} style={{
                         marginTop: '1rem'
@@ -160,9 +131,42 @@ export default function PostBrowser() {
                         <MdPreview value={post.content} sanitize={(html) => html}/>
                     </Card>
                 </Content>
+                <Sider style={{backgroundColor: '#F0F2F5', paddingTop: '12rem'}} width={`${siderWidth}%`} collapsedWidth={0} collapsed={!tocEnable}>
+                    {tocEnable ? <Card variant={'borderless'} styles={{body: {padding: 8}}}
+                                       style={{
+                                           marginLeft: '0.5rem',
+                                           position: 'sticky',
+                                           top: '12rem'
+                                       }}
+                                       className={'postBrowserToc'}>
+                        <div className='tocTitle'>目录</div>
+                        <Tree
+                            defaultExpandAll={expandAllEnable}
+                            showLine={true}
+                            treeData={tocTree as any}
+                            switcherIcon={<DownOutlined/>}
+                            onSelect={onSelect}
+                        >
+                        </Tree>
+                        <Flex justify={'center'}>
+                            <Space.Compact>
+                                <Button onClick={() => {
+                                    updateSiderWidth(Math.max(siderWidth - 5, 20));
+                                }} icon={<MinusOutlined/>}/>
+                                <Button onClick={() => {
+                                    updateSiderWidth(Math.min(siderWidth + 5, 50));
+                                }} icon={<PlusOutlined/>}/>
+                            </Space.Compact>
+                        </Flex>
+                    </Card> : null}
+                </Sider>
                 <FloatButton.Group shape='square' style={{zIndex: toastZIndex}}>
                     <FloatButton onClick={() => {
-                        updateTocEnable(!tocEnable);
+                        if (tocTree.length > 0) {
+                            updateTocEnable(!tocEnable);
+                        } else {
+                            message.info('未找到目录结构');
+                        }
                     }}/>
                     <FloatButton.BackTop visibilityHeight={0}/>
                 </FloatButton.Group>
