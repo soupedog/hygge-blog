@@ -44,7 +44,7 @@ export default function MusicPlayer({configuration}: MusicPlayerProps) {
                 playerRef.current = null;
             };
         }
-    });
+    }, [JSON.stringify(configuration)]);
 
     switch (configuration.backgroundMusicType) {
         case 'DEFAULT':

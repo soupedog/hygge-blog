@@ -82,7 +82,6 @@
 .lazy-fallback-title p {
     font-size: 0.8rem;
     color: var(--lf-text-soft);
-    margin-top: 2px;
     margin: 2px 0 0 0;
     padding: 0;
 }

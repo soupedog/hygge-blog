@@ -4,11 +4,11 @@ import {useParams} from 'react-router-dom';
 
 import './PostBrowser.css'
 
-import {usePostService} from '../util/ApiService.ts';
 import {Breadcrumb, Button, Card, Flex, FloatButton, Layout, message, Space, Tree, type TreeProps} from 'antd';
 import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone, MinusOutlined, PlusOutlined} from '@ant-design/icons';
-import {type ArticleConfiguration, type ArticleDto, UserClient} from '../util/ApiClient.ts';
 import {appConfiguration} from '../configuration/app.configuration.ts';
+import {usePostService} from '../util/ApiService.ts';
+import {type ArticleDto, UserClient} from '../util/ApiClient.ts';
 import UrlHelper from '../util/UrlHelper.ts';
 import AppFooter from './component/AppFooter.tsx';
 import {Content} from 'antd/es/layout/layout';
@@ -98,13 +98,13 @@ export default function PostBrowser() {
                 height: '25rem',
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
-            {renderMusicPlayer(post.configuration)}
+            <MusicPlayer configuration={post.configuration}/>
             <Layout>
                 <Content>
                     <Card title={post.title} variant={'borderless'} style={{
                         marginTop: '1rem'
                     }}>
-                        <Breadcrumb items={renderBreadcrumbItems(post)}/>
+                        <Breadcrumb items={buildBreadcrumbItems(post)}/>
                         <div style={{
                             marginTop: '1rem',
                             fontSize: '0.8rem',
@@ -177,11 +177,7 @@ export default function PostBrowser() {
         </Layout>
     );
 
-    function renderMusicPlayer(configuration: ArticleConfiguration) {
-        return (<MusicPlayer configuration={configuration}/>);
-    }
-
-    function renderBreadcrumbItems(article: ArticleDto) {
+    function buildBreadcrumbItems(article: ArticleDto) {
         let result = [];
         // 主题名称
         result.push(
