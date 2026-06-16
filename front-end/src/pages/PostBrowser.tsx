@@ -4,60 +4,24 @@ import {useParams} from 'react-router-dom';
 
 import './PostBrowser.css'
 
-import {Breadcrumb, Button, Card, Flex, FloatButton, Layout, message, Space, Tooltip, Tree, type TreeProps} from 'antd';
-import {DashboardTwoTone, DownOutlined, EditTwoTone, EyeOutlined, EyeTwoTone, MinusOutlined, PlusOutlined} from '@ant-design/icons';
+import {FloatButton, Layout, message, Splitter, Tooltip} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import {usePostService} from '../util/ApiService.ts';
-import {type ArticleDto, UserClient} from '../util/ApiClient.ts';
+import {type ArticleDto} from '../util/ApiClient.ts';
 import UrlHelper from '../util/UrlHelper.ts';
 import AppFooter from './component/AppFooter.tsx';
-import {Content} from 'antd/es/layout/layout';
-import Sider from 'antd/es/layout/Sider';
-import {TimeHelper} from '../util/TimeHelper.ts';
-import {TimeType} from '../enums/EnumKeeper.ts';
-import {MdPreview} from 'md-editor-rt';
 import {type AntdTreeNodeInfo, type CreateTocTreeInputParam, MdHelper, type TreeNodeInfo} from '../util/markdown/MdHelper.ts';
 import PostBrowserHeader from './component/PostBrowserHeader.tsx';
 import MusicPlayer from './component/MusicPlayer.tsx';
+import PostBrowserContentView from './component/PostBrowserContentView.tsx';
+import PostBrowserTocView from './component/PostBrowserTocView.tsx';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
-const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
-    <Space>
-        {React.createElement(icon)}
-        {text}
-    </Space>
-);
-
-// 目录选中自动跳转函数
-const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
-    // @ts-ignore
-    let item: TreeNodeInfo = info.node;
-
-    // 用标签类型 + data-line 属性做筛选
-    let element = document.querySelector(item.nodeName + '[data-line="' + item.dataLine + '"]');
-
-    if (element != undefined) {
-        // 滚动到锚点元素的顶部(offsetTop 是数字类型，你可以在此基础上追加偏移量)
-
-        window.scrollTo({
-            // @ts-ignore
-            top: element.offsetTop + 540,
-            behavior: 'smooth'
-        });
-
-        // 拿到 dom 元素可以直接使用此方法滚动到目标位置(无法追加偏移量)
-        // element.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
-    } else {
-        message.warning('未找到对应跳转锚点');
-    }
-};
 
 export default function PostBrowser() {
-    const [post, updatePost] = useState<ArticleDto | undefined>(undefined);
-    const [expandAllEnable, updateExpandAllEnable] = useState<boolean>(false);
-    const [tocEnable, updateTocEnable] = useState<boolean>(false);
-    const [siderWidth, updateSiderWidth] = useState<number>(20);
-    const [tocTree, updateTocTree] = useState<Array<TreeNodeInfo>>([]);
+    const [post, setPost] = useState<ArticleDto | undefined>(undefined);
+    const [tocEnable, setTocEnable] = useState<boolean>(false);
+    const [tocTree, setTocTree] = useState<Array<TreeNodeInfo>>([]);
     const {pid} = useParams();
     const {findArticleByAidMutation} = usePostService();
 
@@ -67,8 +31,7 @@ export default function PostBrowser() {
                 if (data) {
                     // 依赖静态值表示仅初始化时调用一次
                     document.title = `${data.title} | 我的小宅子`;
-                    updatePost(data);
-
+                    setPost(data);
                     // 需要等待 markdown Html 元素渲染完成
                     window.setTimeout(() => {
                         initToc();
@@ -87,9 +50,6 @@ export default function PostBrowser() {
         return null;
     }
 
-    const currentUser = UserClient.getCurrentUser();
-    const isAuthor: boolean = currentUser != null && currentUser.uid == post.uid;
-
     return (
         <Layout>
             <PostBrowserHeader isAnyPending={false}/>
@@ -99,78 +59,22 @@ export default function PostBrowser() {
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
             <MusicPlayer configuration={post.configuration}/>
-            <Layout>
-                <Content>
-                    <Card title={post.title} variant={'borderless'} style={{
-                        marginTop: '1rem'
-                    }}>
-                        <Breadcrumb items={buildBreadcrumbItems(post)}/>
-                        <div style={{
-                            marginTop: '1rem',
-                            fontSize: '0.8rem',
-                            lineHeight: '1.6rem',
-                            color: '#6a737d'
-                        }}>
-                            <Space size={'middle'}>
-                                <IconText icon={EditTwoTone} text={'字数 ' + post.wordCount}
-                                          key={'word_count_' + post.aid}/>
-                                <IconText icon={DashboardTwoTone}
-                                          text={'创建于 ' + TimeHelper.formatTimeStampToString(post.createTs, TimeType.yyyy_mm_dd)}
-                                          key={'create_ts_' + post.aid}/>
-                                <IconText icon={DashboardTwoTone}
-                                          text={'最后修改于 ' + TimeHelper.formatTimeStampToString(post.lastUpdateTs, TimeType.yyyy_mm_dd)}
-                                          key={'lastUpdate_ts_' + post.aid}/>
-                                <IconText icon={EyeTwoTone} text={'浏览量 ' + post.pageViews}
-                                          key={'page_view_' + post.aid}/>
-                                {isAuthor ? <IconText icon={EyeOutlined} text={'自浏览 ' + post.selfPageViews}
-                                                      key={'self_view_' + post.aid}/>
-                                    : null
-                                }
-                            </Space>
-                        </div>
-                    </Card>
-                    <Card style={{marginTop: '1rem'}} variant={'borderless'}>
-                        <MdPreview value={post.content} sanitize={(html) => html}/>
-                    </Card>
-                </Content>
-                <Sider style={{backgroundColor: '#F0F2F5', paddingTop: '12rem'}} width={`${siderWidth}%`} collapsedWidth={0} collapsed={!tocEnable}>
-                    {tocEnable ? <Card variant={'borderless'} styles={{body: {padding: 8}}}
-                                       style={{
-                                           marginLeft: '0.5rem',
-                                           position: 'sticky',
-                                           top: '12rem'
-                                       }}
-                                       className={'postBrowserToc'}>
-                        <div className='tocTitle'>目录</div>
-                        <Tree
-                            defaultExpandAll={expandAllEnable}
-                            showLine={true}
-                            treeData={tocTree as any}
-                            switcherIcon={<DownOutlined/>}
-                            onSelect={onSelect}
-                        >
-                        </Tree>
-                        <Flex justify={'center'} style={{marginTop: '2rem'}}>
-                            <Space.Compact>
-                                <Tooltip placement='top' title={'收窄目录'}>
-                                    <Button onClick={() => {
-                                        updateSiderWidth(Math.max(siderWidth - 5, 20));
-                                    }} icon={<MinusOutlined/>}/>
-                                </Tooltip>
-                                <Tooltip placement='top' title={'拓宽目录'}>
-                                    <Button onClick={() => {
-                                        updateSiderWidth(Math.min(siderWidth + 5, 50));
-                                    }} icon={<PlusOutlined/>}/>
-                                </Tooltip>
-                            </Space.Compact>
-                        </Flex>
-                    </Card> : null}
-                </Sider>
+            <Layout style={{marginBottom: '2rem'}}>
+                {tocEnable ?
+                    <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
+                        <Splitter.Panel>
+                            <PostBrowserContentView post={post} key={'post_browser_content'}/>
+                        </Splitter.Panel>
+                        <Splitter.Panel defaultSize='20%' min='20%' max='50%'>
+                            <PostBrowserTocView tocTree={tocTree} key={'post_browser_toc'}/>
+                        </Splitter.Panel>
+                    </Splitter> : <PostBrowserContentView post={post} key={'post_browser_content'}/>
+                }
                 <FloatButton.Group shape='square' style={{zIndex: toastZIndex}}>
                     <Tooltip placement='left' title={'目录'}>
                         <FloatButton onClick={() => {
                             if (tocTree.length > 0) {
-                                updateTocEnable(!tocEnable);
+                                setTocEnable(!tocEnable);
                             } else {
                                 message.info('未找到目录结构');
                             }
@@ -184,26 +88,6 @@ export default function PostBrowser() {
             <AppFooter/>
         </Layout>
     );
-
-    function buildBreadcrumbItems(article: ArticleDto) {
-        let result = [];
-        // 主题名称
-        result.push(
-            {
-                title: article.categoryTreeInfo.topicInfo.topicName,
-            }
-        );
-
-        // 文章类别名称
-        article.categoryTreeInfo.categoryList.forEach((articleCategoryInfo, index) => {
-            result.push(
-                {
-                    title: articleCategoryInfo.categoryName,
-                }
-            );
-        })
-        return result;
-    }
 
     function initToc() {
         let antdTreeNodeInfos = new Array<TreeNodeInfo>();
@@ -229,11 +113,8 @@ export default function PostBrowser() {
         } as CreateTocTreeInputParam);
 
         if (currentTOC.length > 0) {
-            if (antdTreeNodeInfos.length < 10) {
-                updateExpandAllEnable(true);
-            }
-            updateTocTree(currentTOC);
-            updateTocEnable(true);
+            setTocTree(currentTOC);
+            setTocEnable(true);
         } else {
             message.info('未找到目录结构');
         }
