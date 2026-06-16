@@ -1,5 +1,5 @@
-import {lazy, useEffect} from 'react';
-import {Route, Routes, useNavigate} from 'react-router-dom';
+import {lazy, useEffect, useLayoutEffect} from 'react';
+import {Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 import 'md-editor-rt/lib/style.css';
@@ -97,6 +97,17 @@ config({
 
 export default function App() {
     const navigate = useNavigate();
+    const {pathname} = useLocation();
+
+    // useLayoutEffect 在 DOM 更新前执行，更流畅
+    // 页面跳转前，重置窗口滚动到初始位置
+    useLayoutEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth' // 可选：平滑滚动
+        });
+    }, [pathname]);
 
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次

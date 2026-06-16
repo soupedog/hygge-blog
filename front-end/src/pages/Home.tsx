@@ -8,12 +8,17 @@ import {Content} from 'antd/es/layout/layout';
 import HomeHeader from './component/HomeHeader.tsx';
 import HomeCategoryCollapse from './component/HomeCategoryCollapse.tsx';
 import {useHomeService} from '../util/ApiService.ts';
+import HomeTabs from './component/HomeTabs.tsx';
 
 export default function Home() {
     const {fetch} = useHomeService();
 
     const {
-        setCategoryList
+        setCategoryList,
+        setActiveTap,
+        setTopicOverviewInfoList,
+        setQuoteInfo,
+        setAnnouncementInfoList,
     } = useContext(HomeContext);
 
     useEffect(() => {
@@ -21,7 +26,11 @@ export default function Home() {
 
         fetch.mutate(undefined, {
             onSuccess: (data) => {
-                setCategoryList(data.topicOverviewInfoList[0].categoryListInfo);
+                setTopicOverviewInfoList(data.topicOverviewInfoList);
+                setCategoryList(data.topicOverviewInfoList[0]?.categoryListInfo);
+                setActiveTap(data.topicOverviewInfoList[0].topicInfo.tid);
+                setQuoteInfo(data.quoteInfo);
+                setAnnouncementInfoList(data.announcementInfoList);
             }
         });
     }, []);
@@ -29,10 +38,11 @@ export default function Home() {
     return (
         <Layout>
             <HomeSider/>
-            <Content>
+            <Content style={{ backgroundColor: '#FFF'}}>
                 <HomeHeader/>
-                <Card style={{minHeight: '2000px'}}>
+                <Card style={{minHeight: '2000px', margin: '0 2rem 0 2rem', backgroundColor: '#FFF'}}>
                     <HomeCategoryCollapse/>
+                    <HomeTabs/>
                 </Card>
                 <AppFooter/>
             </Content>

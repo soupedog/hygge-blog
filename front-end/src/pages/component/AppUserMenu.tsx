@@ -76,7 +76,7 @@ export default function AppUserMenu() {
     } else {
         return (
             <Dropdown menu={{items, onClick}}>
-                <Avatar className={'pointer'} style={{margin: '0.25rem'}} size={56} src={user.userAvatar}/>
+                <Avatar className={'pointer'} size={44} src={user.userAvatar}/>
             </Dropdown>
         );
     }

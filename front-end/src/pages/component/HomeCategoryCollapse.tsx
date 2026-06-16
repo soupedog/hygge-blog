@@ -18,6 +18,7 @@ export default function HomeCategoryCollapse() {
         categoryList,
         searchTabPageSize,
         searchPostSummaryByCid,
+        setActiveTap,
     } = useContext(HomeContext);
 
     const items: CollapseProps['items'] = [
@@ -36,6 +37,7 @@ export default function HomeCategoryCollapse() {
                                        onClick={() => {
                                            setKeywordType(HomeKeywordType.POST);
                                            searchPostSummaryByCid({cid: item.cid, currentPage: 1, pageSize: searchTabPageSize});
+                                           setActiveTap('搜索结果');
                                        }}
                             >
                                 <Badge.Ribbon key={'card_ribbon' + item.categoryName} style={{top: '-10px'}} text={item.articleCount} color='red'>
@@ -51,6 +53,6 @@ export default function HomeCategoryCollapse() {
     ];
 
     return (
-        <Collapse activeKey={[categoryCollapsed ? 'collapsed' : 'default']} items={items}/>
+        <Collapse activeKey={[categoryCollapsed ? 'collapsed' : 'default']} items={items} style={{backgroundColor: '#FFF'}}/>
     );
 }

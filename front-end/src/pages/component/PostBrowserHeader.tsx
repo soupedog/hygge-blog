@@ -43,7 +43,7 @@ export default function PostBrowserHeader({isAnyPending}: PostBrowserHeaderProps
         <Header className={clsx({
             'backgroundTransparent': isTransparent
         })} style={{position: 'fixed', zIndex: headerZIndex, width: '100%'}}>
-            <Flex justify={'space-between'} style={{height: '100%'}}>
+            <Flex justify={'space-between'} style={{height: '100%', alignItems: 'center'}}>
                 <Flex className={'PostBrowserHeader-left'} justify={'flex-start'} style={{width: '50%'}}>
                     <Tooltip placement='bottom' title={'返回首页'}>
                         <RollbackOutlined onClick={() => {

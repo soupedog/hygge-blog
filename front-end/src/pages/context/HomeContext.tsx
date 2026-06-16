@@ -4,7 +4,7 @@ import {useSearchParams} from 'react-router-dom';
 import {useHomeService} from '../../util/ApiService.ts';
 import {message} from 'antd';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
-import type {ArticleDto, CategoryDto, PostInCategorySearchInput, QuoteDto} from '../../util/ApiClient.ts';
+import type {AnnouncementDto, ArticleDto, CategoryDto, PostInCategorySearchInput, QuoteDto, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
 
@@ -31,6 +31,14 @@ export interface HomeState {
     setCategorySizeInRow: Function;
     categoryList: Array<CategoryDto>;
     setCategoryList: Function;
+    activeTap: string;
+    setActiveTap: Function;
+    topicOverviewInfoList: Array<TopicOverviewInfo>;
+    setTopicOverviewInfoList: Function;
+    quoteInfo: QuoteResponse;
+    setQuoteInfo: Function;
+    announcementInfoList: AnnouncementDto[];
+    setAnnouncementInfoList: Function;
     fuzzySearch: Function;
     searchPostSummaryByCid: (input: PostInCategorySearchInput) => void;
 }
@@ -56,6 +64,10 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
     // 博客类别一行显示几个
     const [categorySizeInRow, setCategorySizeInRow] = useState(5);
     const [categoryList, setCategoryList] = useState<Array<CategoryDto>>([]);
+    const [activeTap, setActiveTap] = useState('');
+    const [topicOverviewInfoList, setTopicOverviewInfoList] = useState<Array<TopicOverviewInfo>>([]);
+    const [quoteInfo, setQuoteInfo] = useState<QuoteResponse>({} as QuoteResponse);
+    const [announcementInfoList, setAnnouncementInfoList] = useState<Array<AnnouncementDto>>([]);
 
     const fuzzySearch = () => {
         if (keyword != null) {
@@ -70,7 +82,7 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
                         onSuccess: (data) => {
                             setSearchResult(data.articleSummaryList);
                             setSearchResultTotalCount(data.totalCount);
-                            //TODO 设置搜索 Tab 为激活状态
+                            setActiveTap('搜索结果');
                         }
                     }
                 );
@@ -85,7 +97,7 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
                         onSuccess: (data) => {
                             setSearchResult(data.quoteList);
                             setSearchResultTotalCount(data.totalCount);
-                            //TODO 设置搜索 Tab 为激活状态
+                            setActiveTap('搜索结果');
                         }
                     }
                 );
@@ -117,6 +129,10 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
             searchTabCurrentPage, setSearchTabCurrentPage,
             searchTabPageSize, setSearchTabPageSize,
             searchResultTotalCount, setSearchResultTotalCount,
+            activeTap, setActiveTap,
+            topicOverviewInfoList, setTopicOverviewInfoList,
+            quoteInfo, setQuoteInfo,
+            announcementInfoList, setAnnouncementInfoList,
             fuzzySearch,
             searchPostSummaryByCid
         }}>
