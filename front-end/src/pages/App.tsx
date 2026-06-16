@@ -3,8 +3,8 @@ import {Route, Routes, useNavigate} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 import 'md-editor-rt/lib/style.css';
-import "@vavt/rt-extension/lib/asset/ExportPDF.css";
-import "@vavt/rt-extension/lib/asset/Mark.css";
+import '@vavt/rt-extension/lib/asset/ExportPDF.css';
+import '@vavt/rt-extension/lib/asset/Mark.css';
 import 'highlight.js/styles/atom-one-dark.css';
 
 import UrlHelper from '../util/UrlHelper.ts';
@@ -21,6 +21,7 @@ import highlight from 'highlight.js';
 import mermaid from 'mermaid';
 import {message} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
+import {HomeProvider} from './context/HomeContext.tsx';
 // 创建 QueryClient 实例
 const queryClient = new QueryClient();
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示
@@ -116,7 +117,7 @@ export default function App() {
                 <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/signin'} element={<Signin key={'Signin'}/>}/>
-                <Route path={'/'} element={<Home key={'Home'}/>}/>
+                <Route path={'/'} element={<HomeProvider><Home key={'Home'}/></HomeProvider>}/>
                 {/*从上到下匹配，上方全未匹配命中则说明 404 */}
                 <Route path={'*'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
             </Routes>

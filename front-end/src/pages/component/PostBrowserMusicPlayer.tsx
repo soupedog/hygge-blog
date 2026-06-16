@@ -8,7 +8,7 @@ export interface MusicPlayerProps {
     configuration: ArticleConfiguration;
 }
 
-export default function MusicPlayer({configuration}: MusicPlayerProps) {
+export default function PostBrowserMusicPlayer({configuration}: MusicPlayerProps) {
     // playerRef.current 是永久变量，这样才能在方法外被引用
     const playerRef = useRef<APlayer>(null);
 

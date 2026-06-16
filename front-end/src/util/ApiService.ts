@@ -31,15 +31,23 @@ export function usePostService() {
 }
 
 export function useHomeService() {
-    const searchArticleSummaryByKeywordMutation = useMutation({
-        mutationFn: HomeClient.searchArticleSummaryByKeyword,
+    const fetchMutation = useMutation({
+        mutationFn: HomeClient.fetch,
+    });
+    const searchPostSummaryByKeywordMutation = useMutation({
+        mutationFn: HomeClient.searchPostSummaryByKeyword,
     });
     const searchQuoteByKeywordMutation = useMutation({
         mutationFn: HomeClient.searchQuoteByKeyword,
     });
+    const fetchPostSummaryByCidMutation = useMutation({
+        mutationFn: HomeClient.fetchPostSummaryByCid,
+    });
 
     return {
-        searchArticleSummaryByKeyword: searchArticleSummaryByKeywordMutation,
-        searchQuoteByKeyword: searchQuoteByKeywordMutation
+        fetch: fetchMutation,
+        searchPostSummaryByKeyword: searchPostSummaryByKeywordMutation,
+        searchQuoteByKeyword: searchQuoteByKeywordMutation,
+        fetchPostSummaryByCid: fetchPostSummaryByCidMutation
     }
 }

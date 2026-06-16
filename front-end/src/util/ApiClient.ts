@@ -170,7 +170,7 @@ export interface CategoryDto {
     categoryName: string;
     categoryType: string;
     orderVal: number;
-    articleCount?: number;
+    articleCount: number;
 }
 
 export interface CategoryTreeInfo {
@@ -216,6 +216,10 @@ export interface KeywordSearchInput extends PageQuery {
     keyword: string;
 }
 
+export interface PostInCategorySearchInput extends PageQuery {
+    cid: string;
+}
+
 export interface ArticleSummaryResponse extends PageQueryResponse {
     articleSummaryList: ArticleDto[];
 }
@@ -238,9 +242,46 @@ export interface QuoteResponse extends PageQueryResponse {
     quoteList: QuoteDto[];
 }
 
+export interface TopicOverviewInfo extends PageQueryResponse {
+    topicInfo: TopicDto,
+    categoryListInfo: CategoryDto[],
+}
+
+export interface AnnouncementDto {
+    announcementId: number,
+    paragraphList: string[],
+    color: string,
+    createTs: number
+}
+
+export interface AllOverviewInfo {
+    topicOverviewInfoList: TopicOverviewInfo[];
+    articleSummaryInfo: ArticleSummaryResponse;
+    quoteInfo: QuoteResponse;
+    announcementInfoList: AnnouncementDto[];
+}
+
 export class HomeClient {
 
-    static async searchArticleSummaryByKeyword(input: KeywordSearchInput): Promise<ArticleSummaryResponse> {
+    static async fetch(): Promise<AllOverviewInfo> {
+        const clientResponse = await httpClient
+            .get(`main/home/fetch`, {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async fetchPostSummaryByCid(input: PostInCategorySearchInput): Promise<ArticleSummaryResponse> {
+        const clientResponse = await httpClient
+            .get(`main/home/fetch/category/${input.cid}?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async searchPostSummaryByKeyword(input: KeywordSearchInput): Promise<ArticleSummaryResponse> {
         const clientResponse = await httpClient
             .get(`main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
                     headers: UserClient.getHeader()

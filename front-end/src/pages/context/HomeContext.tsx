@@ -4,7 +4,7 @@ import {useSearchParams} from 'react-router-dom';
 import {useHomeService} from '../../util/ApiService.ts';
 import {message} from 'antd';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
-import type {ArticleDto, QuoteDto} from '../../util/ApiClient.ts';
+import type {ArticleDto, CategoryDto, PostInCategorySearchInput, QuoteDto} from '../../util/ApiClient.ts';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
 
@@ -17,13 +17,28 @@ export interface HomeState {
     setKeyword: Function;
     keywordType: HomeKeywordType;
     setKeywordType: Function;
+    searchTabCurrentPage: number;
+    setSearchTabCurrentPage: Function;
+    searchTabPageSize: number;
+    setSearchTabPageSize: Function;
+    searchResult: Array<ArticleDto | QuoteDto>;
+    setSearchResult: Function;
+    searchResultTotalCount: number;
+    setSearchResultTotalCount: Function;
+    categoryCollapsed: boolean;
+    setCategoryCollapsed: Function;
+    categorySizeInRow: number;
+    setCategorySizeInRow: Function;
+    categoryList: Array<CategoryDto>;
+    setCategoryList: Function;
     fuzzySearch: Function;
+    searchPostSummaryByCid: (input: PostInCategorySearchInput) => void;
 }
 
 export const HomeContext = createContext<HomeState>({} as HomeState);
 
 export const HomeProvider = ({children}: { children: ReactNode }) => {
-    const {searchArticleSummaryByKeyword, searchQuoteByKeyword} = useHomeService();
+    const {searchPostSummaryByKeyword, searchQuoteByKeyword, fetchPostSummaryByCid} = useHomeService();
 
     // HomeSider 是否收起
     const [collapsed, setCollapsed] = useState(true);
@@ -36,10 +51,16 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
     const [searchResult, setSearchResult] = useState<Array<ArticleDto | QuoteDto>>([]);
     const [searchResultTotalCount, setSearchResultTotalCount] = useState(0);
 
+    // 博客类别面板 是否收起
+    const [categoryCollapsed, setCategoryCollapsed] = useState(false);
+    // 博客类别一行显示几个
+    const [categorySizeInRow, setCategorySizeInRow] = useState(5);
+    const [categoryList, setCategoryList] = useState<Array<CategoryDto>>([]);
+
     const fuzzySearch = () => {
         if (keyword != null) {
             if (keywordType == HomeKeywordType.POST) {
-                searchArticleSummaryByKeyword.mutate(
+                searchPostSummaryByKeyword.mutate(
                     {
                         keyword: keyword,
                         currentPage: searchTabCurrentPage,
@@ -74,13 +95,30 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
         }
     };
 
+    const searchPostSummaryByCid = (input: PostInCategorySearchInput) => {
+        fetchPostSummaryByCid.mutate(input, {
+            onSuccess: (data) => {
+                setSearchResult(data.articleSummaryList);
+                setSearchResultTotalCount(data.totalCount);
+            }
+        });
+    };
+
     return (
         <HomeContext value={{
             searchParams, setSearchParams,
             collapsed, setCollapsed,
             keyword, setKeyword,
             keywordType, setKeywordType,
-            fuzzySearch
+            categoryCollapsed, setCategoryCollapsed,
+            categorySizeInRow, setCategorySizeInRow,
+            categoryList, setCategoryList,
+            searchResult, setSearchResult,
+            searchTabCurrentPage, setSearchTabCurrentPage,
+            searchTabPageSize, setSearchTabPageSize,
+            searchResultTotalCount, setSearchResultTotalCount,
+            fuzzySearch,
+            searchPostSummaryByCid
         }}>
             {children}
         </HomeContext>

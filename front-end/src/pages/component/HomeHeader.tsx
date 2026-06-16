@@ -26,7 +26,7 @@ export default function HomeHeader() {
     const {
         collapsed, setCollapsed,
         keyword, setKeyword,
-        setKeywordType,
+        keywordType, setKeywordType,
         searchParams, setSearchParams,
         fuzzySearch
     } = useContext(HomeContext);
@@ -53,7 +53,7 @@ export default function HomeHeader() {
                 <Flex className={'Header-Right'} justify={'flex-end'} style={{width: '50%', alignItems: 'center'}}>
                     <Space size={'medium'}>
                         <Tooltip placement='bottom' title={'搜索类型'}>
-                            <Switch checkedChildren='文章' unCheckedChildren='句子' defaultChecked onChange={(value) => {
+                            <Switch checkedChildren='文章' unCheckedChildren='句子' value={keywordType == HomeKeywordType.POST} onChange={(value) => {
                                 if (value) {
                                     setKeywordType(HomeKeywordType.POST);
                                 } else {

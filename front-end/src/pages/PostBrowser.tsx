@@ -12,7 +12,7 @@ import UrlHelper from '../util/UrlHelper.ts';
 import AppFooter from './component/AppFooter.tsx';
 import {type AntdTreeNodeInfo, type CreateTocTreeInputParam, MdHelper, type TreeNodeInfo} from '../util/markdown/MdHelper.ts';
 import PostBrowserHeader from './component/PostBrowserHeader.tsx';
-import MusicPlayer from './component/MusicPlayer.tsx';
+import PostBrowserMusicPlayer from './component/PostBrowserMusicPlayer.tsx';
 import PostBrowserContentView from './component/PostBrowserContentView.tsx';
 import PostBrowserTocView from './component/PostBrowserTocView.tsx';
 
@@ -58,7 +58,7 @@ export default function PostBrowser() {
                 height: '25rem',
                 background: 'url(' + post.imageSrc + ') no-repeat center / cover'
             }}/>
-            <MusicPlayer configuration={post.configuration}/>
+            <PostBrowserMusicPlayer configuration={post.configuration}/>
             <Layout style={{marginBottom: '2rem'}}>
                 {tocEnable ?
                     <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
