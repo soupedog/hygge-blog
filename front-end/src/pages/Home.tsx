@@ -18,7 +18,7 @@ export default function Home() {
                 <HomeSider/>
                 <Content>
                     <HomeHeader/>
-                    <Card style={{marginTop: '4rem', minHeight: '2000px'}}>
+                    <Card style={{minHeight: '2000px'}}>
                         主体
                     </Card>
                     <AppFooter/>

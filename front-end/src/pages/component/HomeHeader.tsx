@@ -23,7 +23,13 @@ const HomeHeaderStyle: React.CSSProperties = {
 export default function HomeHeader() {
     // 全局的 Pending 检测，如果单独则如 signIn.isPending 即可
     const isAnyPending = useIsMutating() > 0;
-    const {collapsed, setCollapsed, keyword, setKeyword, setKeywordType, searchParams, setSearchParams, fuzzySearch} = useContext(HomeContext);
+    const {
+        collapsed, setCollapsed,
+        keyword, setKeyword,
+        setKeywordType,
+        searchParams, setSearchParams,
+        fuzzySearch
+    } = useContext(HomeContext);
 
     return (
         <Header style={HomeHeaderStyle}>
@@ -36,15 +42,16 @@ export default function HomeHeader() {
                             onClick={() => setCollapsed(!collapsed)}
                             style={{
                                 color: '#FFF',
-                                fontSize: '1rem',
+                                fontSize: '1.5rem',
                                 width: '4rem',
                                 height: '4rem',
                             }}
                         />
                     </Tooltip>
+                    <Spin spinning={isAnyPending} size='large' style={{display: 'flex'}}/>
                 </Flex>
                 <Flex className={'Header-Right'} justify={'flex-end'} style={{width: '50%', alignItems: 'center'}}>
-                    <Space>
+                    <Space size={'medium'}>
                         <Tooltip placement='bottom' title={'搜索类型'}>
                             <Switch checkedChildren='文章' unCheckedChildren='句子' defaultChecked onChange={(value) => {
                                 if (value) {
@@ -77,7 +84,6 @@ export default function HomeHeader() {
                                 }}
                         />
                         <AppUserMenu/>
-                        <Spin spinning={isAnyPending} size='large' style={{display: 'flex'}}/>
                     </Space>
                 </Flex>
             </Flex>

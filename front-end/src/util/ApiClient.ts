@@ -14,12 +14,15 @@ export interface HyggeResponse<T> {
     main?: T;
 }
 
-const emptyResponse = {} as HyggeResponse<any>;
+const emptyResponse = {} as HyggeResponse<unknown>;
 
-export interface ApiHook<T> {
-    successHook?: (input?: HyggeResponse<T>) => void;
-    beforeHook?: () => void;
-    finallyHook?: () => void;
+export interface PageQuery {
+    currentPage: number;
+    pageSize: number;
+}
+
+export interface PageQueryResponse {
+    totalCount: number;
 }
 
 export interface UserDto {
@@ -34,7 +37,7 @@ export interface UserDto {
 
 export interface SignInRequest {
     ac?: string;
-    pw?: string
+    pw?: string;
 }
 
 export interface SignInResponse {
@@ -146,65 +149,111 @@ export class UserClient {
 }
 
 export interface ArticleConfiguration {
-    backgroundMusicType: string,
-    mediaPlayType: string,
-    src: string,
-    coverSrc?: string,
-    name?: string,
-    artist?: string,
-    lrc?: string
+    backgroundMusicType: string;
+    mediaPlayType: string;
+    src: string;
+    coverSrc?: string;
+    name?: string;
+    artist?: string;
+    lrc?: string;
 }
 
 export interface TopicDto {
-    tid: string,
-    topicName: string,
-    orderVal: number
+    tid: string;
+    topicName: string;
+    orderVal: number;
 }
 
 export interface CategoryDto {
-    cid: string,
-    permissionId: number,
-    categoryName: string,
-    categoryType: string,
-    orderVal: number,
-    articleCount?: number
+    cid: string;
+    permissionId: number;
+    categoryName: string;
+    categoryType: string;
+    orderVal: number;
+    articleCount?: number;
 }
 
 export interface CategoryTreeInfo {
-    topicInfo: TopicDto,
-    categoryList: CategoryDto[],
+    topicInfo: TopicDto;
+    categoryList: CategoryDto[];
 }
 
 export interface ArticleDto {
-    aid: string,
-    configuration: ArticleConfiguration,
-    categoryTreeInfo: CategoryTreeInfo,
-    cid: string,
-    uid: string,
-    title: string,
-    imageSrc: string,
-    coverFileNo: string,
-    summary: string,
-    content: string,
-    wordCount: number,
-    pageViews: number,
-    selfPageViews: number,
-    orderGlobal: number,
-    orderCategory: number,
-    articleState: string,
-    createTs: number,
-    lastUpdateTs: number,
-    editable: boolean
+    aid: string;
+    configuration: ArticleConfiguration;
+    categoryTreeInfo: CategoryTreeInfo;
+    cid: string;
+    uid: string;
+    title: string;
+    imageSrc: string;
+    coverFileNo: string;
+    summary: string;
+    content: string;
+    wordCount: number;
+    pageViews: number;
+    selfPageViews: number;
+    orderGlobal: number;
+    orderCategory: number;
+    articleState: string;
+    createTs: number;
+    lastUpdateTs: number;
+    editable: boolean;
 }
 
 export class PostClient {
 
     static async findArticleByAid(aid: string): Promise<ArticleDto> {
-        const clientResponse = await httpClient.get('/main/article/' + aid, {
-            headers: UserClient.getHeader()
-        });
+        const clientResponse = await httpClient
+            .get(`/main/article/${aid}`, {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+}
 
+export interface KeywordSearchInput extends PageQuery {
+    keyword: string;
+}
+
+export interface ArticleSummaryResponse extends PageQueryResponse {
+    articleSummaryList: ArticleDto[];
+}
+
+export interface QuoteDto {
+    quoteId: number;
+    uid: string;
+    imageSrc?: string;
+    coverFileNo: string;
+    content: string;
+    source?: string;
+    portal?: string;
+    remarks?: string;
+    orderVal?: number;
+    quoteState?: string;
+    editable: boolean;
+}
+
+export interface QuoteResponse extends PageQueryResponse {
+    quoteList: QuoteDto[];
+}
+
+export class HomeClient {
+
+    static async searchArticleSummaryByKeyword(input: KeywordSearchInput): Promise<ArticleSummaryResponse> {
+        const clientResponse = await httpClient
+            .get(`main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+                    headers: UserClient.getHeader()
+                }
+            );
         return clientResponse.data.main;
     }
 
+    static async searchQuoteByKeyword(input: KeywordSearchInput): Promise<QuoteResponse> {
+        const clientResponse = await httpClient
+            .get(`main/home/search/quote?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+                headers: UserClient.getHeader()
+            });
+        return clientResponse.data.main;
+    }
 }

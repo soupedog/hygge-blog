@@ -1,5 +1,5 @@
 import {useMutation} from '@tanstack/react-query';
-import {PostClient, UserClient} from './ApiClient.ts';
+import {HomeClient, PostClient, UserClient} from './ApiClient.ts';
 import {message} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 
@@ -27,5 +27,19 @@ export function usePostService() {
 
     return {
         findArticleByAidMutation: findArticleByAidMutation
+    }
+}
+
+export function useHomeService() {
+    const searchArticleSummaryByKeywordMutation = useMutation({
+        mutationFn: HomeClient.searchArticleSummaryByKeyword,
+    });
+    const searchQuoteByKeywordMutation = useMutation({
+        mutationFn: HomeClient.searchQuoteByKeyword,
+    });
+
+    return {
+        searchArticleSummaryByKeyword: searchArticleSummaryByKeywordMutation,
+        searchQuoteByKeyword: searchQuoteByKeywordMutation
     }
 }
