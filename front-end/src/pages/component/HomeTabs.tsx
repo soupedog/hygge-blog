@@ -24,7 +24,7 @@ export default function HomeTabs() {
 
     function buildItems(list: Array<TopicOverviewInfo>) {
         const items = new Array<TabsProps>();
-        topicOverviewInfoList.map((item) => {
+        list.map((item) => {
             items.push(
                 {
                     key: item.topicInfo.tid,
