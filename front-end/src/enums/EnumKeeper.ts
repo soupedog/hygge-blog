@@ -18,6 +18,14 @@ export class ClientScope {
     }
 }
 
+export class HomeKeywordType {
+    static readonly POST = 'POST';
+    static readonly QUOTE = 'QUOTE';
+
+    private constructor() {
+    }
+}
+
 export class TimeType {
     // 2022-8-4
     static readonly yyyy_mm_dd = '0';

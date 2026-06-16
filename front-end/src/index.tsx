@@ -1,7 +1,7 @@
 import {lazy, Suspense} from 'react'
 import {createRoot} from 'react-dom/client'
 
-import './index.css'
+import './index.less'
 
 import Loading from './pages/Loading.tsx';
 import {BrowserRouter} from 'react-router-dom';
