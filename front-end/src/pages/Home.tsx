@@ -40,7 +40,7 @@ export default function Home() {
             <HomeSider/>
             <Content style={{ backgroundColor: '#FFF'}}>
                 <HomeHeader/>
-                <Card style={{minHeight: '2000px', margin: '0 2rem 0 2rem', backgroundColor: '#FFF'}}>
+                <Card variant="borderless" style={{minHeight: '2000px', margin: '0 2rem 0 2rem', backgroundColor: '#FFF'}}>
                     <HomeCategoryCollapse/>
                     <HomeTabs/>
                 </Card>

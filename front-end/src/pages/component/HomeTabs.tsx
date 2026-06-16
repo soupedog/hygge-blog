@@ -5,6 +5,7 @@ import {HomeContext} from '../context/HomeContext.tsx';
 export default function HomeTabs() {
     const {
         activeTap, setActiveTap,
+        setCategoryCollapsed,
         searchResultTotalCount,
         topicOverviewInfoList,
         quoteInfo,
@@ -66,6 +67,13 @@ export default function HomeTabs() {
             style={{marginTop: '1rem', padding: '1rem', borderRadius: '0.5rem', boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)', backgroundColor: '#FFF'}}
             items={items}
             onChange={(key) => {
+                if (key == '句子收藏') {
+                    setCategoryCollapsed(true);
+                }
+                // 默认 key 是 tid，32 位
+                if (key.length > 10) {
+                    setCategoryCollapsed(false);
+                }
                 setActiveTap(key);
             }}
         />
