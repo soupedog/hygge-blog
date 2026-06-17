@@ -61,7 +61,7 @@ export default function HomeTabPostContent({initData, tid}: HomeTabContentProps)
             renderItem={(item) => {
                 const post = item as ArticleDto;
 
-                if (post.orderCategory > 0) {
+                if (post.orderGlobal > 0) {
                     return (
                         <Badge.Ribbon key={`postItemBadge_${post.aid}`} text='顶置' color='red'>
                             <HomeTabPostListItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>

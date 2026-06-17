@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {List, Space} from 'antd';
+import {Image, List, Space} from 'antd';
 import {type ArticleDto, type CategoryDto, UserClient} from '../../util/ApiClient.ts';
 import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from '@ant-design/icons';
 import {TimeHelper} from '../../util/TimeHelper.ts';
@@ -25,8 +25,8 @@ const EditIcon = ({icon, text, pid}: { icon: React.FC; text: string, pid: string
            }}
            style={{
                float: 'right',
-               marginRight: '20px',
-               fontSize: '14px'
+               marginRight: '2rem',
+               fontSize: '1rem'
            }}>
         {React.createElement(icon)}
         {text}
@@ -62,7 +62,21 @@ export default function HomeTabPostListItem({post}: HomePostListItemProps) {
     return (
         <List.Item
             actions={actionItems}
-            extra={<img width={272} alt='postImage' src={post.imageSrc}/>}
+            extra={
+                <Image
+                    width={272}
+                    height={153}
+                    alt='postImage'
+                    src={post.imageSrc}
+                    preview={false}
+                    style={{
+                        objectFit: 'contain',  // 保持比例，不拉伸
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                />
+            }
         >
             <List.Item.Meta
                 title={
