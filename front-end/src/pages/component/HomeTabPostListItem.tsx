@@ -42,7 +42,7 @@ function getCategoryInfo(articleSummary: ArticleDto): string {
     return result;
 }
 
-export default function HomeTabListPostItem({post}: HomePostListItemProps) {
+export default function HomeTabPostListItem({post}: HomePostListItemProps) {
     const currentUser = UserClient.getCurrentUser();
     const isAuthor: boolean = currentUser != null && currentUser.uid == post.uid;
     let isDraft = post.articleState == 'DRAFT';

@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from 'react';
 import type {ArticleDto, FePageQueryResponse, QuoteDto} from '../../util/ApiClient.ts';
 import {Badge, List} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
-import HomeTabListPostItem from './HomeTabListPostItem.tsx';
+import HomeTabPostListItem from './HomeTabPostListItem.tsx';
 import {useHomeService} from '../../util/ApiService.ts';
 
 export interface HomeTabContentProps {
@@ -64,7 +64,7 @@ export default function HomeTabPostContent({initData, tid}: HomeTabContentProps)
                 if (post.orderCategory > 0) {
                     return (
                         <Badge.Ribbon key={`postItemBadge_${post.aid}`} text='顶置' color='red'>
-                            <HomeTabListPostItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>
+                            <HomeTabPostListItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>
                         </Badge.Ribbon>
                     );
                 }
@@ -72,12 +72,12 @@ export default function HomeTabPostContent({initData, tid}: HomeTabContentProps)
                 if (post.articleState == 'PRIVATE') {
                     return (
                         <Badge.Ribbon key={`postItemBadge_${post.aid}`} text='个人' color='blue'>
-                            <HomeTabListPostItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>
+                            <HomeTabPostListItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>
                         </Badge.Ribbon>
                     );
                 }
 
-                return <HomeTabListPostItem key={`postItem_${post.aid}`} post={post}/>
+                return <HomeTabPostListItem key={`postItem_${post.aid}`} post={post}/>
             }}
         />
     );

@@ -5,7 +5,7 @@ export interface HomeTabListQuoteItemProps {
     readonly quote: QuoteDto;
 }
 
-export default function HomeTabListQuoteItem({quote}: HomeTabListQuoteItemProps) {
+export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps) {
 
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
