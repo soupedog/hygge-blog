@@ -10,6 +10,7 @@ export interface AppNavigateConfig {
     path: string;
     delayTime?: number;
     canBack?: boolean;
+    needReload?: boolean;
 }
 
 export default class UrlHelper {
@@ -144,9 +145,15 @@ export default class UrlHelper {
         if (config.delayTime != null) {
             window.setTimeout(() => {
                 navigate(actualPath, {replace: actualReplace});
+                if (config.needReload) {
+                    location.reload();
+                }
             }, config.delayTime);
         } else {
             navigate(actualPath, {replace: actualReplace});
+            if (config.needReload) {
+                location.reload();
+            }
         }
     }
 

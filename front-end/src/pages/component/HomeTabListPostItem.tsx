@@ -1,0 +1,101 @@
+import * as React from 'react';
+import {List, Space} from 'antd';
+import {type ArticleDto, type CategoryDto, UserClient} from '../../util/ApiClient.ts';
+import {DashboardTwoTone, EditTwoTone, EyeOutlined, EyeTwoTone, FormOutlined} from '@ant-design/icons';
+import {TimeHelper} from '../../util/TimeHelper.ts';
+import {TimeType} from '../../enums/EnumKeeper.ts';
+import clsx from 'clsx';
+import UrlHelper from '../../util/UrlHelper.ts';
+
+export interface HomePostListItemProps {
+    readonly post: ArticleDto;
+}
+
+const IconText = ({icon, text}: { icon: React.FC; text: string }) => (
+    <Space>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+const EditIcon = ({icon, text, pid}: { icon: React.FC; text: string, pid: string }) => (
+    <Space className={'pointer'}
+           onClick={() => {
+               UrlHelper.navigateTo({path: `/manage/editor/post?pid=${pid}`});
+           }}
+           style={{
+               float: 'right',
+               marginRight: '20px',
+               fontSize: '14px'
+           }}>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+function getCategoryInfo(articleSummary: ArticleDto): string {
+    let result = articleSummary.categoryTreeInfo.topicInfo.topicName;
+
+    articleSummary.categoryTreeInfo.categoryList.forEach((item: CategoryDto) => {
+        result = result + ' / ' + item.categoryName
+    });
+    return result;
+}
+
+export default function HomeTabListPostItem({post}: HomePostListItemProps) {
+    const currentUser = UserClient.getCurrentUser();
+    const isAuthor: boolean = currentUser != null && currentUser.uid == post.uid;
+    let isDraft = post.articleState == 'DRAFT';
+
+    const actionItems = [
+        <IconText key={'word_count_' + post.aid} icon={EditTwoTone} text={'字数 ' + post.wordCount}/>,
+        <IconText key={'create_ts_' + post.aid} icon={DashboardTwoTone} text={TimeHelper.formatTimeStampToString(post.createTs, TimeType.yyyy_mm_dd)}/>,
+        <IconText key={'page_view_' + post.aid} icon={EyeTwoTone} text={'浏览量 ' + post.pageViews}/>,
+    ];
+
+    if (isAuthor) {
+        actionItems.push(
+            <IconText key={'self_view_' + post.aid} icon={EyeOutlined} text={'自浏览 ' + post.selfPageViews}/>
+        );
+    }
+
+    return (
+        <List.Item
+            key={post.title}
+            actions={actionItems}
+            extra={
+                <img
+                    width={272}
+                    alt='logo'
+                    src={post.imageSrc}
+                />
+            }
+        >
+            <List.Item.Meta
+                title={
+                    <>
+                        <a className={
+                            clsx({
+                                'draftHighlight': isDraft
+                            })
+                        }
+                           style={{fontSize: '32px', fontWeight: 900, lineHeight: '40px'}}
+                           href={
+                               UrlHelper.getHomePagePrefix() + 'browser/' + post.aid
+                           }
+                           target='_blank'>{post.title}{isDraft ? '【草稿】' : null}</a>
+                        {
+                            isAuthor ? <EditIcon icon={FormOutlined} text={'编辑'}
+                                                 pid={post.aid}
+                                                 key={'edit_' + post.aid}></EditIcon> : null
+                        }
+                    </>
+                }
+                description={getCategoryInfo(post)}
+            />
+            <div style={{textIndent: '2em', fontSize: '14px', lineHeight: '24px'}}>
+                {post.summary}
+            </div>
+        </List.Item>
+    );
+}

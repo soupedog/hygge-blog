@@ -40,6 +40,9 @@ export function useHomeService() {
     const searchQuoteByKeywordMutation = useMutation({
         mutationFn: HomeClient.searchQuoteByKeyword,
     });
+    const fetchPostSummaryByTidMutation = useMutation({
+        mutationFn: HomeClient.fetchPostSummaryByTid,
+    });
     const fetchPostSummaryByCidMutation = useMutation({
         mutationFn: HomeClient.fetchPostSummaryByCid,
     });
@@ -48,6 +51,7 @@ export function useHomeService() {
         fetch: fetchMutation,
         searchPostSummaryByKeyword: searchPostSummaryByKeywordMutation,
         searchQuoteByKeyword: searchQuoteByKeywordMutation,
-        fetchPostSummaryByCid: fetchPostSummaryByCidMutation
+        fetchPostSummaryByTid: fetchPostSummaryByTidMutation,
+        fetchPostSummaryByCid: fetchPostSummaryByCidMutation,
     }
 }

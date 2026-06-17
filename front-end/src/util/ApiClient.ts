@@ -217,6 +217,10 @@ export interface KeywordSearchInput extends PageQuery {
     keyword: string;
 }
 
+export interface PostInTopicSearchInput extends PageQuery {
+    tid: string;
+}
+
 export interface PostInCategorySearchInput extends PageQuery {
     cid: string;
 }
@@ -273,6 +277,15 @@ export class HomeClient {
         const clientResponse = await httpClient
             .get(`main/home/fetch`,
                 {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async fetchPostSummaryByTid(input: PostInTopicSearchInput): Promise<ArticleSummaryResponse> {
+        const clientResponse = await httpClient
+            .get(`main/home/fetch/topic/${input.tid}?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
                     headers: UserClient.getHeader()
                 }
             );

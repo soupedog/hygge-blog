@@ -2,9 +2,10 @@ import {createContext, type ReactNode, useState} from 'react';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
 import {useSearchParams} from 'react-router-dom';
 import {useHomeService} from '../../util/ApiService.ts';
-import {message} from 'antd';
+import {ConfigProvider, message} from 'antd';
+import zhCN from 'antd/lib/locale/zh_CN';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
-import type {AnnouncementDto, CategoryDto, FePageQueryResponse, PostInCategorySearchInput, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
+import type {AnnouncementDto, ArticleDto, CategoryDto, FePageQueryResponse, PostInCategorySearchInput, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
 
@@ -27,16 +28,20 @@ export interface HomeState {
     setSearchTabPageSize: Function;
     categoryCollapsed: boolean;
     setCategoryCollapsed: Function;
-    categoryList: Array<CategoryDto>;
-    setCategoryList: Function;
+    // tid-Array<CategoryDto>
+    categoryInfoMap: Map<string, Array<CategoryDto>>;
+    currentCategoryInfo: Array<CategoryDto>;
+    setCurrentCategoryInfo: Function;
+    addCategoryInfoOfTopic: (input: { tid?: string, list?: Array<CategoryDto> }) => void;
     activeTap: string;
     setActiveTap: Function;
     topicOverviewInfoList: Array<TopicOverviewInfo>;
     setTopicOverviewInfoList: Function;
     quoteInfo: QuoteResponse;
     setQuoteInfo: Function;
-    announcementInfoList: AnnouncementDto[];
+    announcementInfoList: Array<AnnouncementDto>;
     setAnnouncementInfoList: Function;
+    isPostType: (input: unknown) => boolean;
     fuzzySearch: Function;
     searchPostSummaryByCid: (input: PostInCategorySearchInput) => void;
 }
@@ -60,11 +65,23 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
 
     // 博客类别面板 是否收起
     const [categoryCollapsed, setCategoryCollapsed] = useState(false);
-    const [categoryList, setCategoryList] = useState<Array<CategoryDto>>([]);
+    const [categoryInfoMap, setCategoryInfoMap] = useState(new Map());
+    const [currentCategoryInfo, setCurrentCategoryInfo] = useState([]);
     const [activeTap, setActiveTap] = useState('');
     const [topicOverviewInfoList, setTopicOverviewInfoList] = useState<Array<TopicOverviewInfo>>([]);
     const [quoteInfo, setQuoteInfo] = useState<QuoteResponse>({quoteList: [], totalCount: 0});
     const [announcementInfoList, setAnnouncementInfoList] = useState<Array<AnnouncementDto>>([]);
+
+    const isPostType = (input: unknown) => {
+        // 如果存在 aid 属性且不为 undefined，返回 true
+        return (input as ArticleDto).aid !== undefined;
+    };
+
+    const addCategoryInfoOfTopic = (input: { tid?: string, list?: Array<CategoryDto> }) => {
+        if (input.tid && input.list && input.list.length > 0) {
+            categoryInfoMap.set(input.tid, input.list);
+        }
+    };
 
     const fuzzySearch = () => {
         if (keyword != null) {
@@ -121,15 +138,19 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
             keyword, setKeyword,
             keywordType, setKeywordType,
             categoryCollapsed, setCategoryCollapsed,
-            categoryList, setCategoryList,
+            categoryInfoMap, addCategoryInfoOfTopic,
+            currentCategoryInfo, setCurrentCategoryInfo,
             activeTap, setActiveTap,
             topicOverviewInfoList, setTopicOverviewInfoList,
             quoteInfo, setQuoteInfo,
             announcementInfoList, setAnnouncementInfoList,
+            isPostType,
             fuzzySearch,
             searchPostSummaryByCid
         }}>
-            {children}
+            <ConfigProvider locale={zhCN}>
+                {children}
+            </ConfigProvider>
         </HomeContext>
     );
 }

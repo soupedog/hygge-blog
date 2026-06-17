@@ -14,9 +14,11 @@ export default function Home() {
     const {fetch} = useHomeService();
 
     const {
-        setCategoryList,
-        setActiveTap,
         setTopicOverviewInfoList,
+        addCategoryInfoOfTopic,
+        setCurrentCategoryInfo,
+        setFirstTopicInitResult,
+        setActiveTap,
         setQuoteInfo,
         setAnnouncementInfoList,
     } = useContext(HomeContext);
@@ -26,11 +28,24 @@ export default function Home() {
 
         fetch.mutate(undefined, {
             onSuccess: (data) => {
-                setTopicOverviewInfoList(data.topicOverviewInfoList);
-                setCategoryList(data.topicOverviewInfoList[0]?.categoryListInfo);
+                data.topicOverviewInfoList.map(item => {
+                    addCategoryInfoOfTopic({tid: item.topicInfo.tid, list: item.categoryListInfo});
+                });
+
+                setFirstTopicInitResult({
+                    dataSet: data.articleSummaryInfo.articleSummaryList,
+                    totalCount: data.articleSummaryInfo.totalCount
+                });
+
                 setActiveTap(data.topicOverviewInfoList[0]?.topicInfo.tid);
+                const listTemp = data.topicOverviewInfoList[0]?.categoryListInfo;
+                if (listTemp) {
+                    setCurrentCategoryInfo(listTemp);
+                }
+
                 setQuoteInfo(data.quoteInfo);
                 setAnnouncementInfoList(data.announcementInfoList);
+                setTopicOverviewInfoList(data.topicOverviewInfoList);
             }
         });
     }, []);
@@ -38,9 +53,9 @@ export default function Home() {
     return (
         <Layout>
             <HomeSider/>
-            <Content style={{ backgroundColor: '#FFF'}}>
+            <Content style={{minHeight: '100vh', backgroundColor: '#FFF'}}>
                 <HomeHeader/>
-                <Card variant="borderless" style={{minHeight: '2000px', margin: '0 2rem 0 2rem', backgroundColor: '#FFF'}}>
+                <Card style={{margin: '0 2rem 2rem 2rem', backgroundColor: '#FFF'}}>
                     <HomeCategoryCollapse/>
                     <HomeTabs/>
                 </Card>

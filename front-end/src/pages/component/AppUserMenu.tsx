@@ -4,6 +4,7 @@ import {Avatar, Button, Dropdown, type MenuProps, message} from 'antd';
 import {UserClient} from '../../util/ApiClient.ts';
 import UrlHelper from '../../util/UrlHelper.ts';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
+import {useState} from 'react';
 
 const items: MenuProps['items'] = [
     {
@@ -34,7 +35,7 @@ const items: MenuProps['items'] = [
 ];
 
 export default function AppUserMenu() {
-    const user = UserClient.getCurrentUser();
+    const [user, setUser] = useState(UserClient.getCurrentUser());
     const {pid} = useParams();
 
     const onClick: MenuProps['onClick'] = ({key}) => {
@@ -58,7 +59,7 @@ export default function AppUserMenu() {
             case 'signOut':
                 UserClient.removeCurrentUser();
                 message.success('登出成功，1 s 内将跳转回首页。');
-                UrlHelper.navigateTo({path: `/`, delayTime: 1000});
+                UrlHelper.navigateTo({path: `/`, delayTime: 1000, needReload: true});
                 break;
         }
     };
@@ -80,5 +81,4 @@ export default function AppUserMenu() {
             </Dropdown>
         );
     }
-
 }

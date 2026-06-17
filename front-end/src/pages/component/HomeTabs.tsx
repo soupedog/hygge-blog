@@ -1,11 +1,15 @@
 import {useContext, useMemo} from 'react';
 import {Badge, Tabs, type TabsProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
+import HomeTabContent from './HomeTabContent.tsx';
 
 export default function HomeTabs() {
     const {
         activeTap, setActiveTap,
         setCategoryCollapsed,
+        categoryInfoMap,
+        currentCategoryInfo, setCurrentCategoryInfo,
+        firstTopicInitResult,
         searchResult,
         topicOverviewInfoList,
         quoteInfo,
@@ -21,7 +25,7 @@ export default function HomeTabs() {
                     <Badge count={item.totalCount} overflowCount={9999} offset={[10, -20]}/>
                 </>
             ),
-            children: <div>{item.topicInfo.topicName} 内容：</div>,
+            children: <HomeTabContent tid={item.topicInfo.tid} initData={activeTap == item.topicInfo.tid ? firstTopicInitResult : undefined}/>,
         }));
 
         return [
@@ -67,6 +71,12 @@ export default function HomeTabs() {
             style={{marginTop: '1rem', padding: '1rem', borderRadius: '0.5rem', boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)', backgroundColor: '#FFF'}}
             items={items}
             onChange={(key) => {
+                setActiveTap(key);
+                const listTemp = categoryInfoMap.get(key);
+                if (listTemp) {
+                    setCurrentCategoryInfo(listTemp);
+                }
+
                 if (key == '句子收藏') {
                     setCategoryCollapsed(true);
                 }
@@ -74,7 +84,6 @@ export default function HomeTabs() {
                 if (key.length > 10) {
                     setCategoryCollapsed(false);
                 }
-                setActiveTap(key);
             }}
         />
     );

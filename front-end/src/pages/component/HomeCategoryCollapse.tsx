@@ -1,4 +1,4 @@
-import {useContext, useMemo} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {Badge, Card, Collapse, type CollapseProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
@@ -15,10 +15,10 @@ export default function HomeCategoryCollapse() {
     const {
         categoryCollapsed,
         setKeywordType,
-        categoryList,
-        searchTabPageSize,
+        currentCategoryInfo,
+        setSearchTabPageSize,
         searchPostSummaryByCid,
-        setActiveTap,
+        activeTap, setActiveTap,
     } = useContext(HomeContext);
 
     const items: CollapseProps['items'] = useMemo(() => {
@@ -29,7 +29,7 @@ export default function HomeCategoryCollapse() {
                 label: '文章类别目录',
                 children:
                     <Card size={'small'}>
-                        {categoryList.map((item, index) => {
+                        {currentCategoryInfo.map((item, index) => {
                             if (item.articleCount < 1) {
                                 return null;
                             }
@@ -37,7 +37,9 @@ export default function HomeCategoryCollapse() {
                                 <Card.Grid key={'card_' + item.categoryName} className={clsx(['pointer'])} style={gridStyle}
                                            onClick={() => {
                                                setKeywordType(HomeKeywordType.POST);
-                                               searchPostSummaryByCid({cid: item.cid, currentPage: 1, pageSize: searchTabPageSize});
+                                               // 重置分页搜索参数
+                                               setSearchTabPageSize(5);
+                                               searchPostSummaryByCid({cid: item.cid, currentPage: 1, pageSize: 5});
                                                setActiveTap('搜索结果');
                                            }}
                                 >
@@ -52,7 +54,7 @@ export default function HomeCategoryCollapse() {
                     </Card>
             }
         ];
-    }, [searchTabPageSize, JSON.stringify(categoryList)]);
+    }, [activeTap]);
 
     return (
         <Collapse activeKey={[categoryCollapsed ? 'collapsed' : 'default']} items={items} style={{backgroundColor: '#FFF'}}/>
