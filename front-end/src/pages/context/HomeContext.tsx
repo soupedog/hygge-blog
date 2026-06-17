@@ -2,12 +2,9 @@ import {createContext, type ReactNode, useState} from 'react';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
 import {useSearchParams} from 'react-router-dom';
 import {useHomeService} from '../../util/ApiService.ts';
-import {ConfigProvider, message} from 'antd';
+import {ConfigProvider} from 'antd';
 import zhCN from 'antd/lib/locale/zh_CN';
-import {appConfiguration} from '../../configuration/app.configuration.ts';
-import type {AnnouncementDto, ArticleDto, CategoryDto, FePageQueryResponse, PostInCategorySearchInput, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
-
-const toastZIndex = appConfiguration.toastDefaultZIndex;
+import type {AnnouncementDto, ArticleDto, CategoryDto, FePageQueryResponse, KeywordSearchInput, PostInCategorySearchInput, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
 
 export interface HomeState {
     searchParams: URLSearchParams;
@@ -22,10 +19,15 @@ export interface HomeState {
     setKeywordType: Function;
     searchResult: FePageQueryResponse;
     setSearchResult: (input: FePageQueryResponse) => void;
-    searchTabCurrentPage: number;
-    setSearchTabCurrentPage: Function;
-    searchTabPageSize: number;
-    setSearchTabPageSize: Function;
+    searchResultCurrentPage: number;
+    setSearchResultCurrentPage: Function;
+    searchResultPageSize: number;
+    setSearchResultPageSize: Function;
+    searchResultOrderEnable: boolean;
+    setSearchResultOrderEnable: Function;
+    // cid
+    searchCategoryInfo?: string;
+    setSearchCategoryInfo: Function;
     categoryCollapsed: boolean;
     setCategoryCollapsed: Function;
     // tid-Array<CategoryDto>
@@ -42,7 +44,7 @@ export interface HomeState {
     announcementInfoList: Array<AnnouncementDto>;
     setAnnouncementInfoList: Function;
     isPostType: (input: unknown) => boolean;
-    fuzzySearch: Function;
+    fuzzySearch: (input: KeywordSearchInput) => void;
     searchPostSummaryByCid: (input: PostInCategorySearchInput) => void;
 }
 
@@ -60,8 +62,10 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
     // 主页初始化加载第一次网络请求中包含了第一个主题的内容，第一个主题拉取第一页内容无需发起请求
     const [firstTopicInitResult, setFirstTopicInitResult] = useState<FePageQueryResponse>({dataSet: [], totalCount: 0});
     const [searchResult, setSearchResult] = useState<FePageQueryResponse>({dataSet: [], totalCount: 0});
-    const [searchTabCurrentPage, setSearchTabCurrentPage] = useState(1);
-    const [searchTabPageSize, setSearchTabPageSize] = useState(5);
+    const [searchResultCurrentPage, setSearchResultCurrentPage] = useState(1);
+    const [searchResultPageSize, setSearchResultPageSize] = useState(5);
+    const [searchResultOrderEnable, setSearchResultOrderEnable] = useState(false);
+    const [searchCategoryInfo, setSearchCategoryInfo] = useState<string | undefined>(undefined);
 
     // 博客类别面板 是否收起
     const [categoryCollapsed, setCategoryCollapsed] = useState(false);
@@ -83,39 +87,35 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
         }
     };
 
-    const fuzzySearch = () => {
-        if (keyword != null) {
-            if (keywordType == HomeKeywordType.POST) {
-                searchPostSummaryByKeyword.mutate(
-                    {
-                        keyword: keyword,
-                        currentPage: searchTabCurrentPage,
-                        pageSize: searchTabPageSize,
-                    },
-                    {
-                        onSuccess: (data) => {
-                            setSearchResult({dataSet: data.articleSummaryList, totalCount: data.totalCount});
-                            setActiveTap('搜索结果');
-                        }
+    const fuzzySearch = (input: KeywordSearchInput) => {
+        if (keywordType == HomeKeywordType.POST) {
+            searchPostSummaryByKeyword.mutate(
+                {
+                    keyword: input.keyword,
+                    currentPage: input.currentPage,
+                    pageSize: input.pageSize,
+                },
+                {
+                    onSuccess: (data) => {
+                        setSearchResult({dataSet: data.articleSummaryList, totalCount: data.totalCount});
+                        setActiveTap('搜索结果');
                     }
-                );
-            } else {
-                searchQuoteByKeyword.mutate(
-                    {
-                        keyword: keyword,
-                        currentPage: searchTabCurrentPage,
-                        pageSize: searchTabPageSize,
-                    },
-                    {
-                        onSuccess: (data) => {
-                            setSearchResult({dataSet: data.quoteList, totalCount: data.totalCount});
-                            setActiveTap('搜索结果');
-                        }
-                    }
-                );
-            }
+                }
+            );
         } else {
-            message.warning({content: '搜索关键字不可为空！', style: {zIndex: toastZIndex}});
+            searchQuoteByKeyword.mutate(
+                {
+                    keyword: input.keyword,
+                    currentPage: input.currentPage,
+                    pageSize: input.pageSize,
+                },
+                {
+                    onSuccess: (data) => {
+                        setSearchResult({dataSet: data.quoteList, totalCount: data.totalCount});
+                        setActiveTap('搜索结果');
+                    }
+                }
+            );
         }
     };
 
@@ -133,8 +133,10 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
             collapsed, setCollapsed,
             firstTopicInitResult, setFirstTopicInitResult,
             searchResult, setSearchResult,
-            searchTabCurrentPage, setSearchTabCurrentPage,
-            searchTabPageSize, setSearchTabPageSize,
+            searchResultCurrentPage: searchResultCurrentPage, setSearchResultCurrentPage: setSearchResultCurrentPage,
+            searchResultPageSize: searchResultPageSize, setSearchResultPageSize: setSearchResultPageSize,
+            searchResultOrderEnable, setSearchResultOrderEnable,
+            searchCategoryInfo, setSearchCategoryInfo,
             keyword, setKeyword,
             keywordType, setKeywordType,
             categoryCollapsed, setCategoryCollapsed,

@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from 'react';
+import {useContext, useMemo} from 'react';
 import {Badge, Card, Collapse, type CollapseProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
@@ -16,8 +16,11 @@ export default function HomeCategoryCollapse() {
         categoryCollapsed,
         setKeywordType,
         currentCategoryInfo,
-        setSearchTabPageSize,
+        searchResultCurrentPage, setSearchResultCurrentPage,
+        searchResultPageSize, setSearchResultPageSize,
+        setSearchCategoryInfo,
         searchPostSummaryByCid,
+        setSearchResultOrderEnable,
         activeTap, setActiveTap,
     } = useContext(HomeContext);
 
@@ -36,10 +39,15 @@ export default function HomeCategoryCollapse() {
                             return (
                                 <Card.Grid key={'card_' + item.categoryName} className={clsx(['pointer'])} style={gridStyle}
                                            onClick={() => {
+                                               setSearchResultOrderEnable(true);
                                                setKeywordType(HomeKeywordType.POST);
-                                               // 重置分页搜索参数
-                                               setSearchTabPageSize(5);
+
+                                               setSearchCategoryInfo(item.cid);
+                                               setSearchResultCurrentPage(1);
+                                               setSearchResultPageSize(5);
+                                               // TODO 分页信息非初始值，修改分页信息 HomeTabSearchContent 的 useEffect 会自动触发查询
                                                searchPostSummaryByCid({cid: item.cid, currentPage: 1, pageSize: 5});
+
                                                setActiveTap('搜索结果');
                                            }}
                                 >

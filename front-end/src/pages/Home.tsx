@@ -8,7 +8,7 @@ import {Content} from 'antd/es/layout/layout';
 import HomeHeader from './component/HomeHeader.tsx';
 import HomeCategoryCollapse from './component/HomeCategoryCollapse.tsx';
 import {useHomeService} from '../util/ApiService.ts';
-import HomeTabs from './component/HomeTabs.tsx';
+import HomeTabContainer from './component/HomeTabContainer.tsx';
 
 export default function Home() {
     const {fetch} = useHomeService();
@@ -57,7 +57,7 @@ export default function Home() {
                 <HomeHeader/>
                 <Card style={{margin: '0 2rem 2rem 2rem', backgroundColor: '#FFF'}}>
                     <HomeCategoryCollapse/>
-                    <HomeTabs/>
+                    <HomeTabContainer/>
                 </Card>
                 <AppFooter/>
             </Content>

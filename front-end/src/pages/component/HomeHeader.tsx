@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useContext} from 'react';
 import {Header} from 'antd/es/layout/layout';
-import {Button, Flex, Space, Spin, Switch, Tooltip} from 'antd';
+import {Button, Flex, message, Space, Spin, Switch, Tooltip} from 'antd';
 import {MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
 import AppUserMenu from './AppUserMenu.tsx';
 import {useIsMutating} from '@tanstack/react-query';
@@ -9,6 +9,9 @@ import {HomeContext} from '../context/HomeContext.tsx';
 import Search from 'antd/es/input/Search';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
+import {appConfiguration} from '../../configuration/app.configuration.ts';
+
+const toastZIndex = appConfiguration.toastDefaultZIndex;
 
 const HomeHeaderStyle: React.CSSProperties = {
     padding: '0 2rem 0 0',
@@ -28,6 +31,10 @@ export default function HomeHeader() {
         keyword, setKeyword,
         keywordType, setKeywordType,
         searchParams, setSearchParams,
+        searchResultCurrentPage, setSearchResultCurrentPage,
+        searchResultPageSize, setSearchResultPageSize,
+        setSearchCategoryInfo,
+        setSearchResultOrderEnable,
         fuzzySearch
     } = useContext(HomeContext);
 
@@ -80,7 +87,16 @@ export default function HomeHeader() {
                                 }}
 
                                 onSearch={(value) => {
-                                    fuzzySearch();
+                                    if (keyword != null) {
+                                        setSearchResultOrderEnable(false);
+                                        setSearchCategoryInfo(undefined);
+                                        // TODO 分页信息非初始值，修改分页信息 HomeTabSearchContent 的 useEffect 会自动触发查询
+                                        setSearchResultCurrentPage(1);
+                                        setSearchResultPageSize(5);
+                                        fuzzySearch({keyword: keyword, currentPage: 1, pageSize: 5});
+                                    } else {
+                                        message.warning({content: '搜索关键字不可为空！', style: {zIndex: toastZIndex}});
+                                    }
                                 }}
                         />
                         <AppUserMenu/>

@@ -3,8 +3,9 @@ import {Badge, Tabs, type TabsProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
 import HomeTabPostContent from './HomeTabPostContent.tsx';
 import HomeTabQuoteContent from './HomeTabQuoteContent.tsx';
+import HomeTabSearchContent from './HomeTabSearchContent.tsx';
 
-export default function HomeTabs() {
+export default function HomeTabContainer() {
     const {
         activeTap, setActiveTap,
         setCategoryCollapsed,
@@ -49,7 +50,7 @@ export default function HomeTabs() {
                         <Badge key={`tabContentBadge_搜索结果`} count={searchResult.totalCount} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
-                children: <div>搜索结果内容</div>,
+                children: <HomeTabSearchContent key={`tabContent_搜索结果`}/>,
             },
             {
                 key: '公告',
