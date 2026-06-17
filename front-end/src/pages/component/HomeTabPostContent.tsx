@@ -1,9 +1,8 @@
 import {useContext, useEffect, useState} from 'react';
 import type {ArticleDto, FePageQueryResponse, QuoteDto} from '../../util/ApiClient.ts';
-import {List} from 'antd';
+import {Badge, List} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
 import HomeTabListPostItem from './HomeTabListPostItem.tsx';
-import HomeTabListQuoteItem from './HomeTabListQuoteItem.tsx';
 import {useHomeService} from '../../util/ApiService.ts';
 
 export interface HomeTabContentProps {
@@ -11,7 +10,7 @@ export interface HomeTabContentProps {
     readonly tid: string;
 }
 
-export default function HomeTabContent({initData, tid}: HomeTabContentProps) {
+export default function HomeTabPostContent({initData, tid}: HomeTabContentProps) {
     const {
         isPostType
     } = useContext(HomeContext);
@@ -42,6 +41,7 @@ export default function HomeTabContent({initData, tid}: HomeTabContentProps) {
         <List
             itemLayout='vertical'
             size='large'
+            bordered={false}
             loading={fetchPostSummaryByTid.isPending}
             pagination={{
                 onChange: (page, pageSize) => {
@@ -58,9 +58,27 @@ export default function HomeTabContent({initData, tid}: HomeTabContentProps) {
                 pageSize: currentPageSize,
             }}
             dataSource={listData}
-            renderItem={(item) => (
-                isPostType(item) ? <HomeTabListPostItem post={item as ArticleDto}/> : <HomeTabListQuoteItem quote={item as QuoteDto}/>
-            )}
+            renderItem={(item) => {
+                const post = item as ArticleDto;
+
+                if (post.orderCategory > 0) {
+                    return (
+                        <Badge.Ribbon key={`postItemBadge_${post.aid}`} text='顶置' color='red'>
+                            <HomeTabListPostItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>
+                        </Badge.Ribbon>
+                    );
+                }
+
+                if (post.articleState == 'PRIVATE') {
+                    return (
+                        <Badge.Ribbon key={`postItemBadge_${post.aid}`} text='个人' color='blue'>
+                            <HomeTabListPostItem key={`postItem_${post.aid}`} post={item as ArticleDto}/>
+                        </Badge.Ribbon>
+                    );
+                }
+
+                return <HomeTabListPostItem key={`postItem_${post.aid}`} post={post}/>
+            }}
         />
     );
 }

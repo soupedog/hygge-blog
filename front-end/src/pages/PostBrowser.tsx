@@ -4,7 +4,7 @@ import {useParams} from 'react-router-dom';
 
 import './PostBrowser.css'
 
-import {FloatButton, Layout, message, Splitter, Tooltip} from 'antd';
+import {FloatButton, Layout, message, Skeleton, Splitter, Tooltip} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import {usePostService} from '../util/ApiService.ts';
 import {type ArticleDto} from '../util/ApiClient.ts';
@@ -47,12 +47,17 @@ export default function PostBrowser() {
 
     // 博客不存在时无需渲染
     if (post == null) {
-        return null;
+        return <div>
+            <Skeleton active/>
+            <Skeleton active/>
+            <Skeleton active/>
+            <Skeleton active/>
+        </div>;
     }
 
     return (
         <Layout>
-            <PostBrowserHeader isAnyPending={false}/>
+            <PostBrowserHeader isAnyPending={findArticleByAidMutation.isPending}/>
             <div className={'PostBrowser_image'} style={{
                 width: '100%',
                 height: '25rem',

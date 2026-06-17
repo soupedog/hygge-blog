@@ -1,7 +1,7 @@
 import {useContext, useMemo} from 'react';
 import {Badge, Tabs, type TabsProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
-import HomeTabContent from './HomeTabContent.tsx';
+import HomeTabPostContent from './HomeTabPostContent.tsx';
 
 export default function HomeTabs() {
     const {
@@ -22,10 +22,10 @@ export default function HomeTabs() {
             label: (
                 <>
                     {item.topicInfo.topicName}
-                    <Badge count={item.totalCount} overflowCount={9999} offset={[10, -20]}/>
+                    <Badge key={`tabContentBadge_${item.topicInfo.tid}`} count={item.totalCount} overflowCount={9999} offset={[10, -20]}/>
                 </>
             ),
-            children: <HomeTabContent tid={item.topicInfo.tid} initData={activeTap == item.topicInfo.tid ? firstTopicInitResult : undefined}/>,
+            children: <HomeTabPostContent key={`tabContent_${item.topicInfo.tid}`} tid={item.topicInfo.tid} initData={activeTap == item.topicInfo.tid ? firstTopicInitResult : undefined}/>,
         }));
 
         return [
@@ -35,7 +35,7 @@ export default function HomeTabs() {
                 label: (
                     <>
                         句子收藏
-                        <Badge count={quoteInfo.totalCount} overflowCount={9999} offset={[10, -20]}/>
+                        <Badge key={`tabContentBadge_句子收藏`} count={quoteInfo.totalCount} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
                 children: <div>句子收藏内容</div>,
@@ -45,7 +45,7 @@ export default function HomeTabs() {
                 label: (
                     <>
                         搜索结果
-                        <Badge count={searchResult.totalCount} overflowCount={9999} offset={[10, -20]}/>
+                        <Badge key={`tabContentBadge_搜索结果`} count={searchResult.totalCount} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
                 children: <div>搜索结果内容</div>,
@@ -55,7 +55,7 @@ export default function HomeTabs() {
                 label: (
                     <>
                         公告
-                        <Badge count={announcementInfoList.length} overflowCount={9999} offset={[10, -20]}/>
+                        <Badge key={`tabContentBadge_公告`} count={announcementInfoList.length} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
                 children: <div>公告内容</div>,
