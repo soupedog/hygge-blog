@@ -35,33 +35,30 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
     return (
         <List.Item
             extra={PropertiesHelper.isStringNotEmpty(quote.imageSrc) ?
-                <Image
-                    width={272}
-                    height={153}
-                    alt='quateLogo'
-                    src={quote.imageSrc}
-                    preview={true}
-                    style={{
-                        objectFit: 'contain',  // 保持比例，不拉伸
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                />
+                <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+                    <Image
+                        width={272}
+                        height={153}
+                        alt='quoteLogo'
+                        src={quote.imageSrc}
+                        preview={true}
+                        style={{
+                            objectFit: 'contain',
+                        }}
+                    />
+                </div>
                 : null}
         >
             <List.Item.Meta
                 title={
-                    quote.source == null ? null :
-                        <>
-                            <Tooltip placement='top' title={'可能的出处'}>
-                                <span style={{fontSize: '1.5rem', fontWeight: 'bold'}}>{quote.source}</span>
-                            </Tooltip>
-                            {
-                                isAuthor ? <EditIcon icon={FormOutlined} text={'编辑'}
-                                                     quoteId={quote.quoteId}/> : null
-                            }
-                        </>
+                    <>
+                        <Tooltip placement='top' title={'可能的出处'}>
+                            <span style={{fontSize: '1.5rem', fontWeight: 'bold'}}>{quote.source}</span>
+                        </Tooltip>
+                        {
+                            isAuthor ? <EditIcon icon={FormOutlined} text={'编辑'} quoteId={quote.quoteId}/> : null
+                        }
+                    </>
                 }
                 description={
                     quote.portal == null ? null :
@@ -81,7 +78,7 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                 {hasRemarks ?
                     <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
                         <Splitter.Panel>
-                            <Card>
+                            <Card styles={{body: {padding: 4}}}>
                                 <div className={'quote-md-preview'}>
                                     <MdPreview
                                         id={`md-id-quote-${quote.quoteId}`} value={quote.content}
@@ -107,7 +104,7 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                         </Splitter.Panel>
                     </Splitter>
                     :
-                    <Card>
+                    <Card styles={{body: {padding: 4}}}>
                         <div className={'quote-md-preview'}>
                             <MdPreview
                                 id={`md-id-quote-${quote.quoteId}`} value={quote.content}

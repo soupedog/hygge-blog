@@ -62,30 +62,44 @@
 }
 
 // 句子收藏样式
-.quote-md-preview {
-  .md-editor-preview {
-    p, li {
-      color: #9a0707;
+
+.QuoteList {
+  .ant-list-item-meta {
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+  }
+
+  .ant-list-item-meta-title {
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+  }
+
+  .quote-md-preview {
+    .md-editor-preview {
+      p, li {
+        color: #9a0707;
+      }
     }
+  }
+
+  .quote-md-remark-preview {
+    .md-editor-preview {
+      p, li {
+        color: teal;
+        font-size: 0.8rem;
+        line-height: 1.5rem;
+        font-style: italic;
+      }
+    }
+  }
+
+  .quote-remarks-title {
+    color: teal;
+    font-weight: 600;
+    font-style: italic;
   }
 }
 
-.quote-md-remark-preview {
-  .md-editor-preview {
-    p, li {
-      color: teal;
-      font-size: 0.8rem;
-      line-height: 1.5rem;
-      font-style: italic;
-    }
-  }
-}
-
-.quote-remarks-title{
-  color: teal;
-  font-weight: 600;
-  font-style: italic;
-}
 
 // 公告栏相关样式
 .ant-timeline-item-content {

@@ -235,7 +235,7 @@ export interface QuoteDto {
     imageSrc?: string;
     coverFileNo: string;
     content: string;
-    source?: string;
+    source: string;
     portal?: string;
     remarks?: string;
     orderVal?: number;

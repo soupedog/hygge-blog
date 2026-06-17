@@ -26,6 +26,7 @@ export default function HomeTabQuoteContent() {
 
     return (
         <List
+            className={'QuoteList'}
             itemLayout='vertical'
             size='large'
             pagination={{
