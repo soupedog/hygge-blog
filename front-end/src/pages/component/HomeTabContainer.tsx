@@ -4,6 +4,7 @@ import {HomeContext} from '../context/HomeContext.tsx';
 import HomeTabPostContent from './HomeTabPostContent.tsx';
 import HomeTabQuoteContent from './HomeTabQuoteContent.tsx';
 import HomeTabSearchContent from './HomeTabSearchContent.tsx';
+import HomeTabAnnouncementContent from './HomeTabAnnouncementContent.tsx';
 
 export default function HomeTabContainer() {
     const {
@@ -60,7 +61,7 @@ export default function HomeTabContainer() {
                         <Badge key={`tabContentBadge_公告`} count={announcementInfoList.length} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
-                children: <div>公告内容</div>,
+                children: <HomeTabAnnouncementContent key={`tabContent_公告`}/>,
             },
         ];
     }, [topicOverviewInfoList, JSON.stringify(quoteInfo), JSON.stringify(searchResult), announcementInfoList.length]);
