@@ -76,7 +76,8 @@ export class HttpClient {
                     // token 校验不匹配
                     // 清空本地错误用户信息
                     UserClient.removeCurrentUser();
-                    message.warning({content: `错误的用户登录缓存信息已清空！`, style: {zIndex: toastZIndex}});
+                    message.warning({content: `错误的用户登录缓存信息已清空！2 秒内即将跳转回主页。`, duration: 2, style: {zIndex: toastZIndex}});
+                    UrlHelper.navigateTo({path: '/', needReload: true, delayTime: 2000});
                 }
 
                 // 相当于中断正常流程的 Promise 流程，主动触发异常处理器方法
