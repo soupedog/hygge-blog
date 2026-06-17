@@ -33,36 +33,37 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
     const hasRemarks = PropertiesHelper.isStringNotEmpty(quote.remarks);
 
     return (
-        <List.Item
-            extra={PropertiesHelper.isStringNotEmpty(quote.imageSrc) ?
-                <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
-                    <Image
-                        width={272}
-                        height={153}
-                        alt='quoteLogo'
-                        src={quote.imageSrc}
-                        preview={true}
-                        style={{
-                            objectFit: 'contain',
-                        }}
-                    />
-                </div>
-                : null}
-        >
-            <List.Item.Meta
-                title={
-                    <>
-                        <Tooltip placement='top' title={'可能的出处'}>
-                            <span style={{fontSize: '1.5rem', fontWeight: 'bold'}}>{quote.source}</span>
-                        </Tooltip>
-                        {
-                            isAuthor ? <EditIcon icon={FormOutlined} text={'编辑'} quoteId={quote.quoteId}/> : null
-                        }
-                    </>
-                }
-                description={
-                    quote.portal == null ? null :
+        <div className={'QuoteListItem'}>
+            <List.Item
+                extra={PropertiesHelper.isStringNotEmpty(quote.imageSrc) ?
+                    <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+                        <Image
+                            width={272}
+                            height={153}
+                            alt='quoteLogo'
+                            src={quote.imageSrc}
+                            preview={true}
+                            style={{
+                                objectFit: 'contain',
+                            }}
+                        />
+                    </div>
+                    : null}
+            >
+                <List.Item.Meta
+                    title={
                         <>
+                            <Tooltip placement='top' title={'可能的出处'}>
+                                <span style={{fontSize: '1.5rem', fontWeight: 'bold'}}>{quote.source}</span>
+                            </Tooltip>
+                            {
+                                isAuthor ? <EditIcon icon={FormOutlined} text={'编辑'} quoteId={quote.quoteId}/> : null
+                            }
+                        </>
+                    }
+                    description={
+                        quote.portal == null ? null :
+                            <>
                             <span style={{
                                 fontSize: '1rem',
                                 color: '#0039f6',
@@ -70,49 +71,50 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                             }}>
                                     &emsp;传送门:&emsp;
                             </span>
-                            <a href={quote.portal} target='_blank'>{quote.portal}</a>
-                        </>
-                }
-            />
-            <Row>
-                {hasRemarks ?
-                    <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
-                        <Splitter.Panel>
-                            <Card styles={{body: {padding: 4}}}>
-                                <div className={'quote-md-preview'}>
+                                <a href={quote.portal} target='_blank'>{quote.portal}</a>
+                            </>
+                    }
+                />
+                <Row>
+                    {hasRemarks ?
+                        <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
+                            <Splitter.Panel>
+                                <Card styles={{body: {padding: 4, paddingLeft: 28}}}>
+                                    <div className={'quote-md-preview'}>
+                                        <MdPreview
+                                            id={`md-id-quote-${quote.quoteId}`} value={quote.content}
+                                            sanitize={(html) => html}/>
+                                    </div>
+                                </Card>
+                            </Splitter.Panel>
+                            <Splitter.Panel defaultSize='30%' min='10%' max='90%'>
+                                <Card className={'quote-md-remark-preview'}>
+                                    <div className={clsx([
+                                        'inlineBlock',
+                                        'autoOmit',
+                                        'textAlignRight',
+                                        'fullWidth',
+                                        'quote-remarks-title'
+                                    ])}>
+                                        —— 备注&nbsp;&nbsp;
+                                    </div>
                                     <MdPreview
-                                        id={`md-id-quote-${quote.quoteId}`} value={quote.content}
+                                        id={`md-id-quote-remarks-${quote.quoteId}`} value={`${quote.remarks}`}
                                         sanitize={(html) => html}/>
-                                </div>
-                            </Card>
-                        </Splitter.Panel>
-                        <Splitter.Panel defaultSize='30%' min='10%' max='90%'>
-                            <Card className={'quote-md-remark-preview'}>
-                                <div className={clsx([
-                                    'inlineBlock',
-                                    'autoOmit',
-                                    'textAlignRight',
-                                    'fullWidth',
-                                    'quote-remarks-title'
-                                ])}>
-                                    —— 备注&nbsp;&nbsp;
-                                </div>
+                                </Card>
+                            </Splitter.Panel>
+                        </Splitter>
+                        :
+                        <Card styles={{body: {padding: 4, paddingLeft: 28}}}>
+                            <div className={'quote-md-preview'}>
                                 <MdPreview
-                                    id={`md-id-quote-remarks-${quote.quoteId}`} value={`${quote.remarks}`}
+                                    id={`md-id-quote-${quote.quoteId}`} value={quote.content}
                                     sanitize={(html) => html}/>
-                            </Card>
-                        </Splitter.Panel>
-                    </Splitter>
-                    :
-                    <Card styles={{body: {padding: 4}}}>
-                        <div className={'quote-md-preview'}>
-                            <MdPreview
-                                id={`md-id-quote-${quote.quoteId}`} value={quote.content}
-                                sanitize={(html) => html}/>
-                        </div>
-                    </Card>
-                }
-            </Row>
-        </List.Item>
+                            </div>
+                        </Card>
+                    }
+                </Row>
+            </List.Item>
+        </div>
     );
 }
