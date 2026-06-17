@@ -45,10 +45,10 @@ export default function HomeTabPostContent({initData, tid}: HomeTabContentProps)
             loading={fetchPostSummaryByTid.isPending}
             pagination={{
                 onChange: (page, pageSize) => {
-                    console.log(`page:${page} pageSize:${pageSize}`);
                     if (page != currentPage) {
                         setCurrentPage(page);
-                    } else if (pageSize != currentPageSize) {
+                    }
+                    if (pageSize != currentPageSize) {
                         setCurrentPageSize(pageSize);
                     }
                 },

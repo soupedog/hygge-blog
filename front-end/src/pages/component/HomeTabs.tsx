@@ -2,6 +2,7 @@ import {useContext, useMemo} from 'react';
 import {Badge, Tabs, type TabsProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
 import HomeTabPostContent from './HomeTabPostContent.tsx';
+import HomeTabQuoteContent from './HomeTabQuoteContent.tsx';
 
 export default function HomeTabs() {
     const {
@@ -38,7 +39,7 @@ export default function HomeTabs() {
                         <Badge key={`tabContentBadge_句子收藏`} count={quoteInfo.totalCount} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
-                children: <div>句子收藏内容</div>,
+                children: <HomeTabQuoteContent key={`tabContent_句子收藏`}/>,
             },
             {
                 key: '搜索结果',

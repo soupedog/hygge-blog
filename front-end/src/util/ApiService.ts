@@ -34,24 +34,28 @@ export function useHomeService() {
     const fetchMutation = useMutation({
         mutationFn: HomeClient.fetch,
     });
-    const searchPostSummaryByKeywordMutation = useMutation({
-        mutationFn: HomeClient.searchPostSummaryByKeyword,
-    });
-    const searchQuoteByKeywordMutation = useMutation({
-        mutationFn: HomeClient.searchQuoteByKeyword,
-    });
     const fetchPostSummaryByTidMutation = useMutation({
         mutationFn: HomeClient.fetchPostSummaryByTid,
     });
     const fetchPostSummaryByCidMutation = useMutation({
         mutationFn: HomeClient.fetchPostSummaryByCid,
     });
+    const fetchQuoteMutation = useMutation({
+        mutationFn: HomeClient.fetchQuote,
+    });
+    const searchPostSummaryByKeywordMutation = useMutation({
+        mutationFn: HomeClient.searchPostSummaryByKeyword,
+    });
+    const searchQuoteByKeywordMutation = useMutation({
+        mutationFn: HomeClient.searchQuoteByKeyword,
+    });
 
     return {
         fetch: fetchMutation,
-        searchPostSummaryByKeyword: searchPostSummaryByKeywordMutation,
-        searchQuoteByKeyword: searchQuoteByKeywordMutation,
         fetchPostSummaryByTid: fetchPostSummaryByTidMutation,
         fetchPostSummaryByCid: fetchPostSummaryByCidMutation,
+        fetchQuote: fetchQuoteMutation,
+        searchPostSummaryByKeyword: searchPostSummaryByKeywordMutation,
+        searchQuoteByKeyword: searchQuoteByKeywordMutation,
     }
 }

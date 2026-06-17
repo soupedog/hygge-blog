@@ -38,7 +38,7 @@ export interface HomeState {
     topicOverviewInfoList: Array<TopicOverviewInfo>;
     setTopicOverviewInfoList: Function;
     quoteInfo: QuoteResponse;
-    setQuoteInfo: Function;
+    setQuoteInfo: (input: QuoteResponse) => void;
     announcementInfoList: Array<AnnouncementDto>;
     setAnnouncementInfoList: Function;
     isPostType: (input: unknown) => boolean;

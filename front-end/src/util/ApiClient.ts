@@ -301,6 +301,15 @@ export class HomeClient {
         return clientResponse.data.main;
     }
 
+    static async fetchQuote(input: PageQuery): Promise<QuoteResponse> {
+        const clientResponse = await httpClient
+            .get(`main/home/fetch/quote?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
     static async searchPostSummaryByKeyword(input: KeywordSearchInput): Promise<ArticleSummaryResponse> {
         const clientResponse = await httpClient
             .get(`main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
