@@ -35,6 +35,10 @@ export default function AppFooter() {
                     &nbsp;&amp;&nbsp;<a className='dependentLink' target='_blank'
                                         href='https://ant-design.antgroup.com/index-cn'>Ant Design</a>
                 </Text>
+                <Text>
+                    &nbsp;&amp;&nbsp;<a className='dependentLink' target='_blank'
+                                        href='https://cn.vite.dev/'>Vite</a>
+                </Text>
             </Paragraph>
 
             <Paragraph strong={true}>

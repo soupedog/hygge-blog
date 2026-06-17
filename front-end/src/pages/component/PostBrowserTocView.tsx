@@ -105,6 +105,7 @@ export default function PostBrowserTocView({tocTree}: PostBrowserTocViewProps) {
 
     return (
         <Card
+            variant={'borderless'}
             style={{
                 height: '100%',
                 backgroundColor: '#F0F2F5'
@@ -118,7 +119,7 @@ export default function PostBrowserTocView({tocTree}: PostBrowserTocViewProps) {
                 right: 0,
                 width: '100%'
             }} offsetTop={180}>
-                <Card style={{marginLeft: '0.5rem'}} styles={{body: {padding: 8}}}>
+                <Card style={{marginLeft: '0.5rem'}} variant={'borderless'} styles={{body: {padding: 8}}}>
                     <div className='tocTitle'>目录</div>
                     <Tree
                         expandedKeys={expandedKeys}
