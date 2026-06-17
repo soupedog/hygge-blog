@@ -4,7 +4,7 @@ import {useSearchParams} from 'react-router-dom';
 import {useHomeService} from '../../util/ApiService.ts';
 import {message} from 'antd';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
-import type {AnnouncementDto, ArticleDto, CategoryDto, PostInCategorySearchInput, QuoteDto, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
+import type {AnnouncementDto, CategoryDto, FePageQueryResponse, PostInCategorySearchInput, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
 
 const toastZIndex = appConfiguration.toastDefaultZIndex;
 
@@ -13,22 +13,20 @@ export interface HomeState {
     setSearchParams: Function;
     collapsed: boolean;
     setCollapsed: Function;
+    firstTopicInitResult: FePageQueryResponse;
+    setFirstTopicInitResult: (input: FePageQueryResponse) => void;
     keyword?: string;
     setKeyword: Function;
     keywordType: HomeKeywordType;
     setKeywordType: Function;
+    searchResult: FePageQueryResponse;
+    setSearchResult: (input: FePageQueryResponse) => void;
     searchTabCurrentPage: number;
     setSearchTabCurrentPage: Function;
     searchTabPageSize: number;
     setSearchTabPageSize: Function;
-    searchResult: Array<ArticleDto | QuoteDto>;
-    setSearchResult: Function;
-    searchResultTotalCount: number;
-    setSearchResultTotalCount: Function;
     categoryCollapsed: boolean;
     setCategoryCollapsed: Function;
-    categorySizeInRow: number;
-    setCategorySizeInRow: Function;
     categoryList: Array<CategoryDto>;
     setCategoryList: Function;
     activeTap: string;
@@ -54,19 +52,18 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
     // HomeHeader 搜索关键字
     const [keyword, setKeyword] = useState(searchParams.get('keyword') || undefined);
     const [keywordType, setKeywordType] = useState<HomeKeywordType>(HomeKeywordType.POST);
+    // 主页初始化加载第一次网络请求中包含了第一个主题的内容，第一个主题拉取第一页内容无需发起请求
+    const [firstTopicInitResult, setFirstTopicInitResult] = useState<FePageQueryResponse>({dataSet: [], totalCount: 0});
+    const [searchResult, setSearchResult] = useState<FePageQueryResponse>({dataSet: [], totalCount: 0});
     const [searchTabCurrentPage, setSearchTabCurrentPage] = useState(1);
     const [searchTabPageSize, setSearchTabPageSize] = useState(5);
-    const [searchResult, setSearchResult] = useState<Array<ArticleDto | QuoteDto>>([]);
-    const [searchResultTotalCount, setSearchResultTotalCount] = useState(0);
 
     // 博客类别面板 是否收起
     const [categoryCollapsed, setCategoryCollapsed] = useState(false);
-    // 博客类别一行显示几个
-    const [categorySizeInRow, setCategorySizeInRow] = useState(5);
     const [categoryList, setCategoryList] = useState<Array<CategoryDto>>([]);
     const [activeTap, setActiveTap] = useState('');
     const [topicOverviewInfoList, setTopicOverviewInfoList] = useState<Array<TopicOverviewInfo>>([]);
-    const [quoteInfo, setQuoteInfo] = useState<QuoteResponse>({} as QuoteResponse);
+    const [quoteInfo, setQuoteInfo] = useState<QuoteResponse>({quoteList: [], totalCount: 0});
     const [announcementInfoList, setAnnouncementInfoList] = useState<Array<AnnouncementDto>>([]);
 
     const fuzzySearch = () => {
@@ -80,8 +77,7 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
                     },
                     {
                         onSuccess: (data) => {
-                            setSearchResult(data.articleSummaryList);
-                            setSearchResultTotalCount(data.totalCount);
+                            setSearchResult({dataSet: data.articleSummaryList, totalCount: data.totalCount});
                             setActiveTap('搜索结果');
                         }
                     }
@@ -95,8 +91,7 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
                     },
                     {
                         onSuccess: (data) => {
-                            setSearchResult(data.quoteList);
-                            setSearchResultTotalCount(data.totalCount);
+                            setSearchResult({dataSet: data.quoteList, totalCount: data.totalCount});
                             setActiveTap('搜索结果');
                         }
                     }
@@ -110,8 +105,7 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
     const searchPostSummaryByCid = (input: PostInCategorySearchInput) => {
         fetchPostSummaryByCid.mutate(input, {
             onSuccess: (data) => {
-                setSearchResult(data.articleSummaryList);
-                setSearchResultTotalCount(data.totalCount);
+                setSearchResult({dataSet: data.articleSummaryList, totalCount: data.totalCount});
             }
         });
     };
@@ -120,15 +114,14 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
         <HomeContext value={{
             searchParams, setSearchParams,
             collapsed, setCollapsed,
-            keyword, setKeyword,
-            keywordType, setKeywordType,
-            categoryCollapsed, setCategoryCollapsed,
-            categorySizeInRow, setCategorySizeInRow,
-            categoryList, setCategoryList,
+            firstTopicInitResult, setFirstTopicInitResult,
             searchResult, setSearchResult,
             searchTabCurrentPage, setSearchTabCurrentPage,
             searchTabPageSize, setSearchTabPageSize,
-            searchResultTotalCount, setSearchResultTotalCount,
+            keyword, setKeyword,
+            keywordType, setKeywordType,
+            categoryCollapsed, setCategoryCollapsed,
+            categoryList, setCategoryList,
             activeTap, setActiveTap,
             topicOverviewInfoList, setTopicOverviewInfoList,
             quoteInfo, setQuoteInfo,

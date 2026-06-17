@@ -28,7 +28,7 @@ export default function Home() {
             onSuccess: (data) => {
                 setTopicOverviewInfoList(data.topicOverviewInfoList);
                 setCategoryList(data.topicOverviewInfoList[0]?.categoryListInfo);
-                setActiveTap(data.topicOverviewInfoList[0].topicInfo.tid);
+                setActiveTap(data.topicOverviewInfoList[0]?.topicInfo.tid);
                 setQuoteInfo(data.quoteInfo);
                 setAnnouncementInfoList(data.announcementInfoList);
             }

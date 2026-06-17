@@ -204,7 +204,8 @@ export class PostClient {
 
     static async findArticleByAid(aid: string): Promise<ArticleDto> {
         const clientResponse = await httpClient
-            .get(`/main/article/${aid}`, {
+            .get(`/main/article/${aid}`,
+                {
                     headers: UserClient.getHeader()
                 }
             );
@@ -238,6 +239,11 @@ export interface QuoteDto {
     editable: boolean;
 }
 
+// 纯前端的业务对象
+export interface FePageQueryResponse extends PageQueryResponse {
+    dataSet: Array<QuoteDto | ArticleDto>;
+}
+
 export interface QuoteResponse extends PageQueryResponse {
     quoteList: QuoteDto[];
 }
@@ -265,7 +271,8 @@ export class HomeClient {
 
     static async fetch(): Promise<AllOverviewInfo> {
         const clientResponse = await httpClient
-            .get(`main/home/fetch`, {
+            .get(`main/home/fetch`,
+                {
                     headers: UserClient.getHeader()
                 }
             );
@@ -283,7 +290,8 @@ export class HomeClient {
 
     static async searchPostSummaryByKeyword(input: KeywordSearchInput): Promise<ArticleSummaryResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+            .get(`main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
+                {
                     headers: UserClient.getHeader()
                 }
             );
@@ -292,9 +300,11 @@ export class HomeClient {
 
     static async searchQuoteByKeyword(input: KeywordSearchInput): Promise<QuoteResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/search/quote?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
-                headers: UserClient.getHeader()
-            });
+            .get(`main/home/search/quote?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
+                {
+                    headers: UserClient.getHeader()
+                }
+            );
         return clientResponse.data.main;
     }
 }

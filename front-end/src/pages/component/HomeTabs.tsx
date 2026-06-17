@@ -6,7 +6,7 @@ export default function HomeTabs() {
     const {
         activeTap, setActiveTap,
         setCategoryCollapsed,
-        searchResultTotalCount,
+        searchResult,
         topicOverviewInfoList,
         quoteInfo,
         announcementInfoList,
@@ -41,7 +41,7 @@ export default function HomeTabs() {
                 label: (
                     <>
                         搜索结果
-                        <Badge count={searchResultTotalCount} overflowCount={9999} offset={[10, -20]}/>
+                        <Badge count={searchResult.totalCount} overflowCount={9999} offset={[10, -20]}/>
                     </>
                 ),
                 children: <div>搜索结果内容</div>,
@@ -57,7 +57,7 @@ export default function HomeTabs() {
                 children: <div>公告内容</div>,
             },
         ];
-    }, [topicOverviewInfoList, quoteInfo.totalCount, searchResultTotalCount, announcementInfoList.length]);
+    }, [topicOverviewInfoList, JSON.stringify(quoteInfo), JSON.stringify(searchResult), announcementInfoList.length]);
 
     return (
         <Tabs
