@@ -17,7 +17,7 @@ const HomeHeaderStyle: React.CSSProperties = {
     padding: '0 2rem 0 0',
     top: 0,
     position: 'sticky',
-    zIndex: 1,
+    zIndex: toastZIndex - 10,
     width: '100%',
     background: '#001529',
     color: '#fff'

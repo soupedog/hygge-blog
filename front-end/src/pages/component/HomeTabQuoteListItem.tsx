@@ -1,10 +1,11 @@
 import * as React from 'react';
 import {type QuoteDto, UserClient} from '../../util/ApiClient.ts';
-import {Image, List, Space, Tooltip} from 'antd';
+import {Card, Image, List, Row, Space, Splitter, Tooltip} from 'antd';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {FormOutlined} from '@ant-design/icons';
 import UrlHelper from '../../util/UrlHelper.ts';
 import {MdPreview} from 'md-editor-rt';
+import clsx from 'clsx';
 
 export interface HomeTabListQuoteItemProps {
     readonly quote: QuoteDto;
@@ -28,6 +29,8 @@ const EditIcon = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId
 export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps) {
     const currentUser = UserClient.getCurrentUser();
     const isAuthor: boolean = currentUser != null && currentUser.uid == quote.uid;
+
+    const hasRemarks = PropertiesHelper.isStringNotEmpty(quote.remarks);
 
     return (
         <List.Item
@@ -74,11 +77,45 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                         </>
                 }
             />
-            <div className={'quote-md-preview'}>
-                <MdPreview
-                    id={`editor_id_for_browser_${quote.quoteId}`} value={quote.content}
-                    sanitize={(html) => html}/>
-            </div>
+            <Row>
+                {hasRemarks ?
+                    <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
+                        <Splitter.Panel>
+                            <Card>
+                                <div className={'quote-md-preview'}>
+                                    <MdPreview
+                                        id={`md-id-quote-${quote.quoteId}`} value={quote.content}
+                                        sanitize={(html) => html}/>
+                                </div>
+                            </Card>
+                        </Splitter.Panel>
+                        <Splitter.Panel defaultSize='30%' min='10%' max='90%'>
+                            <Card className={'quote-md-remark-preview'}>
+                                <div className={clsx([
+                                    'inlineBlock',
+                                    'autoOmit',
+                                    'textAlignRight',
+                                    'fullWidth',
+                                    'quote-remarks-title'
+                                ])}>
+                                    —— 备注&nbsp;&nbsp;
+                                </div>
+                                <MdPreview
+                                    id={`md-id-quote-remarks-${quote.quoteId}`} value={`${quote.remarks}`}
+                                    sanitize={(html) => html}/>
+                            </Card>
+                        </Splitter.Panel>
+                    </Splitter>
+                    :
+                    <Card>
+                        <div className={'quote-md-preview'}>
+                            <MdPreview
+                                id={`md-id-quote-${quote.quoteId}`} value={quote.content}
+                                sanitize={(html) => html}/>
+                        </div>
+                    </Card>
+                }
+            </Row>
         </List.Item>
     );
 }

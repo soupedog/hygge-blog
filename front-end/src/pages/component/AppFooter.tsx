@@ -24,29 +24,33 @@ export default function AppFooter() {
                     Made with
                 </Text>
                 <Text>
-                    <a className='dependentLink' target='_blank'
-                       href='https://www.typescriptlang.org/'> TypeScript</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a className='dependentLink' target='_blank' href='https://cn.vite.dev/'>
+                        Vite
+                    </a>
                 </Text>
                 <Text>
-                    &nbsp;&amp;&nbsp;<a className='dependentLink' target='_blank'
-                                        href='https://zh-hans.react.dev/'> React</a>
+                    &nbsp;&nbsp;&amp;&nbsp;&nbsp;
+                    <a className='dependentLink' target='_blank' href='https://www.typescriptlang.org/'>
+                        TypeScript
+                    </a>
                 </Text>
                 <Text>
-                    &nbsp;&amp;&nbsp;<a className='dependentLink' target='_blank'
-                                        href='https://ant-design.antgroup.com/index-cn'>Ant Design</a>
+                    &nbsp;&nbsp;&amp;&nbsp;&nbsp;
+                    <a className='dependentLink' target='_blank' href='https://zh-hans.react.dev/'>
+                        React
+                    </a>
                 </Text>
                 <Text>
-                    &nbsp;&amp;&nbsp;<a className='dependentLink' target='_blank'
-                                        href='https://cn.vite.dev/'>Vite</a>
+                    &nbsp;&nbsp;&amp;&nbsp;&nbsp;
+                    <a className='dependentLink' target='_blank' href='https://ant-design.antgroup.com/index-cn'>
+                        Ant Design
+                    </a>
                 </Text>
             </Paragraph>
 
             <Paragraph strong={true}>
-                <a className='dependentLink'
-                   href={`http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=${code}`}
-                   target='_blank'
-                   rel='noopener noreferrer'
-                >
+                <a className='dependentLink' target='_blank' rel='noopener noreferrer' href={`http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=${code}`}>
                     🛡️ {codePrefix}{code}
                 </a>
 
@@ -54,11 +58,7 @@ export default function AppFooter() {
                     |
                 </Text>
 
-                <a className='dependentLink'
-                   href='https://beian.miit.gov.cn/'
-                   target='_blank'
-                   rel='noopener noreferrer'
-                >
+                <a className='dependentLink' href='https://beian.miit.gov.cn/' target='_blank' rel='noopener noreferrer'>
                     {icpInfo}
                 </a>
             </Paragraph>

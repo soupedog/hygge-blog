@@ -38,6 +38,18 @@
   align-self: center;
 }
 
+.inlineBlock {
+  display: inline-block;
+}
+
+.textAlignRight {
+  text-align: right;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
 //Home start
 // 明示折叠不可点击
 .ant-collapse > .ant-collapse-item > .ant-collapse-header {
@@ -49,6 +61,7 @@
   color: #a32001 !important;
 }
 
+// 句子收藏样式
 .quote-md-preview {
   .md-editor-preview {
     p, li {
@@ -57,11 +70,29 @@
   }
 }
 
+.quote-md-remark-preview {
+  .md-editor-preview {
+    p, li {
+      color: teal;
+      font-size: 0.8rem;
+      line-height: 1.5rem;
+      font-style: italic;
+    }
+  }
+}
+
+.quote-remarks-title{
+  color: teal;
+  font-weight: 600;
+  font-style: italic;
+}
+
 // 公告栏相关样式
 .ant-timeline-item-content {
   word-wrap: break-word;
   word-break: break-word;
   white-space: pre-wrap;
 }
+
 //Home end
 

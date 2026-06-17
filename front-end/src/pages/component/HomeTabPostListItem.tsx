@@ -47,6 +47,7 @@ export default function HomeTabPostListItem({post}: HomePostListItemProps) {
     const isAuthor: boolean = currentUser != null && currentUser.uid == post.uid;
     let isDraft = post.articleState == 'DRAFT';
 
+
     const actionItems = [
         <IconText icon={EditTwoTone} text={'字数 ' + post.wordCount}/>,
         <IconText icon={DashboardTwoTone} text={TimeHelper.formatTimeStampToString(post.createTs, TimeType.yyyy_mm_dd)}/>,
@@ -58,6 +59,9 @@ export default function HomeTabPostListItem({post}: HomePostListItemProps) {
             <IconText icon={EyeOutlined} text={'自浏览 ' + post.selfPageViews}/>
         );
     }
+
+    let link = UrlHelper.getHomePagePrefix() + '/post/' + post.aid;
+    link = UrlHelper.mergeUrl(link, {'secretKey': UrlHelper.getQueryString('secretKey')});
 
     return (
         <List.Item
@@ -82,8 +86,8 @@ export default function HomeTabPostListItem({post}: HomePostListItemProps) {
                 title={
                     <>
                         <a className={clsx({'draftHighlight': isDraft})}
-                           style={{fontSize: '32px', fontWeight: 900, lineHeight: '40px'}}
-                           href={UrlHelper.getHomePagePrefix() + '/post/' + post.aid}
+                           style={{fontSize: '2rem', fontWeight: 900, lineHeight: '2.5rem'}}
+                           href={link}
                            target='_blank'>{post.title}{isDraft ? '【草稿】' : null}
                         </a>
                         {
