@@ -45,5 +45,5 @@ public class CategoryDto {
     @Schema(title = "文章类别状态", description = "禁用,启用")
     private CategoryStateEnum categoryState;
     @Schema(title = "文章类别下文章数量")
-    private Integer articleCount;
+    private Long articleCount;
 }
