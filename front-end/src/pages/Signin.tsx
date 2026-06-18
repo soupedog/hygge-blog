@@ -3,7 +3,7 @@ import {Button, Form, Input, Layout, Space} from 'antd';
 import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {Content} from 'antd/es/layout/layout';
 
-import SimpleHeader from './component/SimpleHeader.tsx';
+import SigninHeader from './component/SigninHeader.tsx';
 import AppFooter from './component/AppFooter.tsx';
 import {useUserService} from '../util/ApiService.ts';
 import UrlHelper from '../util/UrlHelper.ts';
@@ -39,7 +39,7 @@ export default function Signin() {
 
     return (
         <Layout>
-            <SimpleHeader title={'登录'} isAnyPending={isAnyPending}/>
+            <SigninHeader title={'登录'} isAnyPending={isAnyPending}/>
             <Content style={{minHeight: '35rem'}}>
                 <Form
                     name='basic'

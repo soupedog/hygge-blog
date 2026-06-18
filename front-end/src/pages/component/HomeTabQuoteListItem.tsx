@@ -33,7 +33,7 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
     const hasRemarks = PropertiesHelper.isStringNotEmpty(quote.remarks);
 
     return (
-        <div className={'QuoteListItem'}>
+        <div className={'quote-list-item'}>
             <List.Item
                 extra={PropertiesHelper.isStringNotEmpty(quote.imageSrc) ?
                     <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
@@ -93,7 +93,7 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                                         'inlineBlock',
                                         'autoOmit',
                                         'textAlignRight',
-                                        'fullWidth',
+                                        'full-width',
                                         'quote-remarks-title'
                                     ])}>
                                         —— 备注&nbsp;&nbsp;

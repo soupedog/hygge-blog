@@ -22,6 +22,7 @@ import mermaid from 'mermaid';
 import {message} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import {HomeProvider} from './context/HomeContext.tsx';
+import QuoteEditor from './QuoteEditor.tsx';
 // 创建 QueryClient 实例
 const queryClient = new QueryClient();
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示
@@ -123,7 +124,7 @@ export default function App() {
             <Routes>
                 <Route path={'/post/:pid'} element={<PostBrowser key={'PostBrowser'}/>}/>
                 <Route path={'/manage/editor/post'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-                <Route path={'/manage/editor/quote'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                <Route path={'/manage/editor/quote'} element={<QuoteEditor key={'QuoteEditor'}/>}/>
                 <Route path={'/manage/file/glance'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                 <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
