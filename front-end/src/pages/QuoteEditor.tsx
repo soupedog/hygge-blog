@@ -14,16 +14,16 @@ export default function QuoteEditor() {
         queryModalOpen,
         setQueryModalOpen,
         getQuoteByQuoteId,
+        fetchImageInfo,
     } = useContext(QuoteEditorContext);
 
     useEffect(() => {
         // 初次加载页面
-
+        fetchImageInfo();
 
         if (quoteId) {
             getQuoteByQuoteId();
         }
-
     }, []);
 
     return (

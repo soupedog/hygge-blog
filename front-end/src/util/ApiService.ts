@@ -31,11 +31,19 @@ export function usePostService() {
 }
 
 export function useQuoteService() {
+    const createQuoteMutation = useMutation({
+        mutationFn: QuoteClient.createQuote,
+    });
+    const updateQuoteMutation = useMutation({
+        mutationFn: QuoteClient.updateQuote,
+    });
     const findQuoteMutation = useMutation({
         mutationFn: QuoteClient.findQuote,
     });
 
     return {
+        createQuote: createQuoteMutation,
+        updateQuote: updateQuoteMutation,
         findQuote: findQuoteMutation
     }
 }

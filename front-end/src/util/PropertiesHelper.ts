@@ -1,6 +1,6 @@
 export interface OfNullableInputParam<T> {
     target: T | null | undefined;
-    defaultValue: T;
+    defaultValue: T | null;
 }
 
 export interface ArrayFormatInputParam<T = any> {
@@ -13,22 +13,22 @@ export default class PropertiesHelper {
     /**
      * 安全获取字符串值，若 target 无效则返回默认值
      */
-    static stringOfNullable(inputParam: OfNullableInputParam<string>): string {
-        return this.isStringNotEmpty(inputParam.target) ? inputParam.target : inputParam.defaultValue;
+    static stringOfNullable(inputParam: OfNullableInputParam<string>): string | null {
+        return this.isStringNotEmpty(inputParam.target) ? inputParam.target.trimEnd() : inputParam.defaultValue;
     }
 
     /**
      * 安全获取布尔值，若 target 无效则返回默认值
      */
     static booleanOfNullable(inputParam: OfNullableInputParam<boolean>): boolean {
-        return this.isBooleanNotNull(inputParam.target) ? inputParam.target : inputParam.defaultValue;
+        return this.isBooleanNotNull(inputParam.target) ? inputParam.target : inputParam.defaultValue!;
     }
 
     /**
      * 判断是否为非空字符串
      */
     static isStringNotEmpty(target: unknown): target is string {
-        return typeof target === 'string' && target.length > 0;
+        return typeof target === 'string' && target.trimEnd().length > 0;
     }
 
     /**

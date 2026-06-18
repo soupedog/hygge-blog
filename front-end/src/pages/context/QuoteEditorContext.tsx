@@ -3,16 +3,18 @@ import {useIsMutating} from '@tanstack/react-query';
 import {Form, message} from 'antd';
 import {useSearchParams} from 'react-router-dom';
 import {useFileCService, useQuoteService} from '../../util/ApiService.ts';
-import type {QuoteDto} from '../../util/ApiClient.ts';
+import type {QuoteAddUpdateInput, QuoteDto} from '../../util/ApiClient.ts';
 import type {FormInstance} from 'antd/es/form/hooks/useForm';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
-import type {QuoteFO} from '../component/QuoteEditorForm.tsx';
+
 
 export interface QuoteEditorContextState {
     isAnyPending: boolean;
     searchParams: URLSearchParams;
     setSearchParams: (input: URLSearchParams) => void;
     quoteForm: FormInstance;
+    fileOptions: Array<any>,
+    setFileOptions: Function,
     quoteId?: string;
     setQuoteId: Function;
     quote?: QuoteDto;
@@ -21,6 +23,8 @@ export interface QuoteEditorContextState {
     setQueryModalOpen: Function;
     onQuoteIdChange: Function;
     fetchImageInfo: Function;
+    addQuote: Function;
+    modifyQuote: Function;
     getQuoteByQuoteId: Function;
 }
 
@@ -30,13 +34,15 @@ export const QuoteEditorProvider = ({children}: { children: ReactNode }) => {
     // 全局的 Pending 检测，如果单独则如 signIn.isPending 即可
     const isAnyPending = useIsMutating() > 0;
     const [searchParams, setSearchParams] = useSearchParams();
+    const [fileOptions, setFileOptions] = useState<Array<any>>([]);
+
     const [quoteId, setQuoteId] = useState(searchParams.get('quoteId') || undefined);
 
-    const [quoteForm] = Form.useForm<QuoteFO>();
+    const [quoteForm] = Form.useForm<QuoteAddUpdateInput>();
     const [quote, setQuote] = useState<QuoteDto | undefined>(undefined);
     const [queryModalOpen, setQueryModalOpen] = useState(false);
 
-    const {findQuote} = useQuoteService();
+    const {createQuote, updateQuote, findQuote} = useQuoteService();
     const {fetchFileInfo} = useFileCService();
 
     const onQuoteIdChange = (nextQuoteId?: string) => {
@@ -53,11 +59,47 @@ export const QuoteEditorProvider = ({children}: { children: ReactNode }) => {
     };
 
     const fetchImageInfo = () => {
-        fetchFileInfo.mutate({fileType: 'QUOTE'}, {
+        fetchFileInfo.mutate({type: 'QUOTE'}, {
             onSuccess: (data) => {
+                // @ts-ignore
+                const fileInfo = [];
 
+                data.fileInfoList.map(item => {
+                    fileInfo.push(
+                        {
+                            value: item.fileNo,
+                            label: `${item.name}——${item.fileSize}`
+                        }
+                    );
+                });
+
+                // @ts-ignore
+                setFileOptions(fileInfo);
+                message.success({content: '图片数据拉取成功！'});
             }
         });
+    };
+
+    const addQuote = (input: QuoteAddUpdateInput) => {
+        if (quote) {
+            createQuote.mutate(input, {
+                onSuccess: (data) => {
+                    setQuote(data);
+                    message.success({content: '创建句子收藏成功！'});
+                }
+            });
+        }
+    };
+
+    const modifyQuote = (input: QuoteAddUpdateInput) => {
+        if (quote) {
+            updateQuote.mutate(input, {
+                onSuccess: (data) => {
+                    setQuote(data);
+                    message.success({content: '修改句子收藏成功！'});
+                }
+            });
+        }
     };
 
     const getQuoteByQuoteId = () => {
@@ -87,12 +129,15 @@ export const QuoteEditorProvider = ({children}: { children: ReactNode }) => {
         <QuoteEditorContext value={{
             isAnyPending: isAnyPending,
             searchParams: searchParams, setSearchParams: setSearchParams,
+            fileOptions: fileOptions, setFileOptions: setFileOptions,
             quoteForm: quoteForm,
             quoteId: quoteId, setQuoteId: setQuoteId,
             quote: quote, setQuote: setQuote,
             queryModalOpen: queryModalOpen, setQueryModalOpen: setQueryModalOpen,
             onQuoteIdChange: onQuoteIdChange,
             fetchImageInfo: fetchImageInfo,
+            addQuote: addQuote,
+            modifyQuote: modifyQuote,
             getQuoteByQuoteId: getQuoteByQuoteId,
         }}>
             {children}

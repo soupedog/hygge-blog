@@ -1,33 +1,31 @@
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {Button, Col, Flex, Form, Input, InputNumber, message, Radio, Row, Select, Space} from 'antd';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {QuoteEditorContext} from '../context/QuoteEditorContext.tsx';
 
-export interface QuoteFO {
-    quoteId?: string;
-    coverFileNo?: string;
-    content: string;
-    source?: string;
-    portal?: string;
-    remarks?: string;
-    orderVal?: number;
-    quoteState: string;
-}
-
 export default function QuoteEditorForm() {
     const {
+        fileOptions,
         quoteForm,
         quoteId,
         onQuoteIdChange,
         setQueryModalOpen,
+        addQuote,
+        modifyQuote,
     } = useContext(QuoteEditorContext);
 
-    const [quote, setQuote] = useState({content: '', quoteState: 'ACTIVE'});
     const [formMode, setFormMode] = useState<'query' | 'add' | 'update'>(quoteId ? 'query' : 'add');
 
     const isAddMode = formMode == 'add';
     const isQueryMode = formMode == 'query';
     const isUpdateMode = formMode == 'update';
+
+    useEffect(() => {
+        // 初始化默认选中无图片
+        quoteForm.setFieldsValue({
+            coverFileNo: ''
+        });
+    }, []);
 
     return (
         <Form
@@ -38,28 +36,16 @@ export default function QuoteEditorForm() {
             style={{padding: '4rem'}}
 
             onFinish={(value) => {
-                if (!PropertiesHelper.isStringNotEmpty(value.coverFileNo)) {
-                    value.coverFileNo = null;
-                }
-
-                if (!PropertiesHelper.isStringNotEmpty(value.remarks)) {
-                    value.remarks = null;
-                }
-
-                if (!PropertiesHelper.isStringNotEmpty(value.source)) {
-                    value.source = null;
-                }
-
-                if (!PropertiesHelper.isStringNotEmpty(value.portal)) {
-                    value.portal = null;
-                }
-
-                console.log(value);
+                value.coverFileNo = PropertiesHelper.stringOfNullable({target: value.coverFileNo, defaultValue: null});
+                value.source = PropertiesHelper.stringOfNullable({target: value.source, defaultValue: null});
+                value.portal = PropertiesHelper.stringOfNullable({target: value.portal, defaultValue: null});
+                value.content = PropertiesHelper.stringOfNullable({target: value.content, defaultValue: null});
+                value.remarks = PropertiesHelper.stringOfNullable({target: value.remarks, defaultValue: null});
 
                 if (value.action == 'update') {
-
+                    modifyQuote(value);
                 } else if (value.action == 'add') {
-
+                    addQuote(value);
                 }
             }}
         >
@@ -96,18 +82,7 @@ export default function QuoteEditorForm() {
                                     value: '',
                                     label: '无图片'
                                 },
-                                {
-                                    value: 'jack',
-                                    label: '图1',
-                                },
-                                {
-                                    value: 'lucy',
-                                    label: '图24',
-                                },
-                                {
-                                    value: 'tom',
-                                    label: 'Tom',
-                                },
+                                ...fileOptions
                             ]}
                         />
                     </Form.Item>
@@ -147,7 +122,7 @@ export default function QuoteEditorForm() {
                 <Col span={1}></Col>
                 <Col span={22}>
                     <Form.Item name={['content']} label='内容' rules={[{required: isAddMode}]}>
-                        <Input.TextArea rows={2}/>
+                        <Input.TextArea rows={4}/>
                     </Form.Item>
                 </Col>
                 <Col span={1}></Col>
@@ -195,7 +170,7 @@ export default function QuoteEditorForm() {
                                     setFormMode('query');
                                     if (PropertiesHelper.isStringNotEmpty(quoteId)) {
                                         setQueryModalOpen(true);
-                                    }else {
+                                    } else {
                                         message.warning('句子编号不可为空！')
                                     }
                                 }}>

@@ -239,7 +239,7 @@ export interface QuoteDto {
     portal?: string;
     remarks?: string;
     orderVal?: number;
-    quoteState?: string;
+    quoteState: 'ACTIVE' | 'INACTIVE';
     editable: boolean;
 }
 
@@ -335,7 +335,40 @@ export interface QuoteQueryInput {
     quoteId: string;
 }
 
+export interface QuoteAddUpdateInput {
+    quoteId?: string;
+    coverFileNo?: string;
+    content: string;
+    source?: string;
+    portal?: string;
+    remarks?: string;
+    orderVal?: number;
+    quoteState: 'ACTIVE' | 'INACTIVE';
+}
+
 export class QuoteClient {
+
+    static async createQuote(input: QuoteAddUpdateInput): Promise<QuoteDto> {
+        const clientResponse = await httpClient
+            .post(`main/quote`,
+                input,
+                {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async updateQuote(input: QuoteAddUpdateInput): Promise<QuoteDto> {
+        const clientResponse = await httpClient
+            .put(`main/quote/${input.quoteId}`,
+                input,
+                {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
 
     static async findQuote(input: QuoteQueryInput): Promise<QuoteDto> {
         const clientResponse = await httpClient
@@ -374,16 +407,14 @@ export interface FileInfoResponse extends PageQueryResponse {
 }
 
 export interface FileInfoQueryInput {
-    fileType?: string;
+    type?: string;
 }
 
 export class FileClient {
 
     static async fetchFileInfo(input: FileInfoQueryInput): Promise<FileInfoResponse> {
-        let url = 'main/file';
-        url = UrlHelper.mergeUrl(url, {fileType: input.fileType});
+        const url = UrlHelper.mergeUrl('main/file', {type: input.type, sss: undefined});
 
-        console.log(url);
         const clientResponse = await httpClient
             .get(url, {
                     headers: UserClient.getHeader()

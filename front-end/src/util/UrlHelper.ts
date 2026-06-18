@@ -31,7 +31,8 @@ export default class UrlHelper {
 
     /**
      * 处理完整 URL，合并旧的 queryString 和新传入的 queryString
-     * @param url - 完整 URL（必须包含 http:// 或 https://）
+     *
+     * @param url - 完整 URL（必须包含 http:// 或 https://） 完整 path (不带 / 开头)
      * @param queryStrings - 0 个或多个 query string 对象
      * @returns 合并参数后的完整 URL
      *
@@ -40,7 +41,7 @@ export default class UrlHelper {
      * // => 'https://example.com/api?page=1&size=10&sort=desc'
      *
      * @example
-     * UrlBuilder.mergeUrl('https://example.com/api?a=1', { a: 2, b: 3 })
+     * UrlBuilder.mergeUrl('https://example.com/api?a=1', { a: 2, b: 3, c: undefined})
      * // => 'https://example.com/api?a=2&b=3'
      *
      * @example
@@ -48,7 +49,19 @@ export default class UrlHelper {
      * // => 'https://example.com/api'
      */
     static mergeUrl(url: string, ...queryStrings: QueryStringValue[]): string {
-        const urlObj = new URL(url);
+        let needReplace = false;
+        let urlObj;
+        try {
+            urlObj = new URL(url);
+        } catch {
+            // 如果连 base URL 都无法解析，使用 'http://localhost' 作为 fallback
+            try {
+                urlObj = new URL(url, 'http://localhost/');
+                needReplace = true;
+            } catch (e) {
+                throw e;
+            }
+        }
 
         for (const qs of queryStrings) {
             if (qs && typeof qs === 'object') {
@@ -62,7 +75,11 @@ export default class UrlHelper {
             }
         }
 
-        return urlObj.href;
+        if (needReplace) {
+            return urlObj.href.replace('http://localhost', '')
+        } else {
+            return urlObj.href;
+        }
     }
 
     /**
