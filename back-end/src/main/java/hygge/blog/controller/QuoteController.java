@@ -54,6 +54,10 @@ public class QuoteController implements QuoteControllerDoc {
     @GetMapping("/quote/{quoteId}")
     public ResponseEntity<HyggeBlogControllerResponse<QuoteDto>> findQuote(@PathVariable("quoteId") Integer quoteId) {
         Quote resultTemp = quoteService.findQuoteByQuoteId(quoteId, true);
+        if (resultTemp == null) {
+            return (ResponseEntity<HyggeBlogControllerResponse<QuoteDto>>) success();
+        }
+
         QuoteDto result = PoDtoMapper.INSTANCE.poToDto(resultTemp);
         // userId → uid
         String authorUid = cacheService.userIdToUid(resultTemp.getUserId());
