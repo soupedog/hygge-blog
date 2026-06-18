@@ -41,7 +41,7 @@ export default function PostBrowserHeader({isAnyPending}: PostBrowserHeaderProps
 
     return (
         <Header className={clsx({
-            'backgroundTransparent': isTransparent
+            'background-transparent': isTransparent
         })} style={{position: 'fixed', zIndex: headerZIndex, width: '100%'}}>
             <Flex justify={'space-between'} style={{height: '100%', alignItems: 'center'}}>
                 <Flex className={'PostBrowserHeader-left'} justify={'flex-start'} style={{width: '50%'}}>

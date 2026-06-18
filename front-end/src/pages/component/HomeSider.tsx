@@ -63,7 +63,7 @@ export default function HomeSider() {
 
     return (
         <Sider trigger={null} collapsible collapsed={collapsed}>
-            <div className={clsx(['autoWrap', 'autoOmit'])} style={homeSiderTitleStyle}>{collapsed ? '宅' : '我的小宅子'}</div>
+            <div className={clsx(['auto-wrap', 'auto-omit'])} style={homeSiderTitleStyle}>{collapsed ? '宅' : '我的小宅子'}</div>
             <Menu theme={'dark'} mode={'inline'} selectable={false}
                   items={items}
                   onClick={menuOnClick}

@@ -91,8 +91,8 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                                 <Card className={'quote-md-remark-preview'}>
                                     <div className={clsx([
                                         'inlineBlock',
-                                        'autoOmit',
-                                        'textAlignRight',
+                                        'auto-omit',
+                                        'text-align-right',
                                         'full-width',
                                         'quote-remarks-title'
                                     ])}>

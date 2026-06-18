@@ -1,28 +1,36 @@
 /*用 modern-normalize 统一浏览器默认样式*/
 @import '../node_modules/modern-normalize';
 
-.backgroundTransparent {
+.background-transparent {
   background-color: transparent;
 }
 
-.textCenter {
+.text-center {
   text-align: center;
 }
 
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
 /*文本自动换行*/
-.autoWrap {
+.auto-wrap {
   word-wrap: break-word
 }
 
 /*文本溢出行内省略*/
-.autoOmit {
+.auto-omit {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
 
 /*文本溢出 2 行后的部分省略*/
-.autoOmit_2 {
+.auto-omit_2 {
   display: -webkit-box;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -34,16 +42,12 @@
   cursor: pointer;
 }
 
-.alignCenter {
+.align-center {
   align-self: center;
 }
 
 .inlineBlock {
   display: inline-block;
-}
-
-.textAlignRight {
-  text-align: right;
 }
 
 .full-width {
@@ -54,7 +58,7 @@
   height: 100%;
 }
 
-.full-screenY {
+.full-screen-y {
   height: 100vh;
 }
 
@@ -80,9 +84,7 @@
   color: white;
   border-radius: 0.25rem;
 }
-
 // APP 共享样式 end
-
 
 //Home start
 // 明示折叠不可点击
@@ -142,6 +144,5 @@
   word-break: break-word;
   white-space: pre-wrap;
 }
-
 //Home end
 
