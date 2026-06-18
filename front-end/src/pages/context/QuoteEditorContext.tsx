@@ -12,7 +12,7 @@ export interface QuoteEditorContextState {
     isAnyPending: boolean;
     searchParams: URLSearchParams;
     setSearchParams: (input: URLSearchParams) => void;
-    quoteForm: FormInstance;
+    quoteForm: FormInstance<QuoteAddUpdateInput>;
     fileOptions: Array<any>,
     setFileOptions: Function,
     quoteId?: string;
@@ -30,7 +30,7 @@ export interface QuoteEditorContextState {
 
 export const QuoteEditorContext = createContext<QuoteEditorContextState>({} as QuoteEditorContextState);
 
-export const QuoteEditorProvider = ({children}: { children: ReactNode }) => {
+export const QuoteEditorContextProvider = ({children}: { children: ReactNode }) => {
     // 全局的 Pending 检测，如果单独则如 signIn.isPending 即可
     const isAnyPending = useIsMutating() > 0;
     const [searchParams, setSearchParams] = useSearchParams();
@@ -75,7 +75,7 @@ export const QuoteEditorProvider = ({children}: { children: ReactNode }) => {
 
                 // @ts-ignore
                 setFileOptions(fileInfo);
-                message.success({content: '图片数据拉取成功！'});
+                message.info({content: '图片数据拉取成功！'});
             }
         });
     };

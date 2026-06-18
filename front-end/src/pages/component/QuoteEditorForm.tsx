@@ -29,10 +29,15 @@ export default function QuoteEditorForm() {
             style={{padding: '4rem'}}
 
             onFinish={(value) => {
+                // @ts-ignore
                 value.coverFileNo = PropertiesHelper.stringOfNullable({target: value.coverFileNo, defaultValue: null});
+                // @ts-ignore
                 value.source = PropertiesHelper.stringOfNullable({target: value.source, defaultValue: null});
+                // @ts-ignore
                 value.portal = PropertiesHelper.stringOfNullable({target: value.portal, defaultValue: null});
+                // @ts-ignore
                 value.content = PropertiesHelper.stringOfNullable({target: value.content, defaultValue: null});
+                // @ts-ignore
                 value.remarks = PropertiesHelper.stringOfNullable({target: value.remarks, defaultValue: null});
 
                 if (value.action == 'update') {

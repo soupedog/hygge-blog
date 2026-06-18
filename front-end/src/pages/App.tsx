@@ -21,9 +21,9 @@ import mermaid from 'mermaid';
 import {ConfigProvider, message} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import {HomeProvider} from './context/HomeContext.tsx';
-import QuoteEditor from './QuoteEditor.tsx';
 import zhCN from 'antd/lib/locale/zh_CN';
-import {QuoteEditorProvider} from './context/QuoteEditorContext.tsx';
+import {QuoteEditorContextProvider} from './context/QuoteEditorContext.tsx';
+import {PostEditorContextProvider} from './context/PostEditorContext.tsx';
 // 创建 QueryClient 实例
 const queryClient = new QueryClient();
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示
@@ -32,6 +32,8 @@ const Home = lazy(() => import('./Home.tsx'));
 const NotFound = lazy(() => import('./NotFound.tsx'));
 const Signin = lazy(() => import('./Signin.tsx'));
 const PostBrowser = lazy(() => import('./PostBrowser.tsx'));
+const PostEditor = lazy(() => import('./PostEditor.tsx'));
+const QuoteEditor = lazy(() => import('./QuoteEditor.tsx'));
 
 // 在应用初始化时配置
 message.config({
@@ -123,8 +125,8 @@ export default function App() {
             <ConfigProvider locale={zhCN}>
                 <Routes>
                     <Route path={'/post/:pid'} element={<PostBrowser key={'PostBrowser'}/>}/>
-                    <Route path={'/manage/editor/post'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-                    <Route path={'/manage/editor/quote'} element={<QuoteEditorProvider><QuoteEditor key={'QuoteEditor'}/></QuoteEditorProvider>}/>
+                    <Route path={'/manage/editor/post'} element={<PostEditorContextProvider><PostEditor key={'PostEditor'}/></PostEditorContextProvider>}/>
+                    <Route path={'/manage/editor/quote'} element={<QuoteEditorContextProvider><QuoteEditor key={'QuoteEditor'}/></QuoteEditorContextProvider>}/>
                     <Route path={'/manage/file/glance'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                     <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                     <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>

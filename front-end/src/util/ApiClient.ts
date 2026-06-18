@@ -336,6 +336,7 @@ export interface QuoteQueryInput {
 }
 
 export interface QuoteAddUpdateInput {
+    action: 'add' | 'update' | 'query';
     quoteId?: string;
     coverFileNo?: string;
     content: string;
