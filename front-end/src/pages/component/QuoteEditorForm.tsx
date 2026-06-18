@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useState} from 'react';
 import {Button, Col, Flex, Form, Input, InputNumber, message, Radio, Row, Select, Space} from 'antd';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {QuoteEditorContext} from '../context/QuoteEditorContext.tsx';
@@ -19,13 +19,6 @@ export default function QuoteEditorForm() {
     const isAddMode = formMode == 'add';
     const isQueryMode = formMode == 'query';
     const isUpdateMode = formMode == 'update';
-
-    useEffect(() => {
-        // 初始化默认选中无图片
-        quoteForm.setFieldsValue({
-            coverFileNo: ''
-        });
-    }, []);
 
     return (
         <Form
@@ -71,6 +64,7 @@ export default function QuoteEditorForm() {
                 </Col>
                 <Col span={6}>
                     <Form.Item name={['coverFileNo']} label='句子封面图'
+                               initialValue={'无图片'}
                                rules={[{required: false}]}>
                         <Select
                             showSearch={{
@@ -144,31 +138,37 @@ export default function QuoteEditorForm() {
                     <Radio.Group>
                         <Radio value={'add'}>添加句子</Radio>
                         <Radio value={'update'}>修改句子</Radio>
+                        <Radio value={'query'}>查询句子</Radio>
                     </Radio.Group>
                 </Form.Item>
                 <Col span={22}>
                     <Form.Item>
                         <Flex justify={'center'} style={{alignItems: 'center'}}>
                             <Space size={'large'} align={'end'}>
-                                <Button type='primary' htmlType='submit' onClick={() => {
+                                <Button type='primary' htmlType='button' onClick={() => {
                                     quoteForm.setFieldsValue({
                                         action: 'add'
                                     });
                                     setFormMode('add');
+                                    quoteForm.submit();
                                 }}>
                                     添加句子
                                 </Button>
-                                <Button type='primary' htmlType='submit' danger onClick={() => {
+                                <Button type='primary' htmlType='button' danger onClick={() => {
                                     quoteForm.setFieldsValue({
                                         action: 'update'
                                     });
                                     setFormMode('update');
+                                    quoteForm.submit();
                                 }}>
                                     修改句子
                                 </Button>
-                                <Button type='dashed' color={'purple'} htmlType='button' onClick={() => {
+                                <Button type='dashed' color={'purple'} htmlType='submit' onClick={() => {
                                     setFormMode('query');
                                     if (PropertiesHelper.isStringNotEmpty(quoteId)) {
+                                        quoteForm.setFieldsValue({
+                                            action: 'query'
+                                        });
                                         setQueryModalOpen(true);
                                     } else {
                                         message.warning('句子编号不可为空！')

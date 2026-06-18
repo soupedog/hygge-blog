@@ -107,19 +107,24 @@ export const QuoteEditorProvider = ({children}: { children: ReactNode }) => {
             findQuote.mutate({quoteId: quoteId}, {
                 onSuccess: (data) => {
                     setQueryModalOpen(false);
-                    setQuote(data);
-                    quoteForm.setFieldsValue({
-                        quoteId: String(data.quoteId),
-                        coverFileNo: data.coverFileNo,
-                        content: data.content,
-                        remarks: data.remarks,
-                        source: data.source,
-                        portal: data.portal,
-                        quoteState: data.quoteState,
-                        orderVal: data.orderVal,
-                    });
+                    if (data == null) {
+                        message.warning(`句子收藏(${quoteId})未找到！`);
+                        quoteForm.resetFields();
+                    } else {
+                        setQuote(data);
+                        quoteForm.setFieldsValue({
+                            quoteId: String(data.quoteId),
+                            coverFileNo: data.coverFileNo,
+                            content: data.content,
+                            remarks: data.remarks,
+                            source: data.source,
+                            portal: data.portal,
+                            quoteState: data.quoteState,
+                            orderVal: data.orderVal,
+                        });
 
-                    message.success('拉取句子收藏成功！');
+                        message.success('拉取句子收藏成功！');
+                    }
                 }
             });
         }
