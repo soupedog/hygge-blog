@@ -93,13 +93,30 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         HashMap<String, Object> finalData = daoHelper.filterOutTheFinalColumns(data, forUpdate);
 
-        Quote old = findQuoteByQuoteId(quoteId, false);
+        Quote quoteInDB = findQuoteByQuoteId(quoteId, false);
 
         Quote newOne = MapToAnyMapper.INSTANCE.mapToQuote(finalData);
 
-        OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
+        OverrideMapper.INSTANCE.overrideToAnother(newOne, quoteInDB);
 
-        Quote result = quoteDao.save(old);
+        // 最笨但是最有效的办法
+        if (finalData.containsKey("coverFileNo") && parameterHelper.isEmpty(newOne.getCoverFileNo())) {
+            quoteInDB.setCoverFileNo(null);
+        }
+        if (finalData.containsKey("source") && parameterHelper.isEmpty(newOne.getSource())) {
+            quoteInDB.setSource(null);
+        }
+        if (finalData.containsKey("portal") && parameterHelper.isEmpty(newOne.getPortal())) {
+            quoteInDB.setPortal(null);
+        }
+        if (finalData.containsKey("remarks") && parameterHelper.isEmpty(newOne.getRemarks())) {
+            quoteInDB.setRemarks(null);
+        }
+        if (finalData.containsKey("orderVal") && parameterHelper.isEmpty(newOne.getOrderVal())) {
+            quoteInDB.setOrderVal(null);
+        }
+
+        Quote result = quoteDao.save(quoteInDB);
 
         eventService.refreshQuoteByQuoteId(result.getQuoteId());
 
