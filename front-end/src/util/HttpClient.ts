@@ -19,7 +19,7 @@ export class HttpClient {
         this.initInterceptors();
     }
 
-    initInterceptors() {
+    private initInterceptors() {
         // 请求拦截器
         this.axiosInstance.interceptors.request.use(
             (config) => {
@@ -80,22 +80,20 @@ export class HttpClient {
                     UrlHelper.navigateTo({path: '/', needReload: true, delayTime: 2000});
                 }
 
-                // 相当于中断正常流程的 Promise 流程，主动触发异常处理器方法
+                // 这种是网络请求成功，但业务码错误，仅需提示。
+                message.warning({content: `业务码：${response.code} 错误信息：${response.msg}`, style: {zIndex: toastZIndex}});
+
+                // 相当于中断正常流程的 Promise 流程
                 return Promise.reject(axiosResponse);
             },
             // 异常处理器
             (axiosResponseWhenError) => {
                 const httpStatus = axiosResponseWhenError.status;
-
                 if (httpStatus == null || httpStatus != 200) {
                     message.error({content: `网络请求异常！HttpStats:${httpStatus}`, style: {zIndex: toastZIndex}});
-                } else {
-                    // 这种是网络请求成功，但业务码错误，仅需提示。
-                    const response: HyggeResponse<any> = axiosResponseWhenError.data;
-                    message.warning({content: `业务码：${response.code} 错误信息：${response.msg}`, style: {zIndex: toastZIndex}});
                 }
 
-                // 异常处理再拒绝默认操作是把 axiosResponseWhenError 输出到控制台
+                // 相当于中断正常流程的 Promise 流程
                 return Promise.reject(axiosResponseWhenError);
             }
         );

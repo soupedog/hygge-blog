@@ -9,6 +9,7 @@ import clsx from 'clsx';
 
 export interface HomeTabListQuoteItemProps {
     readonly quote: QuoteDto;
+    readonly noEditor?: boolean;
 }
 
 const EditIcon = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId: number }) => (
@@ -26,9 +27,9 @@ const EditIcon = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId
     </Space>
 );
 
-export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps) {
+export default function HomeTabQuoteListItem({quote, noEditor}: HomeTabListQuoteItemProps) {
     const currentUser = UserClient.getCurrentUser();
-    const isAuthor: boolean = currentUser != null && currentUser.uid == quote.uid;
+    const isAuthor: boolean = noEditor == undefined ? (currentUser != null && currentUser.uid == quote.uid) : !noEditor;
 
     const hasRemarks = PropertiesHelper.isStringNotEmpty(quote.remarks);
 
@@ -90,7 +91,7 @@ export default function HomeTabQuoteListItem({quote}: HomeTabListQuoteItemProps)
                             <Splitter.Panel defaultSize='30%' min='10%' max='90%'>
                                 <Card className={'quote-md-remark-preview'}>
                                     <div className={clsx([
-                                        'inlineBlock',
+                                        'inline-block',
                                         'auto-omit',
                                         'text-align-right',
                                         'full-width',

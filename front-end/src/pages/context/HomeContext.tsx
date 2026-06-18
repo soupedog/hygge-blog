@@ -2,8 +2,6 @@ import {createContext, type ReactNode, useState} from 'react';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
 import {useSearchParams} from 'react-router-dom';
 import {useHomeService} from '../../util/ApiService.ts';
-import {ConfigProvider} from 'antd';
-import zhCN from 'antd/lib/locale/zh_CN';
 import type {AnnouncementDto, ArticleDto, CategoryDto, FePageQueryResponse, KeywordSearchInput, PostInCategorySearchInput, QuoteResponse, TopicOverviewInfo} from '../../util/ApiClient.ts';
 
 export interface HomeState {
@@ -150,9 +148,7 @@ export const HomeProvider = ({children}: { children: ReactNode }) => {
             fuzzySearch,
             searchPostSummaryByCid
         }}>
-            <ConfigProvider locale={zhCN}>
-                {children}
-            </ConfigProvider>
+            {children}
         </HomeContext>
     );
 }

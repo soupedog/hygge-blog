@@ -1,0 +1,212 @@
+import {useContext, useState} from 'react';
+import {Button, Col, Flex, Form, Input, InputNumber, message, Radio, Row, Select, Space} from 'antd';
+import PropertiesHelper from '../../util/PropertiesHelper.ts';
+import {QuoteEditorContext} from '../context/QuoteEditorContext.tsx';
+
+export interface QuoteFO {
+    quoteId?: string;
+    coverFileNo?: string;
+    content: string;
+    source?: string;
+    portal?: string;
+    remarks?: string;
+    orderVal?: number;
+    quoteState: string;
+}
+
+export default function QuoteEditorForm() {
+    const {
+        quoteForm,
+        quoteId,
+        onQuoteIdChange,
+        setQueryModalOpen,
+    } = useContext(QuoteEditorContext);
+
+    const [quote, setQuote] = useState({content: '', quoteState: 'ACTIVE'});
+    const [formMode, setFormMode] = useState<'query' | 'add' | 'update'>(quoteId ? 'query' : 'add');
+
+    const isAddMode = formMode == 'add';
+    const isQueryMode = formMode == 'query';
+    const isUpdateMode = formMode == 'update';
+
+    return (
+        <Form
+            name='hygge_quote_editor'
+            // 不再记录历史信息
+            autoComplete={'off'}
+            form={quoteForm}
+            style={{padding: '4rem'}}
+
+            onFinish={(value) => {
+                if (!PropertiesHelper.isStringNotEmpty(value.coverFileNo)) {
+                    value.coverFileNo = null;
+                }
+
+                if (!PropertiesHelper.isStringNotEmpty(value.remarks)) {
+                    value.remarks = null;
+                }
+
+                if (!PropertiesHelper.isStringNotEmpty(value.source)) {
+                    value.source = null;
+                }
+
+                if (!PropertiesHelper.isStringNotEmpty(value.portal)) {
+                    value.portal = null;
+                }
+
+                console.log(value);
+
+                if (value.action == 'update') {
+
+                } else if (value.action == 'add') {
+
+                }
+            }}
+        >
+            <Row gutter={'4rem'}>
+                <Col span={1}></Col>
+                <Col span={6}>
+                    <Form.Item name={['quoteId']} label='句子编号' rules={[{required: isQueryMode || isUpdateMode}]}>
+                        <Input value={quoteId} onChange={(event) => {
+                            onQuoteIdChange(event.target.value);
+                        }}/>
+                    </Form.Item>
+                </Col>
+                <Col span={4}>
+                    <Form.Item name={['orderVal']} label='排序' rules={[{required: false}]}>
+                        <InputNumber
+                            min={0}           // 最小值
+                            max={999999999999999}         // 最大值
+                            step={1}          // 步长
+                            precision={0}     // 小数位数，0 表示整数
+                            placeholder='排序值'
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={6}>
+                    <Form.Item name={['coverFileNo']} label='句子封面图'
+                               rules={[{required: false}]}>
+                        <Select
+                            showSearch={{
+                                optionFilterProp: 'label'
+                            }}
+                            placeholder='请选择封面'
+                            options={[
+                                {
+                                    value: '',
+                                    label: '无图片'
+                                },
+                                {
+                                    value: 'jack',
+                                    label: '图1',
+                                },
+                                {
+                                    value: 'lucy',
+                                    label: '图24',
+                                },
+                                {
+                                    value: 'tom',
+                                    label: 'Tom',
+                                },
+                            ]}
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={6}>
+                    <Form.Item name={['quoteState']} label='句子状态'
+                               rules={[{required: true}]}
+                               initialValue={'ACTIVE'}
+                    >
+                        <Radio.Group>
+                            <Radio value={'ACTIVE'}>启用</Radio>
+                            <Radio value={'INACTIVE'}>禁用</Radio>
+                        </Radio.Group>
+                    </Form.Item>
+                </Col>
+                <Col span={1}></Col>
+            </Row>
+            <Row gutter={'4rem'}>
+                <Col span={1}></Col>
+                <Col span={22}>
+                    <Form.Item name={['portal']} label='传送门' rules={[{required: false}]}>
+                        <Input.TextArea rows={1}/>
+                    </Form.Item>
+                </Col>
+                <Col span={1}></Col>
+            </Row>
+            <Row gutter={'4rem'}>
+                <Col span={1}></Col>
+                <Col span={22}>
+                    <Form.Item name={['source']} label='出处' rules={[{required: false}]}>
+                        <Input.TextArea rows={1}/>
+                    </Form.Item>
+                </Col>
+                <Col span={1}></Col>
+            </Row>
+            <Row gutter={'4rem'}>
+                <Col span={1}></Col>
+                <Col span={22}>
+                    <Form.Item name={['content']} label='内容' rules={[{required: isAddMode}]}>
+                        <Input.TextArea rows={2}/>
+                    </Form.Item>
+                </Col>
+                <Col span={1}></Col>
+            </Row>
+            <Row gutter={'4rem'}>
+                <Col span={1}></Col>
+                <Col span={22}>
+                    <Form.Item name={['remarks']} label='备注' rules={[{required: false}]}>
+                        <Input.TextArea rows={2}/>
+                    </Form.Item>
+                </Col>
+                <Col span={1}></Col>
+            </Row>
+            <Row gutter={'4rem'}>
+                <Col span={1}></Col>
+                <Form.Item className={'display-none'} name={['action']} label='操作类型'
+                           rules={[{required: true}]}
+                           initialValue={'add'}>
+                    <Radio.Group>
+                        <Radio value={'add'}>添加句子</Radio>
+                        <Radio value={'update'}>修改句子</Radio>
+                    </Radio.Group>
+                </Form.Item>
+                <Col span={22}>
+                    <Form.Item>
+                        <Flex justify={'center'} style={{alignItems: 'center'}}>
+                            <Space size={'large'} align={'end'}>
+                                <Button type='primary' htmlType='submit' onClick={() => {
+                                    quoteForm.setFieldsValue({
+                                        action: 'add'
+                                    });
+                                    setFormMode('add');
+                                }}>
+                                    添加句子
+                                </Button>
+                                <Button type='primary' htmlType='submit' danger onClick={() => {
+                                    quoteForm.setFieldsValue({
+                                        action: 'update'
+                                    });
+                                    setFormMode('update');
+                                }}>
+                                    修改句子
+                                </Button>
+                                <Button type='dashed' color={'purple'} htmlType='button' onClick={() => {
+                                    setFormMode('query');
+                                    if (PropertiesHelper.isStringNotEmpty(quoteId)) {
+                                        setQueryModalOpen(true);
+                                    }else {
+                                        message.warning('句子编号不可为空！')
+                                    }
+                                }}>
+                                    查询句子
+                                </Button>
+                            </Space>
+                        </Flex>
+                    </Form.Item>
+                </Col>
+                <Col span={1}></Col>
+            </Row>
+        </Form>
+    );
+}

@@ -1,5 +1,5 @@
 import {useMutation} from '@tanstack/react-query';
-import {HomeClient, PostClient, UserClient} from './ApiClient.ts';
+import {FileClient, HomeClient, PostClient, QuoteClient, UserClient} from './ApiClient.ts';
 import {message} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 
@@ -27,6 +27,26 @@ export function usePostService() {
 
     return {
         findArticleByAidMutation: findArticleByAidMutation
+    }
+}
+
+export function useQuoteService() {
+    const findQuoteMutation = useMutation({
+        mutationFn: QuoteClient.findQuote,
+    });
+
+    return {
+        findQuote: findQuoteMutation
+    }
+}
+
+export function useFileCService() {
+    const fetchFileInfoMutation = useMutation({
+        mutationFn: FileClient.fetchFileInfo,
+    });
+
+    return {
+        fetchFileInfo: fetchFileInfoMutation
     }
 }
 

@@ -330,3 +330,65 @@ export class HomeClient {
         return clientResponse.data.main;
     }
 }
+
+export interface QuoteQueryInput {
+    quoteId: string;
+}
+
+export class QuoteClient {
+
+    static async findQuote(input: QuoteQueryInput): Promise<QuoteDto> {
+        const clientResponse = await httpClient
+            .get(`main/quote/${input.quoteId}`, {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+}
+
+export interface FileDescription {
+    content?: string;
+    timePointer?: number;
+    nginxLink?: string;
+}
+
+export interface FileInfo {
+    fileNo: string;
+    relativePath: string;
+    permissionId: number;
+    name: string;
+    extension: string;
+    fileCacheType: string;
+    fileType: string;
+    description?: FileDescription
+    fileSize: string;
+    cacheLink?: string;
+    apiLink: string;
+    createTs: number;
+    lastUpdateTs: number;
+}
+
+export interface FileInfoResponse extends PageQueryResponse {
+    fileInfoList: FileInfo[];
+}
+
+export interface FileInfoQueryInput {
+    fileType?: string;
+}
+
+export class FileClient {
+
+    static async fetchFileInfo(input: FileInfoQueryInput): Promise<FileInfoResponse> {
+        let url = 'main/file';
+        url = UrlHelper.mergeUrl(url, {fileType: input.fileType});
+
+        console.log(url);
+        const clientResponse = await httpClient
+            .get(url, {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+}

@@ -10,7 +10,6 @@ import 'highlight.js/styles/atom-one-dark.css';
 import UrlHelper from '../util/UrlHelper.ts';
 import {UserClient} from '../util/ApiClient.ts';
 import {ClientScope} from '../enums/EnumKeeper.ts';
-import {httpClient} from '../util/HttpClient.ts';
 import {config} from 'md-editor-rt';
 // @ts-ignore
 import MarkExtension from 'markdown-it-mark';
@@ -19,10 +18,12 @@ import parserMarkdown from 'prettier/plugins/markdown';
 import {keymap} from '@codemirror/view';
 import highlight from 'highlight.js';
 import mermaid from 'mermaid';
-import {message} from 'antd';
+import {ConfigProvider, message} from 'antd';
 import {appConfiguration} from '../configuration/app.configuration.ts';
 import {HomeProvider} from './context/HomeContext.tsx';
 import QuoteEditor from './QuoteEditor.tsx';
+import zhCN from 'antd/lib/locale/zh_CN';
+import {QuoteEditorProvider} from './context/QuoteEditorContext.tsx';
 // 创建 QueryClient 实例
 const queryClient = new QueryClient();
 // 懒加载模块，打包后可以看出来，这几个页面被单独打包了，页面可以在懒加载组件未完成时就展示
@@ -115,24 +116,24 @@ export default function App() {
         UrlHelper.init(navigate);
         UserClient.init(ClientScope.WEB);
 
-        // 初始化单例
-        httpClient.initInterceptors();
     }, []);
 
     return (
         <QueryClientProvider client={queryClient}>
-            <Routes>
-                <Route path={'/post/:pid'} element={<PostBrowser key={'PostBrowser'}/>}/>
-                <Route path={'/manage/editor/post'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-                <Route path={'/manage/editor/quote'} element={<QuoteEditor key={'QuoteEditor'}/>}/>
-                <Route path={'/manage/file/glance'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-                <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-                <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-                <Route path={'/signin'} element={<Signin key={'Signin'}/>}/>
-                <Route path={'/'} element={<HomeProvider><Home key={'Home'}/></HomeProvider>}/>
-                {/*从上到下匹配，上方全未匹配命中则说明 404 */}
-                <Route path={'*'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
-            </Routes>
+            <ConfigProvider locale={zhCN}>
+                <Routes>
+                    <Route path={'/post/:pid'} element={<PostBrowser key={'PostBrowser'}/>}/>
+                    <Route path={'/manage/editor/post'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                    <Route path={'/manage/editor/quote'} element={<QuoteEditorProvider><QuoteEditor key={'QuoteEditor'}/></QuoteEditorProvider>}/>
+                    <Route path={'/manage/file/glance'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                    <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                    <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                    <Route path={'/signin'} element={<Signin key={'Signin'}/>}/>
+                    <Route path={'/'} element={<HomeProvider><Home key={'Home'}/></HomeProvider>}/>
+                    {/*从上到下匹配，上方全未匹配命中则说明 404 */}
+                    <Route path={'*'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                </Routes>
+            </ConfigProvider>
         </QueryClientProvider>
     );
 }
