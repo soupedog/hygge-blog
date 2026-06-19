@@ -5,6 +5,7 @@ import {UserClient} from '../../util/ApiClient.ts';
 import UrlHelper from '../../util/UrlHelper.ts';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {useState} from 'react';
+import StorageHelper from '../../util/StorageHelper.ts';
 
 const items: MenuProps['items'] = [
     {
@@ -58,6 +59,7 @@ export default function AppUserMenu() {
                 break;
             case 'signOut':
                 UserClient.removeCurrentUser();
+                StorageHelper.clear();
                 message.success('登出成功，1 s 内将跳转回首页。');
                 UrlHelper.navigateTo({path: `/`, delayTime: 1000, needReload: true});
                 break;
