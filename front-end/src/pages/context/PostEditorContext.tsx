@@ -6,6 +6,7 @@ import {StorageKey} from '../../enums/EnumKeeper.ts';
 import StorageHelper from '../../util/StorageHelper.ts';
 
 export interface PostEditorContextState {
+    isAnyPending: boolean;
     pid?: string;
     setPid: (input: string) => void;
     post?: ArticleDto;
@@ -47,6 +48,7 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
 
     return (
         <PostEditorContext value={{
+            isAnyPending: isAnyPending,
             pid: pid, setPid: setPid,
             post: post, setPost: setPost,
             editorContent: editorContent, setEditorContent: setEditorContent,

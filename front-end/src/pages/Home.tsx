@@ -53,7 +53,7 @@ export default function Home() {
     return (
         <Layout>
             <HomeSider/>
-            <Content className={'full-screen-y'} style={{backgroundColor: '#FFF'}}>
+            <Content className={'full-screen-min-y'} style={{backgroundColor: '#FFF'}}>
                 <HomeHeader/>
                 <Card style={{margin: '0 2rem 2rem 2rem', backgroundColor: '#FFF'}}>
                     <HomeCategoryCollapse/>

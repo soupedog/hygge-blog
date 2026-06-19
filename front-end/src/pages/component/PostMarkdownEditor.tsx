@@ -9,7 +9,7 @@ export default function PostMarkdownEditor() {
         pid,
         post, setPost,
         editorContent, setEditorContent,
-        setDraft, removeDraft
+        setDraft, removeDraft, getDraft
     } = useContext(PostEditorContext);
 
     useEffect(() => {

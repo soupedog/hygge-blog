@@ -7,11 +7,14 @@ import PostEditorForm from './component/PostEditorForm.tsx';
 import {PostEditorContext} from './context/PostEditorContext.tsx';
 import {usePostService} from '../util/ApiService.ts';
 import PostMarkdownEditor from './component/PostMarkdownEditor.tsx';
+import PropertiesHelper from '../util/PropertiesHelper.ts';
 
 export default function PostEditor() {
     const {
+        isAnyPending,
         pid,
         setEditorContent,
+        getDraft,
         post, setPost,
     } = useContext(PostEditorContext);
 
@@ -21,23 +24,29 @@ export default function PostEditor() {
         // 依赖静态值表示仅初始化时调用一次
         document.title = `博文编辑 | 我的小宅子`;
 
-        // 依赖静态值表示仅初始化时调用一次
-        if (pid) {
-            findArticleByAid.mutate(pid, {
-                onSuccess: (data) => {
-                    if (data) {
-                        setPost(data);
-                        setEditorContent(data.content);
-                        message.info({content: '博文数据拉取成功！'});
+        const draft = getDraft(pid);
+        if (PropertiesHelper.isStringNotEmpty(draft)) {
+            setEditorContent(draft);
+            message.info({content: '已从本地草稿中恢复数据！'});
+        } else {
+            // 依赖静态值表示仅初始化时调用一次
+            if (pid) {
+                findArticleByAid.mutate(pid, {
+                    onSuccess: (data) => {
+                        if (data) {
+                            setPost(data);
+                            setEditorContent(data.content);
+                            message.info({content: '博文数据拉取成功！'});
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }, []);
 
     return (
         <Layout className={'full-screen-min-y'}>
-            <AppBaseHeader title={'博文编辑'} isAnyPending={true}/>
+            <AppBaseHeader title={'博文编辑'} isAnyPending={isAnyPending}/>
             <Content>
                 <Modal key={'postQueryModal'}
                        title='请注意'
