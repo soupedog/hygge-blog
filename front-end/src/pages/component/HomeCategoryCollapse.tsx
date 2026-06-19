@@ -3,10 +3,13 @@ import {Badge, Card, Collapse, type CollapseProps} from 'antd';
 import {HomeContext} from '../context/HomeContext.tsx';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
 import clsx from 'clsx';
+import {detectDevice} from '@al01/detectdevice/dist';
+
+const device = detectDevice();
 
 const gridStyle: React.CSSProperties = {
-    // 移动端适配
-    width: '20%',
+    // 移动端简单适配
+    width: device.isDesktop ? '20%' : '25%',
     padding: '10px',
     textAlign: 'center',
 };

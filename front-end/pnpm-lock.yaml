@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@al01/detectdevice':
+        specifier: ^0.0.5
+        version: 0.0.5(typescript@6.0.3)
       '@ant-design/icons':
         specifier: ^6.2.5
         version: 6.2.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -119,6 +122,11 @@ importers:
         version: 0.5.1(vite@8.0.16(@types/node@24.13.2)(less@4.6.4)(sass-embedded@1.100.0)(sass@1.100.0))
 
 packages:
+
+  '@al01/detectdevice@0.0.5':
+    resolution: {integrity: sha512-n/AkNLvAEIWPVggQBetuonK2Zgb4hDasouvyk4aYeb6hl17rKfq45rKnR5gcHxlBfnoafJdzS4fndl6uJuQ6wg==}
+    peerDependencies:
+      typescript: ^5
 
   '@ant-design/colors@8.0.1':
     resolution: {integrity: sha512-foPVl0+SWIslGUtD/xBr1p9U4AKzPhNYEseXYRRo5QSzGACYZrQbe11AYJbYfAWnWSpGBx6JjBmSeugUsD9vqQ==}
@@ -2617,6 +2625,10 @@ packages:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
+
+  '@al01/detectdevice@0.0.5(typescript@6.0.3)':
+    dependencies:
+      typescript: 6.0.3
 
   '@ant-design/colors@8.0.1':
     dependencies:
