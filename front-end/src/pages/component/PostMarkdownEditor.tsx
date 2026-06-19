@@ -1,4 +1,4 @@
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import {MdEditor} from 'md-editor-rt';
 import {ExportPDF, Mark} from '@vavt/rt-extension';
 import {PostEditorContext} from '../context/PostEditorContext.tsx';
@@ -11,6 +11,16 @@ export default function PostMarkdownEditor() {
         editorContent, setEditorContent,
         setDraft, removeDraft
     } = useContext(PostEditorContext);
+
+    useEffect(() => {
+        return (
+            // 等效于析构函数
+            () => {
+                // 有可能在全屏化的情况下跳转走，需要回滚全屏话对 body 的样式调整
+                document.body.style.removeProperty('overflow');
+            }
+        );
+    }, []);
 
     return (
         <MdEditor id={'post_editor'}

@@ -36,8 +36,12 @@ const QuoteEditor = lazy(() => import('./QuoteEditor.tsx'));
 
 // 在应用初始化时配置
 message.config({
-    // 优先编辑器、其次 root 再 body
-    getContainer: () => document.getElementById('post_editor') || document.getElementById('root') || document.body,
+    // 消息容器优先 编辑器 其次 root 最后 body
+    getContainer: () => {
+        return document.getElementById('post_editor')
+            || document.getElementById('root')
+            || document.body;
+    },
     top: 64,  // 可调整距离顶部的距离
 });
 
