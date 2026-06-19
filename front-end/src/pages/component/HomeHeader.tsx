@@ -11,13 +11,13 @@ import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {HomeKeywordType} from '../../enums/EnumKeeper.ts';
 import {appConfiguration} from '../../configuration/app.configuration.ts';
 
-const toastZIndex = appConfiguration.toastDefaultZIndex;
+const headerZIndex = appConfiguration.toastDefaultZIndex - 10;
 
 const HomeHeaderStyle: React.CSSProperties = {
     padding: '0 2rem 0 0',
     top: 0,
     position: 'sticky',
-    zIndex: toastZIndex - 10,
+    zIndex: headerZIndex,
     width: '100%',
     background: '#001529',
     color: '#fff'
@@ -95,7 +95,7 @@ export default function HomeHeader() {
                                         setSearchResultPageSize(5);
                                         fuzzySearch({keyword: keyword, currentPage: 1, pageSize: 5});
                                     } else {
-                                        message.warning({content: '搜索关键字不可为空！', style: {zIndex: toastZIndex}});
+                                        message.warning({content: '搜索关键字不可为空！'});
                                     }
                                 }}
                         />

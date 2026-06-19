@@ -4,9 +4,6 @@ import StorageHelper from './StorageHelper.ts';
 import {ClientScope, StorageKey} from '../enums/EnumKeeper.ts';
 import PropertiesHelper from './PropertiesHelper.ts';
 import {httpClient} from './HttpClient.ts';
-import {appConfiguration} from '../configuration/app.configuration.ts';
-
-const toastZIndex = appConfiguration.toastDefaultZIndex;
 
 export interface HyggeResponse<T> {
     code: number;
@@ -122,7 +119,7 @@ export class UserClient {
 
         if (requestHeader != null) {
             StorageHelper.set(StorageKey.AUTO_LOGIN_DISABLED, '已禁止再次触发自动登陆');
-            message.info({content: '尝试用令牌刷新秘钥自动登录。', style: {zIndex: toastZIndex}});
+            message.info({content: '尝试用令牌刷新秘钥自动登录。'});
             // 刷新令牌
             clientResponse = await httpClient.post('/sign/in', {}, {headers: requestHeader});
         } else {
@@ -141,7 +138,7 @@ export class UserClient {
             StorageHelper.set(StorageKey.USER_REFRESH_KEY, response.main.refreshKey);
             StorageHelper.set(StorageKey.USER_INFO, user);
             StorageHelper.remove(StorageKey.AUTO_LOGIN_DISABLED);
-            message.info({content: '用户登录缓存信息已更新！', style: {zIndex: toastZIndex}});
+            message.info({content: '用户登录缓存信息已更新！'});
         }
 
         return response.main;

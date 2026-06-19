@@ -19,7 +19,6 @@ import {keymap} from '@codemirror/view';
 import highlight from 'highlight.js';
 import mermaid from 'mermaid';
 import {ConfigProvider, message} from 'antd';
-import {appConfiguration} from '../configuration/app.configuration.ts';
 import {HomeProvider} from './context/HomeContext.tsx';
 import zhCN from 'antd/lib/locale/zh_CN';
 import {QuoteEditorContextProvider} from './context/QuoteEditorContext.tsx';
@@ -37,11 +36,11 @@ const QuoteEditor = lazy(() => import('./QuoteEditor.tsx'));
 
 // 在应用初始化时配置
 message.config({
-    getContainer: () => document.getElementById('root') || document.body,
+    // 优先编辑器、其次 root 再 body
+    getContainer: () => document.getElementById('post_editor') || document.getElementById('root') || document.body,
     top: 64,  // 可调整距离顶部的距离
 });
 
-const toastZIndex = appConfiguration.toastDefaultZIndex;
 // Markdown 工具全局配置
 config({
     markdownItConfig(md) {
@@ -80,7 +79,7 @@ config({
                 if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyL') {
                     // @ts-ignore
                     prettierAction();
-                    message.success({content: '已将文本进行美化排版。', style: {zIndex: toastZIndex}})
+                    message.success({content: '已将文本进行美化排版。'})
                 }
             }
         };

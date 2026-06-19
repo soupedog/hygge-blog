@@ -4,9 +4,6 @@ import {message} from 'antd';
 import StorageHelper from './StorageHelper.ts';
 import {StorageKey} from '../enums/EnumKeeper.ts';
 import UrlHelper from './UrlHelper.ts';
-import {appConfiguration} from '../configuration/app.configuration.ts';
-
-const toastZIndex = appConfiguration.toastDefaultZIndex;
 
 export class HttpClient {
     private readonly axiosInstance: AxiosInstance;
@@ -56,7 +53,7 @@ export class HttpClient {
                     if (autoLoginDisabled) {
                         // 已尝试自动登录过仍然失败
                         UserClient.removeCurrentUser();
-                        message.warning({content: '该账号登录状态已失效，请重新登陆。', duration: 2, style: {zIndex: toastZIndex}});
+                        message.warning({content: '该账号登录状态已失效，请重新登陆。', duration: 2});
                     } else {
                         // 允许自动登录
                         const signInResponse = await UserClient.signIn();
@@ -76,12 +73,12 @@ export class HttpClient {
                     // token 校验不匹配
                     // 清空本地错误用户信息
                     UserClient.removeCurrentUser();
-                    message.warning({content: `错误的用户登录缓存信息已清空！2 秒内即将跳转回主页。`, duration: 2, style: {zIndex: toastZIndex}});
+                    message.warning({content: `错误的用户登录缓存信息已清空！2 秒内即将跳转回主页。`, duration: 2});
                     UrlHelper.navigateTo({path: '/', needReload: true, delayTime: 2000});
                 }
 
                 // 这种是网络请求成功，但业务码错误，仅需提示。
-                message.warning({content: `业务码：${response.code} 错误信息：${response.msg}`, style: {zIndex: toastZIndex}});
+                message.warning({content: `业务码：${response.code} 错误信息：${response.msg}`});
 
                 // 相当于中断正常流程的 Promise 流程
                 return Promise.reject(axiosResponse);
@@ -90,7 +87,7 @@ export class HttpClient {
             (axiosResponseWhenError) => {
                 const httpStatus = axiosResponseWhenError.status;
                 if (httpStatus == null || httpStatus != 200) {
-                    message.error({content: `网络请求异常！HttpStats:${httpStatus}`, style: {zIndex: toastZIndex}});
+                    message.error({content: `网络请求异常！HttpStats:${httpStatus}`});
                 }
 
                 // 相当于中断正常流程的 Promise 流程

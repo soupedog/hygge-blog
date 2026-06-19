@@ -16,7 +16,7 @@ import PostBrowserMusicPlayer from './component/PostBrowserMusicPlayer.tsx';
 import PostBrowserContentView from './component/PostBrowserContentView.tsx';
 import PostBrowserTocView from './component/PostBrowserTocView.tsx';
 
-const toastZIndex = appConfiguration.toastDefaultZIndex;
+const buttonZIndex = appConfiguration.toastDefaultZIndex - 10;
 
 export default function PostBrowser() {
     const [post, setPost] = useState<ArticleDto | undefined>(undefined);
@@ -38,7 +38,7 @@ export default function PostBrowser() {
                     }, 1000);
 
                 } else {
-                    message.warning({content: '目标文章不存在，2 秒内自动跳转回主页，请稍后……', duration: 2, style: {zIndex: toastZIndex}});
+                    message.warning({content: '目标文章不存在，2 秒内自动跳转回主页，请稍后……', duration: 2});
                     UrlHelper.navigateTo({path: '/', delayTime: 2000, canBack: false});
                 }
             }
@@ -75,7 +75,7 @@ export default function PostBrowser() {
                         </Splitter.Panel>
                     </Splitter> : <PostBrowserContentView post={post} key={'post_browser_content'}/>
                 }
-                <FloatButton.Group shape='square' style={{zIndex: toastZIndex}}>
+                <FloatButton.Group shape='square' style={{zIndex: buttonZIndex}}>
                     <Tooltip placement='left' title={'目录'}>
                         <FloatButton onClick={() => {
                             if (tocTree.length > 0) {
