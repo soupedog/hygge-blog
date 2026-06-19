@@ -18,6 +18,8 @@ export default function QuoteEditor() {
     } = useContext(QuoteEditorContext);
 
     useEffect(() => {
+        document.title = `句子收藏编辑 | 我的小宅子`;
+
         // 初次加载页面
         fetchImageInfo();
 

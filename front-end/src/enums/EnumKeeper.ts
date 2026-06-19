@@ -5,6 +5,7 @@ export class StorageKey {
     static readonly USER_TOKEN = 'USER_TOKEN';
     static readonly USER_REFRESH_KEY = 'USER_REFRESH_KEY';
     static readonly AUTO_LOGIN_DISABLED = 'AUTO_LOGIN_DISABLED';
+    static readonly DRAFT_PREFIX = 'DRAFT_PREFIX';
 
     private constructor() {
     }

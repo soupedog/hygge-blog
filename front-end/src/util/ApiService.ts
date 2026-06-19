@@ -26,7 +26,7 @@ export function usePostService() {
     });
 
     return {
-        findArticleByAidMutation: findArticleByAidMutation
+        findArticleByAid: findArticleByAidMutation
     }
 }
 

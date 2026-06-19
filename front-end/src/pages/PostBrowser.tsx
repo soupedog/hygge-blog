@@ -23,10 +23,10 @@ export default function PostBrowser() {
     const [tocEnable, setTocEnable] = useState<boolean>(false);
     const [tocTree, setTocTree] = useState<Array<TreeNodeInfo>>([]);
     const {pid} = useParams();
-    const {findArticleByAidMutation} = usePostService();
+    const {findArticleByAid} = usePostService();
 
     useEffect(() => {
-        findArticleByAidMutation.mutate(pid!, {
+        findArticleByAid.mutate(pid!, {
             onSuccess: (data) => {
                 if (data) {
                     // 依赖静态值表示仅初始化时调用一次
@@ -57,7 +57,7 @@ export default function PostBrowser() {
 
     return (
         <Layout>
-            <PostBrowserHeader isAnyPending={findArticleByAidMutation.isPending}/>
+            <PostBrowserHeader isAnyPending={findArticleByAid.isPending}/>
             <div className={'PostBrowser_image'} style={{
                 width: '100%',
                 height: '25rem',
