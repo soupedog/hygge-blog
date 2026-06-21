@@ -5,7 +5,6 @@ import {Content} from 'antd/es/layout/layout';
 import AppFooter from './component/AppFooter.tsx';
 import PostEditorForm from './component/PostEditorForm.tsx';
 import {PostEditorContext} from './context/PostEditorContext.tsx';
-import {usePostService} from '../util/ApiService.ts';
 import PostMarkdownEditor from './component/PostMarkdownEditor.tsx';
 import PropertiesHelper from '../util/PropertiesHelper.ts';
 
@@ -13,12 +12,16 @@ export default function PostEditor() {
     const {
         isAnyPending,
         pid,
+        postForm,
+        queryModalOpen, setQueryModalOpen,
         setEditorContent,
+        setBackgroundMusicType,
         getDraft,
         post, setPost,
+        fetchCategoryInfo,
+        fetchImageInfo,
+        findPost,
     } = useContext(PostEditorContext);
-
-    const {findArticleByAid} = usePostService();
 
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
@@ -29,19 +32,11 @@ export default function PostEditor() {
             setEditorContent(draft);
             message.info({content: '已从本地草稿中恢复数据！'});
         } else {
-            // 依赖静态值表示仅初始化时调用一次
-            if (pid) {
-                findArticleByAid.mutate(pid, {
-                    onSuccess: (data) => {
-                        if (data) {
-                            setPost(data);
-                            setEditorContent(data.content);
-                            message.info({content: '博文数据拉取成功！'});
-                        }
-                    }
-                });
-            }
+            fetchCategoryInfo();
+            fetchImageInfo();
+            findPost();
         }
+        // 依赖静态值表示仅初始化时调用一次
     }, []);
 
     return (
@@ -50,13 +45,14 @@ export default function PostEditor() {
             <Content>
                 <Modal key={'postQueryModal'}
                        title='请注意'
-                       open={undefined}
+                       open={queryModalOpen}
                        onOk={(event) => {
-                           // getQuoteByQuoteId();
+                           findPost();
+                           setQueryModalOpen(false);
                        }}
-                       confirmLoading={true}
+                       confirmLoading={isAnyPending}
                        onCancel={(event) => {
-                           // setQueryModalOpen(false);
+                           setQueryModalOpen(false);
                        }}
                 >
                     <p>执行查询将丢失编辑数据</p>

@@ -146,8 +146,8 @@ export class UserClient {
 }
 
 export interface ArticleConfiguration {
-    backgroundMusicType: string;
-    mediaPlayType: string;
+    backgroundMusicType: 'NONE' | 'DEFAULT' | 'WANG_YI_YUN';
+    mediaPlayType: 'FORCE_AUTO_PLAY' | 'FORCE_NOT_AUTO_PLAY' | 'SUGGEST_AUTO_PLAY' | 'SUGGEST_NOT_AUTO_PLAY';
     src: string;
     coverSrc?: string;
     name?: string;
@@ -191,13 +191,49 @@ export interface ArticleDto {
     selfPageViews: number;
     orderGlobal: number;
     orderCategory: number;
-    articleState: string;
+    articleState: 'DRAFT' | 'PRIVATE' | 'ACTIVE';
     createTs: number;
     lastUpdateTs: number;
     editable: boolean;
 }
 
+export interface PostAddUpdateInput {
+    action: 'add' | 'update' | 'query';
+    aid?: string;
+    configuration: ArticleConfiguration;
+    cid: string;
+    title: string;
+    coverFileNo: string;
+    summary: string;
+    content: string;
+    orderGlobal?: number;
+    orderCategory?: number;
+    articleState: 'DRAFT' | 'PRIVATE' | 'ACTIVE';
+}
+
 export class PostClient {
+
+    static async createPost(input: PostAddUpdateInput): Promise<ArticleDto> {
+        const clientResponse = await httpClient
+            .post(`/main/article`,
+                input,
+                {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async updatePost(input: PostAddUpdateInput): Promise<ArticleDto> {
+        const clientResponse = await httpClient
+            .put(`/main/article/${input.aid!}`,
+                input,
+                {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
 
     static async findArticleByAid(aid: string): Promise<ArticleDto> {
         const clientResponse = await httpClient
@@ -272,7 +308,7 @@ export class HomeClient {
 
     static async fetch(): Promise<AllOverviewInfo> {
         const clientResponse = await httpClient
-            .get(`main/home/fetch`,
+            .get(`/main/home/fetch`,
                 {
                     headers: UserClient.getHeader()
                 }
@@ -282,7 +318,7 @@ export class HomeClient {
 
     static async fetchPostSummaryByTid(input: PostInTopicSearchInput): Promise<ArticleSummaryResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/fetch/topic/${input.tid}?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+            .get(`/main/home/fetch/topic/${input.tid}?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
                     headers: UserClient.getHeader()
                 }
             );
@@ -291,7 +327,7 @@ export class HomeClient {
 
     static async fetchPostSummaryByCid(input: PostInCategorySearchInput): Promise<ArticleSummaryResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/fetch/category/${input.cid}?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+            .get(`/main/home/fetch/category/${input.cid}?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
                     headers: UserClient.getHeader()
                 }
             );
@@ -300,7 +336,7 @@ export class HomeClient {
 
     static async fetchQuote(input: PageQuery): Promise<QuoteResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/fetch/quote?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
+            .get(`/main/home/fetch/quote?currentPage=${input.currentPage}&pageSize=${input.pageSize}`, {
                     headers: UserClient.getHeader()
                 }
             );
@@ -309,7 +345,7 @@ export class HomeClient {
 
     static async searchPostSummaryByKeyword(input: KeywordSearchInput): Promise<ArticleSummaryResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
+            .get(`/main/home/search/article?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
                 {
                     headers: UserClient.getHeader()
                 }
@@ -319,7 +355,7 @@ export class HomeClient {
 
     static async searchQuoteByKeyword(input: KeywordSearchInput): Promise<QuoteResponse> {
         const clientResponse = await httpClient
-            .get(`main/home/search/quote?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
+            .get(`/main/home/search/quote?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
                 {
                     headers: UserClient.getHeader()
                 }
@@ -348,7 +384,7 @@ export class QuoteClient {
 
     static async createQuote(input: QuoteAddUpdateInput): Promise<QuoteDto> {
         const clientResponse = await httpClient
-            .post(`main/quote`,
+            .post(`/main/quote`,
                 input,
                 {
                     headers: UserClient.getHeader()
@@ -359,7 +395,7 @@ export class QuoteClient {
 
     static async updateQuote(input: QuoteAddUpdateInput): Promise<QuoteDto> {
         const clientResponse = await httpClient
-            .put(`main/quote/${input.quoteId}`,
+            .put(`/main/quote/${input.quoteId}`,
                 input,
                 {
                     headers: UserClient.getHeader()
@@ -370,7 +406,7 @@ export class QuoteClient {
 
     static async findQuote(input: QuoteQueryInput): Promise<QuoteDto> {
         const clientResponse = await httpClient
-            .get(`main/quote/${input.quoteId}`, {
+            .get(`/main/quote/${input.quoteId}`, {
                     headers: UserClient.getHeader()
                 }
             );
@@ -391,7 +427,7 @@ export interface FileInfo {
     name: string;
     extension: string;
     fileCacheType: string;
-    fileType: string;
+    fileType: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
     description?: FileDescription
     fileSize: string;
     cacheLink?: string;
@@ -405,13 +441,13 @@ export interface FileInfoResponse extends PageQueryResponse {
 }
 
 export interface FileInfoQueryInput {
-    type?: string;
+    type?: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
 }
 
 export class FileClient {
 
     static async fetchFileInfo(input: FileInfoQueryInput): Promise<FileInfoResponse> {
-        const url = UrlHelper.mergeUrl('main/file', {type: input.type, sss: undefined});
+        const url = UrlHelper.mergeUrl('/main/file', {type: input.type, sss: undefined});
 
         const clientResponse = await httpClient
             .get(url, {

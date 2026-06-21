@@ -18,11 +18,19 @@ export function useUserService() {
 }
 
 export function usePostService() {
+    const createPostMutation = useMutation({
+        mutationFn: PostClient.createPost,
+    });
+    const updatePostMutation = useMutation({
+        mutationFn: PostClient.updatePost,
+    });
     const findArticleByAidMutation = useMutation({
         mutationFn: PostClient.findArticleByAid,
     });
 
     return {
+        createPost: createPostMutation,
+        updatePost: updatePostMutation,
         findArticleByAid: findArticleByAidMutation
     }
 }
