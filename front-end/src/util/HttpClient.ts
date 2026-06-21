@@ -46,29 +46,30 @@ export class HttpClient {
                     return axiosResponse;
                 }
 
-                if (code == 403003) {
-                    // token 过期，唯一有自动登录必要的请求类型
-                    let autoLoginDisabled = StorageHelper.get<string>(StorageKey.AUTO_LOGIN_DISABLED);
+                let autoLoginDisabled = StorageHelper.get<string>(StorageKey.AUTO_LOGIN_DISABLED);
 
-                    if (autoLoginDisabled) {
-                        // 已尝试自动登录过仍然失败
-                        UserClient.removeCurrentUser();
-                        message.warning({content: '该账号登录状态已失效，请重新登陆。', duration: 2});
-                    } else {
-                        // 允许自动登录
-                        const signInResponse = await UserClient.signIn();
-                        if (signInResponse != null) {
-                            // 自动登录成功
-                            const originalRequest = axiosResponse.config;
-                            // 更新身份认证信息 重试原请求
-                            originalRequest.headers.uid = StorageHelper.get(StorageKey.USER_UID);
-                            originalRequest.headers.token = StorageHelper.get(StorageKey.USER_TOKEN);
+                // token 过期，唯一有自动登录必要的请求类型
+                if (!autoLoginDisabled && code == 403003) {
+                    // 允许自动登录
+                    const signInResponse = await UserClient.signIn();
+                    if (signInResponse != null) {
+                        // 自动登录成功
+                        const originalRequest = axiosResponse.config;
+                        // 更新身份认证信息 重试原请求
+                        originalRequest.headers.uid = StorageHelper.get(StorageKey.USER_UID);
+                        originalRequest.headers.token = StorageHelper.get(StorageKey.USER_TOKEN);
 
-                            return this.axiosInstance(originalRequest);
-                        }
+                        return this.axiosInstance(originalRequest);
                     }
                 }
 
+                // token 刷新令牌类登录信息有误
+                if (autoLoginDisabled && code == 403002) {
+                    UserClient.removeCurrentUser();
+                    UrlHelper.navigateTo({path: '/signin', needReload: true, delayTime: 2000});
+                }
+
+                // 账号密码类登录信息有误
                 if (code == 403000) {
                     // token 校验不匹配
                     // 清空本地错误用户信息
