@@ -135,7 +135,7 @@ export default function PostEditorForm() {
                 </Col>
             </Row>
             <Row gutter={'4rem'}>
-                <Col offset={1} span={6}>
+                <Col offset={1} span={7}>
                     <Form.Item name={['cid']} label='文章类别'
                                rules={[{required: true}]}>
                         <Select
@@ -147,9 +147,19 @@ export default function PostEditorForm() {
                         />
                     </Form.Item>
                 </Col>
-            </Row>
-            <Row gutter={'4rem'}>
-                <Col offset={1} span={6}>
+                <Col span={7}>
+                    <Form.Item name={['coverFileNo']} label='封面图'
+                               rules={[{required: true}]}>
+                        <Select
+                            showSearch={{
+                                optionFilterProp: 'label'
+                            }}
+                            placeholder='请选择封面'
+                            options={fileOptions}
+                        />
+                    </Form.Item>
+                </Col>
+                <Col span={7}>
                     <Form.Item name={['articleState']} label='博文状态'
                                rules={[{required: true}]}
                                initialValue={'ACTIVE'}
@@ -159,19 +169,6 @@ export default function PostEditorForm() {
                             <Radio value={'PRIVATE'}>私有</Radio>
                             <Radio value={'ACTIVE'}>公开</Radio>
                         </Radio.Group>
-                    </Form.Item>
-                </Col>
-                <Col span={6}>
-                    <Form.Item name={['coverFileNo']} label='封面图'
-                               initialValue={'无图片'}
-                               rules={[{required: true}]}>
-                        <Select
-                            showSearch={{
-                                optionFilterProp: 'label'
-                            }}
-                            placeholder='请选择封面'
-                            options={fileOptions}
-                        />
                     </Form.Item>
                 </Col>
             </Row>

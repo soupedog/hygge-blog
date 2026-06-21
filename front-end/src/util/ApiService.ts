@@ -57,9 +57,13 @@ export function useFileCService() {
     const fetchFileInfoMutation = useMutation({
         mutationFn: FileClient.fetchFileInfo,
     });
+    const uploadFilesMutation = useMutation({
+        mutationFn: FileClient.uploadFiles,
+    });
 
     return {
-        fetchFileInfo: fetchFileInfoMutation
+        fetchFileInfo: fetchFileInfoMutation,
+        uploadFiles: uploadFilesMutation,
     }
 }
 

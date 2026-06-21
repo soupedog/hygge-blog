@@ -1,8 +1,9 @@
 import {useContext, useEffect} from 'react';
-import {MdEditor} from 'md-editor-rt';
+import {MdEditor, type UploadImgCallBack} from 'md-editor-rt';
 import {ExportPDF, Mark} from '@vavt/rt-extension';
 import {PostEditorContext} from '../context/PostEditorContext.tsx';
 import {message} from 'antd';
+import {useFileCService} from '../../util/ApiService.ts';
 
 export default function PostMarkdownEditor() {
     const {
@@ -11,6 +12,29 @@ export default function PostMarkdownEditor() {
         editorContent, setEditorContent,
         setDraft, removeDraft, getDraft
     } = useContext(PostEditorContext);
+
+    const {uploadFiles} = useFileCService();
+
+    const cid: string | undefined = post?.cid;
+
+    const onUploadImg = async (files: Array<File>, callBack: UploadImgCallBack) => {
+        const formData = new FormData();
+        files.map(file =>
+            formData.append('files', file)
+        );
+
+        uploadFiles.mutate({type: 'ARTICLE', cid: cid, formData: formData}, {
+            onSuccess: (data) => {
+                callBack(
+                    data.map(fileInfo => ({
+                        url: fileInfo.fileCacheType === 'NGINX' ? fileInfo.cacheLink! : fileInfo.apiLink,
+                        alt: fileInfo.name,
+                        title: fileInfo.name,
+                    }))
+                );
+            }
+        });
+    };
 
     useEffect(() => {
         return (
@@ -57,7 +81,7 @@ export default function PostMarkdownEditor() {
                           message.info({content: '已将草稿保存到本地。'});
                       }
                   }}
-                  onUploadImg={undefined}
+                  onUploadImg={onUploadImg}
         />
     );
 }

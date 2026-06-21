@@ -444,14 +444,33 @@ export interface FileInfoQueryInput {
     type?: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
 }
 
+export interface FileUploadInput extends FileInfoQueryInput {
+    type: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
+    cid?: string;
+    formData: FormData;
+}
+
 export class FileClient {
 
     static async fetchFileInfo(input: FileInfoQueryInput): Promise<FileInfoResponse> {
-        const url = UrlHelper.mergeUrl('/main/file', {type: input.type, sss: undefined});
+        const url = UrlHelper.mergeUrl('/main/file', {type: input.type});
 
         const clientResponse = await httpClient
             .get(url, {
-                    headers: UserClient.getHeader()
+                    headers: UserClient.getHeader(),
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async uploadFiles(input: FileUploadInput): Promise<FileInfo[]> {
+        const url = UrlHelper.mergeUrl('/main/file', {type: input.type, cid: input.cid});
+
+        const clientResponse = await httpClient
+            .post(url,
+                input.formData,
+                {
+                    headers: UserClient.getHeader({'Content-Type': 'multipart/form-data'}),
                 }
             );
         return clientResponse.data.main;
