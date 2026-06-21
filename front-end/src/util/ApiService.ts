@@ -54,16 +54,24 @@ export function useQuoteService() {
 }
 
 export function useFileCService() {
-    const fetchFileInfoMutation = useMutation({
-        mutationFn: FileClient.fetchFileInfo,
+    const deleteFileMutation = useMutation({
+        mutationFn: FileClient.deleteFile,
     });
     const uploadFilesMutation = useMutation({
         mutationFn: FileClient.uploadFiles,
     });
+    const fetchFileInfoMutation = useMutation({
+        mutationFn: FileClient.fetchFileInfo,
+    });
+    const downloadFilePromiseMutation = useMutation({
+        mutationFn: FileClient.downloadFilePromise,
+    });
 
     return {
-        fetchFileInfo: fetchFileInfoMutation,
+        deleteFile: deleteFileMutation,
         uploadFiles: uploadFilesMutation,
+        fetchFileInfo: fetchFileInfoMutation,
+        downloadFilePromise: downloadFilePromiseMutation,
     }
 }
 

@@ -95,7 +95,7 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
     };
 
     const fetchImageInfo = () => {
-        fetchFileInfo.mutate({type: 'ARTICLE_COVER'}, {
+        fetchFileInfo.mutate({types: ['ARTICLE_COVER'], currentPage: 1, pageSize: 9999}, {
             onSuccess: (data) => {
                 // @ts-ignore
                 const fileInfo = [];

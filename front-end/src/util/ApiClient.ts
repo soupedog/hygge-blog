@@ -3,7 +3,8 @@ import UrlHelper from './UrlHelper.ts';
 import StorageHelper from './StorageHelper.ts';
 import {ClientScope, StorageKey} from '../enums/EnumKeeper.ts';
 import PropertiesHelper from './PropertiesHelper.ts';
-import {httpClient} from './HttpClient.ts';
+import {httpClient, httpClient_file} from './HttpClient.ts';
+import type {AxiosResponse} from 'axios';
 
 export interface HyggeResponse<T> {
     code: number;
@@ -440,11 +441,12 @@ export interface FileInfoResponse extends PageQueryResponse {
     fileInfoList: FileInfo[];
 }
 
-export interface FileInfoQueryInput {
-    type?: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
+export interface FileInfoQueryInput extends PageQuery {
+    types?: Array<'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS'>;
+    keywords?: string;
 }
 
-export interface FileUploadInput extends FileInfoQueryInput {
+export interface FileUploadInput {
     type: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
     cid?: string;
     formData: FormData;
@@ -453,7 +455,12 @@ export interface FileUploadInput extends FileInfoQueryInput {
 export class FileClient {
 
     static async fetchFileInfo(input: FileInfoQueryInput): Promise<FileInfoResponse> {
-        const url = UrlHelper.mergeUrl('/main/file', {type: input.type});
+        const url = UrlHelper.mergeUrl('/main/file', {
+            type: input.types ? input.types.join(',') : undefined,
+            keywords: input.keywords,
+            currentPage: input.currentPage,
+            pageSize: input.pageSize,
+        });
 
         const clientResponse = await httpClient
             .get(url, {
@@ -474,5 +481,21 @@ export class FileClient {
                 }
             );
         return clientResponse.data.main;
+    }
+
+    static async deleteFile(fileNo: string): Promise<void> {
+        const clientResponse = await httpClient
+            .delete('/main/file/' + fileNo, {
+                    headers: UserClient.getHeader(),
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async downloadFilePromise(fileNo: string): Promise<AxiosResponse> {
+        return httpClient_file.get('/main/file/static/' + fileNo, {
+            headers: UserClient.getHeader(),
+            responseType: 'arraybuffer'
+        })
     }
 }

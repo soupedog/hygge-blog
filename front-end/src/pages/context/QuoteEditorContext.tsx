@@ -59,7 +59,7 @@ export const QuoteEditorContextProvider = ({children}: { children: ReactNode }) 
     };
 
     const fetchImageInfo = () => {
-        fetchFileInfo.mutate({type: 'QUOTE'}, {
+        fetchFileInfo.mutate({types: ['QUOTE'], currentPage: 1, pageSize: 9999}, {
             onSuccess: (data) => {
                 // @ts-ignore
                 const fileInfo = [];
