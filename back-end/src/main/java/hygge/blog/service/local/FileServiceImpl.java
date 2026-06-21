@@ -430,7 +430,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         List<FileInfoDto> fileInfoDtoList = new ArrayList<>();
         List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(currentUser, null);
 
-        Sort sort = Sort.by(Sort.Order.asc("createTs"));
+        Sort sort = Sort.by(Sort.Order.desc("createTs"));
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
 
         Page<FileInfoView> resultTemp;
