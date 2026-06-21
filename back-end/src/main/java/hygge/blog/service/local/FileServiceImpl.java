@@ -245,7 +245,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileNo(fileNo);
                 fileInfo.setUserId(currentUser.getUserId());
-                fileInfo.setPermissionId(permissionId);
+                fileInfo.setPermissionId(actualPermissionId);
                 fileInfo.setExtension(extension);
                 fileInfo.setName(name);
                 fileInfo.setFileType(fileType);
