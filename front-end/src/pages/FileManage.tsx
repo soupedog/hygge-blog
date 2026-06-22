@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {type FileInfo} from '../util/ApiClient.ts';
-import {Button, Card, Col, Flex, type GetProp, Image, Layout, message, Modal, Row, Space, Switch, Table, type TableProps} from 'antd';
+import {Button, Card, Col, Flex, type GetProp, Image, Layout, message, Modal, Row, Space, Table, type TableProps} from 'antd';
 import {createStyles} from 'antd-style';
 import type {SorterResult} from 'antd/es/table/interface';
 import AppBaseHeader from './component/AppBaseHeader.tsx';
@@ -13,6 +13,8 @@ import imageNotFound from '../assets/imageNotFound.png'
 import imageDefault from '../assets/imageDefault.png'
 import {useFileCService} from '../util/ApiService.ts';
 import Search from 'antd/es/input/Search';
+import {saveAs} from 'file-saver';
+import UrlHelper from '../util/UrlHelper.ts';
 
 const useStyle = createStyles(({css, token}) => {
     // @ts-ignore
@@ -146,6 +148,7 @@ export default function FileManage() {
 
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
+        document.title = `文件概览 | 我的小宅子`;
         fetchData();
     }, []);
 
@@ -159,7 +162,7 @@ export default function FileManage() {
 
     return (
         <Layout className={'full-screen-min-y'}>
-            <AppBaseHeader title={'文件管理'} isAnyPending={isAnyPending}/>
+            <AppBaseHeader title={'文件概览'} isAnyPending={isAnyPending}/>
             <Modal key={'deleteFileModal'}
                    title='请注意'
                    open={deleteModalOpen}
@@ -256,12 +259,6 @@ export default function FileManage() {
                                 ]}/>
                         <Column title='扩展名' dataIndex='extension' fixed={'left'}/>
                         <Column title='大小' dataIndex='fileSize'/>
-                        <Column title='磁盘副本' dataIndex='isInHardDisk'
-                                render={(_: any, record: FileInfo) => (
-                                    record.cacheLink == undefined ? <Switch disabled/> :
-                                        <Switch disabled defaultChecked/>
-                                )}
-                        />
                         <Column title='路径' dataIndex='src'
                                 render={(_: any, record: FileInfo) => (
                                     record.cacheLink == undefined ?
@@ -308,14 +305,20 @@ export default function FileManage() {
                                         查看
                                     </Button>
                                     <Button color='cyan' variant='solid' onClick={() => {
-                                        // let filePromise = FileService.downloadFilePromise(record.fileNo)
-                                        // let fileName = record.name + '.' + record.extension;
-                                        // FileService.saveFile(filePromise, fileName);
+                                        downloadFilePromise.mutate(record.fileNo, {
+                                            onSuccess: axiosResponse => {
+                                                // @ts-ignore
+                                                const type: string = axiosResponse.headers['content-type'];
+                                                const blob = new Blob([axiosResponse.data], {type: type});
+                                                const fileName = record.name + '.' + record.extension;
+                                                saveAs(blob, fileName);
+                                            }
+                                        });
                                     }}>
                                         下载
                                     </Button>
                                     <Button color='primary' variant='solid' onClick={() => {
-                                        // navigate('/file/operation/' + record.fileNo);
+                                        UrlHelper.navigateTo({path: `/manage/file/operate?fileNo=${record.fileNo}`});
                                     }}>
                                         编辑
                                     </Button>
