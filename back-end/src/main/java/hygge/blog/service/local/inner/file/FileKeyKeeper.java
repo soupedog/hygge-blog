@@ -17,7 +17,7 @@ public interface FileKeyKeeper {
      *
      * @return 文件秘钥
      */
-    String generateOneTimeFileKey(String fileNo);
+    String generateFileKeyForFile(String fileNo, Integer maxCount);
 
     /**
      * 核销特定文件的秘钥是否成功

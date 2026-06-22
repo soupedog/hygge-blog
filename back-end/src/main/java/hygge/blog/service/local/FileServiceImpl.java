@@ -99,11 +99,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         this.eventService = eventService;
     }
 
-    public String generateOneTimeFileKey(String fileNo) {
+    public String generateFileKey(String fileNo, Integer maxCount) {
         if (fileNo == null || fileNo.isEmpty()) {
             throw new InternalRuntimeException("[fileNo] can't be empty.");
         }
-        return fileKeyKeeper.generateOneTimeFileKey(fileNo);
+        return fileKeyKeeper.generateFileKeyForFile(fileNo, maxCount);
     }
 
     public String getFileCacheLink(String fileNo) {
@@ -276,7 +276,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
                 // 文件上传者默认有权限，直接发放授权
                 if (!PermissionServiceImpl._PUBLIC.getPermissionId().equals(item.getPermissionId())) {
-                    item.setApiLink(item.getApiLink() + "?fileKey=" + generateOneTimeFileKey(fileNo));
+                    item.setApiLink(item.getApiLink() + "?fileKey=" + generateFileKey(fileNo, 1));
                 }
 
                 result.add(item);
@@ -469,6 +469,12 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         File file = new File(cachePath);
         if (file.exists()) {
             dto.setCacheLink(fileUrlBuilder.getFileNginxLinkByRelativePath(dto.getRelativePath()));
+        }
+    }
+
+    public void initFileKeyForDto(FileInfoDto fileInfoDto, Integer accessCountMin) {
+        if (accessCountMin != null && accessCountMin > 0) {
+            fileInfoDto.setApiLink(fileInfoDto.getApiLink() + "?fileKey=" + generateFileKey(fileInfoDto.getFileNo(), accessCountMin));
         }
     }
 
