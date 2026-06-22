@@ -21,6 +21,7 @@
     "aplayer-ts": "^2.6.0",
     "axios": "^1.17.0",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.21",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.11.1",
     "markdown-it-mark": "^4.0.0",

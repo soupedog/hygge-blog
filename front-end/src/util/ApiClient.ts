@@ -480,7 +480,23 @@ export interface FileInfoAddUpdateInput {
     description?: FileDescription
 }
 
+export interface FileInfoDetailQueryInput {
+    fileNo: string;
+    accessCountMin?: number
+}
+
 export class FileClient {
+
+    static async getFileInfoByFileNo(input: FileInfoDetailQueryInput): Promise<FileInfo> {
+        const url = UrlHelper.mergeUrl(`/main/file/${input.fileNo}`, {accessCountMin: input.accessCountMin});
+
+        const clientResponse = await httpClient
+            .get(url, {
+                    headers: UserClient.getHeader(),
+                }
+            );
+        return clientResponse.data.main;
+    }
 
     static async fetchFileInfo(input: FileInfoQueryInput): Promise<FileInfoResponse> {
         const url = UrlHelper.mergeUrl('/main/file', {
@@ -514,6 +530,17 @@ export class FileClient {
     static async deleteFile(fileNo: string): Promise<void> {
         const clientResponse = await httpClient
             .delete('/main/file/' + fileNo, {
+                    headers: UserClient.getHeader(),
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async updateFile(input: FileInfoAddUpdateInput): Promise<void> {
+        const clientResponse = await httpClient
+            .put('/main/file/' + input.fileNo,
+                input,
+                {
                     headers: UserClient.getHeader(),
                 }
             );

@@ -57,11 +57,17 @@ export function useFileCService() {
     const deleteFileMutation = useMutation({
         mutationFn: FileClient.deleteFile,
     });
+    const updateFileMutation = useMutation({
+        mutationFn: FileClient.updateFile,
+    });
     const uploadFilesMutation = useMutation({
         mutationFn: FileClient.uploadFiles,
     });
     const fetchFileInfoMutation = useMutation({
         mutationFn: FileClient.fetchFileInfo,
+    });
+    const getFileInfoByFileNoMutation = useMutation({
+        mutationFn: FileClient.getFileInfoByFileNo,
     });
     const downloadFilePromiseMutation = useMutation({
         mutationFn: FileClient.downloadFilePromise,
@@ -69,8 +75,10 @@ export function useFileCService() {
 
     return {
         deleteFile: deleteFileMutation,
+        updateFile: updateFileMutation,
         uploadFiles: uploadFilesMutation,
         fetchFileInfo: fetchFileInfoMutation,
+        getFileInfoByFileNo: getFileInfoByFileNoMutation,
         downloadFilePromise: downloadFilePromiseMutation,
     }
 }

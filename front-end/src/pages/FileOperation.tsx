@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import AppBaseHeader from './component/AppBaseHeader.tsx';
-import {Button, Col, DatePicker, Flex, Form, Input, Layout, message, Modal, Radio, Row, Select, Space, Upload} from 'antd';
+import {BorderBeam, Button, Card, Col, DatePicker, Empty, Flex, Form, Image, Input, Layout, message, Modal, Radio, Row, Select, Space, Typography, Upload} from 'antd';
 import {useIsMutating} from '@tanstack/react-query';
 import AppFooter from './component/AppFooter.tsx';
 import {Content} from 'antd/es/layout/layout';
@@ -10,7 +10,13 @@ import PropertiesHelper from '../util/PropertiesHelper.ts';
 import {UploadOutlined} from '@ant-design/icons';
 import UrlHelper from '../util/UrlHelper.ts';
 import type {DefaultOptionType} from 'antd/es/select/index';
-import {useHomeService} from '../util/ApiService.ts';
+import {useFileCService, useHomeService} from '../util/ApiService.ts';
+import imageNotFound from '../assets/imageNotFound.png'
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import Title from 'antd/es/typography/Title';
+
+dayjs.extend(customParseFormat);
 
 const selectItems: DefaultOptionType[] = [
     {
@@ -44,6 +50,8 @@ export default function FileOperation() {
 
     const {fetchPermission} = useHomeService();
 
+    const {getFileInfoByFileNo, updateFile} = useFileCService();
+
     const [searchParams, setSearchParams] = useSearchParams();
     const [fileNo, setFileNo] = useState(searchParams.get('fileNo') || undefined);
     const [currentFileType, setCurrentFileType] = useState('');
@@ -62,6 +70,13 @@ export default function FileOperation() {
     const isQueryMode = formMode == 'query';
     const isUpdateMode = formMode == 'update';
 
+    const isImage = fileInfo != null && (
+        fileInfo.extension == 'jpg'
+        || fileInfo.extension == 'jpeg'
+        || fileInfo.extension == 'gif'
+        || fileInfo.extension == 'png'
+    );
+
     const onFileNoChange = (nextFileNo?: string) => {
         // 复制一个新的 URLSearchParams 对象
         const nextParams = new URLSearchParams(searchParams);
@@ -75,8 +90,30 @@ export default function FileOperation() {
         setSearchParams(nextParams);
     };
 
+    const freshFileInfo = () => {
+        if (fileNo) {
+            getFileInfoByFileNo.mutate({fileNo: fileNo, accessCountMin: 1}, {
+                onSuccess: data => {
+                    setFileInfo(data);
+                    message.info('文件信息拉取成功！');
+                }
+            });
+        }
+    };
+
+    const modifyFileInfo = (input: FileInfoAddUpdateInput) => {
+        updateFile.mutate(input, {
+                onSuccess: data => {
+                    message.success({content: '修改文件信息成功！'});
+                }
+            }
+        );
+    }
+
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
+        document.title = `文件操作 | 我的小宅子`;
+
         fetchPermission.mutate(undefined, {
             onSuccess: data => {
                 const nextPermissionOptions: any[] = [];
@@ -96,7 +133,7 @@ export default function FileOperation() {
             },
         });
 
-
+        freshFileInfo();
     }, []);
 
     useEffect(() => {
@@ -124,10 +161,9 @@ export default function FileOperation() {
                    title='请注意'
                    open={queryModalOpen}
                    onOk={(event) => {
-                       // removeFile(currentFileInfo?.fileNo ?? '');
+                       freshFileInfo();
                        setQueryModalOpen(false);
                    }}
-                   okButtonProps={{danger: true}}
                    confirmLoading={isAnyPending}
                    onCancel={(event) => {
                        setQueryModalOpen(false);
@@ -143,24 +179,34 @@ export default function FileOperation() {
                     name='hygge_file_operation'
                     style={{padding: '4rem'}}
                     onFinish={(value) => {
-                        if (value.action == 'query') {
-                            // FileService.findFileInfo(value.fileNo, (data) => {
-                            //     let fileInfo = data!.main;
-                            //     if (fileInfo != null) {
-                            //         refreshFormData(fileInfo);
-                            //         message.info('查询文件信息完毕。');
-                            //     } else {
-                            //         message.info('文件信息(' + value.fileNo + ')未查询到相关信息。');
-                            //     }
-                            // })
-                        } else if (value.action == 'update') {
-                            console.log(value)
-                            // FileService.updateFileInfo(value, (da) => {
-                            //     message.success('文件信息更新成功。')
-                            // });
+                        if (value.action == 'update') {
+                            // @ts-ignore
+                            value.name = PropertiesHelper.stringOfNullable({target: value.name, defaultValue: null});
+                            // @ts-ignore
+                            value.description.content = PropertiesHelper.stringOfNullable({target: value.description.content, defaultValue: null});
+                            // @ts-ignore
+                            value.description.nginxLink = PropertiesHelper.stringOfNullable({target: value.description.nginxLink, defaultValue: null});
+
+                            modifyFileInfo(value);
                         }
                     }}
                 >
+                    <Row gutter={'4rem'}>
+                        <Col offset={1} span={22}>
+                            <BorderBeam>
+                                <Typography>
+                                    <Title level={3} style={{color: '#0c13d1'}}>预览效果：</Title>
+                                </Typography>
+                                <Card className={'align-center'} style={{marginBottom: '2rem'}}>
+                                    <Flex justify={'center'}>
+                                        {fileInfo ?
+                                            isImage ? <Image width={'16%'} height={'9%'} src={fileInfo.apiLink}/> : <Image width={'16%'} height={'9%'} src={imageNotFound}/>
+                                            : <Empty/>}
+                                    </Flex>
+                                </Card>
+                            </BorderBeam>
+                        </Col>
+                    </Row>
                     <Row gutter={'4rem'}>
                         <Col offset={1} span={8}>
                             <Form.Item name={['fileNo']} label='文件编号'
@@ -181,7 +227,7 @@ export default function FileOperation() {
                             </Form.Item>
                         </Col>
                         <Col span={7}>
-                            <Form.Item name={['fileType']} label='文件类型' rules={[{required: true}]}>
+                            <Form.Item name={['fileType']} label='文件类型' rules={[{required: isAddMode || isUpdateMode}]}>
                                 <Select
                                     value={currentFileType}
                                     onChange={value => setCurrentFileType(value)}
@@ -203,7 +249,7 @@ export default function FileOperation() {
                             </Form.Item>
                         </Col>
                         <Col span={8}>
-                            <Form.Item name={['permissionId']} label='授权类型' rules={[{required: true}]}>
+                            <Form.Item name={['permissionId']} label='授权类型' rules={[{required: isAddMode || isUpdateMode}]}>
                                 <Select
                                     style={{width: '100%'}}
                                     styles={{
@@ -222,6 +268,10 @@ export default function FileOperation() {
                     <Row gutter={'4rem'}>
                         <Col offset={1} span={12}>
                             <Form.Item name={['description', 'timePointer']} label='图片发生时间'
+                                       getValueProps={(value) => ({
+                                           // 这里的 value 是从表单数据中读取的字符串
+                                           value: value ? dayjs(value) : null,
+                                       })}
                                        rules={[{required: false}]}>
                                 <DatePicker showTime format={'YYYY-MM-DD HH:mm:ss'}/>
                             </Form.Item>
@@ -248,6 +298,12 @@ export default function FileOperation() {
                             <Form.Item>
                                 <Flex justify={'center'} style={{alignItems: 'center'}}>
                                     <Space size={'large'} align={'end'}>
+                                        <Button type='dashed' htmlType='reset' onClick={() => {
+                                            setFormMode('query');
+                                            setFileInfo(undefined);
+                                        }}>
+                                            重置表单
+                                        </Button>
                                         <Upload name={'files'}
                                                 maxCount={1}
                                                 action={`${UrlHelper.getApiPrefix()}/main/file?type=${currentFileType}&permissionId=${currentPermissionId}`}
