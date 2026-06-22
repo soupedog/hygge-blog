@@ -272,7 +272,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 }
 
                 // 存在检测 Nginx 缓存，需要在缓存之后再初始化
-                initLink(item);
+                initLinkForDto(item);
 
                 // 文件上传者默认有权限，直接发放授权
                 if (!PermissionServiceImpl._PUBLIC.getPermissionId().equals(item.getPermissionId())) {
@@ -416,7 +416,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         FileInfoView fileInfoView = fileInfoViewTemp.get();
         FileInfoDto resultTempItem = fileInfoView.toDto();
-        initLink(resultTempItem);
+        initLinkForDto(resultTempItem);
 
         return resultTempItem;
     }
@@ -451,7 +451,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         resultTemp.stream().forEach(item -> {
             FileInfoDto resultTempItem = item.toDto();
-            initLink(resultTempItem);
+            initLinkForDto(resultTempItem);
             fileInfoDtoList.add(resultTempItem);
         });
 
@@ -461,7 +461,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 .build();
     }
 
-    private void initLink(FileInfoDto dto) {
+    private void initLinkForDto(FileInfoDto dto) {
         // 初始化 API 链接
         dto.setApiLink(fileUrlBuilder.getFileApiLinkByFileNo(dto.getFileNo()));
         // 检测是否存在硬盘副本
