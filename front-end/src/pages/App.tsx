@@ -124,13 +124,14 @@ export default function App() {
     useEffect(() => {
         // 依赖静态值表示仅初始化时调用一次
         UrlHelper.init(navigate);
-        UserClient.init(ClientScope.WEB);
-
         if (!device.isDesktop) {
+            UserClient.init(ClientScope.PHONE);
             const notPCNoticeForbiddenFlag = StorageHelper.get<string>(StorageKey.NOT_PC_NOTICE_FORBIDDEN);
             if (!notPCNoticeForbiddenFlag) {
                 setNotPCModalOpen(true);
             }
+        } else {
+            UserClient.init(ClientScope.WEB);
         }
     }, []);
 
