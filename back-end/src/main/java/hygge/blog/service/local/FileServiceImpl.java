@@ -472,8 +472,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void initFileKeyForDto(FileInfoDto fileInfoDto, Integer accessCountMin) {
-        if (accessCountMin != null && accessCountMin > 0) {
+    public void initFileKeyIfNecessaryForDto(FileInfoDto fileInfoDto, Integer accessCountMin) {
+        if (fileInfoDto != null
+                && !PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoDto.getPermissionId())
+                && accessCountMin != null
+                && accessCountMin > 0) {
             fileInfoDto.setApiLink(fileInfoDto.getApiLink() + "?fileKey=" + generateFileKey(fileInfoDto.getFileNo(), accessCountMin));
         }
     }
