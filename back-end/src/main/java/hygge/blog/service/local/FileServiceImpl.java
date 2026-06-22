@@ -99,11 +99,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         this.eventService = eventService;
     }
 
-    public String generateOneTimeFileKey(String fileNo) {
+    public String generateFileKey(String fileNo, Integer maxCount) {
         if (fileNo == null || fileNo.isEmpty()) {
             throw new InternalRuntimeException("[fileNo] can't be empty.");
         }
-        return fileKeyKeeper.generateOneTimeFileKey(fileNo);
+        return fileKeyKeeper.generateFileKeyForFile(fileNo, maxCount);
     }
 
     public String getFileCacheLink(String fileNo) {
@@ -245,7 +245,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setFileNo(fileNo);
                 fileInfo.setUserId(currentUser.getUserId());
-                fileInfo.setPermissionId(permissionId);
+                fileInfo.setPermissionId(actualPermissionId);
                 fileInfo.setExtension(extension);
                 fileInfo.setName(name);
                 fileInfo.setFileType(fileType);
@@ -272,11 +272,11 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 }
 
                 // 存在检测 Nginx 缓存，需要在缓存之后再初始化
-                initLink(item);
+                initLinkForDto(item);
 
                 // 文件上传者默认有权限，直接发放授权
                 if (!PermissionServiceImpl._PUBLIC.getPermissionId().equals(item.getPermissionId())) {
-                    item.setApiLink(item.getApiLink() + "?fileKey=" + generateOneTimeFileKey(fileNo));
+                    item.setApiLink(item.getApiLink() + "?fileKey=" + generateFileKey(fileNo, 1));
                 }
 
                 result.add(item);
@@ -304,8 +304,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException("File(" + fileNo + ") was not found.", BlogSystemCode.FAIL_TO_QUERY_FILE);
         }
 
-        FileInfoView oldFileInfoView = targetFileInfoTemp.get();
-        User owner = userService.findUserByUserId(oldFileInfoView.getUserId(), false);
+        FileInfoView fileInfoViewInDB = targetFileInfoTemp.get();
+        User owner = userService.findUserByUserId(fileInfoViewInDB.getUserId(), false);
 
         // 是否有修改权限
         userService.checkUserRightOrHimself(owner, UserTypeEnum.ROOT);
@@ -318,7 +318,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         });
 
         // 公开可见类型，才允许缓存
-        boolean isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(oldFileInfoView.getPermissionId());
+        boolean isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoViewInDB.getPermissionId());
 
         Integer permissionId = (Integer) finalData.get("permissionId");
         if (permissionId != null) {
@@ -329,69 +329,69 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             isAllowCaching = PermissionServiceImpl._PUBLIC.getPermissionId().equals(permissionId);
         }
 
-        FileInfo oldAndBeenOverwrite = new FileInfo();
-        OverrideMapper.INSTANCE.viewOverrideToPo(oldFileInfoView, oldAndBeenOverwrite);
+        FileInfo fileInfoInDB = new FileInfo();
+        OverrideMapper.INSTANCE.viewOverrideToPo(fileInfoViewInDB, fileInfoInDB);
 
         FileInfo newOne = MapToAnyMapper.INSTANCE.mapToFileInfo(finalData);
 
-        OverrideMapper.INSTANCE.overrideToAnother(newOne, oldAndBeenOverwrite);
+        OverrideMapper.INSTANCE.overrideToAnother(newOne, fileInfoInDB);
 
         // 非公开的文章类别不允许创建 Nginx 文件副本
         if (newOne.getFileCacheType() != null && newOne.getFileCacheType().equals(FileCacheTypeEnum.NGINX) && !isAllowCaching) {
-            throw new LightRuntimeException("File(" + oldFileInfoView.getName() + ") can't be updated to Permission(negative) with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
+            throw new LightRuntimeException("File(" + fileInfoViewInDB.getName() + ") can't be updated to Permission(negative) with FileCacheType.NGINX.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
         }
 
-        boolean isPathChanged = !oldFileInfoView.returnRelativePath().equals(oldAndBeenOverwrite.returnRelativePath());
+        boolean isPathChanged = !fileInfoViewInDB.returnRelativePath().equals(fileInfoInDB.returnRelativePath());
 
         if (isPathChanged) {
-            pathConflictCheck(oldAndBeenOverwrite);
+            pathConflictCheck(fileInfoInDB);
         }
 
-        boolean copyTypeChanged = newOne.getFileCacheType() != null && !oldFileInfoView.getFileCacheType().equals(newOne.getFileCacheType());
+        boolean copyTypeChanged = newOne.getFileCacheType() != null && !fileInfoViewInDB.getFileCacheType().equals(newOne.getFileCacheType());
 
-        String nginxLink = fileUrlBuilder.getFileNginxLinkByRelativePath(oldFileInfoView.returnRelativePath());
+        String nginxLink = fileUrlBuilder.getFileNginxLinkByRelativePath(fileInfoViewInDB.returnRelativePath());
 
         if (copyTypeChanged) {
-            if (oldFileInfoView.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
+            if (fileInfoViewInDB.getFileCacheType().equals(FileCacheTypeEnum.DEFAULT)) {
                 // 无副本切换到有副本，仅新增副本
                 Optional<FileInfo> fileInfoTemp = fileInfoDao.findOne(Example.of(FileInfo.builder().fileNo(fileNo).build()));
                 if (fileInfoTemp.isEmpty()) {
                     throw new InternalRuntimeException("FileInfo(" + fileNo + ") was not found.");
                 }
 
-                oldAndBeenOverwrite.setContent(fileInfoTemp.get().getContent());
+                fileInfoInDB.setContent(fileInfoTemp.get().getContent());
 
                 // 缓存更新流程允许文件覆盖
-                FileOperationTool.copyFile(true, getAbsolutePath(oldAndBeenOverwrite), oldAndBeenOverwrite.getName(), oldAndBeenOverwrite.getContent());
+                FileOperationTool.copyFile(true, getAbsolutePath(fileInfoInDB), fileInfoInDB.getName(), fileInfoInDB.getContent());
 
                 // 更新 nginx 信息
-                oldAndBeenOverwrite.getDescription().setNginxLink(nginxLink);
+                fileInfoInDB.getDescription().setNginxLink(nginxLink);
             } else {
                 // 有副本切换到无副本，仅删除旧副本
-                String oldCachePath = fileRootPath + oldFileInfoView.returnRelativePath();
+                String oldCachePath = fileRootPath + fileInfoViewInDB.returnRelativePath();
                 File oldFile = new File(oldCachePath);
                 FileOperationTool.deleteFile(oldFile);
 
                 // 清除 Nginx 相关信息
-                oldAndBeenOverwrite.getDescription().setNginxLink(null);
+                fileInfoInDB.getDescription().setNginxLink(null);
             }
         } else {
-            if (oldFileInfoView.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
+            if (fileInfoViewInDB.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
                 // 未切换副本类型，属于 Nginx，可能存在路径变更
                 // 检测是否存在硬盘副本
-                String newCachePath = fileRootPath + oldAndBeenOverwrite.returnRelativePath();
-                String oldCachePath = fileRootPath + oldFileInfoView.returnRelativePath();
+                String newCachePath = fileRootPath + fileInfoInDB.returnRelativePath();
+                String oldCachePath = fileRootPath + fileInfoViewInDB.returnRelativePath();
 
                 File oldFile = new File(oldCachePath);
                 if (oldFile.exists()) {
                     File newFile = new File(newCachePath);
                     // 保障所需文件夹被创建
-                    fileHelper.getOrCreateDirectoryIfNotExit(fileRootPath + oldAndBeenOverwrite.getFileType().getPath());
+                    fileHelper.getOrCreateDirectoryIfNotExit(fileRootPath + fileInfoInDB.getFileType().getPath());
                     try {
                         FileCopyUtils.copy(oldFile, newFile);
                         FileOperationTool.deleteFile(oldFile);
                         // 更新 nginx 信息
-                        oldAndBeenOverwrite.getDescription().setNginxLink(nginxLink);
+                        fileInfoInDB.getDescription().setNginxLink(nginxLink);
                         log.info("Copy file({}) to file({}) success.", oldCachePath, newCachePath);
                     } catch (IOException e) {
                         throw new InternalRuntimeException("Fail to copy old file to new space.", BlogSystemCode.FAIL_TO_UPDATE_FILE, e);
@@ -402,7 +402,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
             }
         }
 
-        fileInfoDao.save(oldAndBeenOverwrite);
+        fileInfoDao.save(fileInfoInDB);
         // 更新默认清空旧查询缓存
         eventService.refreshFileCacheLinkByFileNo(fileNo);
     }
@@ -416,7 +416,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         FileInfoView fileInfoView = fileInfoViewTemp.get();
         FileInfoDto resultTempItem = fileInfoView.toDto();
-        initLink(resultTempItem);
+        initLinkForDto(resultTempItem);
 
         return resultTempItem;
     }
@@ -430,7 +430,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         List<FileInfoDto> fileInfoDtoList = new ArrayList<>();
         List<Integer> activePermissionIdList = permissionService.getActivePermissionIdListOfUser(currentUser, null);
 
-        Sort sort = Sort.by(Sort.Order.asc("createTs"));
+        Sort sort = Sort.by(Sort.Order.desc("createTs"));
         Pageable pageable = PageRequest.of(currentPage - 1, pageSize, sort);
 
         Page<FileInfoView> resultTemp;
@@ -451,7 +451,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         resultTemp.stream().forEach(item -> {
             FileInfoDto resultTempItem = item.toDto();
-            initLink(resultTempItem);
+            initLinkForDto(resultTempItem);
             fileInfoDtoList.add(resultTempItem);
         });
 
@@ -461,7 +461,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 .build();
     }
 
-    private void initLink(FileInfoDto dto) {
+    private void initLinkForDto(FileInfoDto dto) {
         // 初始化 API 链接
         dto.setApiLink(fileUrlBuilder.getFileApiLinkByFileNo(dto.getFileNo()));
         // 检测是否存在硬盘副本
@@ -469,6 +469,15 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         File file = new File(cachePath);
         if (file.exists()) {
             dto.setCacheLink(fileUrlBuilder.getFileNginxLinkByRelativePath(dto.getRelativePath()));
+        }
+    }
+
+    public void initFileKeyIfNecessaryForDto(FileInfoDto fileInfoDto, Integer accessCountMin) {
+        if (fileInfoDto != null
+                && !PermissionServiceImpl._PUBLIC.getPermissionId().equals(fileInfoDto.getPermissionId())
+                && accessCountMin != null
+                && accessCountMin > 0) {
+            fileInfoDto.setApiLink(fileInfoDto.getApiLink() + "?fileKey=" + generateFileKey(fileInfoDto.getFileNo(), accessCountMin));
         }
     }
 

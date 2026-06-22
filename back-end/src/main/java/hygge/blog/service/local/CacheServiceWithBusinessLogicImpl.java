@@ -2,7 +2,6 @@ package hygge.blog.service.local;
 
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.util.template.HyggeJsonUtilContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,7 +35,7 @@ public class CacheServiceWithBusinessLogicImpl extends HyggeJsonUtilContainer {
 
             // 非公开类型自动授权
             if (resultTemp.isApiLink() && !resultTemp.isPublic()) {
-                result = result + "?fileKey=" + fileService.generateOneTimeFileKey(fileNo);
+                result = result + "?fileKey=" + fileService.generateFileKey(fileNo, 1);
             }
         }
         return result;

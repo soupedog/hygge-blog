@@ -10,10 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Getter
 public class FileKeyLocalCounter {
-    private final AtomicInteger counter = new AtomicInteger(1);
+    private final AtomicInteger counter;
     private final String fileNo;
 
-    public FileKeyLocalCounter(String fileNo) {
+    public FileKeyLocalCounter(Integer maxCount, String fileNo) {
+        this.counter = new AtomicInteger(maxCount);
         this.fileNo = fileNo;
     }
 

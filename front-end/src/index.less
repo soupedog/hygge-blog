@@ -1,0 +1,154 @@
+/*用 modern-normalize 统一浏览器默认样式*/
+@import '../node_modules/modern-normalize';
+
+.background-transparent {
+  background-color: transparent;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+/*文本自动换行*/
+.auto-wrap {
+  word-wrap: break-word
+}
+
+/*文本溢出行内省略*/
+.auto-omit {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/*文本溢出 2 行后的部分省略*/
+.auto-omit_2 {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.align-center {
+  align-self: center;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.full-screen-y {
+  height: 100vh;
+}
+
+.full-screen-min-y {
+  min-height: 100vh;
+}
+
+.full-screen-x {
+  width: 100vw;
+}
+
+.display-none {
+  display: none;
+}
+
+// APP 共享样式 start
+.hygge-header-title {
+  float: left;
+  height: 2rem;
+  margin: 1rem;
+  padding: 0 1rem 0 1rem;
+  background: rgba(255, 255, 255, 0.3);
+  font-size: 1.125rem;
+  text-align: center;
+  font-weight: bold;
+  line-height: 2rem;
+  color: white;
+  border-radius: 0.25rem;
+}
+
+// APP 共享样式 end
+
+//Home start
+// 明示折叠不可点击
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  cursor: default !important;
+}
+
+// 给草稿高亮
+.ant-list-item-meta-content > .ant-list-item-meta-title > .draftHighlight {
+  color: #a32001 !important;
+}
+
+// 句子收藏样式
+.quote-list-item {
+  .ant-list-item {
+    padding: 0.5rem;
+  }
+
+  .ant-list-item-meta {
+    margin-bottom: 0 !important;
+  }
+
+  .ant-list-item-meta-title {
+    margin-bottom: 0 !important;
+  }
+
+  .quote-md-preview {
+    .md-editor-preview {
+      p, li {
+        color: #9a0707;
+      }
+    }
+  }
+
+  .quote-md-remark-preview {
+    .md-editor-preview {
+      p, li {
+        color: teal;
+        font-size: 0.8rem;
+        line-height: 1.5rem;
+        font-style: italic;
+      }
+    }
+  }
+
+  .quote-remarks-title {
+    color: teal;
+    font-weight: 600;
+    font-style: italic;
+  }
+}
+
+
+// 公告栏相关样式
+.ant-timeline-item-content {
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+//Home end
+

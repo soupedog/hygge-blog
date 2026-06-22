@@ -87,8 +87,10 @@ public class FileController extends HyggeJsonUtilContainer implements FileContro
     @Override
     @RequireAuth
     @GetMapping("/file/{fileNo}")
-    public ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>> findFileInfo(@PathVariable("fileNo") String fileNo) {
+    public ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>> findFileInfo(@PathVariable("fileNo") String fileNo,
+                                                                                 @RequestParam(value = "accessCountMin", defaultValue = "0", required = false) Integer accessCountMin) {
         FileInfoDto result = fileService.findFileInfo(fileNo);
+        fileService.initFileKeyIfNecessaryForDto(result, accessCountMin);
         return (ResponseEntity<HyggeBlogControllerResponse<FileInfoDto>>) success(result);
     }
 

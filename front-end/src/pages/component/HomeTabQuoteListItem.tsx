@@ -1,0 +1,121 @@
+import * as React from 'react';
+import {type QuoteDto, UserClient} from '../../util/ApiClient.ts';
+import {Card, Image, List, Row, Space, Splitter, Tooltip} from 'antd';
+import PropertiesHelper from '../../util/PropertiesHelper.ts';
+import {FormOutlined} from '@ant-design/icons';
+import UrlHelper from '../../util/UrlHelper.ts';
+import {MdPreview} from 'md-editor-rt';
+import clsx from 'clsx';
+
+export interface HomeTabListQuoteItemProps {
+    readonly quote: QuoteDto;
+    readonly noEditor?: boolean;
+}
+
+const EditIcon = ({icon, text, quoteId}: { icon: React.FC; text: string, quoteId: number }) => (
+    <Space className={'pointer'}
+           onClick={() => {
+               UrlHelper.navigateTo({path: `/manage/editor/quote?quoteId=${quoteId}`});
+           }}
+           style={{
+               float: 'right',
+               marginRight: '2rem',
+               fontSize: '1rem'
+           }}>
+        {React.createElement(icon)}
+        {text}
+    </Space>
+);
+
+export default function HomeTabQuoteListItem({quote, noEditor}: HomeTabListQuoteItemProps) {
+    const currentUser = UserClient.getCurrentUser();
+    const isAuthor: boolean = noEditor == undefined ? (currentUser != null && currentUser.uid == quote.uid) : !noEditor;
+
+    const hasRemarks = PropertiesHelper.isStringNotEmpty(quote.remarks);
+
+    return (
+        <div className={'quote-list-item'}>
+            <List.Item
+                extra={PropertiesHelper.isStringNotEmpty(quote.imageSrc) ?
+                    <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
+                        <Image
+                            width={272}
+                            height={153}
+                            alt='quoteLogo'
+                            src={quote.imageSrc}
+                            preview={true}
+                            style={{
+                                objectFit: 'contain',
+                            }}
+                        />
+                    </div>
+                    : null}
+            >
+                <List.Item.Meta
+                    title={
+                        <>
+                            <Tooltip placement='top' title={'可能的出处'}>
+                                <span style={{fontSize: '1.5rem', fontWeight: 'bold'}}>{quote.source}</span>
+                            </Tooltip>
+                            {
+                                isAuthor ? <EditIcon icon={FormOutlined} text={'编辑'} quoteId={quote.quoteId}/> : null
+                            }
+                        </>
+                    }
+                    description={
+                        quote.portal == null ? null :
+                            <>
+                            <span style={{
+                                fontSize: '1rem',
+                                color: '#0039f6',
+                                fontWeight: 'bold'
+                            }}>
+                                    &emsp;传送门:&emsp;
+                            </span>
+                                <a href={quote.portal} target='_blank'>{quote.portal}</a>
+                            </>
+                    }
+                />
+                <Row>
+                    {hasRemarks ?
+                        <Splitter style={{boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'}}>
+                            <Splitter.Panel>
+                                <Card styles={{body: {padding: 4, paddingLeft: 28}}}>
+                                    <div className={'quote-md-preview'}>
+                                        <MdPreview
+                                            id={`md-id-quote-${quote.quoteId}`} value={quote.content}
+                                            sanitize={(html) => html}/>
+                                    </div>
+                                </Card>
+                            </Splitter.Panel>
+                            <Splitter.Panel defaultSize='30%' min='10%' max='90%'>
+                                <Card className={'quote-md-remark-preview'}>
+                                    <div className={clsx([
+                                        'inline-block',
+                                        'auto-omit',
+                                        'text-align-right',
+                                        'full-width',
+                                        'quote-remarks-title'
+                                    ])}>
+                                        —— 备注&nbsp;&nbsp;
+                                    </div>
+                                    <MdPreview
+                                        id={`md-id-quote-remarks-${quote.quoteId}`} value={`${quote.remarks}`}
+                                        sanitize={(html) => html}/>
+                                </Card>
+                            </Splitter.Panel>
+                        </Splitter>
+                        :
+                        <Card styles={{body: {padding: 4, paddingLeft: 28}}}>
+                            <div className={'quote-md-preview'}>
+                                <MdPreview
+                                    id={`md-id-quote-${quote.quoteId}`} value={quote.content}
+                                    sanitize={(html) => html}/>
+                            </div>
+                        </Card>
+                    }
+                </Row>
+            </List.Item>
+        </div>
+    );
+}

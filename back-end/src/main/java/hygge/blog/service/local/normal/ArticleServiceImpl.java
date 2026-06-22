@@ -28,7 +28,6 @@ import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,11 +66,11 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "configuration", null));
         forUpdate.add(new ColumnInfo(true, false, "cid", null).toStringColumn(1, 50));
         forUpdate.add(new ColumnInfo(true, false, "title", null).toStringColumn(1, 500));
-        forUpdate.add(new ColumnInfo(true, true, "coverFileNo", null).toStringColumn(0, 1000));
+        forUpdate.add(new ColumnInfo(true, false, "coverFileNo", null).toStringColumn(0, 1000));
         forUpdate.add(new ColumnInfo(true, true, "summary", null).toStringColumn(0, 3000));
         forUpdate.add(new ColumnInfo(true, true, "content", null).toStringColumn(0, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo(true, false, "orderGlobal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
-        forUpdate.add(new ColumnInfo(true, false, "orderCategory", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, true, "orderGlobal", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        forUpdate.add(new ColumnInfo(true, true, "orderCategory", null, Integer.MIN_VALUE, Integer.MAX_VALUE));
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
@@ -140,12 +139,12 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
 
         HashMap<String, Object> finalData = daoHelper.filterOutTheFinalColumns(data, forUpdate);
 
-        Article old = articleDao.findArticleByAid(aid);
+        Article articleInDB = articleDao.findArticleByAid(aid);
 
         Article newOne = MapToAnyMapper.INSTANCE.mapToArticle(finalData);
 
         String title = (String) finalData.get("title");
-        if (title != null && !old.getTitle().equals(newOne.getTitle())) {
+        if (title != null && !articleInDB.getTitle().equals(newOne.getTitle())) {
             nameConflictCheck(title);
         }
         String cid = (String) finalData.get("cid");
@@ -160,9 +159,23 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
             articleConfigurationValidate(newOne.getConfiguration());
         }
 
-        OverrideMapper.INSTANCE.overrideToAnother(newOne, old);
+        OverrideMapper.INSTANCE.overrideToAnother(newOne, articleInDB);
 
-        Article result = articleDao.save(old);
+        // 最笨但是最有效的办法
+        if (finalData.containsKey("summary") && parameterHelper.isEmpty(newOne.getSummary())) {
+            articleInDB.setSummary(null);
+        }
+        if (finalData.containsKey("content") && parameterHelper.isEmpty(newOne.getContent())) {
+            articleInDB.setContent(null);
+        }
+        if (finalData.containsKey("orderGlobal") && parameterHelper.isEmpty(newOne.getOrderGlobal())) {
+            articleInDB.setOrderGlobal(null);
+        }
+        if (finalData.containsKey("orderCategory") && parameterHelper.isEmpty(newOne.getOrderCategory())) {
+            articleInDB.setOrderCategory(null);
+        }
+
+        Article result = articleDao.save(articleInDB);
 
         Integer articleId = result.getArticleId();
         eventService.refreshArticleByArticleId(articleId);

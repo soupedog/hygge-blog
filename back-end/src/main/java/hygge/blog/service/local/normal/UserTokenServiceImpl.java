@@ -30,7 +30,7 @@ public class UserTokenServiceImpl extends HyggeJsonUtilContainer {
 
         User user = userService.findUserByUserName(userName);
         if (user == null) {
-            throw new LightRuntimeException(String.format("User(%s) was not found.", userName), BlogSystemCode.USER_NOT_FOUND);
+            throw new LightRuntimeException(String.format("User(%s) was not found.", userName), BlogSystemCode.LOGIN_FAIL);
         }
 
         if (!user.getPassword().equals(password)) {

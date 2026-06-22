@@ -62,7 +62,7 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
 
         List<ArticleCountInfo> articleCountInfoList = articleCountService.findArticleCountInfoOfCategory(accessibleCategoryIdList, context.isGuest() ? null : currentUser.getUserId());
 
-        HashMap<Integer, Integer> articleCountInfoMap = collectionHelper.filterNonemptyItemAsHashMap(articleCountInfoList, ArticleCountInfo::getCategoryId, ArticleCountInfo::getCount);
+        HashMap<Integer, Long> articleCountInfoMap = collectionHelper.filterNonemptyItemAsHashMap(articleCountInfoList, ArticleCountInfo::getCategoryId, ArticleCountInfo::getCount);
 
         HomepageFetchResult result = HomepageFetchResult.builder().topicOverviewInfoList(new ArrayList<>()).build();
 
@@ -79,7 +79,7 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
 
             categoryList.stream().filter(category -> category.getTopicId().equals(topic.getTopicId())).forEach(category -> {
                 CategoryDto categoryDto = PoDtoMapper.INSTANCE.poToDto(category);
-                int count = articleCountInfoMap.getOrDefault(category.getCategoryId(), 0);
+                long count = articleCountInfoMap.getOrDefault(category.getCategoryId(), 0L);
                 // 非管理员隐藏挂载文章数目为 0 的类别
                 if (!context.isMaintainer() && count < 1) {
                     return;
@@ -149,5 +149,4 @@ public class HomePageServiceImpl extends HyggeJsonUtilContainer {
     public QuoteInfo findQuoteInfo(int currentPage, int pageSize) {
         return quoteService.findQuoteInfo(currentPage, pageSize);
     }
-
 }

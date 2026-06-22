@@ -9,7 +9,6 @@ import hygge.blog.filter.base.AbstractHyggeRequestFilter;
 import hygge.blog.service.local.normal.UserServiceImpl;
 import hygge.blog.service.local.normal.UserTokenServiceImpl;
 import hygge.commons.constant.ConstantParameters;
-import hygge.commons.exception.InternalRuntimeException;
 import hygge.commons.exception.main.HyggeRuntimeException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
@@ -22,12 +21,14 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,10 +45,10 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
     private final UserServiceImpl userService;
     private final RequestMappingHandlerMapping handlerMapping;
     /**
-     * e.g: RoleCheckKey-[ROOT]
+     * key : value
+     * e.g: 被标记 @RequireAuth 的 Controller 层方法名称 : 要求的权限列表
      * <p>
-     * <p>
-     * RoleCheckKey = httpMethod-path
+     * createArticle : [ROOT]
      */
     private final Map<String, Set<UserTypeEnum>> directMatcherMap = new ConcurrentHashMap<>();
 
@@ -60,14 +61,14 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
     @PostConstruct
     public void init() {
         Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
+        LinkedHashMap<String, Set<UserTypeEnum>> mappingInfoForLog = new LinkedHashMap<>();
 
         for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
             HandlerMethod method = entry.getValue();
             // 检查是否有 @RequireAuth 注解
             if (method.hasMethodAnnotation(RequireAuth.class)) {
                 RequireAuth requireAuth = method.getMethodAnnotation(RequireAuth.class);
-                Set<UserTypeEnum> userTypeEnumSet = new HashSet<>();
-                userTypeEnumSet.addAll(Arrays.asList(requireAuth.userType()));
+                Set<UserTypeEnum> userTypeEnumSet = new HashSet<>(Arrays.asList(requireAuth.userType()));
 
                 PathPatternsRequestCondition pathPatternsCondition = entry.getKey().getPathPatternsCondition();
                 // getPatternValues() 返回的非空
@@ -75,26 +76,35 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
                 String httpMethod = getTypeByMethod(method);
 
                 for (String path : paths) {
-                    if (httpMethod == null || path.contains("{")) {
-                        // 不允许带通配符的方法、不被 @GetMapping 等 @XXXMapping 标记的方法使用该注解
-                        throw new InternalRuntimeException("@RequireAuth can't add to path:" + path + ".");
-                    }
-                    directMatcherMap.put(getRoleCheckKey(httpMethod, path), userTypeEnumSet);
+                    mappingInfoForLog.put(getRoleCheckKey(httpMethod, path), userTypeEnumSet);
                 }
+
+                // 绑定到被标记 @RequireAuth 的 Controller 层方法名称上
+                directMatcherMap.put(method.getMethod().getName(), userTypeEnumSet);
             }
         }
 
-        String logInfo = "Permission verification for automatic registration:" + ConstantParameters.LINE_SEPARATOR + jsonHelper_indent.formatAsString(directMatcherMap);
+        String logInfo = "Permission verification for automatic registration:" + ConstantParameters.LINE_SEPARATOR + jsonHelper_indent.formatAsString(mappingInfoForLog);
         log.info(logInfo);
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        try {
-            String httpMethod = request.getMethod();
-            String path = request.getRequestURI();
+        Set<UserTypeEnum> roleRequireSet = null;
 
-            Set<UserTypeEnum> roleRequireSet = directMatcherMap.get(getRoleCheckKey(httpMethod, path));
+        try {
+            // 利用 Spring 的路由树进行匹配
+            HandlerExecutionChain chain = handlerMapping.getHandler(request);
+            if (chain != null) {
+                Object handler = chain.getHandler();
+                // 判断是否是 HandlerMethod（Controller 方法）
+                if (handler instanceof HandlerMethod handlerMethod) {
+                    // 2. 获取方法信息
+                    String methodName = handlerMethod.getMethod().getName();
+                    roleRequireSet = directMatcherMap.get(methodName);
+                }
+            }
+
             boolean needPreCheckRole = roleRequireSet != null;
 
             HyggeRequestContext context = HyggeRequestTracker.getContext();
@@ -116,10 +126,16 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
             }
 
             if (needPreCheckRole) {
+                String httpMethod = request.getMethod();
+                String path = request.getRequestURI();
+
                 // 需要权限预检查
                 if (!roleRequireSet.isEmpty()) {
                     UserTypeEnum[] typeEnumsArray = roleRequireSet.toArray(UserTypeEnum[]::new);
-                    userService.checkUserRight(context.getCurrentLoginUser(), typeEnumsArray);
+                    String requireInfo = jsonHelper.formatAsString(typeEnumsArray);
+                    userService.checkUserRight(context.getCurrentLoginUser(), (isPass) -> {
+                        log.info("Auto auth check: result-{} require-{} method-{} path-{}", isPass ? "Y" : "N", requireInfo, httpMethod, path);
+                    }, typeEnumsArray);
                 }
                 // TODO 目前没有 ROOT 以外的类型，有需要时再加
             }

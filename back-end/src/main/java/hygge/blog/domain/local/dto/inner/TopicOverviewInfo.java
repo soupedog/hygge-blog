@@ -32,5 +32,5 @@ public class TopicOverviewInfo {
     @Schema(title = "板块下文章摘要信息")
     private List<ArticleDto> articleSummaryList;
     @Schema(title = "板块下文章总数")
-    private int totalCount;
+    private long totalCount;
 }

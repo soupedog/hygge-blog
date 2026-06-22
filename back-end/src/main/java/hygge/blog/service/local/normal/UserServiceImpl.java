@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Xavier
@@ -120,21 +121,41 @@ public class UserServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void checkUserRight(User targetUser, UserTypeEnum... expectedUserType) {
+    public boolean isUserRightPass(User targetUser, UserTypeEnum... expectedUserType) {
         if (targetUser == null) {
             for (UserTypeEnum item : expectedUserType) {
                 if (UserTypeEnum.NORMAL.equals(item)) {
-                    return;
+                    return true;
                 }
             }
         } else {
             for (UserTypeEnum item : expectedUserType) {
                 if (targetUser.getUserType().equals(item)) {
-                    return;
+                    return true;
                 }
             }
         }
+        return false;
+    }
+
+    public void checkUserRight(User targetUser, UserTypeEnum... expectedUserType) {
+        if (isUserRightPass(targetUser, expectedUserType)) {
+            return;
+        }
         throw new LightRuntimeException(BlogSystemCode.INSUFFICIENT_PERMISSIONS.getPublicMessage(), BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+    }
+
+    public void checkUserRight(User targetUser, Consumer<Boolean> hook, UserTypeEnum... expectedUserType) {
+        boolean pass = isUserRightPass(targetUser, expectedUserType);
+
+        // 执行钩子函数，传入检查结果
+        if (hook != null) {
+            hook.accept(pass);
+        }
+
+        if (!pass) {
+            throw new LightRuntimeException(BlogSystemCode.INSUFFICIENT_PERMISSIONS.getPublicMessage(), BlogSystemCode.INSUFFICIENT_PERMISSIONS);
+        }
     }
 
     public void checkUserRightOrHimself(User targetUser, UserTypeEnum... expectedUserType) {
