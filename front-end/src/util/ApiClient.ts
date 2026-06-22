@@ -305,6 +305,12 @@ export interface AllOverviewInfo {
     announcementInfoList: AnnouncementDto[];
 }
 
+export interface Permission {
+    permissionId: number,
+    name: string,
+    description: string,
+}
+
 export class HomeClient {
 
     static async fetch(): Promise<AllOverviewInfo> {
@@ -357,6 +363,16 @@ export class HomeClient {
     static async searchQuoteByKeyword(input: KeywordSearchInput): Promise<QuoteResponse> {
         const clientResponse = await httpClient
             .get(`/main/home/search/quote?keyword=${input.keyword}&currentPage=${input.currentPage}&pageSize=${input.pageSize}`,
+                {
+                    headers: UserClient.getHeader()
+                }
+            );
+        return clientResponse.data.main;
+    }
+
+    static async fetchPermission(): Promise<Permission[]> {
+        const clientResponse = await httpClient
+            .get(`/main/home/fetch/permission`,
                 {
                     headers: UserClient.getHeader()
                 }
@@ -424,7 +440,7 @@ export interface FileDescription {
 export interface FileInfo {
     fileNo: string;
     relativePath: string;
-    permissionId: number;
+    permissionId: string;
     name: string;
     extension: string;
     fileCacheType: string;
@@ -450,6 +466,18 @@ export interface FileUploadInput {
     type: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
     cid?: string;
     formData: FormData;
+}
+
+
+export interface FileInfoAddUpdateInput {
+    action: 'add' | 'update' | 'query';
+    fileNo: string;
+    permissionId: string;
+    name: string;
+    extension: string;
+    fileCacheType: string;
+    fileType: 'CORE' | 'QUOTE' | 'ARTICLE_COVER' | 'ARTICLE' | 'BGM' | 'OTHERS';
+    description?: FileDescription
 }
 
 export class FileClient {

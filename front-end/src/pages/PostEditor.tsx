@@ -55,7 +55,7 @@ export default function PostEditor() {
                            setQueryModalOpen(false);
                        }}
                 >
-                    <p>执行查询将丢失编辑数据</p>
+                    <p>执行查询将丢失正在编辑的数据！</p>
                 </Modal>
                 <PostMarkdownEditor/>
                 <PostEditorForm/>

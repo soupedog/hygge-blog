@@ -94,6 +94,9 @@ export function useHomeService() {
     const searchQuoteByKeywordMutation = useMutation({
         mutationFn: HomeClient.searchQuoteByKeyword,
     });
+    const fetchPermissionMutation = useMutation({
+        mutationFn: HomeClient.fetchPermission,
+    });
 
     return {
         fetch: fetchMutation,
@@ -102,5 +105,6 @@ export function useHomeService() {
         fetchQuote: fetchQuoteMutation,
         searchPostSummaryByKeyword: searchPostSummaryByKeywordMutation,
         searchQuoteByKeyword: searchQuoteByKeywordMutation,
+        fetchPermission: fetchPermissionMutation,
     }
 }

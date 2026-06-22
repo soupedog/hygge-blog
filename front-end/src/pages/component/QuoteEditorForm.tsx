@@ -136,7 +136,6 @@ export default function QuoteEditorForm() {
                 <Col span={1}></Col>
             </Row>
             <Row gutter={'4rem'}>
-                <Col span={1}></Col>
                 <Form.Item className={'display-none'} name={['action']} label='操作类型'
                            rules={[{required: true}]}
                            initialValue={'add'}>
@@ -146,7 +145,7 @@ export default function QuoteEditorForm() {
                         <Radio value={'query'}>查询句子</Radio>
                     </Radio.Group>
                 </Form.Item>
-                <Col span={22}>
+                <Col offset={1} span={22}>
                     <Form.Item>
                         <Flex justify={'center'} style={{alignItems: 'center'}}>
                             <Space size={'large'} align={'end'}>
@@ -185,7 +184,6 @@ export default function QuoteEditorForm() {
                         </Flex>
                     </Form.Item>
                 </Col>
-                <Col span={1}></Col>
             </Row>
         </Form>
     );

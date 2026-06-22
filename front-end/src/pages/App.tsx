@@ -36,6 +36,7 @@ const PostBrowser = lazy(() => import('./PostBrowser.tsx'));
 const PostEditor = lazy(() => import('./PostEditor.tsx'));
 const QuoteEditor = lazy(() => import('./QuoteEditor.tsx'));
 const FileManage = lazy(() => import('./FileManage.tsx'));
+const FileOperation = lazy(() => import('./FileOperation.tsx'));
 
 // 在应用初始化时配置
 message.config({
@@ -157,7 +158,7 @@ export default function App() {
                     <Route path={'/manage/editor/post'} element={<PostEditorContextProvider><PostEditor key={'PostEditor'}/></PostEditorContextProvider>}/>
                     <Route path={'/manage/editor/quote'} element={<QuoteEditorContextProvider><QuoteEditor key={'QuoteEditor'}/></QuoteEditorContextProvider>}/>
                     <Route path={'/manage/file/glance'} element={<FileManage key={'FileManage'}/>}/>
-                    <Route path={'/manage/file/operate'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
+                    <Route path={'/manage/file/operate'} element={<FileOperation key={'FileOperation'}/>}/>
                     <Route path={'/signup'} element={<NotFound key={'NotFound'} delayTime={3000}/>}/>
                     <Route path={'/signin'} element={<Signin key={'Signin'}/>}/>
                     <Route path={'/'} element={<HomeProvider><Home key={'Home'}/></HomeProvider>}/>
