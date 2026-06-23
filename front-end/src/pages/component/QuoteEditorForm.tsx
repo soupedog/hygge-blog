@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {Button, Col, Flex, Form, Input, InputNumber, message, Radio, Row, Select, Space} from 'antd';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 import {QuoteEditorContext} from '../context/QuoteEditorContext.tsx';
@@ -7,6 +7,7 @@ export default function QuoteEditorForm() {
     const {
         fileOptions,
         quoteForm,
+        quote,
         quoteId,
         onQuoteIdChange,
         setQueryModalOpen,
@@ -20,6 +21,21 @@ export default function QuoteEditorForm() {
     const isQueryMode = formMode == 'query';
     const isUpdateMode = formMode == 'update';
 
+    useEffect(() => {
+        if (quote) {
+            quoteForm.setFieldsValue({
+                quoteId: String(quote.quoteId),
+                coverFileNo: quote.coverFileNo,
+                content: quote.content,
+                remarks: quote.remarks,
+                source: quote.source,
+                portal: quote.portal,
+                quoteState: quote.quoteState,
+                orderVal: quote.orderVal,
+            });
+        }
+    }, [JSON.stringify(quote)]);
+
     return (
         <Form
             name='hygge_quote_editor'
@@ -32,14 +48,13 @@ export default function QuoteEditorForm() {
                 // @ts-ignore
                 value.coverFileNo = PropertiesHelper.stringOfNullable({target: value.coverFileNo, defaultValue: null});
                 // @ts-ignore
-                value.source = PropertiesHelper.stringOfNullable({target: value.source, defaultValue: null});
+                value.source = PropertiesHelper.stringOfNullable({target: value.source, defaultValue: '佚名'});
                 // @ts-ignore
                 value.portal = PropertiesHelper.stringOfNullable({target: value.portal, defaultValue: null});
                 // @ts-ignore
                 value.content = PropertiesHelper.stringOfNullable({target: value.content, defaultValue: null});
                 // @ts-ignore
                 value.remarks = PropertiesHelper.stringOfNullable({target: value.remarks, defaultValue: null});
-
                 if (value.action == 'update') {
                     modifyQuote(value);
                 } else if (value.action == 'add') {
@@ -153,6 +168,7 @@ export default function QuoteEditorForm() {
                                     quoteForm.setFieldsValue({
                                         action: 'add'
                                     });
+                                    console.log(1);
                                     setFormMode('add');
                                     quoteForm.submit();
                                 }}>

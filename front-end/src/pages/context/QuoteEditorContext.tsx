@@ -81,7 +81,7 @@ export const QuoteEditorContextProvider = ({children}: { children: ReactNode }) 
     };
 
     const addQuote = (input: QuoteAddUpdateInput) => {
-        if (quote) {
+        if (PropertiesHelper.isStringNotEmpty(input.content)) {
             createQuote.mutate(input, {
                 onSuccess: (data) => {
                     setQuote(data);
@@ -112,17 +112,6 @@ export const QuoteEditorContextProvider = ({children}: { children: ReactNode }) 
                         quoteForm.resetFields();
                     } else {
                         setQuote(data);
-                        quoteForm.setFieldsValue({
-                            quoteId: String(data.quoteId),
-                            coverFileNo: data.coverFileNo,
-                            content: data.content,
-                            remarks: data.remarks,
-                            source: data.source,
-                            portal: data.portal,
-                            quoteState: data.quoteState,
-                            orderVal: data.orderVal,
-                        });
-
                         message.success('拉取句子收藏成功！');
                     }
                 }
