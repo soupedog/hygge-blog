@@ -45,12 +45,13 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
     private final UserServiceImpl userService;
     private final RequestMappingHandlerMapping handlerMapping;
     /**
-     * key : value
-     * e.g: 被标记 @RequireAuth 的 Controller 层方法名称 : 要求的权限列表
+     * key : value<br/>
+     * e.g: <br/>
+     * 被标记 @RequireAuth 的 Controller 层方法名称 : 要求的权限列表
      * <p>
      * createArticle : [ROOT]
      */
-    private final Map<String, Set<UserTypeEnum>> directMatcherMap = new ConcurrentHashMap<>();
+    private final Map<String, UserTypeEnum[]> directMatcherMap = new ConcurrentHashMap<>();
 
     public LoginFilter(UserTokenServiceImpl userTokenService, UserServiceImpl userService, RequestMappingHandlerMapping handlerMapping) {
         this.userTokenService = userTokenService;
@@ -80,7 +81,7 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
                 }
 
                 // 绑定到被标记 @RequireAuth 的 Controller 层方法名称上
-                directMatcherMap.put(method.getMethod().getName(), userTypeEnumSet);
+                directMatcherMap.put(method.getMethod().getName(), userTypeEnumSet.toArray(UserTypeEnum[]::new));
             }
         }
 
@@ -90,7 +91,7 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-        Set<UserTypeEnum> roleRequireSet = null;
+        UserTypeEnum[] typeEnumsArray = null;
 
         try {
             // 利用 Spring 的路由树进行匹配
@@ -101,11 +102,11 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
                 if (handler instanceof HandlerMethod handlerMethod) {
                     // 2. 获取方法信息
                     String methodName = handlerMethod.getMethod().getName();
-                    roleRequireSet = directMatcherMap.get(methodName);
+                    typeEnumsArray = directMatcherMap.get(methodName);
                 }
             }
 
-            boolean needPreCheckRole = roleRequireSet != null;
+            boolean needPreCheckRole = typeEnumsArray != null;
 
             HyggeRequestContext context = HyggeRequestTracker.getContext();
             String uid = context.getObject(HyggeRequestContext.Key.UID);
@@ -130,8 +131,7 @@ public class LoginFilter extends AbstractHyggeRequestFilter {
                 String path = request.getRequestURI();
 
                 // 需要权限预检查
-                if (!roleRequireSet.isEmpty()) {
-                    UserTypeEnum[] typeEnumsArray = roleRequireSet.toArray(UserTypeEnum[]::new);
+                if (typeEnumsArray.length > 0) {
                     String requireInfo = jsonHelper.formatAsString(typeEnumsArray);
                     userService.checkUserRight(context.getCurrentLoginUser(), (isPass) -> {
                         log.info("Auto auth check: result-{} require-{} method-{} path-{}", isPass ? "Y" : "N", requireInfo, httpMethod, path);
