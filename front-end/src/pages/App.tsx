@@ -13,6 +13,8 @@ import {ClientScope, StorageKey} from '../enums/EnumKeeper.ts';
 import {config} from 'md-editor-rt';
 // @ts-ignore
 import MarkExtension from 'markdown-it-mark';
+// @ts-ignore
+import LinkAttr from 'markdown-it-link-attributes';
 import * as prettier from 'prettier';
 import parserMarkdown from 'prettier/plugins/markdown';
 import {keymap} from '@codemirror/view';
@@ -65,6 +67,26 @@ config({
         mermaid: {
             instance: mermaid
         }
+    },
+    markdownItPlugins(plugins) {
+        return [
+            ...plugins,
+            // 文章内部链接调整为新打开窗口访问
+            {
+                type: 'linkAttr',
+                plugin: LinkAttr,
+                options: {
+                    matcher(href: string) {
+                        // 如果使用了markdown-it-anchor
+                        // 应该忽略标题头部的锚点链接
+                        return !href.startsWith('#');
+                    },
+                    attrs: {
+                        target: '_blank',
+                    },
+                },
+            },
+        ];
     },
     codeMirrorExtensions(extensions, {keyBindings}) {
         // 1. 先把旧的快捷键映射移除

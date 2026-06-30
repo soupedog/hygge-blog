@@ -47,6 +47,9 @@ importers:
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
+      markdown-it-link-attributes:
+        specifier: ^4.0.1
+        version: 4.0.1
       markdown-it-mark:
         specifier: ^4.0.0
         version: 4.0.0
@@ -2141,6 +2144,9 @@ packages:
     engines: {node: '>=12.0.0'}
     peerDependencies:
       markdown-it: '*'
+
+  markdown-it-link-attributes@4.0.1:
+    resolution: {integrity: sha512-pg5OK0jPLg62H4k7M9mRJLT61gUp9nvG0XveKYHMOOluASo9OEF13WlXrpAp2aj35LbedAy3QOCgQCw0tkLKAQ==}
 
   markdown-it-mark@4.0.0:
     resolution: {integrity: sha512-YLhzaOsU9THO/cal0lUjfMjrqSMPjjyjChYM7oyj4DnyaXEzA8gnW6cVJeyCrCVeyesrY2PlEdUYJSPFYL4Nkg==}
@@ -5143,6 +5149,8 @@ snapshots:
   markdown-it-image-figures@2.1.1(markdown-it@14.2.0):
     dependencies:
       markdown-it: 14.2.0
+
+  markdown-it-link-attributes@4.0.1: {}
 
   markdown-it-mark@4.0.0: {}
 
