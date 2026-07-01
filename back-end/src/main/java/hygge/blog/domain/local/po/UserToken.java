@@ -61,8 +61,8 @@ public class UserToken {
     private Timestamp deadline;
 
     public void refresh(long currentTimeStamp) {
-        this.token = randomHelper.getUniversallyUniqueIdentifier(true);
-        this.refreshKey = randomHelper.getUniversallyUniqueIdentifier(true);
+        this.token = randomHelper.randomUUID(true);
+        this.refreshKey = randomHelper.randomUUID(true);
 
         long nextDeadline = Instant.ofEpochMilli(currentTimeStamp)
                 .plus(3, ChronoUnit.HOURS)

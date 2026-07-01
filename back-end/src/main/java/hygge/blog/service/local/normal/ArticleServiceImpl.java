@@ -102,7 +102,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
 
         Article article = PoDtoMapper.INSTANCE.dtoToPo(articleDto);
         article.setUserId(currentUser.getUserId());
-        article.setAid(randomHelper.getUniversallyUniqueIdentifier(true));
+        article.setAid(randomHelper.randomUUID(true));
         Category category = categoryService.findCategoryByCid(articleDto.getCid(), false);
         article.setCategoryId(category.getCategoryId());
         article.setOrderGlobal(parameterHelper.parseObjectOfNullable("orderGlobal", article.getOrderGlobal(), 0));

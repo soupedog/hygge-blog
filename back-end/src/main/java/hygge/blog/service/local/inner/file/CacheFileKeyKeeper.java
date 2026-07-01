@@ -27,7 +27,7 @@ public class CacheFileKeyKeeper extends HyggeJsonUtilContainer implements FileKe
 
     @Override
     public String genderKey(String fileNo) {
-        return randomHelper.getRandomString(6, StringCategoryEnum.A_Z, StringCategoryEnum.a_z, StringCategoryEnum.NUMBER);
+        return randomHelper.randomString(6, StringCategoryEnum.A_Z, StringCategoryEnum.a_z, StringCategoryEnum.NUMBER);
     }
 
     /**

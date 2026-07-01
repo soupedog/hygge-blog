@@ -239,7 +239,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 throw new LightRuntimeException("File(" + fileName + ") was duplicate.", BlogSystemCode.FAIL_TO_UPLOAD_FILE);
             }
 
-            String fileNo = randomHelper.getUniversallyUniqueIdentifier(true);
+            String fileNo = randomHelper.randomUUID(true);
 
             try {
                 FileInfo fileInfo = new FileInfo();

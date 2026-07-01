@@ -61,7 +61,7 @@ public class TopicServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException(String.format("Topic(%s) already exists.", topic.getTopicName()), BlogSystemCode.TOPIC_ALREADY_EXISTS);
         }
 
-        topic.setTid(randomHelper.getUniversallyUniqueIdentifier(true));
+        topic.setTid(randomHelper.randomUUID(true));
         topic.setUserId(currentUser.getUserId());
         topic.setOrderVal(parameterHelper.integerFormatOfNullable("orderVal", topic.getOrderVal(), 0));
         topic.setTopicState(parameterHelper.parseObjectOfNullable("topicState", topic.getTopicState(), TopicStateEnum.ACTIVE));

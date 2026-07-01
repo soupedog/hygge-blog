@@ -43,7 +43,7 @@ public class ApiFileNoLinkPicker implements HyggeFileNoLinkPicker {
 
     @Override
     public void validate() {
-        String exampleLink = apiUrlPrefix + UtilCreator.INSTANCE.getDefaultInstance(RandomHelper.class).getUniversallyUniqueIdentifier(true);
+        String exampleLink = apiUrlPrefix + UtilCreator.INSTANCE.getDefaultInstance(RandomHelper.class).randomUUID(true);
         String fileNo = tryToGetFileNo(exampleLink);
 
         if (fileNo != null) {

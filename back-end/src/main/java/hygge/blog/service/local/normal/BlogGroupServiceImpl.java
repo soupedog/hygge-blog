@@ -47,7 +47,7 @@ public class BlogGroupServiceImpl extends HyggeJsonUtilContainer {
             throw new LightRuntimeException(String.format("BlogGroup(%s) already exists.", blogGroup.getGroupName()), BlogSystemCode.BLOG_GROUP_ALREADY_EXISTS);
         }
 
-        blogGroup.setGid(randomHelper.getUniversallyUniqueIdentifier(true));
+        blogGroup.setGid(randomHelper.randomUUID(true));
         blogGroup.setUserId(currentUser.getUserId());
 
         BlogGroup result = blogGroupDao.save(blogGroup);

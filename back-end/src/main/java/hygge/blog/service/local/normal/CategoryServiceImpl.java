@@ -83,7 +83,7 @@ public class CategoryServiceImpl extends HyggeJsonUtilContainer {
         }
 
         Category category = PoDtoMapper.INSTANCE.dtoToPo(categoryDto);
-        category.setCid(randomHelper.getUniversallyUniqueIdentifier(true));
+        category.setCid(randomHelper.randomUUID(true));
         category.setUserId(currentUser.getUserId());
 
         nameConflictCheck(category.getCategoryName());
