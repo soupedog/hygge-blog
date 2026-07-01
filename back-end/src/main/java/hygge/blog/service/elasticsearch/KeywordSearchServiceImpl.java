@@ -207,6 +207,7 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
 
     // 类级别常量，排除 content 字段，所有方法共享
     private static final FetchSourceFilter ARTICLE_SOURCE_FILTER = new FetchSourceFilter(
+            null,// 不为 null 时，true 或 false 是启用全部字段 或 禁用全部字段
             new String[]{
                     "esId", "type", "aid", "configuration", "categoryTreeInfo",
                     "categoryId", "cid", "uid", "title", "imageSrc",
@@ -217,6 +218,7 @@ public class KeywordSearchServiceImpl extends HyggeJsonUtilContainer {
     );
 
     private static final FetchSourceFilter QUOTE_SOURCE_FILTER = new FetchSourceFilter(
+            null,// 不为 null 时，true 或 false 是启用全部字段 或 禁用全部字段
             new String[]{
                     "esId", "type", "quoteId", "source", "content", "portal", "remarks", "uid", "imageSrc",
                     "state", "createTs", "lastUpdateTs"
