@@ -404,7 +404,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
 
         fileInfoDao.save(fileInfoInDB);
         // 更新默认清空旧查询缓存
-        eventService.refreshFileCacheLinkByFileNo(fileNo);
+        eventService.refreshFileCacheLinkByFileNo(false, fileNo);
     }
 
     public FileInfoDto findFileInfo(String fileNo) {
@@ -519,7 +519,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 log.info("delete file({}) success, affected rows:{}.", fileInfoView.getName(), affectedRows);
             }
             // 删除默认清空旧查询缓存
-            eventService.refreshFileCacheLinkByFileNo(fileNo);
+            eventService.refreshFileCacheLinkByFileNo(false, fileNo);
         });
     }
 

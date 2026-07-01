@@ -114,7 +114,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
 
         Integer articleId = result.getArticleId();
 
-        eventService.refreshArticleByArticleId(articleId);
+        eventService.refreshArticleByArticleId(false, articleId);
         return result;
     }
 
@@ -178,7 +178,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         Article result = articleDao.save(articleInDB);
 
         Integer articleId = result.getArticleId();
-        eventService.refreshArticleByArticleId(articleId);
+        eventService.refreshArticleByArticleId(false, articleId);
         return result;
     }
 

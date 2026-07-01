@@ -88,7 +88,7 @@ public class FileCacheRefreshServiceImpl {
         // 删除数据库中旧缓存链接并置为无缓存状态
         fileInfoDao.removeFileCacheLink(fileInfoView.getFileNo());
         // 删除链接查询缓存
-        eventService.refreshFileCacheLinkByFileNo(fileInfoView.getFileNo());
+        eventService.refreshFileCacheLinkByFileNo(false, fileInfoView.getFileNo());
         totalCount.incrementAndGet();
     }
 }

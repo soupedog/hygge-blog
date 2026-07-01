@@ -3,14 +3,15 @@ package hygge.blog.event.listener;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.event.ESRefreshEvent;
 import hygge.blog.event.ESRefreshEventInfo;
-import hygge.blog.event.listener.base.HyggeEventListener;
 import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.commons.spring.event.BaseHyggeEventListener;
+import hygge.commons.spring.event.HyggeEventListenerContext;
 
 /**
  * @author Xavier
  * @date 2025/9/1
  */
-public class ESRefreshListener extends HyggeEventListener<ESRefreshEvent> {
+public class ESRefreshListener extends BaseHyggeEventListener<ESRefreshEventInfo, ESRefreshEvent> {
     private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
 
     public ESRefreshListener(RefreshElasticSearchServiceImpl refreshElasticSearchService) {
@@ -23,7 +24,7 @@ public class ESRefreshListener extends HyggeEventListener<ESRefreshEvent> {
     }
 
     @Override
-    protected void handleEvent(ESRefreshEvent event) {
+    protected void handleEvent(HyggeEventListenerContext<ESRefreshEventInfo, ESRefreshEvent> context, ESRefreshEvent event) {
         ESRefreshEventInfo info = event.getActualSource();
 
         if (info.isForAll()) {
@@ -41,5 +42,10 @@ public class ESRefreshListener extends HyggeEventListener<ESRefreshEvent> {
                 refreshElasticSearchService.freshSingleArticle(info.getArticleId());
             }
         }
+    }
+
+    @Override
+    protected void handleThrowable(HyggeEventListenerContext<ESRefreshEventInfo, ESRefreshEvent> context, Throwable throwable) {
+        // 异常仅需输出日志，已经在 printLog 中有默认实现
     }
 }

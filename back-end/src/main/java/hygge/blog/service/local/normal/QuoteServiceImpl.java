@@ -83,7 +83,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         Quote result = quoteDao.save(quote);
 
-        eventService.refreshQuoteByQuoteId(result.getQuoteId());
+        eventService.refreshQuoteByQuoteId(false, result.getQuoteId());
 
         return result;
     }
@@ -118,7 +118,7 @@ public class QuoteServiceImpl extends HyggeJsonUtilContainer {
 
         Quote result = quoteDao.save(quoteInDB);
 
-        eventService.refreshQuoteByQuoteId(result.getQuoteId());
+        eventService.refreshQuoteByQuoteId(false, result.getQuoteId());
 
         return result;
     }

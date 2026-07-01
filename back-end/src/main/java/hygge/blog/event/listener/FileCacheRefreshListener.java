@@ -3,8 +3,9 @@ package hygge.blog.event.listener;
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.event.FileCacheRefreshEvent;
 import hygge.blog.event.FileCacheRefreshEventInfo;
-import hygge.blog.event.listener.base.HyggeEventListener;
 import hygge.commons.exception.InternalRuntimeException;
+import hygge.commons.spring.event.BaseHyggeEventListener;
+import hygge.commons.spring.event.HyggeEventListenerContext;
 import hygge.util.UtilCreator;
 import hygge.util.definition.ParameterHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ import static hygge.blog.domain.local.bo.CacheObjectContainer.CacheTypeEnum.FILE
  * @date 2026/5/29
  */
 @Slf4j
-public class FileCacheRefreshListener extends HyggeEventListener<FileCacheRefreshEvent> {
+public class FileCacheRefreshListener extends BaseHyggeEventListener<FileCacheRefreshEventInfo, FileCacheRefreshEvent> {
     private static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
     public static final CacheObjectContainer.CacheTypeEnum type = FILE_NO_URL_MAPPING;
     private final CacheManager cacheManager;
@@ -33,7 +34,7 @@ public class FileCacheRefreshListener extends HyggeEventListener<FileCacheRefres
     }
 
     @Override
-    protected void handleEvent(FileCacheRefreshEvent event) {
+    protected void handleEvent(HyggeEventListenerContext<FileCacheRefreshEventInfo, FileCacheRefreshEvent> context, FileCacheRefreshEvent event) {
         FileCacheRefreshEventInfo info = event.getActualSource();
         Cache cache = cacheManager.getCache(type.getValue());
         if (cache == null) {
@@ -51,5 +52,10 @@ public class FileCacheRefreshListener extends HyggeEventListener<FileCacheRefres
                 cache.evict("fileNoToFileUrl" + fileNo);
             }
         }
+    }
+
+    @Override
+    protected void handleThrowable(HyggeEventListenerContext<FileCacheRefreshEventInfo, FileCacheRefreshEvent> context, Throwable throwable) {
+        // 异常仅需输出日志，已经在 printLog 中有默认实现
     }
 }

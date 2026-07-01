@@ -5,47 +5,50 @@ import hygge.blog.event.ESRefreshEvent;
 import hygge.blog.event.ESRefreshEventInfo;
 import hygge.blog.event.FileCacheRefreshEvent;
 import hygge.blog.event.FileCacheRefreshEventInfo;
-import hygge.blog.event.base.HyggeEvent;
-import hygge.blog.event.listener.base.HyggeEventListener;
+import hygge.commons.spring.event.BaseHyggeEventListener;
+import hygge.commons.spring.event.BaseHyggeEventService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /**
- * event 具体处理逻辑见 {@link HyggeEventListener} 的具体实现类
+ * event 具体处理逻辑见 {@link BaseHyggeEventListener} 的具体实现类
  *
  * @author Xavier
  * @date 2025/9/1
  */
 @Service
-public class EventServiceImpl {
-    private final ApplicationEventPublisher applicationEventPublisher;
-
-    public EventServiceImpl(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
+public class EventServiceImpl extends BaseHyggeEventService {
+    protected EventServiceImpl(ApplicationEventPublisher applicationEventPublisher) {
+        super(applicationEventPublisher);
     }
 
-    public void refreshArticleByArticleId(Integer articleId) {
-        ESRefreshEvent event = new ESRefreshEvent(
-                new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.ARTICLE, false, articleId)
-        );
+    public void refreshArticleByArticleId(boolean isAsynchronous, Integer articleId) {
+        ESRefreshEventInfo source = new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.ARTICLE, false, articleId);
+
+        ESRefreshEvent event = buildEvent(source, ESRefreshEvent::new)
+                .asynchronous(isAsynchronous)
+                .build();
+
         fireEvent(event);
     }
 
-    public void refreshFileCacheLinkByFileNo(String fileNo) {
-        FileCacheRefreshEvent event = new FileCacheRefreshEvent(
-                new FileCacheRefreshEventInfo(fileNo)
-        );
+    public void refreshFileCacheLinkByFileNo(boolean isAsynchronous, String fileNo) {
+        FileCacheRefreshEventInfo source = new FileCacheRefreshEventInfo(fileNo);
+
+        FileCacheRefreshEvent event = buildEvent(source, FileCacheRefreshEvent::new)
+                .asynchronous(isAsynchronous)
+                .build();
+
         fireEvent(event);
     }
 
-    public void refreshQuoteByQuoteId(Integer quoteId) {
-        ESRefreshEvent event = new ESRefreshEvent(
-                new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.QUOTE, false, quoteId)
-        );
-        fireEvent(event);
-    }
+    public void refreshQuoteByQuoteId(boolean isAsynchronous, Integer quoteId) {
+        ESRefreshEventInfo source = new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.QUOTE, false, quoteId);
 
-    private void fireEvent(HyggeEvent<?> event) {
-        applicationEventPublisher.publishEvent(event);
+        ESRefreshEvent event = buildEvent(source, ESRefreshEvent::new)
+                .asynchronous(isAsynchronous)
+                .build();
+
+        fireEvent(event);
     }
 }
