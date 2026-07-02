@@ -75,13 +75,6 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         }
     }
 
-    public void freshSingleArticleAsync(Integer articleId) {
-        CompletableFuture.runAsync(() -> freshSingleArticle(articleId)).exceptionally(e -> {
-            log.error("刷新文章(" + articleId + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
-    }
-
     public void freshSingleArticle(Integer articleId) {
         Article article = articleService.findArticleByArticleId(articleId, false);
         Category currentCategory = categoryService.findCategoryByCategoryId(article.getCategoryId(), false);
@@ -93,13 +86,6 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     private void freshSingleArticle(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
         ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(article, currentCategory, categoryTreeInfo);
         searchingCacheDao.save(articleQuoteSearchCache);
-    }
-
-    public void freshSingleQuoteAsync(Integer quoteId) {
-        CompletableFuture.runAsync(() -> freshSingleQuote(quoteId)).exceptionally(e -> {
-            log.error("刷新句子(" + quoteId + ") 模糊搜索数据 失败.", e);
-            return null;
-        });
     }
 
     public void freshSingleQuote(Integer quoteId) {
