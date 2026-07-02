@@ -293,8 +293,6 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     public void updateFileInfo(String fileNo, Map<String, Object> data) {
         HyggeRequestContext context = HyggeRequestTracker.getContext();
         User currentUser = context.getCurrentLoginUser();
-        // 是否有文件查询权限
-        userService.checkUserRight(currentUser, UserTypeEnum.ROOT);
 
         Optional<FileInfoView> targetFileInfoTemp = fileInfoViewDao.findOne(Example.of(FileInfoView.builder()
                 .fileNo(fileNo)
@@ -376,8 +374,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 fileInfoInDB.getDescription().setNginxLink(null);
             }
         } else {
-            if (fileInfoViewInDB.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
-                // 未切换副本类型，属于 Nginx，可能存在路径变更
+            if (isPathChanged && fileInfoViewInDB.getFileCacheType().equals(FileCacheTypeEnum.NGINX)) {
+                // 未切换副本类型，但文件路径变更了
                 // 检测是否存在硬盘副本
                 String newCachePath = fileRootPath + fileInfoInDB.returnRelativePath();
                 String oldCachePath = fileRootPath + fileInfoViewInDB.returnRelativePath();
