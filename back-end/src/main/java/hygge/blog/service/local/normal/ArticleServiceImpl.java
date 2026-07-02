@@ -21,7 +21,7 @@ import hygge.blog.service.local.ArticleContentServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.CacheServiceWithBusinessLogicImpl;
 import hygge.blog.service.local.EventServiceImpl;
-import hygge.blog.service.local.inner.markdown.FlexmarkWordCounter;
+import hygge.blog.service.local.inner.markdown.MarkdownWordCounter;
 import hygge.commons.exception.LightRuntimeException;
 import hygge.util.UtilCreator;
 import hygge.util.bo.ColumnInfo;
@@ -125,7 +125,7 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         } else {
             String newContent = articleContentService.forSaveContent(article);
             article.setContent(newContent);
-            article.setWordCount(FlexmarkWordCounter.quickCount(article.getContent()));
+            article.setWordCount(MarkdownWordCounter.count(article.getContent()));
         }
     }
 
