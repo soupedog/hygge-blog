@@ -53,9 +53,4 @@ public class FileCacheRefreshListener extends BaseHyggeEventListener<FileCacheRe
             }
         }
     }
-
-    @Override
-    protected void handleThrowable(HyggeEventListenerContext<FileCacheRefreshEventInfo, FileCacheRefreshEvent> context, Throwable throwable) {
-        // 异常仅需输出日志，已经在 printLog 中有默认实现
-    }
 }

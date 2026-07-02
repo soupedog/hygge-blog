@@ -43,9 +43,4 @@ public class ESRefreshListener extends BaseHyggeEventListener<ESRefreshEventInfo
             }
         }
     }
-
-    @Override
-    protected void handleThrowable(HyggeEventListenerContext<ESRefreshEventInfo, ESRefreshEvent> context, Throwable throwable) {
-        // 异常仅需输出日志，已经在 printLog 中有默认实现
-    }
 }
