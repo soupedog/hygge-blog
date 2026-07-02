@@ -5,7 +5,6 @@ import hygge.blog.common.HyggeRequestContext;
 import hygge.blog.common.HyggeRequestTracker;
 import hygge.blog.domain.local.dto.CategoryDto;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
-import hygge.blog.domain.local.enums.AccessConditionTypeEnum;
 import hygge.blog.domain.local.enums.ArticleStateEnum;
 import hygge.blog.domain.local.enums.UserTypeEnum;
 import hygge.blog.domain.local.po.Article;
@@ -30,13 +29,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
@@ -65,11 +64,11 @@ import java.util.List;
 @Slf4j
 class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
     // 本地不需要 ES 支持
-    @MockBean
+    @MockitoBean
     private RefreshElasticSearchServiceImpl refreshElasticSearchService;
-    @MockBean
+    @MockitoBean
     private SearchingCacheDao searchingCacheDao;
-    @MockBean
+    @MockitoBean
     private ElasticsearchOperations elasticsearchOperations;
 
     private static final String path = "G:\\Xavier\\Documents\\md文档\\";
