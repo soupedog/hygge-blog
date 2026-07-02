@@ -3,7 +3,7 @@ package hygge.blog.event.listener;
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.event.FileCacheRefreshEvent;
 import hygge.blog.event.FileCacheRefreshEventInfo;
-import hygge.commons.exception.InternalRuntimeException;
+import hygge.commons.exception.UnreachableRuntimeException;
 import hygge.commons.spring.event.BaseHyggeEventListener;
 import hygge.commons.spring.event.HyggeEventListenerContext;
 import hygge.util.UtilCreator;
@@ -38,7 +38,7 @@ public class FileCacheRefreshListener extends BaseHyggeEventListener<FileCacheRe
         FileCacheRefreshEventInfo info = event.getActualSource();
         Cache cache = cacheManager.getCache(type.getValue());
         if (cache == null) {
-            throw new InternalRuntimeException("Reached unreachable code.");
+            throw new UnreachableRuntimeException();
         }
 
         if (info.isForAll()) {

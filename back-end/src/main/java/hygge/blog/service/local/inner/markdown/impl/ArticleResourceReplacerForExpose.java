@@ -4,7 +4,7 @@ import hygge.blog.domain.local.po.Article;
 import hygge.blog.service.local.CacheServiceWithBusinessLogicImpl;
 import hygge.blog.service.local.inner.markdown.ReplaceCheckResult;
 import hygge.blog.service.local.inner.markdown.impl.base.BaseResourceReplacer;
-import hygge.commons.exception.InternalRuntimeException;
+import hygge.commons.exception.UnreachableRuntimeException;
 
 import java.util.regex.Pattern;
 
@@ -28,7 +28,7 @@ public class ArticleResourceReplacerForExpose extends BaseResourceReplacer<Artic
 
     @Override
     public Article getExtendObject() {
-        throw new InternalRuntimeException("Reached unreachable code.");
+        throw new UnreachableRuntimeException();
     }
 
     @Override
@@ -54,6 +54,6 @@ public class ArticleResourceReplacerForExpose extends BaseResourceReplacer<Artic
 
     @Override
     public ReplaceCheckResult checkResource(String resource, Article extendObject) {
-        throw new InternalRuntimeException("Reached unreachable code.");
+        throw new UnreachableRuntimeException();
     }
 }

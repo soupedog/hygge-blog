@@ -5,7 +5,7 @@ import hygge.blog.service.local.inner.file.picker.ApiFileNoLinkPicker;
 import hygge.blog.service.local.inner.file.picker.NginxFileNoLinkPicker;
 import hygge.blog.service.local.inner.markdown.ReplaceCheckResult;
 import hygge.blog.service.local.inner.markdown.impl.base.BaseResourceReplacer;
-import hygge.commons.exception.InternalRuntimeException;
+import hygge.commons.exception.UnreachableRuntimeException;
 
 /**
  * @author Xavier
@@ -34,7 +34,7 @@ public class ArticleResourceReplacerForSave extends BaseResourceReplacer<Article
 
     @Override
     public ReplaceCheckResult checkResource(String resource) {
-        throw new InternalRuntimeException("Reached unreachable code.");
+        throw new UnreachableRuntimeException();
     }
 
     @Override
