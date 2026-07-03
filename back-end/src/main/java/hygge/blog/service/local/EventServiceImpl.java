@@ -32,6 +32,16 @@ public class EventServiceImpl extends BaseHyggeEventService {
         fireEvent(event);
     }
 
+    public void refreshArticleForAll(boolean isAsynchronous) {
+        ESRefreshEventInfo source = new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.ARTICLE, true, null);
+
+        ESRefreshEvent event = buildEvent(source, ESRefreshEvent::new)
+                .asynchronous(isAsynchronous)
+                .build();
+
+        fireEvent(event);
+    }
+
     public void refreshFileCacheLinkByFileNo(boolean isAsynchronous, String fileNo) {
         FileCacheRefreshEventInfo source = new FileCacheRefreshEventInfo(fileNo);
 
@@ -44,6 +54,16 @@ public class EventServiceImpl extends BaseHyggeEventService {
 
     public void refreshQuoteByQuoteId(boolean isAsynchronous, Integer quoteId) {
         ESRefreshEventInfo source = new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.QUOTE, false, quoteId);
+
+        ESRefreshEvent event = buildEvent(source, ESRefreshEvent::new)
+                .asynchronous(isAsynchronous)
+                .build();
+
+        fireEvent(event);
+    }
+
+    public void refreshQuoteForAll(boolean isAsynchronous) {
+        ESRefreshEventInfo source = new ESRefreshEventInfo(ArticleQuoteSearchCache.Type.QUOTE, true, null);
 
         ESRefreshEvent event = buildEvent(source, ESRefreshEvent::new)
                 .asynchronous(isAsynchronous)

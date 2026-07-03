@@ -9,8 +9,6 @@ import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.Quote;
-import hygge.blog.repository.database.ArticleDao;
-import hygge.blog.repository.database.CategoryDao;
 import hygge.blog.repository.database.QuoteDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
 import hygge.blog.service.local.CacheServiceImpl;
@@ -28,9 +26,8 @@ import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -39,10 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @Service
-public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
-    private final ArticleDao articleDao;
+public class ElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     private final ArticleServiceImpl articleService;
-    private final CategoryDao categoryDao;
     private final CategoryServiceImpl categoryService;
     private final QuoteDao quoteDao;
     private final QuoteServiceImpl quoteService;
@@ -50,10 +45,8 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
     private final SearchingCacheDao searchingCacheDao;
     private final ElasticsearchOperations operations;
 
-    public RefreshElasticSearchServiceImpl(ArticleDao articleDao, ArticleServiceImpl articleService, CategoryDao categoryDao, CategoryServiceImpl categoryService, QuoteDao quoteDao, QuoteServiceImpl quoteService, CacheServiceImpl cacheService, SearchingCacheDao searchingCacheDao, ElasticsearchOperations operations) {
-        this.articleDao = articleDao;
+    public ElasticSearchServiceImpl(ArticleServiceImpl articleService, CategoryServiceImpl categoryService, QuoteDao quoteDao, QuoteServiceImpl quoteService, CacheServiceImpl cacheService, SearchingCacheDao searchingCacheDao, ElasticsearchOperations operations) {
         this.articleService = articleService;
-        this.categoryDao = categoryDao;
         this.categoryService = categoryService;
         this.quoteDao = quoteDao;
         this.quoteService = quoteService;
@@ -98,46 +91,6 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         searchingCacheDao.save(articleQuoteSearchCache);
     }
 
-    public void freshAllArticle() {
-        long startTs = System.currentTimeMillis();
-        AtomicInteger totalCount = new AtomicInteger(0);
-        List<Category> allCategoryList = categoryDao.findAll();
-        Map<Integer, Category> allCategoryMap = collectionHelper.filterNonemptyItemAsHashMap(allCategoryList, (Category::getCategoryId), item -> item);
-
-        int pageSize = 25;
-
-        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Order.asc("articleId")));
-
-        Page<Article> articleTemp = articleDao.findAll(pageable);
-
-        List<Article> articleList = null;
-
-        List<ArticleQuoteSearchCache> forSaveBatch = new ArrayList<>(pageSize);
-
-        do {
-            if (articleList != null) {
-                articleTemp = articleDao.findAll(articleTemp.nextPageable());
-            }
-            articleList = articleTemp.getContent();
-
-            articleList.forEach(article -> {
-                Category currentCategory = allCategoryMap.get(article.getCategoryId());
-                // 数据无误时，文章必属于全部文章类别中的一种，不可能空指针异常
-                CategoryTreeInfo categoryTreeInfo = cacheService.getCategoryTreeFormCurrent(currentCategory.getCategoryId());
-
-                ArticleQuoteSearchCache articleQuoteSearchCache = buildEsDto(article, currentCategory, categoryTreeInfo);
-                forSaveBatch.add(articleQuoteSearchCache);
-            });
-
-            searchingCacheDao.saveAll(forSaveBatch);
-            totalCount.getAndAdd(forSaveBatch.size());
-            forSaveBatch.clear();
-
-        } while (!articleTemp.isLast());
-
-        log.info("已刷新文章数 {} 耗时 {} ms", totalCount.get(), System.currentTimeMillis() - startTs);
-    }
-
     public void freshAllQuote() {
         long startTs = System.currentTimeMillis();
         AtomicInteger totalCount = new AtomicInteger(0);
@@ -171,7 +124,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         log.info("已刷新句子数 {} 耗时 {} ms", totalCount.get(), System.currentTimeMillis() - startTs);
     }
 
-    private ArticleQuoteSearchCache buildEsDto(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
+    public ArticleQuoteSearchCache buildEsDto(Article article, Category currentCategory, CategoryTreeInfo categoryTreeInfo) {
         ArticleDto articleDto = PoDtoMapper.INSTANCE.poToDto(article);
 
         articleService.initUidAndCoverURL(article.getUserId(), articleDto);
@@ -186,7 +139,7 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         return articleQuoteSearchCache;
     }
 
-    private ArticleQuoteSearchCache buildEsDto(Quote quote) {
+    public ArticleQuoteSearchCache buildEsDto(Quote quote) {
         QuoteDto quoteDto = PoDtoMapper.INSTANCE.poToDto(quote);
 
         quoteService.initUidAndCoverURL(quote.getUserId(), quoteDto);
@@ -195,5 +148,13 @@ public class RefreshElasticSearchServiceImpl extends HyggeJsonUtilContainer {
         articleQuoteSearchCache.initEsId(quote.getQuoteId(), ArticleQuoteSearchCache.Type.QUOTE);
         articleQuoteSearchCache.setType(ArticleQuoteSearchCache.Type.QUOTE);
         return articleQuoteSearchCache;
+    }
+
+    public void save(Collection<ArticleQuoteSearchCache> collection) {
+        searchingCacheDao.saveAll(collection);
+    }
+
+    public void save(ArticleQuoteSearchCache articleQuoteSearchCache) {
+        searchingCacheDao.save(articleQuoteSearchCache);
     }
 }

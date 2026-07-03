@@ -4,8 +4,9 @@ import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.ManageControllerDoc;
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
-import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
+import hygge.blog.service.local.EventServiceImpl;
 import hygge.blog.service.local.FileCacheRefreshServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,13 +25,15 @@ import java.sql.Timestamp;
 @RequestMapping(value = "/blog-service/api/main")
 public class ManageController implements ManageControllerDoc {
     private final FileCacheRefreshServiceImpl fileCacheRefreshService;
-    private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private final ElasticSearchServiceImpl elasticSearchService;
     private final CacheServiceImpl cacheService;
+    private final EventServiceImpl eventService;
 
-    public ManageController(FileCacheRefreshServiceImpl fileCacheRefreshService, RefreshElasticSearchServiceImpl refreshElasticSearchService, CacheServiceImpl cacheService) {
+    public ManageController(FileCacheRefreshServiceImpl fileCacheRefreshService, ElasticSearchServiceImpl elasticSearchService, CacheServiceImpl cacheService, EventServiceImpl eventService) {
         this.fileCacheRefreshService = fileCacheRefreshService;
-        this.refreshElasticSearchService = refreshElasticSearchService;
+        this.elasticSearchService = elasticSearchService;
         this.cacheService = cacheService;
+        this.eventService = eventService;
     }
 
     @Override
@@ -48,8 +51,8 @@ public class ManageController implements ManageControllerDoc {
         fileCacheRefreshService.freshAllPublicFileCache(forceOverWrite, true);
         // 更新完图片资源需要刷新缓存
         cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
-        refreshElasticSearchService.freshAllArticle();
-        refreshElasticSearchService.freshAllQuote();
+        eventService.refreshArticleForAll(false);
+        elasticSearchService.freshAllQuote();
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));
     }
 
@@ -60,8 +63,8 @@ public class ManageController implements ManageControllerDoc {
         fileCacheRefreshService.freshAllPublicFileCache(true, false);
         // 更新完图片资源需要刷新缓存
         cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
-        refreshElasticSearchService.freshAllArticle();
-        refreshElasticSearchService.freshAllQuote();
+        eventService.refreshArticleForAll(false);
+        eventService.refreshQuoteForAll(false);
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));
     }
 }

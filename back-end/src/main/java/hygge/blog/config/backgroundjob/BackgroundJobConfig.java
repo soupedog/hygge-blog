@@ -1,6 +1,6 @@
 package hygge.blog.config.backgroundjob;
 
-import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -13,10 +13,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Profile("!dev")
 @Configuration
 public class BackgroundJobConfig {
-    private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private final ElasticSearchServiceImpl refreshElasticSearchService;
     private final ArticleBrowseLogServiceImpl articleBrowseLogService;
 
-    public BackgroundJobConfig(RefreshElasticSearchServiceImpl refreshElasticSearchService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
+    public BackgroundJobConfig(ElasticSearchServiceImpl refreshElasticSearchService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
         this.refreshElasticSearchService = refreshElasticSearchService;
         this.articleBrowseLogService = articleBrowseLogService;
     }

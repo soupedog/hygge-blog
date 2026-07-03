@@ -12,7 +12,7 @@ import hygge.blog.domain.local.po.Category;
 import hygge.blog.domain.local.po.User;
 import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.repository.elasticsearch.SearchingCacheDao;
-import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.MarkdownContentServiceImpl;
 import hygge.blog.service.local.inner.markdown.ImageResourceServerToLocalVisitor;
@@ -65,7 +65,7 @@ import java.util.List;
 class ArticleLocalFileSystemOperation extends HyggeJsonUtilContainer {
     // 本地不需要 ES 支持
     @MockitoBean
-    private RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private ElasticSearchServiceImpl elasticSearchService;
     @MockitoBean
     private SearchingCacheDao searchingCacheDao;
     @MockitoBean

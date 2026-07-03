@@ -3,7 +3,8 @@ package hygge.blog.event.listener;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.event.ESRefreshEvent;
 import hygge.blog.event.ESRefreshEventInfo;
-import hygge.blog.service.elasticsearch.RefreshElasticSearchServiceImpl;
+import hygge.blog.job.RefreshArticleJob;
+import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import hygge.commons.spring.event.BaseHyggeEventListener;
 import hygge.commons.spring.event.HyggeEventListenerContext;
 
@@ -12,10 +13,12 @@ import hygge.commons.spring.event.HyggeEventListenerContext;
  * @date 2025/9/1
  */
 public class ESRefreshListener extends BaseHyggeEventListener<ESRefreshEventInfo, ESRefreshEvent> {
-    private final RefreshElasticSearchServiceImpl refreshElasticSearchService;
+    private final ElasticSearchServiceImpl elasticSearchService;
+    private final RefreshArticleJob refreshArticleJob;
 
-    public ESRefreshListener(RefreshElasticSearchServiceImpl refreshElasticSearchService) {
-        this.refreshElasticSearchService = refreshElasticSearchService;
+    public ESRefreshListener(ElasticSearchServiceImpl elasticSearchService, RefreshArticleJob refreshArticleJob) {
+        this.elasticSearchService = elasticSearchService;
+        this.refreshArticleJob = refreshArticleJob;
     }
 
     @Override
@@ -30,16 +33,16 @@ public class ESRefreshListener extends BaseHyggeEventListener<ESRefreshEventInfo
         if (info.isForAll()) {
             // 全量刷新
             if (ArticleQuoteSearchCache.Type.QUOTE.equals(info.getType())) {
-                refreshElasticSearchService.freshAllQuote();
+                elasticSearchService.freshAllQuote();
             } else if (ArticleQuoteSearchCache.Type.ARTICLE.equals(info.getType())) {
-                refreshElasticSearchService.freshAllArticle();
+                refreshArticleJob.execute();
             }
         } else {
             // 单个刷新
             if (ArticleQuoteSearchCache.Type.QUOTE.equals(info.getType())) {
-                refreshElasticSearchService.freshSingleQuote(info.getQuoteId());
+                elasticSearchService.freshSingleQuote(info.getQuoteId());
             } else if (ArticleQuoteSearchCache.Type.ARTICLE.equals(info.getType())) {
-                refreshElasticSearchService.freshSingleArticle(info.getArticleId());
+                elasticSearchService.freshSingleArticle(info.getArticleId());
             }
         }
     }
