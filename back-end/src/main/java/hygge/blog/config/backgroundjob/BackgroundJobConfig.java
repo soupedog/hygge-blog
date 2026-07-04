@@ -1,6 +1,7 @@
 package hygge.blog.config.backgroundjob;
 
 import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
+import hygge.blog.service.local.EventServiceImpl;
 import hygge.blog.service.local.normal.ArticleBrowseLogServiceImpl;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -13,22 +14,24 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Profile("!dev")
 @Configuration
 public class BackgroundJobConfig {
-    private final ElasticSearchServiceImpl refreshElasticSearchService;
+    private final ElasticSearchServiceImpl searchService;
+    private final EventServiceImpl eventService;
     private final ArticleBrowseLogServiceImpl articleBrowseLogService;
 
-    public BackgroundJobConfig(ElasticSearchServiceImpl refreshElasticSearchService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
-        this.refreshElasticSearchService = refreshElasticSearchService;
+    public BackgroundJobConfig(ElasticSearchServiceImpl searchService, EventServiceImpl eventService, ArticleBrowseLogServiceImpl articleBrowseLogService) {
+        this.searchService = searchService;
+        this.eventService = eventService;
         this.articleBrowseLogService = articleBrowseLogService;
     }
 
     @Scheduled(fixedDelay = 1000 * 3600)
     public void toFreshArticleSearchData() {
-        refreshElasticSearchService.freshAllArticle();
+        eventService.refreshArticleForAll(false);
     }
 
     @Scheduled(fixedDelay = 1000 * 3600)
     public void toFreshQuoteSearchData() {
-        refreshElasticSearchService.freshAllQuote();
+        searchService.freshAllQuote();
     }
 
     // 每 5 分钟一次，初始静默 5 分钟

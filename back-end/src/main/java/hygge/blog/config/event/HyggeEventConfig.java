@@ -2,7 +2,7 @@ package hygge.blog.config.event;
 
 import hygge.blog.event.listener.ESRefreshListener;
 import hygge.blog.event.listener.FileCacheRefreshListener;
-import hygge.blog.job.RefreshArticleJob;
+import hygge.blog.job.RefreshArticleCacheJob;
 import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HyggeEventConfig {
     @Bean
-    public ESRefreshListener esRefreshListener(ElasticSearchServiceImpl elasticSearchService, RefreshArticleJob refreshArticleJob) {
-        return new ESRefreshListener(elasticSearchService, refreshArticleJob);
+    public ESRefreshListener esRefreshListener(ElasticSearchServiceImpl elasticSearchService, RefreshArticleCacheJob refreshArticleCacheJob) {
+        return new ESRefreshListener(elasticSearchService, refreshArticleCacheJob);
     }
 
     @Bean

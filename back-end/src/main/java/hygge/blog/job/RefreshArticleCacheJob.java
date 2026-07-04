@@ -11,7 +11,7 @@ import hygge.blog.repository.database.ArticleDao;
 import hygge.blog.repository.database.CategoryDao;
 import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import hygge.blog.service.local.CacheServiceImpl;
-import hygge.job.DefaultHyggeJobBatchItem;
+import hygge.job.HyggeJobBatchItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,20 +23,18 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
 /**
  * @author Xavier
  * @date 2026/7/2
  */
 @Service
-public class RefreshArticleJob extends BaseBlogJob<RefreshArticleJobItem, Article, ArticleQuoteSearchCache> {
+public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, Article, ArticleQuoteSearchCache> {
     private final ArticleDao articleDao;
     private final CategoryDao categoryDao;
     private final ElasticSearchServiceImpl refreshElasticSearchService;
     private final CacheServiceImpl cacheService;
 
-    public RefreshArticleJob(ArticleDao articleDao, CategoryDao categoryDao, ElasticSearchServiceImpl refreshElasticSearchService, CacheServiceImpl cacheService) {
-        super(35, true);
+    public RefreshArticleCacheJob(ArticleDao articleDao, CategoryDao categoryDao, ElasticSearchServiceImpl refreshElasticSearchService, CacheServiceImpl cacheService) {
         this.articleDao = articleDao;
         this.categoryDao = categoryDao;
         this.refreshElasticSearchService = refreshElasticSearchService;
@@ -49,9 +47,7 @@ public class RefreshArticleJob extends BaseBlogJob<RefreshArticleJobItem, Articl
     }
 
     @Override
-    protected List<Article> firstFetch(HyggeBlogJpaContext<Article> context, DefaultHyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem) {
-        context.setTitle("刷新所有博文 ES 缓存");
-
+    protected List<Article> firstFetch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem) {
         Pageable pageable = PageRequest.of(0, context.getBatchSize(), Sort.by(Sort.Order.asc("articleId")));
         Page<Article> page = articleDao.findAll(pageable);
         context.setPage(page);
@@ -80,7 +76,7 @@ public class RefreshArticleJob extends BaseBlogJob<RefreshArticleJobItem, Articl
     }
 
     @Override
-    protected List<Article> getNextBatch(HyggeBlogJpaContext<Article> context, DefaultHyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem) {
+    protected List<Article> getNextBatch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem) {
         if (context.isNoNextPage()) {
             return List.of();
         }
@@ -97,7 +93,7 @@ public class RefreshArticleJob extends BaseBlogJob<RefreshArticleJobItem, Articl
     }
 
     @Override
-    protected RefreshArticleJobItem createJobItem(HyggeBlogJpaContext<Article> context, DefaultHyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, Article rawData) {
+    protected RefreshArticleJobItem createJobItem(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, Article rawData) {
         RefreshArticleJobItem result = new RefreshArticleJobItem();
         result.setRawData(rawData);
         return result;
@@ -116,7 +112,7 @@ public class RefreshArticleJob extends BaseBlogJob<RefreshArticleJobItem, Articl
     }
 
     @Override
-    protected void batchCompleteHook(HyggeBlogJpaContext<Article> context, DefaultHyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, List<Article> rawDataCollection, List<ArticleQuoteSearchCache> processedDataCollection) {
+    protected void batchCompleteHook(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, List<Article> rawDataCollection, List<ArticleQuoteSearchCache> processedDataCollection) {
         refreshElasticSearchService.save(processedDataCollection);
         super.batchCompleteHook(context, jobBatchItem, rawDataCollection, processedDataCollection);
     }

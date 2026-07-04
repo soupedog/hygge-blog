@@ -3,7 +3,7 @@ package hygge.blog.event.listener;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.event.ESRefreshEvent;
 import hygge.blog.event.ESRefreshEventInfo;
-import hygge.blog.job.RefreshArticleJob;
+import hygge.blog.job.RefreshArticleCacheJob;
 import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
 import hygge.commons.spring.event.BaseHyggeEventListener;
 import hygge.commons.spring.event.HyggeEventListenerContext;
@@ -14,11 +14,11 @@ import hygge.commons.spring.event.HyggeEventListenerContext;
  */
 public class ESRefreshListener extends BaseHyggeEventListener<ESRefreshEventInfo, ESRefreshEvent> {
     private final ElasticSearchServiceImpl elasticSearchService;
-    private final RefreshArticleJob refreshArticleJob;
+    private final RefreshArticleCacheJob refreshArticleCacheJob;
 
-    public ESRefreshListener(ElasticSearchServiceImpl elasticSearchService, RefreshArticleJob refreshArticleJob) {
+    public ESRefreshListener(ElasticSearchServiceImpl elasticSearchService, RefreshArticleCacheJob refreshArticleCacheJob) {
         this.elasticSearchService = elasticSearchService;
-        this.refreshArticleJob = refreshArticleJob;
+        this.refreshArticleCacheJob = refreshArticleCacheJob;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ESRefreshListener extends BaseHyggeEventListener<ESRefreshEventInfo
             if (ArticleQuoteSearchCache.Type.QUOTE.equals(info.getType())) {
                 elasticSearchService.freshAllQuote();
             } else if (ArticleQuoteSearchCache.Type.ARTICLE.equals(info.getType())) {
-                refreshArticleJob.execute();
+                refreshArticleCacheJob.execute("刷新全部博文 ES 缓存", 50, true);
             }
         } else {
             // 单个刷新
