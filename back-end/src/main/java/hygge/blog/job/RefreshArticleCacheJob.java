@@ -94,9 +94,7 @@ public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, A
 
     @Override
     protected RefreshArticleJobItem createJobItem(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, Article rawData) {
-        RefreshArticleJobItem result = new RefreshArticleJobItem();
-        result.setRawData(rawData);
-        return result;
+        return new RefreshArticleJobItem(rawData);
     }
 
     @Override

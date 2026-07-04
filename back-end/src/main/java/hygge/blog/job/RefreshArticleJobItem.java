@@ -9,6 +9,10 @@ import hygge.job.BaseHyggeJobItem;
  * @date 2026/7/2
  */
 public class RefreshArticleJobItem extends BaseHyggeJobItem<Article, ArticleQuoteSearchCache, String> {
+    protected RefreshArticleJobItem(Article rawData) {
+        super(rawData);
+    }
+
     @Override
     public String getUniqueIdentifier() {
         return getRawData().getAid();
