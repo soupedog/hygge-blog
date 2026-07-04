@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author Xavier
  * @date 2024/9/12
@@ -35,4 +37,9 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     @Transactional
     @Query(value = "update file_info set fileCacheType = 'DEFAULT', description = JSON_REMOVE(COALESCE(description, '{}'), '$.nginxLink') where fileNo = :fileNo", nativeQuery = true)
     int removeFileCacheLink(@Param("fileNo") String fileNo);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update file_info set fileCacheType = 'DEFAULT', description = JSON_REMOVE(COALESCE(description, '{}'), '$.nginxLink') where fileNo in :fileNoList", nativeQuery = true)
+    int removeFileCacheLinkMultiple(@Param("fileNoList") List<String> fileNoList);
 }

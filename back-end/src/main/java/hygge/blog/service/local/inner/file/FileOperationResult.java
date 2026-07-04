@@ -27,6 +27,10 @@ public class FileOperationResult {
         return ResultType.SUCCESS.equals(resultType);
     }
 
+    public boolean isFailure() {
+        return !isSuccess();
+    }
+
     public enum ResultType {
         SUCCESS,
         ALREADY_EXISTS,

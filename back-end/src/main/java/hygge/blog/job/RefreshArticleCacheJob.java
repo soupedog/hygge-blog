@@ -4,6 +4,7 @@ import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.domain.local.dto.inner.CategoryTreeInfo;
 import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.Category;
+import hygge.blog.job.item.RefreshArticleJobItem;
 import hygge.blog.job.key.RefreshArticleJobKey;
 import hygge.blog.job.other.BaseBlogJob;
 import hygge.blog.job.other.HyggeBlogJpaContext;

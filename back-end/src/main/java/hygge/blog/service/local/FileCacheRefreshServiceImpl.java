@@ -1,6 +1,9 @@
 package hygge.blog.service.local;
 
 import hygge.blog.domain.local.po.view.FileInfoView;
+import hygge.blog.job.RefreshFileCacheJob;
+import hygge.blog.job.key.RefreshFileJobKey;
+import hygge.blog.job.other.HyggeBlogJpaContext;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
 import hygge.blog.service.local.normal.PermissionServiceImpl;
@@ -28,12 +31,20 @@ public class FileCacheRefreshServiceImpl {
     private final FileInfoViewDao fileInfoViewDao;
     private final FileInfoDao fileInfoDao;
     private final EventServiceImpl eventService;
+    private final RefreshFileCacheJob refreshFileCacheJob;
 
-    public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, EventServiceImpl eventService) {
+    public FileCacheRefreshServiceImpl(FileServiceImpl fileService, FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, EventServiceImpl eventService, RefreshFileCacheJob refreshFileCacheJob) {
         this.fileService = fileService;
         this.fileInfoViewDao = fileInfoViewDao;
         this.fileInfoDao = fileInfoDao;
         this.eventService = eventService;
+        this.refreshFileCacheJob = refreshFileCacheJob;
+    }
+
+    public void freshAllPublicFileCache2(boolean isAdd) {
+        HyggeBlogJpaContext<FileInfoView> context = new HyggeBlogJpaContext<>("刷新全部公开文件 Nginx 缓存", 25, false);
+        context.saveFileObject(RefreshFileJobKey.IS_UPDATE_MODE, isAdd);
+        refreshFileCacheJob.execute(context);
     }
 
     public void freshAllPublicFileCache(boolean forceOverWrite, boolean isAdd) {

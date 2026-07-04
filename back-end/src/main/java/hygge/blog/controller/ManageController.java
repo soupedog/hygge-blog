@@ -48,11 +48,12 @@ public class ManageController implements ManageControllerDoc {
     @RequireAuth
     @PostMapping(value = "/refresh/fileCache")
     public ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(@RequestParam(required = false, defaultValue = "false") Boolean forceOverWrite) {
-        fileCacheRefreshService.freshAllPublicFileCache(forceOverWrite, true);
-        // 更新完图片资源需要刷新缓存
-        cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
-        eventService.refreshArticleForAll(false);
-        elasticSearchService.freshAllQuote();
+        fileCacheRefreshService.freshAllPublicFileCache2(forceOverWrite);
+//        fileCacheRefreshService.freshAllPublicFileCache(forceOverWrite, true);
+//        // 更新完图片资源需要刷新缓存
+//        cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
+//        eventService.refreshArticleForAll(false);
+//        elasticSearchService.freshAllQuote();
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));
     }
 

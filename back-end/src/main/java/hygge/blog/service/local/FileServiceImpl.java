@@ -33,6 +33,7 @@ import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +42,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +65,7 @@ import java.util.Optional;
  */
 @Service
 public class FileServiceImpl extends HyggeJsonUtilContainer {
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
 
@@ -88,7 +94,8 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "fileCacheType", null).toStringColumn(1, 30));
     }
 
-    public FileServiceImpl(UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder, CacheFileKeyKeeper fileKeyKeeper, EventServiceImpl eventService) {
+    public FileServiceImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, FileInfoDao fileInfoDao, FileInfoViewDao fileInfoViewDao, FileUrlBuilder fileUrlBuilder, CacheFileKeyKeeper fileKeyKeeper, EventServiceImpl eventService) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
@@ -477,6 +484,32 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
                 && accessCountMin > 0) {
             fileInfoDto.setApiLink(fileInfoDto.getApiLink() + "?fileKey=" + generateFileKey(fileInfoDto.getFileNo(), accessCountMin));
         }
+    }
+
+    @Transactional
+    public <T extends FileInfoBase> int updateFileCacheLink(List<T> targetList) {
+        if (targetList == null || targetList.isEmpty()) {
+            return 0;
+        }
+
+        int totalAffected;
+        String sql = "UPDATE file_info SET " +
+                "fileCacheType = :cacheType, " +
+                "description = JSON_SET(COALESCE(description, '{}'), '$.nginxLink', :cacheLink) " +
+                "WHERE fileNo = :fileNo";
+
+        SqlParameterSource[] batch = targetList.stream()
+                .map(fileInfoBase -> new MapSqlParameterSource()
+                        .addValue("fileNo", fileInfoBase.getFileNo())
+                        .addValue("cacheType", fileInfoBase.getFileCacheType().getValue())
+                        .addValue("cacheLink", fileUrlBuilder.getFileNginxLinkByRelativePath(fileInfoBase.returnRelativePath())))
+                .toArray(SqlParameterSource[]::new);
+
+        int[] updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, batch);
+
+        totalAffected = Arrays.stream(updateCounts).sum();
+
+        return totalAffected;
     }
 
     public boolean createFileCopyFromDBToHardDisk(boolean forceOverWrite, String fileNo) {

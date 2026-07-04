@@ -1,4 +1,4 @@
-package hygge.blog.job;
+package hygge.blog.job.item;
 
 import hygge.blog.domain.local.po.Article;
 import hygge.job.BaseHyggeJobItem;
@@ -8,7 +8,7 @@ import hygge.job.BaseHyggeJobItem;
  * @date 2026/7/2
  */
 public class RefreshArticleJobItem<PD> extends BaseHyggeJobItem<Article, PD, String> {
-    protected RefreshArticleJobItem(Article rawData) {
+    public RefreshArticleJobItem(Article rawData) {
         super(rawData);
     }
 

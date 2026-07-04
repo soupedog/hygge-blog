@@ -12,7 +12,7 @@ public abstract class BaseBlogJob<JI extends BaseHyggeJobItem<RD, PD, ?>, RD, PD
         extends BaseHyggeJob<HyggeBlogJpaContext<RD>, HyggeJobBatchItem<JI>, JI, RD, PD> {
 
     @Override
-    protected HyggeBlogJpaContext<RD> createContext() {
+    public HyggeBlogJpaContext<RD> createContext() {
         return new HyggeBlogJpaContext<>();
     }
 
