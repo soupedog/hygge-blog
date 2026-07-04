@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * @date 2026/7/2
  */
 @Service
-public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, Article, ArticleQuoteSearchCache> {
+public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem<ArticleQuoteSearchCache>, Article, ArticleQuoteSearchCache> {
     private final ArticleDao articleDao;
     private final CategoryDao categoryDao;
     private final ElasticSearchServiceImpl refreshElasticSearchService;
@@ -47,7 +47,7 @@ public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, A
     }
 
     @Override
-    protected List<Article> firstFetch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem) {
+    protected List<Article> firstFetch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem<ArticleQuoteSearchCache>> jobBatchItem) {
         Pageable pageable = PageRequest.of(0, context.getBatchSize(), Sort.by(Sort.Order.asc("articleId")));
         Page<Article> page = articleDao.findAll(pageable);
         context.setPage(page);
@@ -76,7 +76,7 @@ public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, A
     }
 
     @Override
-    protected List<Article> getNextBatch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem) {
+    protected List<Article> getNextBatch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem<ArticleQuoteSearchCache>> jobBatchItem) {
         if (context.isNoNextPage()) {
             return List.of();
         }
@@ -93,12 +93,12 @@ public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, A
     }
 
     @Override
-    protected RefreshArticleJobItem createJobItem(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, Article rawData) {
-        return new RefreshArticleJobItem(rawData);
+    protected RefreshArticleJobItem<ArticleQuoteSearchCache> createJobItem(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem<ArticleQuoteSearchCache>> jobBatchItem, Article rawData) {
+        return new RefreshArticleJobItem<>(rawData);
     }
 
     @Override
-    protected ArticleQuoteSearchCache handleSingleItem(HyggeBlogJpaContext<Article> context, RefreshArticleJobItem jobItem) {
+    protected ArticleQuoteSearchCache handleSingleItem(HyggeBlogJpaContext<Article> context, RefreshArticleJobItem<ArticleQuoteSearchCache> jobItem) {
         Article article = jobItem.getRawData();
 
         Map<Integer, Category> allCategoryMap = context.getObject(RefreshArticleJobKey.ALL_CATEGORY_MAP);
@@ -110,7 +110,7 @@ public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem, A
     }
 
     @Override
-    protected void batchCompleteHook(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem> jobBatchItem, List<Article> rawDataCollection, List<ArticleQuoteSearchCache> processedDataCollection) {
+    protected void batchCompleteHook(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem<ArticleQuoteSearchCache>> jobBatchItem, List<Article> rawDataCollection, List<ArticleQuoteSearchCache> processedDataCollection) {
         refreshElasticSearchService.save(processedDataCollection);
         super.batchCompleteHook(context, jobBatchItem, rawDataCollection, processedDataCollection);
     }
