@@ -156,9 +156,9 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
 
             // 更新所有博文、句子搜藏 ES 缓存
             eventService.refreshArticleForAll(false);
-            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "更新了全部 博文 ES 缓存。");
+            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "执行了全部 博文 ES 缓存更新。");
             eventService.refreshQuoteForAll(false);
-            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "更新了全部 句子收藏 ES 缓存。");
+            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "执行了全部 句子收藏 ES 缓存更新。");
         }
     }
 }
