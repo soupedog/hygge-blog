@@ -1,7 +1,7 @@
 package hygge.blog.config.event;
 
 import hygge.blog.event.listener.ESRefreshListener;
-import hygge.blog.event.listener.FileCacheRefreshListener;
+import hygge.blog.event.listener.FileLinkCacheRemoveListener;
 import hygge.blog.job.RefreshArticleCacheJob;
 import hygge.blog.job.RefreshQuoteCacheJob;
 import hygge.blog.service.elasticsearch.ElasticSearchServiceImpl;
@@ -23,7 +23,7 @@ public class HyggeEventConfig {
     }
 
     @Bean
-    public FileCacheRefreshListener fileCacheRefreshListener(CacheManager cacheManager) {
-        return new FileCacheRefreshListener(cacheManager);
+    public FileLinkCacheRemoveListener fileCacheRefreshListener(CacheManager cacheManager) {
+        return new FileLinkCacheRemoveListener(cacheManager);
     }
 }

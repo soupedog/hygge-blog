@@ -2,7 +2,7 @@ package hygge.blog.event.listener;
 
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.event.FileCacheRefreshEvent;
-import hygge.blog.event.FileCacheRefreshEventInfo;
+import hygge.blog.event.FileCacheEventInfo;
 import hygge.commons.exception.UnreachableRuntimeException;
 import hygge.commons.spring.event.BaseHyggeEventListener;
 import hygge.commons.spring.event.HyggeEventListenerContext;
@@ -19,12 +19,12 @@ import static hygge.blog.domain.local.bo.CacheObjectContainer.CacheTypeEnum.FILE
  * @date 2026/5/29
  */
 @Slf4j
-public class FileCacheRefreshListener extends BaseHyggeEventListener<FileCacheRefreshEventInfo, FileCacheRefreshEvent> {
+public class FileLinkCacheRemoveListener extends BaseHyggeEventListener<FileCacheEventInfo, FileCacheRefreshEvent> {
     private static final ParameterHelper parameterHelper = UtilCreator.INSTANCE.getDefaultInstance(ParameterHelper.class);
     public static final CacheObjectContainer.CacheTypeEnum type = FILE_NO_URL_MAPPING;
     private final CacheManager cacheManager;
 
-    public FileCacheRefreshListener(CacheManager cacheManager) {
+    public FileLinkCacheRemoveListener(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
@@ -34,8 +34,8 @@ public class FileCacheRefreshListener extends BaseHyggeEventListener<FileCacheRe
     }
 
     @Override
-    protected void handleEvent(HyggeEventListenerContext<FileCacheRefreshEventInfo, FileCacheRefreshEvent> context, FileCacheRefreshEvent event) {
-        FileCacheRefreshEventInfo info = event.getActualSource();
+    protected void handleEvent(HyggeEventListenerContext<FileCacheEventInfo, FileCacheRefreshEvent> context, FileCacheRefreshEvent event) {
+        FileCacheEventInfo info = event.getActualSource();
         Cache cache = cacheManager.getCache(type.getValue());
         if (cache == null) {
             throw new UnreachableRuntimeException();

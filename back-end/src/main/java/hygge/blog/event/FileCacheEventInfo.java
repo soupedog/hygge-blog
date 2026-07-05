@@ -11,18 +11,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FileCacheRefreshEventInfo extends BaseRefreshEventInfo {
+public class FileCacheEventInfo extends BaseRefreshEventInfo {
     private String fileNo;
     /**
      * 可空
      */
     private FileInfoBase fileInfoBase;
 
-    public FileCacheRefreshEventInfo(String fileNo) {
+    public FileCacheEventInfo(String fileNo) {
         this.fileNo = fileNo;
     }
 
-    public FileCacheRefreshEventInfo() {
+    public FileCacheEventInfo() {
         this.isForAll = true;
     }
 }

@@ -1,6 +1,5 @@
 package hygge.blog.job;
 
-import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
@@ -10,7 +9,6 @@ import hygge.blog.job.other.BaseBlogExclusiveJob;
 import hygge.blog.job.other.HyggeBlogJpaContext;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
-import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.EventServiceImpl;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.inner.file.FileOperationResult;
@@ -38,14 +36,12 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     private final FileInfoDao fileInfoDao;
     private final FileServiceImpl fileService;
     private final EventServiceImpl eventService;
-    private final CacheServiceImpl cacheService;
 
-    public RefreshFileCacheJob(FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, FileServiceImpl fileService, EventServiceImpl eventService, CacheServiceImpl cacheService) {
+    public RefreshFileCacheJob(FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, FileServiceImpl fileService, EventServiceImpl eventService) {
         this.fileInfoViewDao = fileInfoViewDao;
         this.fileInfoDao = fileInfoDao;
         this.fileService = fileService;
         this.eventService = eventService;
-        this.cacheService = cacheService;
     }
 
     @Override
@@ -151,7 +147,7 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     protected void finallyHook(HyggeBlogJpaContext<FileInfoView> context) {
         if (context.isSuccess()) {
             // 图片缓存变更后，图片链接缓存也得更新（以清空代替更新）
-            cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
+            eventService.removeFileLinkCacheByFileNoForAll(false);
             context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "清空了全部 FILE_NO_URL_MAPPING 缓存。");
 
             // 更新所有博文、句子搜藏 ES 缓存

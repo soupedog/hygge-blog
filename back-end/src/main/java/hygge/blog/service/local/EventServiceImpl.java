@@ -3,8 +3,8 @@ package hygge.blog.service.local;
 import hygge.blog.domain.local.dto.ArticleQuoteSearchCache;
 import hygge.blog.event.ESRefreshEvent;
 import hygge.blog.event.ESRefreshEventInfo;
+import hygge.blog.event.FileCacheEventInfo;
 import hygge.blog.event.FileCacheRefreshEvent;
-import hygge.blog.event.FileCacheRefreshEventInfo;
 import hygge.commons.spring.event.BaseHyggeEventListener;
 import hygge.commons.spring.event.BaseHyggeEventService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,8 +42,18 @@ public class EventServiceImpl extends BaseHyggeEventService {
         fireEvent(event);
     }
 
-    public void refreshFileCacheLinkByFileNo(boolean isAsynchronous, String fileNo) {
-        FileCacheRefreshEventInfo source = new FileCacheRefreshEventInfo(fileNo);
+    public void removeFileLinkCacheByFileNo(boolean isAsynchronous, String fileNo) {
+        FileCacheEventInfo source = new FileCacheEventInfo(fileNo);
+
+        FileCacheRefreshEvent event = buildEvent(source, FileCacheRefreshEvent::new)
+                .asynchronous(isAsynchronous)
+                .build();
+
+        fireEvent(event);
+    }
+
+    public void removeFileLinkCacheByFileNoForAll(boolean isAsynchronous) {
+        FileCacheEventInfo source = new FileCacheEventInfo();
 
         FileCacheRefreshEvent event = buildEvent(source, FileCacheRefreshEvent::new)
                 .asynchronous(isAsynchronous)
