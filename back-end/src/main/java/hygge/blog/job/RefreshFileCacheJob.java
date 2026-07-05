@@ -3,7 +3,7 @@ package hygge.blog.job;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
-import hygge.blog.job.item.RefreshFileJobItem;
+import hygge.blog.job.item.FileJobItem;
 import hygge.blog.job.key.RefreshFileJobKey;
 import hygge.blog.job.other.BaseBlogExclusiveJob;
 import hygge.blog.job.other.HyggeBlogJpaContext;
@@ -31,7 +31,7 @@ import java.util.Optional;
  * @date 2026/7/4
  */
 @Service
-public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem<FileInfo>, FileInfoView, FileInfo> {
+public class RefreshFileCacheJob extends BaseBlogExclusiveJob<FileJobItem<FileInfo>, FileInfoView, FileInfo> {
     private final FileInfoViewDao fileInfoViewDao;
     private final FileInfoDao fileInfoDao;
     private final FileServiceImpl fileService;
@@ -50,7 +50,7 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     }
 
     @Override
-    protected List<FileInfoView> firstFetchIfNecessary(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<RefreshFileJobItem<FileInfo>> jobBatchItem) {
+    protected List<FileInfoView> firstFetchIfNecessary(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<FileJobItem<FileInfo>> jobBatchItem) {
         Pageable pageable = PageRequest.of(0, context.getBatchSize(), Sort.by(Sort.Order.asc("fileId")));
 
         Page<FileInfoView> page = fileInfoViewDao.findAll(pageable);
@@ -64,7 +64,7 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     }
 
     @Override
-    protected List<FileInfoView> getNextBatch(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<RefreshFileJobItem<FileInfo>> jobBatchItem) {
+    protected List<FileInfoView> getNextBatch(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<FileJobItem<FileInfo>> jobBatchItem) {
         if (context.isNoNextPage()) {
             return List.of();
         }
@@ -81,12 +81,12 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     }
 
     @Override
-    protected RefreshFileJobItem<FileInfo> createJobItem(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<RefreshFileJobItem<FileInfo>> jobBatchItem, FileInfoView rawData) {
-        return new RefreshFileJobItem<>(rawData);
+    protected FileJobItem<FileInfo> createJobItem(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<FileJobItem<FileInfo>> jobBatchItem, FileInfoView rawData) {
+        return new FileJobItem<>(rawData);
     }
 
     @Override
-    protected FileInfo handleSingleItem(HyggeBlogJpaContext<FileInfoView> context, RefreshFileJobItem<FileInfo> jobItem) {
+    protected FileInfo handleSingleItem(HyggeBlogJpaContext<FileInfoView> context, FileJobItem<FileInfo> jobItem) {
         FileInfoView fileInfoView = jobItem.getRawData();
         FileInfo result = null;
 
@@ -112,7 +112,7 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     }
 
     @Override
-    protected void batchCompleteHook(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<RefreshFileJobItem<FileInfo>> jobBatchItem, List<FileInfoView> rawDataList, List<FileInfo> processedDataList) {
+    protected void batchCompleteHook(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<FileJobItem<FileInfo>> jobBatchItem, List<FileInfoView> rawDataList, List<FileInfo> processedDataList) {
         List<FileInfoView> publicFileViewList = rawDataList.stream().
                 filter(it -> PermissionServiceImpl._PUBLIC.getPermissionId().equals(it.getPermissionId()))
                 .toList();

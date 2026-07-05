@@ -7,8 +7,8 @@ import hygge.job.BaseHyggeJobItem;
  * @author Xavier
  * @date 2026/7/5
  */
-public class RefreshQueueJobItem<PD> extends BaseHyggeJobItem<Quote, PD, Integer> {
-    public RefreshQueueJobItem(Quote rawData) {
+public class QueueJobItem<PD> extends BaseHyggeJobItem<Quote, PD, Integer> {
+    public QueueJobItem(Quote rawData) {
         super(rawData);
     }
 
