@@ -32,10 +32,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +56,7 @@ import java.util.concurrent.CompletableFuture;
 public class ArticleServiceImpl extends HyggeJsonUtilContainer {
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
     private final ArticleDao articleDao;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final UserServiceImpl userService;
     private final PermissionServiceImpl permissionService;
     private final CategoryServiceImpl categoryService;
@@ -74,8 +79,9 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         forUpdate.add(new ColumnInfo(true, false, "articleState", null).toStringColumn(0, 50));
     }
 
-    public ArticleServiceImpl(ArticleDao articleDao, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic, EventServiceImpl eventService, ArticleContentServiceImpl articleContentService) {
+    public ArticleServiceImpl(ArticleDao articleDao, NamedParameterJdbcTemplate namedParameterJdbcTemplate, UserServiceImpl userService, PermissionServiceImpl permissionService, CategoryServiceImpl categoryService, CacheServiceImpl cacheService, CacheServiceWithBusinessLogicImpl cacheServiceWithBusinessLogic, EventServiceImpl eventService, ArticleContentServiceImpl articleContentService) {
         this.articleDao = articleDao;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
         this.userService = userService;
         this.permissionService = permissionService;
         this.categoryService = categoryService;
@@ -287,6 +293,29 @@ public class ArticleServiceImpl extends HyggeJsonUtilContainer {
         }
 
         return result;
+    }
+
+    @Transactional
+    public int updateArticleWordCount(List<Article> targetList) {
+        if (targetList == null || targetList.isEmpty()) {
+            return 0;
+        }
+
+        int totalAffected;
+        String sql = "UPDATE article SET wordCount = :wordCount WHERE articleId = :articleId";
+
+        SqlParameterSource[] batch = targetList.stream()
+                .map(article -> new MapSqlParameterSource()
+                        .addValue("articleId", article.getArticleId())
+                        .addValue("wordCount", parameterHelper.isEmpty(article.getContent()) ? 0 : MarkdownWordCounter.count(article.getContent()))
+                )
+                .toArray(SqlParameterSource[]::new);
+
+        int[] updateCounts = namedParameterJdbcTemplate.batchUpdate(sql, batch);
+
+        totalAffected = Arrays.stream(updateCounts).sum();
+
+        return totalAffected;
     }
 
     public void increaseSelfViewAsync(Integer articleId) {

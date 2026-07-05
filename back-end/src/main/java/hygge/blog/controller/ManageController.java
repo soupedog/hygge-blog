@@ -4,8 +4,10 @@ import hygge.blog.common.annotation.RequireAuth;
 import hygge.blog.controller.doc.ManageControllerDoc;
 import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.bo.HyggeBlogControllerResponse;
+import hygge.blog.domain.local.po.Article;
 import hygge.blog.domain.local.po.view.FileInfoView;
 import hygge.blog.job.RefreshFileCacheJob;
+import hygge.blog.job.RepairArticleForDBJob;
 import hygge.blog.job.key.RefreshFileJobKey;
 import hygge.blog.job.other.HyggeBlogJpaContext;
 import hygge.blog.service.local.CacheServiceImpl;
@@ -27,10 +29,12 @@ import java.sql.Timestamp;
 public class ManageController implements ManageControllerDoc {
     private final CacheServiceImpl cacheService;
     private final RefreshFileCacheJob refreshFileCacheJob;
+    private final RepairArticleForDBJob repairArticleForDBJob;
 
-    public ManageController(CacheServiceImpl cacheService, RefreshFileCacheJob refreshFileCacheJob) {
+    public ManageController(CacheServiceImpl cacheService, RefreshFileCacheJob refreshFileCacheJob, RepairArticleForDBJob repairArticleForDBJob) {
         this.cacheService = cacheService;
         this.refreshFileCacheJob = refreshFileCacheJob;
+        this.repairArticleForDBJob = repairArticleForDBJob;
     }
 
     @Override
@@ -49,5 +53,14 @@ public class ManageController implements ManageControllerDoc {
         context.saveFileObject(RefreshFileJobKey.IS_UPDATE_MODE, isAddMode);
         refreshFileCacheJob.execute(context);
         return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));
+    }
+
+    @Override
+    @RequireAuth
+    @PutMapping(value = "/repair/article")
+    public ResponseEntity<HyggeBlogControllerResponse<String>> articleRepair() {
+        HyggeBlogJpaContext<Article> context = new HyggeBlogJpaContext<>("文章数据修复", 25, false);
+        repairArticleForDBJob.execute(context);
+        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("修复完毕:" + new Timestamp(System.currentTimeMillis()) + " " + context.getStatus());
     }
 }

@@ -33,7 +33,6 @@ import hygge.util.bo.ColumnInfo;
 import hygge.util.definition.DaoHelper;
 import hygge.util.definition.FileHelper;
 import hygge.util.template.HyggeJsonUtilContainer;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +45,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,7 +65,6 @@ import java.util.Optional;
  */
 @Service
 public class FileServiceImpl extends HyggeJsonUtilContainer {
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private static final FileHelper fileHelper = UtilCreator.INSTANCE.getDefaultInstance(FileHelper.class);
     private static final DaoHelper daoHelper = UtilCreator.INSTANCE.getDefaultInstance(DaoHelper.class);
 
@@ -75,6 +74,7 @@ public class FileServiceImpl extends HyggeJsonUtilContainer {
     @Value("${file.root-in-server.path}")
     private String fileRootPath;
 
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final UserServiceImpl userService;
     private final PermissionServiceImpl permissionService;
     private final CategoryServiceImpl categoryService;
