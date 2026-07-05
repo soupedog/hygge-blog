@@ -48,7 +48,7 @@ public class RefreshArticleCacheJob extends BaseBlogJob<RefreshArticleJobItem<Ar
     }
 
     @Override
-    protected List<Article> firstFetch(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem<ArticleQuoteSearchCache>> jobBatchItem) {
+    protected List<Article> firstFetchIfNecessary(HyggeBlogJpaContext<Article> context, HyggeJobBatchItem<RefreshArticleJobItem<ArticleQuoteSearchCache>> jobBatchItem) {
         Pageable pageable = PageRequest.of(0, context.getBatchSize(), Sort.by(Sort.Order.asc("articleId")));
         Page<Article> page = articleDao.findAll(pageable);
         context.setPage(page);

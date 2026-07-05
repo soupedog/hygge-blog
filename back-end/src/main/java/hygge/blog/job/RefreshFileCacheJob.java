@@ -1,5 +1,6 @@
 package hygge.blog.job;
 
+import hygge.blog.domain.local.bo.CacheObjectContainer;
 import hygge.blog.domain.local.po.FileInfo;
 import hygge.blog.domain.local.po.base.FileInfoBase;
 import hygge.blog.domain.local.po.view.FileInfoView;
@@ -9,6 +10,7 @@ import hygge.blog.job.other.BaseBlogExclusiveJob;
 import hygge.blog.job.other.HyggeBlogJpaContext;
 import hygge.blog.repository.database.FileInfoDao;
 import hygge.blog.repository.database.FileInfoViewDao;
+import hygge.blog.service.local.CacheServiceImpl;
 import hygge.blog.service.local.EventServiceImpl;
 import hygge.blog.service.local.FileServiceImpl;
 import hygge.blog.service.local.inner.file.FileOperationResult;
@@ -36,12 +38,14 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     private final FileInfoDao fileInfoDao;
     private final FileServiceImpl fileService;
     private final EventServiceImpl eventService;
+    private final CacheServiceImpl cacheService;
 
-    public RefreshFileCacheJob(FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, FileServiceImpl fileService, EventServiceImpl eventService) {
+    public RefreshFileCacheJob(FileInfoViewDao fileInfoViewDao, FileInfoDao fileInfoDao, FileServiceImpl fileService, EventServiceImpl eventService, CacheServiceImpl cacheService) {
         this.fileInfoViewDao = fileInfoViewDao;
         this.fileInfoDao = fileInfoDao;
         this.fileService = fileService;
         this.eventService = eventService;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -50,7 +54,7 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
     }
 
     @Override
-    protected List<FileInfoView> firstFetch(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<RefreshFileJobItem<FileInfo>> jobBatchItem) {
+    protected List<FileInfoView> firstFetchIfNecessary(HyggeBlogJpaContext<FileInfoView> context, HyggeJobBatchItem<RefreshFileJobItem<FileInfo>> jobBatchItem) {
         Pageable pageable = PageRequest.of(0, context.getBatchSize(), Sort.by(Sort.Order.asc("fileId")));
 
         Page<FileInfoView> page = fileInfoViewDao.findAll(pageable);
@@ -140,7 +144,21 @@ public class RefreshFileCacheJob extends BaseBlogExclusiveJob<RefreshFileJobItem
             }
         }
 
-        // TODO 批量通知更新链接缓存
         super.batchCompleteHook(context, jobBatchItem, rawDataList, processedDataList);
+    }
+
+    @Override
+    protected void finallyHook(HyggeBlogJpaContext<FileInfoView> context) {
+        if (context.isSuccess()) {
+            // 图片缓存变更后，图片链接缓存也得更新（以清空代替更新）
+            cacheService.clearCacheByType(CacheObjectContainer.CacheTypeEnum.FILE_NO_URL_MAPPING);
+            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "清空了全部 FILE_NO_URL_MAPPING 缓存。");
+
+            // 更新所有博文、句子搜藏 ES 缓存
+            eventService.refreshArticleForAll(false);
+            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "更新了全部 博文 ES 缓存。");
+            eventService.refreshQuoteForAll(false);
+            context.getJobReporter().addProcessTrackingInfo(System.currentTimeMillis(), "更新了全部 句子收藏 ES 缓存。");
+        }
     }
 }

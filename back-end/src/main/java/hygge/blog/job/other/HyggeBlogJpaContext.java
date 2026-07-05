@@ -3,9 +3,12 @@ package hygge.blog.job.other;
 import hygge.blog.job.key.RefreshArticleJobKey;
 import hygge.blog.job.key.RefreshFileJobKey;
 import hygge.job.HyggeJobContext;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 /**
  * @author Xavier
@@ -13,9 +16,14 @@ import org.springframework.data.domain.Page;
  */
 @Getter
 @Setter
+@Generated
 public class HyggeBlogJpaContext<T> extends HyggeJobContext {
     private Page<T> page;
     private boolean noNextPage = false;
+    /**
+     * 全量数据，如果不为空代表不需要再进行数据拉取了。
+     */
+    private List<T> fullData;
 
     public HyggeBlogJpaContext() {
     }
