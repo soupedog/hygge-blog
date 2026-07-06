@@ -11,6 +11,7 @@ export default function PostEditorForm() {
         fileOptions,
         pid, setPid,
         postForm,
+        formMode,setFormMode,
         editorContent, setEditorContent,
         backgroundMusicType, setBackgroundMusicType,
         setQueryModalOpen,
@@ -19,7 +20,6 @@ export default function PostEditorForm() {
     } = useContext(PostEditorContext);
 
 
-    const [formMode, setFormMode] = useState<'query' | 'add' | 'update'>(pid ? 'query' : 'add');
     const [categoryOpinionList, setCategoryOpinionList] = useState<Array<any>>([]);
 
     const isAddMode = formMode == 'add';
@@ -174,7 +174,7 @@ export default function PostEditorForm() {
             </Row>
             <Row gutter={'4rem'}>
                 <Col offset={1} span={22}>
-                    <Form.Item name={['title']} label='标题' rules={[{required: false}]}>
+                    <Form.Item name={['title']} label='标题' rules={[{required: isAddMode || isUpdateMode}]}>
                         <Input/>
                     </Form.Item>
                 </Col>
@@ -246,26 +246,28 @@ export default function PostEditorForm() {
                         <Flex justify={'center'} style={{alignItems: 'center'}}>
                             <Space size={'large'} align={'end'}>
                                 <Button type='primary' htmlType='button' onClick={() => {
+                                    setFormMode('add');
                                     postForm.setFieldsValue({
                                         action: 'add'
                                     });
-                                    setFormMode('add');
                                     postForm.submit();
                                 }}>
                                     添加博文
                                 </Button>
                                 <Button type='primary' htmlType='button' danger onClick={() => {
+                                    setFormMode('update');
                                     postForm.setFieldsValue({
                                         action: 'update'
                                     });
-                                    setFormMode('update');
                                     postForm.submit();
                                 }}>
                                     修改博文
                                 </Button>
+
                                 <Button type='dashed' color={'purple'} htmlType='submit' onClick={() => {
-                                    setFormMode('query');
+                                    // 表单提交绑定到该按钮，防止误触回车，即便触发也只是查询操作，没有数据变更
                                     if (PropertiesHelper.isStringNotEmpty(pid)) {
+                                        setFormMode('query');
                                         postForm.setFieldsValue({
                                             action: 'query'
                                         });

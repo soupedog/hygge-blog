@@ -20,6 +20,8 @@ export interface PostEditorContextState {
     post?: ArticleDto;
     setPost: Function;
     postForm: FormInstance<PostAddUpdateInput>;
+    formMode: 'query' | 'add' | 'update',
+    setFormMode: (mode: 'query' | 'add' | 'update') => void;
     editorContent: string;
     setEditorContent: Function;
     backgroundMusicType: 'NONE' | 'DEFAULT' | 'WANG_YI_YUN';
@@ -51,6 +53,7 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
 
     const [post, setPost] = useState<ArticleDto | undefined>(undefined);
     const [postForm] = Form.useForm<PostAddUpdateInput>();
+    const [formMode, setFormMode] = useState<'query' | 'add' | 'update'>(pid ? 'update' : 'add');
     const [editorContent, setEditorContent] = useState('');
     const [backgroundMusicType, setBackgroundMusicType] = useState<'NONE' | 'DEFAULT' | 'WANG_YI_YUN'>('NONE');
 
@@ -117,14 +120,19 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
     };
 
     const addPost = (input: PostAddUpdateInput) => {
-        if (post) {
-            createPost.mutate(input, {
-                onSuccess: (data) => {
-                    setPost(data);
-                    message.success({content: '创建博文成功！'});
-                }
-            });
-        }
+        createPost.mutate(input, {
+            onSuccess: (data) => {
+                setPost(data);
+                onPidChange(data.aid);
+                // 添加完数据就可以默认接下来是修改操作了(变更相关必填参数标记)
+                setFormMode('update');
+                postForm.setFieldsValue({
+                    action: 'update',
+                    aid: data.aid
+                });
+                message.success({content: '创建博文成功！'});
+            }
+        });
     };
 
     const modifyPost = (input: PostAddUpdateInput) => {
@@ -146,7 +154,10 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
                         setPost(data);
                         setEditorContent(data.content);
                         setBackgroundMusicType(data.configuration.backgroundMusicType);
+                        // 查完数据就可以默认接下来是修改操作了(变更相关必填参数标记)
+                        setFormMode('update');
                         postForm.setFieldsValue({
+                            action: 'update',
                             aid: pid,
                             orderGlobal: data.orderGlobal,
                             orderCategory: data.orderCategory,
@@ -172,6 +183,7 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
             pid: pid, setPid: setPid,
             post: post, setPost: setPost,
             postForm: postForm,
+            formMode: formMode, setFormMode: setFormMode,
             editorContent: editorContent, setEditorContent: setEditorContent,
             backgroundMusicType: backgroundMusicType, setBackgroundMusicType: setBackgroundMusicType,
             queryModalOpen: queryModalOpen, setQueryModalOpen: setQueryModalOpen,
