@@ -17,8 +17,8 @@ public interface ManageControllerDoc extends HyggeBlogController<ResponseEntity<
     ResponseEntity<HyggeBlogControllerResponse<Void>> clearCache(CacheObjectContainer.CacheTypeEnum cacheType);
 
     @Operation(summary = "更新全部公开可见文件缓存", description = "创建/移除 公开可见文件缓存")
-    ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(Boolean isAddMode);
+    ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(Boolean isAddMode, Integer batchSize);
 
     @Operation(summary = "文章数据修复", description = "遍历数据库中所有文章，重新维护字数统计等数据")
-    ResponseEntity<HyggeBlogControllerResponse<String>> articleRepair();
+    ResponseEntity<HyggeBlogControllerResponse<String>> articleRepair(Integer batchSize);
 }

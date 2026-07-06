@@ -48,19 +48,20 @@ public class ManageController implements ManageControllerDoc {
     @Override
     @RequireAuth
     @PutMapping(value = "/refresh/fileCache")
-    public ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(@RequestParam(required = false, defaultValue = "false") Boolean isAddMode) {
-        HyggeBlogJpaContext<FileInfoView> context = new HyggeBlogJpaContext<>("更新全部公开文件 Nginx 缓存", 25, false);
+    public ResponseEntity<HyggeBlogControllerResponse<String>> refreshPublicFileCache(@RequestParam(required = false, defaultValue = "false") Boolean isAddMode,
+                                                                                      @RequestParam(required = false, defaultValue = "25") Integer batchSize) {
+        HyggeBlogJpaContext<FileInfoView> context = new HyggeBlogJpaContext<>("更新全部公开文件 Nginx 缓存", batchSize, false);
         context.saveFileObject(RefreshFileJobKey.IS_UPDATE_MODE, isAddMode);
         refreshFileCacheJob.execute(context);
-        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("更新完毕:" + new Timestamp(System.currentTimeMillis()));
+        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("处理完毕:" + new Timestamp(System.currentTimeMillis()) + " " + context.getStatus());
     }
 
     @Override
     @RequireAuth
     @PutMapping(value = "/repair/article")
-    public ResponseEntity<HyggeBlogControllerResponse<String>> articleRepair() {
-        HyggeBlogJpaContext<Article> context = new HyggeBlogJpaContext<>("文章数据修复", 25, false);
+    public ResponseEntity<HyggeBlogControllerResponse<String>> articleRepair(@RequestParam(required = false, defaultValue = "25") Integer batchSize) {
+        HyggeBlogJpaContext<Article> context = new HyggeBlogJpaContext<>("文章数据修复", batchSize, false);
         repairArticleForDBJob.execute(context);
-        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("修复完毕:" + new Timestamp(System.currentTimeMillis()) + " " + context.getStatus());
+        return (ResponseEntity<HyggeBlogControllerResponse<String>>) success("处理完毕:" + new Timestamp(System.currentTimeMillis()) + " " + context.getStatus());
     }
 }
