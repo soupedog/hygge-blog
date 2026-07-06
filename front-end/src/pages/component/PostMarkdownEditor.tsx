@@ -3,7 +3,7 @@ import {MdEditor, type UploadImgCallBack} from 'md-editor-rt';
 import {ExportPDF, Mark} from '@vavt/rt-extension';
 import {PostEditorContext} from '../context/PostEditorContext.tsx';
 import {message} from 'antd';
-import {useFileCService} from '../../util/ApiService.ts';
+import {useFileService} from '../../util/ApiService.ts';
 
 export default function PostMarkdownEditor() {
     const {
@@ -13,7 +13,7 @@ export default function PostMarkdownEditor() {
         setDraft, removeDraft, getDraft
     } = useContext(PostEditorContext);
 
-    const {uploadFiles} = useFileCService();
+    const {uploadFiles} = useFileService();
 
     const cid: string | undefined = post?.cid;
 

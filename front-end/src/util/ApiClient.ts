@@ -554,3 +554,26 @@ export class FileClient {
         })
     }
 }
+
+export interface ManageFileCacheInput {
+    isAddMoe: boolean;
+    batchSize: number;
+}
+
+export class ManageClient {
+
+    static async manageFileCache(input: ManageFileCacheInput): Promise<string> {
+        const url = UrlHelper.mergeUrl(`/main/refresh/fileCache`, {
+            isAddMode: input.isAddMoe,
+            batchSize: input.batchSize,
+        });
+
+        const clientResponse = await httpClient
+            .put(url, null,
+                {
+                    headers: UserClient.getHeader(),
+                }
+            );
+        return clientResponse.data.main;
+    }
+}

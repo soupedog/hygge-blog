@@ -6,7 +6,7 @@ import {StorageKey} from '../../enums/EnumKeeper.ts';
 import StorageHelper from '../../util/StorageHelper.ts';
 import {Form, message} from 'antd';
 import type {FormInstance} from 'antd/es/form/hooks/useForm';
-import {useFileCService, useHomeService, usePostService} from '../../util/ApiService.ts';
+import {useFileService, useHomeService, usePostService} from '../../util/ApiService.ts';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
 
 export interface PostEditorContextState {
@@ -46,7 +46,7 @@ export const PostEditorContextProvider = ({children}: { children: ReactNode }) =
     const [searchParams, setSearchParams] = useSearchParams();
     const [pid, setPid] = useState(searchParams.get('pid') || undefined);
     const {fetch} = useHomeService();
-    const {fetchFileInfo} = useFileCService();
+    const {fetchFileInfo} = useFileService();
     const {createPost, updatePost, findArticleByAid} = usePostService();
 
     const [post, setPost] = useState<ArticleDto | undefined>(undefined);

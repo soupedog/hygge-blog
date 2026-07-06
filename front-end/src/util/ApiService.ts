@@ -1,5 +1,5 @@
 import {useMutation} from '@tanstack/react-query';
-import {FileClient, HomeClient, PostClient, QuoteClient, UserClient} from './ApiClient.ts';
+import {FileClient, HomeClient, ManageClient, PostClient, QuoteClient, UserClient} from './ApiClient.ts';
 import {message} from 'antd';
 
 // 注意：这是一个自定义 Hook 函数，不是类方法
@@ -53,7 +53,16 @@ export function useQuoteService() {
     }
 }
 
-export function useFileCService() {
+export function useManageService() {
+    const manageFileCacheMutation = useMutation({
+        mutationFn: ManageClient.manageFileCache,
+    });
+    return {
+        manageFileCache: manageFileCacheMutation,
+    }
+}
+
+export function useFileService() {
     const deleteFileMutation = useMutation({
         mutationFn: FileClient.deleteFile,
     });

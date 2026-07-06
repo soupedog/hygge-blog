@@ -2,7 +2,7 @@ import {createContext, type ReactNode, useState} from 'react';
 import {useIsMutating} from '@tanstack/react-query';
 import {Form, message} from 'antd';
 import {useSearchParams} from 'react-router-dom';
-import {useFileCService, useQuoteService} from '../../util/ApiService.ts';
+import {useFileService, useQuoteService} from '../../util/ApiService.ts';
 import type {QuoteAddUpdateInput, QuoteDto} from '../../util/ApiClient.ts';
 import type {FormInstance} from 'antd/es/form/hooks/useForm';
 import PropertiesHelper from '../../util/PropertiesHelper.ts';
@@ -43,7 +43,7 @@ export const QuoteEditorContextProvider = ({children}: { children: ReactNode }) 
     const [queryModalOpen, setQueryModalOpen] = useState(false);
 
     const {createQuote, updateQuote, findQuote} = useQuoteService();
-    const {fetchFileInfo} = useFileCService();
+    const {fetchFileInfo} = useFileService();
 
     const onQuoteIdChange = (nextQuoteId?: string) => {
         // 复制一个新的 URLSearchParams 对象

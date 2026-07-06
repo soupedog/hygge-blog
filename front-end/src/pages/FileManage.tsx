@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {type FileInfo} from '../util/ApiClient.ts';
-import {Button, Card, Col, Flex, type GetProp, Image, Layout, message, Modal, Row, Space, Table, type TableProps} from 'antd';
+import {Button, Card, Col, type GetProp, Image, Layout, message, Modal, Row, Space, Table, type TableProps} from 'antd';
 import {createStyles} from 'antd-style';
 import type {SorterResult} from 'antd/es/table/interface';
 import AppBaseHeader from './component/AppBaseHeader.tsx';
@@ -11,7 +11,7 @@ import AppFooter from './component/AppFooter.tsx';
 
 import imageNotFound from '../assets/imageNotFound.png'
 import imageDefault from '../assets/imageDefault.png'
-import {useFileCService} from '../util/ApiService.ts';
+import {useFileService, useManageService} from '../util/ApiService.ts';
 import Search from 'antd/es/input/Search';
 import {saveAs} from 'file-saver';
 import UrlHelper from '../util/UrlHelper.ts';
@@ -46,7 +46,8 @@ interface TableParams {
 
 export default function FileManage() {
     const {styles} = useStyle();
-    const {fetchFileInfo, downloadFilePromise, deleteFile} = useFileCService();
+    const {fetchFileInfo, downloadFilePromise, deleteFile} = useFileService();
+    const {manageFileCache} = useManageService();
     const isAnyPending = useIsMutating() > 0;
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -181,32 +182,54 @@ export default function FileManage() {
             <Content style={{padding: '0 50px'}}>
                 <Card variant='borderless'>
                     <Row>
-                        <Flex justify={'flex-end'} style={{width: '100%'}}>
-                            <Col span={6}>
-                                <Search
-                                    placeholder='关键字过滤'
-                                    enterButton='查询'
-                                    size='large'
-                                    onChange={event => {
-                                        setKeywords(event.target.value);
-                                    }}
-                                    onSearch={(value) => {
-                                        if (tableParams.pagination!.current == 1) {
-                                            fetchData();
-                                        } else {
-                                            setTableParams({
-                                                ...tableParams,
-                                                pagination: {
-                                                    ...tableParams.pagination,
-                                                    current: 1,
-                                                    showSizeChanger: true,
-                                                },
-                                            });
+                        <Col offset={2} span={6}>
+                            <Space size={'large'} align={'end'}>
+                                <Button color='orange' variant='solid' onClick={() => {
+                                    manageFileCache.mutate({isAddMoe: true, batchSize: 25}, {
+                                        onSuccess: data => {
+                                            message.success(data);
                                         }
-                                    }}
-                                />
-                            </Col>
-                        </Flex>
+                                    });
+                                }}
+                                >
+                                    创建所有文件缓存
+                                </Button>
+                                <Button color='red' variant='solid' onClick={() => {
+                                    manageFileCache.mutate({isAddMoe: false, batchSize: 25}, {
+                                        onSuccess: data => {
+                                            message.success(data);
+                                        }
+                                    });
+                                }}
+                                >
+                                    移除所有文件缓存
+                                </Button>
+                            </Space>
+                        </Col>
+                        <Col offset={10} span={6}>
+                            <Search
+                                placeholder='关键字过滤'
+                                enterButton='查询'
+                                size='large'
+                                onChange={event => {
+                                    setKeywords(event.target.value);
+                                }}
+                                onSearch={(value) => {
+                                    if (tableParams.pagination!.current == 1) {
+                                        fetchData();
+                                    } else {
+                                        setTableParams({
+                                            ...tableParams,
+                                            pagination: {
+                                                ...tableParams.pagination,
+                                                current: 1,
+                                                showSizeChanger: true,
+                                            },
+                                        });
+                                    }
+                                }}
+                            />
+                        </Col>
                     </Row>
                     <Table<FileInfo>
                         className={styles.customTable}

@@ -10,7 +10,7 @@ import PropertiesHelper from '../util/PropertiesHelper.ts';
 import {UploadOutlined} from '@ant-design/icons';
 import UrlHelper from '../util/UrlHelper.ts';
 import type {DefaultOptionType} from 'antd/es/select/index';
-import {useFileCService, useHomeService} from '../util/ApiService.ts';
+import {useFileService, useHomeService} from '../util/ApiService.ts';
 import imageNotFound from '../assets/imageNotFound.png'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -50,7 +50,7 @@ export default function FileOperation() {
 
     const {fetchPermission} = useHomeService();
 
-    const {getFileInfoByFileNo, updateFile} = useFileCService();
+    const {getFileInfoByFileNo, updateFile} = useFileService();
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [fileNo, setFileNo] = useState(searchParams.get('fileNo') || undefined);
