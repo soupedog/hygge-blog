@@ -11,7 +11,7 @@ export default function PostEditorForm() {
         fileOptions,
         pid, setPid,
         postForm,
-        formMode,setFormMode,
+        formMode, setFormMode,
         editorContent, setEditorContent,
         backgroundMusicType, setBackgroundMusicType,
         setQueryModalOpen,
@@ -35,10 +35,13 @@ export default function PostEditorForm() {
             const options: any[] = [];
 
             item.categoryListInfo.map(category => {
-                options.push({
-                    label: category.categoryName,
-                    value: category.cid
-                });
+                if (category.categoryType != 'PATH') {
+                    // path 类型不添加至可选列表
+                    options.push({
+                        label: category.categoryName,
+                        value: category.cid
+                    });
+                }
             });
 
             return {
@@ -266,11 +269,11 @@ export default function PostEditorForm() {
 
                                 <Button type='dashed' color={'purple'} htmlType='submit' onClick={() => {
                                     // 表单提交绑定到该按钮，防止误触回车，即便触发也只是查询操作，没有数据变更
+                                    setFormMode('query');
+                                    postForm.setFieldsValue({
+                                        action: 'query'
+                                    });
                                     if (PropertiesHelper.isStringNotEmpty(pid)) {
-                                        setFormMode('query');
-                                        postForm.setFieldsValue({
-                                            action: 'query'
-                                        });
                                         setQueryModalOpen(true);
                                     } else {
                                         message.warning('博文编号不可为空！')
