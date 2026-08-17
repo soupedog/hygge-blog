@@ -1,9 +1,12 @@
-import {useContext, useEffect} from 'react';
-import {MdEditor, type UploadImgCallBack} from 'md-editor-rt';
+import {useContext, useEffect, useRef} from 'react';
+import {type ExposeParam, MdEditor, type UploadImgCallBack} from 'md-editor-rt';
 import {ExportPDF, Mark} from '@vavt/rt-extension';
 import {PostEditorContext} from '../context/PostEditorContext.tsx';
 import {message} from 'antd';
 import {useFileService} from '../../util/ApiService.ts';
+import InsertEmspButton from '../../util/markdown/InsertEmspButton.tsx';
+import MySupButton from '../../util/markdown/MySupButton.tsx';
+import MySubButton from '../../util/markdown/MySubButton.tsx';
 
 export default function PostMarkdownEditor() {
     const {
@@ -14,6 +17,8 @@ export default function PostMarkdownEditor() {
     } = useContext(PostEditorContext);
 
     const {uploadFiles} = useFileService();
+
+    const editorRef = useRef<ExposeParam>(undefined);
 
     const cid: string | undefined = post?.cid;
 
@@ -48,12 +53,13 @@ export default function PostMarkdownEditor() {
 
     return (
         <MdEditor id={'post_editor'}
+                  ref={editorRef}
                   placeholder='开始记录奇思妙想...'
                   toolbars={[
                       // 第一组图标
-                      0, 'bold', 'underline', 'italic', 'strikeThrough', '-',
+                      0, 'bold', 'underline', 'italic', 'strikeThrough', 3, 4, '-',
                       // 第二组图标 "-" 是分隔符
-                      'quote', 'unorderedList', 'orderedList', '-',
+                      2, 'quote', 'unorderedList', 'orderedList', '-',
                       // 第三组图标 "-" 是分隔符
                       'task', 'codeRow', 'code', 'image', 'table', 'mermaid', 'katex', '-',
                       // 第四组图标
@@ -64,6 +70,9 @@ export default function PostMarkdownEditor() {
                   defToolbars={[
                       <Mark title={'高亮'} key='Mark'/>,
                       <ExportPDF key='ExportPDF' value={editorContent}/>,
+                      <InsertEmspButton key='custom-emsp' editorRef={editorRef}/>,
+                      <MySupButton key='custom-sup' editorRef={editorRef}/>,
+                      <MySubButton key='custom-sub' editorRef={editorRef}/>,
                   ]}
                   value={editorContent}
                   onChange={(value) => {
