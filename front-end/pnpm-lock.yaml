@@ -22,7 +22,7 @@ importers:
         version: 5.101.0(react@19.2.7)
       '@vavt/rt-extension':
         specifier: ^4.0.0
-        version: 4.0.0(md-editor-rt@6.5.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
+        version: 4.0.0(md-editor-rt@6.5.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
       antd:
         specifier: ^6.4.3
         version: 6.4.4(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -54,8 +54,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       md-editor-rt:
-        specifier: ^6.5.1
-        version: 6.5.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^6.5.6
+        version: 6.5.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       mermaid:
         specifier: ^11.15.0
         version: 11.15.0
@@ -1281,6 +1281,9 @@ packages:
   '@vavt/copy2clipboard@1.0.3':
     resolution: {integrity: sha512-HtG48r2FBYp9eRvGB3QGmtRBH1zzRRAVvFbGgFstOwz4/DDaNiX0uZc3YVKPydqgOav26pibr9MtoCaWxn7aeA==}
 
+  '@vavt/markdown-theme@5.0.2':
+    resolution: {integrity: sha512-cGYEV2VIUmhT9p8Wua9yXh7sKN1f3cbztTFHlkYyH9SzbpiKUnQrcbDts/0fP6cmvZPOe9SWWsDujmyuHepJdQ==}
+
   '@vavt/rt-extension@4.0.0':
     resolution: {integrity: sha512-xo83NTW9+Qe41mU2W9yl9oLEyiovvsrnqCPdO/+bFMnjfMXPkEqDh132ANEXp4N6x0xNFAf9gJummEBYud6PfQ==}
     peerDependencies:
@@ -1326,6 +1329,10 @@ packages:
   ansi-regex@6.2.2:
     resolution: {integrity: sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==}
     engines: {node: '>=12'}
+
+  ansi-styles@4.0.0:
+    resolution: {integrity: sha512-8zjUtFJ3db/QoPXuuEMloS2AUf79/yeyttJ7Abr3hteopJu9HK8vsgGviGUMq+zyA6cZZO6gAyZoMTF6TgaEjA==}
+    engines: {node: '>=8'}
 
   ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
@@ -2170,8 +2177,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  md-editor-rt@6.5.1:
-    resolution: {integrity: sha512-k7tJT374Ww23yabLEt4wRaoU8SndeIypAcpTfG+bfcnxzwyLTkgcNCU20Gck+V5pHHQFRoqEStUqlviQFW4pjg==}
+  md-editor-rt@6.5.6:
+    resolution: {integrity: sha512-FDdZOh4D4AKq7Q6tqdQn/2vlFO9vPiScaOeQNrwzQ7JYP0HVyuhUiU9PUn4BCYzmcURwEMt1OIFKAc/IlBhGPQ==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -4250,9 +4257,11 @@ snapshots:
 
   '@vavt/copy2clipboard@1.0.3': {}
 
-  '@vavt/rt-extension@4.0.0(md-editor-rt@6.5.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))':
+  '@vavt/markdown-theme@5.0.2': {}
+
+  '@vavt/rt-extension@4.0.0(md-editor-rt@6.5.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7))':
     dependencies:
-      md-editor-rt: 6.5.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      md-editor-rt: 6.5.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
 
   '@vavt/util@2.1.2': {}
 
@@ -4286,6 +4295,10 @@ snapshots:
   ansi-regex@5.0.1: {}
 
   ansi-regex@6.2.2: {}
+
+  ansi-styles@4.0.0:
+    dependencies:
+      color-convert: 2.0.1
 
   ansi-styles@4.3.0:
     dependencies:
@@ -5171,7 +5184,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  md-editor-rt@6.5.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  md-editor-rt@6.5.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@codemirror/autocomplete': 6.20.3
       '@codemirror/commands': 6.10.3
@@ -5184,6 +5197,7 @@ snapshots:
       '@lezer/highlight': 1.2.3
       '@types/markdown-it': 14.1.2
       '@vavt/copy2clipboard': 1.0.3
+      '@vavt/markdown-theme': 5.0.2
       '@vavt/util': 2.1.2
       codemirror: 6.0.2
       lucide-react: 1.18.0(react@19.2.7)
@@ -5689,7 +5703,7 @@ snapshots:
 
   wrap-ansi@7.0.0:
     dependencies:
-      ansi-styles: 4.3.0
+      ansi-styles: 4.0.0
       string-width: 4.2.0
       strip-ansi: 6.0.1
 
