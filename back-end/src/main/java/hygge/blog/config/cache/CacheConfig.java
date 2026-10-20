@@ -20,7 +20,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        // 设置默认的缓存策略：写入后10分钟过期，最大容量1000
+        // 设置默认的缓存策略：写入后 1 小时过期，最大容量1000
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 .expireAfterWrite(1, TimeUnit.HOURS)
                 .maximumSize(1000);
