@@ -63,9 +63,14 @@ public class MarkdownWordCounter {
     private static String extractText(Node node) {
         StringBuilder sb = new StringBuilder();
 
-        // 直接跳过任何代码节点（内联代码、围栏代码块、缩进代码块）
-        if (node instanceof Code || node instanceof FencedCodeBlock || node instanceof IndentedCodeBlock) {
+        // 直接跳过任何代码节点（围栏代码块、缩进代码块）
+        if (node instanceof FencedCodeBlock || node instanceof IndentedCodeBlock) {
             return ""; // 不提取内容
+        }
+
+        if (node instanceof Code) {
+            // 内联代码（`内容`）
+            sb.append(((Code) node).getText());
         }
 
         if (node instanceof Text) {
