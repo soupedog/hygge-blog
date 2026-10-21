@@ -51,8 +51,8 @@ public class DataBaseAutoConfig implements HyggeAutoConfiguration {
 
         hikariDataSource.setMaximumPoolSize(20);
         hikariDataSource.setMinimumIdle(1);
-        hikariDataSource.setMaxLifetime(35000);
-        hikariDataSource.setIdleTimeout(30000);
+        hikariDataSource.setMaxLifetime(1800000); // 30分钟
+        hikariDataSource.setKeepaliveTime(300000); // 5分钟
         return hikariDataSource;
     }
 
