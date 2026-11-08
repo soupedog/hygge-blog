@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--注册环境变量-->
+    <springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="unknown-app"/>
+    <springProperty scope="context" name="activeProfile" source="spring.profiles.active" defaultValue="dev"/>
+
+    <!--引入 Spring Boot 默认配置，注册 %clr、PID 转换器 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <appender name="HYGGE_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:-unknown}){cyan} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){magenta} %clr(:){faint} %m%n%wEx</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DEFAULT_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:-unknown}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="HYGGE_ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logFile/hygge.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/logFile/hygge.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 单个文件最大 5MB，超过就切分 -->
+            <maxFileSize>5MB</maxFileSize>
+            <!-- 保留 6 天 -->
+            <maxHistory>6</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <!-- providers 标签中书写顺序决定了日志 Json 字段的排列顺序-->
+            <!-- providers 下的子标签 fieldName 是取别名，最终决定日志实际输出文本-->
+            <providers>
+                <!-- 毫秒级数字时间戳 -->
+                <timestamp>
+                    <fieldName>ts</fieldName>
+                    <!-- 使用 pattern 标签，值是特殊关键字，用方括号括起来 -->
+                    <pattern>[UNIX_TIMESTAMP_AS_NUMBER]</pattern>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+
+                <message>
+                    <fieldName>msg</fieldName>
+                </message>
+
+                <!-- 堆栈信息配置-->
+                <stackTrace>
+                    <fieldName>error</fieldName>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <!-- 最大异常深度 -->
+                        <maxDepthPerThrowable>50</maxDepthPerThrowable>
+                        <!-- 最大总堆栈深度 -->
+                        <maxLength>2048</maxLength>
+
+                        <!-- 排除特定的包 -->
+                        <exclude>java\.lang\.reflect\..*</exclude>
+                        <exclude>sun\.reflect\..*</exclude>
+                        <exclude>org\.springframework\.cglib\..*</exclude>
+                        <exclude>net\.sf\.cglib\..*</exclude>
+
+                        <!-- 根因优先显示 -->
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+
+                <!-- 使用 pattern 来控制字段输出 -->
+                <pattern>
+                    <!-- 关键配置：omitEmptyFields=true 会过滤掉空值的字段 -->
+                    <!-- 例如当 requestId 为空时，requestId 字段会被过滤掉 -->
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "app": "${springAppName}",
+                        "env": "${activeProfile}",
+                        "trace_id": "%mdc{traceId}",
+                        "user_id": "%mdc{userId}",
+                        "log_type": "hygge"
+                        }
+                    </pattern>
+                </pattern>
+
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="DEFAULT_ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/logFile/root.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/logFile/root.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 单个文件最大 5MB，超过就切分 -->
+            <maxFileSize>5MB</maxFileSize>
+            <!-- 保留 6 天 -->
+            <maxHistory>6</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <!-- providers 标签中书写顺序决定了日志 Json 字段的排列顺序-->
+            <!-- providers 下的子标签 fieldName 是取别名，最终决定日志实际输出文本-->
+            <providers>
+                <!-- 毫秒级数字时间戳 -->
+                <timestamp>
+                    <fieldName>ts</fieldName>
+                    <!-- 使用 pattern 标签，值是特殊关键字，用方括号括起来 -->
+                    <pattern>[UNIX_TIMESTAMP_AS_NUMBER]</pattern>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+
+                <message>
+                    <fieldName>msg</fieldName>
+                </message>
+
+                <!-- 堆栈信息配置-->
+                <stackTrace>
+                    <fieldName>error</fieldName>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <!-- 最大异常深度 -->
+                        <maxDepthPerThrowable>50</maxDepthPerThrowable>
+                        <!-- 最大总堆栈深度 -->
+                        <maxLength>2048</maxLength>
+
+                        <!-- 排除特定的包 -->
+                        <exclude>java\.lang\.reflect\..*</exclude>
+                        <exclude>sun\.reflect\..*</exclude>
+                        <exclude>org\.springframework\.cglib\..*</exclude>
+                        <exclude>net\.sf\.cglib\..*</exclude>
+
+                        <!-- 根因优先显示 -->
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+
+                <!-- 使用 pattern 来控制字段输出 -->
+                <pattern>
+                    <!-- 关键配置：omitEmptyFields=true 会过滤掉空值的字段 -->
+                    <!-- 例如当 requestId 为空时，requestId 字段会被过滤掉 -->
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "app": "${springAppName}",
+                        "env": "${activeProfile}",
+                        "trace_id": "%mdc{traceId}",
+                        "user_id": "%mdc{userId}",
+                        "log_type": "root"
+                        }
+                    </pattern>
+                </pattern>
+
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+            </providers>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev">
+        <logger name="hygge" level="INFO" additivity="false">
+            <appender-ref ref="HYGGE_CONSOLE"/>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="DEFAULT_CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!dev">
+        <logger name="hygge" level="INFO" additivity="false">
+            <appender-ref ref="HYGGE_ROLLING_FILE"/>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="DEFAULT_ROLLING_FILE"/>
+        </root>
+    </springProfile>
+</configuration>
